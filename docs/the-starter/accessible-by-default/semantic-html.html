@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Semantic HTML — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/the-starter/a-page-that-loads-data/tracing-a-page-load.html">← Tracing a Page Load</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/the-starter/accessible-by-default/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/the-starter/accessible-by-default/announcing-changes.html">Announcing Changes →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Semantic HTML</h1>
+    <p class="lede">Using the HTML element that matches the meaning, so screen readers and keyboards can find their way around.</p>
+
+    
+
+    
+      <div class="slide-body"><p><strong>Accessibility</strong> means people can use your app whatever their abilities
+are: someone who is blind and uses a <strong>screen reader</strong> (software that
+reads the page aloud), someone who can't use a mouse and moves around
+with the <strong>keyboard</strong>, someone with low vision who zooms in. It isn't
+optional extra polish. In Ireland, public-sector websites are legally
+required to meet accessibility standards, and since June 2025 the
+<strong>European Accessibility Act</strong> applies similar rules to many private
+services, such as online shops and banking.</p>
+<p>The standard everyone measures against is <strong>WCAG</strong> (the Web Content
+Accessibility Guidelines). Level <strong>AA</strong> is the usual target, and it's the
+one this module aims for.</p>
+<p>The cheapest and most effective accessibility work is choosing the
+<strong>right HTML element</strong> for each job. That's called <strong>semantic HTML</strong>:
+the element says what the thing <strong>is</strong>, not just how it looks.</p>
+<h2>What the starter uses</h2>
+<table>
+<thead>
+<tr>
+<th>Element</th>
+<th>Where</th>
+<th>What it gives a screen reader user</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>&lt;html lang=&quot;en&quot;&gt;</code></td>
+<td><code>index.html</code></td>
+<td>the right pronunciation: the reader uses an English voice</td>
+</tr>
+<tr>
+<td><code>&lt;header&gt;</code></td>
+<td><code>NavBar</code></td>
+<td>a &quot;banner&quot; landmark at the top of the page</td>
+</tr>
+<tr>
+<td><code>&lt;nav aria-label=&quot;Main&quot;&gt;</code></td>
+<td><code>NavBar</code></td>
+<td>a &quot;Main navigation&quot; landmark they can jump straight to</td>
+</tr>
+<tr>
+<td><code>&lt;ul&gt;</code> of links</td>
+<td><code>NavBar</code></td>
+<td>&quot;list, 1 item&quot;, so they know how many links there are</td>
+</tr>
+<tr>
+<td><code>&lt;main&gt;</code></td>
+<td><code>App</code></td>
+<td>a &quot;main&quot; landmark, to skip past the navigation to the content</td>
+</tr>
+<tr>
+<td>one <code>&lt;h1&gt;</code> per page</td>
+<td>every page</td>
+<td>the page's title; screen reader users often jump between headings</td>
+</tr>
+<tr>
+<td><code>&lt;Link&gt;</code> (a real <code>&lt;a&gt;</code>)</td>
+<td><code>NotFoundPage</code>, <code>NavBar</code></td>
+<td>announced as a link, reachable with Tab, opened with Enter</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Landmarks</strong> (<code>header</code>, <code>nav</code>, <code>main</code>) are like a table of contents for
+the page. Screen readers have a key to jump between them, the way you'd
+glance at the top of a page to find the menu.</p>
+<p><code>aria-label=&quot;Main&quot;</code> gives the <code>&lt;nav&gt;</code> a name. It matters as soon as a
+page has more than one <code>&lt;nav&gt;</code>, such as a footer menu, so users can tell
+them apart.</p>
+<h2>What not to do</h2>
+<pre><code class="hljs language-jsx">&lt;div className=<span class="hljs-string">&quot;nav&quot;</span>&gt;
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">onClick</span>=<span class="hljs-string">{goHome}</span>&gt;</span>Home<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+&lt;/div&gt;
+</code></pre>
+<p>This can be styled to look identical to the real thing, but a screen
+reader just hears &quot;Home&quot; with no hint that it's clickable. The keyboard
+can't reach it with Tab, and Enter does nothing. A real <code>&lt;a&gt;</code> or
+<code>&lt;button&gt;</code> gets all of that from the browser for free.</p>
+<p>The rule: <strong>use a <code>&lt;button&gt;</code> for actions and a link for navigation</strong>, and
+reach for a <code>&lt;div&gt;</code> only when nothing more meaningful fits.</p>
+</div>
+    
+  </main>
+</body>
+</html>

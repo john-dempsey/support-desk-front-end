@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Linting With oxlint — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/the-starter/testing/testing-routes.html">← Testing Routes</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/the-starter/lint-build-and-preview/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/the-starter/lint-build-and-preview/building-for-production.html">Building for Production →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Linting With oxlint</h1>
+    <p class="lede">A tool that reads your code without running it and points out likely mistakes, including breaking the rules of hooks.</p>
+
+    
+
+    
+      <div class="slide-body"><p>A <strong>linter</strong> reads your code <strong>without running it</strong> and points out
+things that are probably mistakes: a variable you never use, a hook
+called in the wrong place, a comparison that can never be true. Think of
+it as a spell-checker for code. It finds a whole class of bugs in
+seconds, before you've even opened the browser.</p>
+<p>The starter uses <strong>oxlint</strong>, the linter in the current Vite React
+template. Run it with:</p>
+<pre><code class="hljs language-bash">npm run lint
+</code></pre>
+<p>If there's nothing to report, it prints nothing.</p>
+<h2>The settings</h2>
+<pre><code class="hljs language-json"><span class="hljs-comment">// Figure 0.32: the linter&#x27;s settings (.oxlintrc.json)</span>
+<span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;$schema&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;./node_modules/oxlint/configuration_schema.json&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;plugins&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;react&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;oxc&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;rules&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;react/rules-of-hooks&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;error&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;react/only-export-components&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span>
+      <span class="hljs-string">&quot;warn&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;allowConstantExport&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span> <span class="hljs-punctuation">}</span>
+    <span class="hljs-punctuation">]</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<p>(The last rule is one line in the file, spread over four here to fit.)</p>
+<p>oxlint has a sensible set of rules turned on already. This file adds the
+React plugin and two React rules on top:</p>
+<ul>
+<li><strong><code>react/rules-of-hooks</code></strong> (an <strong>error</strong>) enforces topic 06's rule:
+hooks are called at the top level of a component, never inside an
+<code>if</code> or a loop.</li>
+<li><strong><code>react/only-export-components</code></strong> (a <strong>warning</strong>) checks that a
+<code>.jsx</code> file exports only components. Vite's Fast Refresh (topic 02)
+can only update a component in place if its file exports nothing else.
+<code>allowConstantExport</code> makes an exception for constants.</li>
+</ul>
+<h2>What an error looks like</h2>
+<p>Suppose a component calls <code>useState</code> inside an <code>if</code>:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-keyword">import</span> { useState } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;react&#x27;</span>;
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">Example</span>(<span class="hljs-params">{ showCount }</span>) {
+  <span class="hljs-keyword">if</span> (showCount) {
+    <span class="hljs-keyword">const</span> [count] = <span class="hljs-title function_">useState</span>(<span class="hljs-number">0</span>);
+    <span class="hljs-keyword">return</span> <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>{count}<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span></span>;
+  }
+  <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;
+}
+</code></pre>
+<p><code>npm run lint</code> reports (on one long line, split here to fit):</p>
+<pre><code class="hljs">src/pages/Example.jsx:5:21: error react-hooks(rules-of-hooks):
+React Hook &quot;useState&quot; is called conditionally. React Hooks must be
+called in the exact same order in every component render. help: Move
+the Hook call before the condition, or call it unconditionally and
+branch inside the Hook/effect instead.
+</code></pre>
+<p>It gives the file, the line and column, which rule failed, why the rule
+exists, and a hint for fixing it.</p>
+<h2>When to run it</h2>
+<p>Before every commit, together with <code>npm test</code>. Many editors (VS Code with
+the oxc extension, for example) can also show these problems as you type,
+underlined in the code.</p>
+</div>
+    
+  </main>
+</body>
+</html>

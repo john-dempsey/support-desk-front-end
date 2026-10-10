@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>One Door to the API — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/the-starter/routing/the-catch-all-route.html">← The Catch-All Route</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/the-starter/talking-to-the-api/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/the-starter/talking-to-the-api/sending-a-request.html">Sending a Request →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>One Door to the API</h1>
+    <p class="lede">Why every request goes through one small module, and how the front-end&#39;s layers line up with the back-end&#39;s.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Every page that shows data has to talk to the API. The obvious way would
+be for each page to call the browser's <code>fetch()</code> function itself. The
+starter deliberately doesn't allow that. Every request goes through
+<strong>one door</strong>: the <code>apiRequest()</code> function in <code>src/api/client.js</code>.</p>
+<p>Here's why. Talking to the API isn't one line of code. Each request has
+to:</p>
+<ul>
+<li>add the API's base URL (<code>http://localhost:3000</code>) to the path</li>
+<li>turn the request body into JSON, and say so in a header</li>
+<li>add a login token, once the app has one</li>
+<li>read the JSON that comes back</li>
+<li>spot an error response, and dig the back-end's error message out of it</li>
+<li>cope with the API not answering at all</li>
+</ul>
+<p>If every page did all of that itself, the same code would be copied into
+every page, and every copy would be a chance for a mistake. Written once
+in <code>client.js</code>, it's tested once, and a fix in one place fixes it
+everywhere.</p>
+<h2>Three layers</h2>
+<p>The front-end splits the work into layers, just like the back-end did:</p>
+<table>
+<thead>
+<tr>
+<th>Front-end</th>
+<th>Its job</th>
+<th>Back-end equivalent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>pages</strong> (<code>HomePage.jsx</code>)</td>
+<td>hold the data, decide what to show</td>
+<td>controllers</td>
+</tr>
+<tr>
+<td><strong>API modules</strong> (<code>welcome.api.js</code>)</td>
+<td>one function per endpoint, e.g. <code>getWelcome()</code></td>
+<td>services</td>
+</tr>
+<tr>
+<td><strong>the client</strong> (<code>client.js</code>)</td>
+<td>the only code that calls <code>fetch()</code></td>
+<td>Prisma: the only code that talks to the database</td>
+</tr>
+</tbody>
+</table>
+<p>So a page never builds a URL or calls <code>fetch()</code>. It calls a function
+with a meaningful name, like <code>getWelcome()</code>. That function asks
+<code>apiRequest()</code> to do the HTTP work.</p>
+<p>The client is also the mirror image of two back-end files. The back-end's
+<code>utils/response.js</code> wraps every success in <code>{ data }</code> (or
+<code>{ data, meta }</code>), and <code>middleware/errorHandler.js</code> wraps every error in
+<code>{ error: { message, details } }</code>. <code>client.js</code> <strong>unwraps</strong> both shapes.
+The two ends of the conversation agree on one format, and each has one
+file in charge of it.</p>
+<p>The rest of this topic goes through <code>client.js</code> from the moment a request
+is sent to the moment its answer comes back.</p>
+</div>
+    
+  </main>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What Vite Does — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/the-starter/why-a-separate-front-end/cors-from-the-other-side.html">← CORS From the Other Side</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/the-starter/the-toolchain/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/the-starter/the-toolchain/package-json-for-a-front-end.html">package.json for a Front-End →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>What Vite Does</h1>
+    <p class="lede">Why a front-end needs a build tool at all, and the two jobs Vite does: a dev server while you work, and a build when you&#39;re done.</p>
+
+    
+
+    
+      <div class="slide-body"><p>In the back-end, Node ran your <code>.js</code> files exactly as you wrote them:
+<code>node src/server.js</code>, and that was it. A front-end can't work that way,
+for three reasons:</p>
+<ol>
+<li><strong>Browsers don't understand everything you'll write.</strong> React
+components are written in <strong>JSX</strong>, HTML-like markup inside JavaScript
+(the next topic introduces it). No browser can run JSX as it is. It has
+to be turned into plain JavaScript first.</li>
+<li><strong>Browsers don't know about <code>node_modules</code>.</strong> In Node,
+<code>import { useState } from 'react'</code> works because Node knows to look in
+<code>node_modules/react</code>. A browser sees <code>'react'</code> and has no idea where to
+find it.</li>
+<li><strong>Lots of small files load slowly.</strong> Your app will grow to dozens of
+files, plus the libraries they import. Sending each one to every user
+separately would make the first page load slow.</li>
+</ol>
+<p><strong>Vite</strong> (French for &quot;quick&quot;, pronounced <em>veet</em>) is the tool that deals
+with all three. It has two jobs.</p>
+<h2>Job 1: the dev server (<code>npm run dev</code>)</h2>
+<p>While you're working, Vite runs a small web server on port 5173. When the
+browser asks for a file, Vite translates it on the spot (JSX into
+JavaScript, <code>'react'</code> into a real path) and sends the result.</p>
+<p>When you save a file, Vite tells the browser straight away, and only the
+part of the page that changed is updated. You don't press refresh, and
+anything you'd typed into a form is usually still there. This is called
+<strong>hot module replacement</strong> (HMR). It's the front-end version of the
+back-end's <code>node --watch</code>, but it updates the page in place instead of
+restarting everything.</p>
+<h2>Job 2: the build (<code>npm run build</code>)</h2>
+<p>When the app is ready to deploy, <code>npm run build</code> translates every file
+once and bundles them into a few small, optimised files in a <code>dist/</code>
+folder. Those are plain HTML, CSS and JavaScript files that any web server
+can host, with no Vite and no Node needed. That's covered at the end of
+this lesson.</p>
+<h2>Have you seen Vite before?</h2>
+<p>Possibly. Recent versions of Laravel use Vite to bundle CSS and
+JavaScript. If your Year 2 project had a <code>vite.config.js</code> and an
+<code>@vite(...)</code> directive in a Blade layout, you were already running Vite
+with <code>npm run dev</code>. The difference is what it bundles: there, a little
+JavaScript added to pages the server built; here, the whole app.</p>
+</div>
+    
+  </main>
+</body>
+</html>

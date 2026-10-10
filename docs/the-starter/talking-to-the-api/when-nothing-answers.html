@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>When Nothing Answers — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/the-starter/talking-to-the-api/reading-the-response.html">← Reading the Response</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/the-starter/talking-to-the-api/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/the-starter/talking-to-the-api/one-function-per-endpoint.html">One Function per Endpoint →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>When Nothing Answers</h1>
+    <p class="lede">fetch() doesn&#39;t fail on a 404 or a 500. It only fails when no response arrives at all, and the client turns that into a clear message.</p>
+
+    
+
+    
+      <div class="slide-body"><p>There's a surprise in how <code>fetch()</code> reports problems:</p>
+<ul>
+<li>If the API answers <strong>anything</strong>, even <code>404 Not Found</code> or
+<code>500 Internal Server Error</code>, <code>fetch()</code> <strong>succeeds</strong>. It got a response;
+it's up to your code to check whether that response was good news.
+That's why <code>apiRequest()</code> checks <code>response.ok</code> itself (previous slide).</li>
+<li><code>fetch()</code> only <strong>fails</strong> (its promise rejects) when <strong>no response
+arrived at all</strong>: the API isn't running, the URL points at the wrong
+port, the network is down, or the browser blocked the response because
+of CORS (topic 01).</li>
+</ul>
+<p>That second case is what the <code>try</code>/<code>catch</code> around <code>fetch()</code> is for (the
+<code>fetch()</code> options from Figure 0.14 are shortened to <code>/* ... */</code> here,
+and the <code>throw</code>, one line in the file, is split to fit):</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 0.18: no response at all (src/api/client.js, excerpt)</span>
+  <span class="hljs-keyword">let</span> response;
+  <span class="hljs-keyword">try</span> {
+    response = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-string">`<span class="hljs-subst">${API_URL}</span><span class="hljs-subst">${path}</span>`</span>, { <span class="hljs-comment">/* ... */</span> });
+  } <span class="hljs-keyword">catch</span> {
+    <span class="hljs-keyword">throw</span> <span class="hljs-title function_">createApiError</span>(
+      <span class="hljs-number">0</span>,
+      <span class="hljs-string">`Can&#x27;t reach the API at <span class="hljs-subst">${API_URL}</span> — is the back-end running?`</span>,
+    );
+  }
+</code></pre>
+<p>The browser's own error here is just <code>TypeError: Failed to fetch</code>, which
+doesn't help anyone. So the client throws its own error instead, with:</p>
+<ul>
+<li><strong>status <code>0</code></strong>, meaning &quot;no HTTP status&quot;: there was no HTTP response to
+have one</li>
+<li>a <strong>message that says what to check</strong>, including the URL it tried, so
+a wrong port in <code>.env</code> is easy to spot</li>
+</ul>
+<p><code>catch {</code> with no <code>(error)</code> is allowed in modern JavaScript when the
+<code>catch</code> block doesn't need the original error.</p>
+<p><code>let response;</code> is declared <strong>before</strong> the <code>try</code> so it can still be used
+after it. A variable declared inside <code>try { }</code> would only exist inside
+those braces.</p>
+<h2>When the body isn't JSON</h2>
+<p>One more thing can go wrong: a response whose body isn't JSON. A proxy
+server's HTML error page is one example. <code>response.json()</code> would throw on
+that, so the client reads the body through a small helper:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 0.19: reading JSON safely (src/api/client.js, excerpt)</span>
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">readJson</span>(<span class="hljs-params">response</span>) {
+  <span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> response.<span class="hljs-title function_">json</span>();
+  } <span class="hljs-keyword">catch</span> {
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;
+  }
+}
+</code></pre>
+<p>If the body can't be read as JSON, this gives <code>null</code> instead of
+crashing, and the <code>?.</code> checks from the previous slide take it from
+there.</p>
+<h2>Try it</h2>
+<p>Stop the API, then reload the home page. What message appears? Now look
+in the browser's <strong>Console</strong>: what did the browser report on its own?
+Which of the two would you rather show a user?</p>
+</div>
+    
+  </main>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Three Pieces of State — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/the-starter/a-page-that-loads-data/state-data-that-changes.html">← State: Data That Changes</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/the-starter/a-page-that-loads-data/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/the-starter/a-page-that-loads-data/showing-the-right-thing.html">Showing the Right Thing →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Three Pieces of State</h1>
+    <p class="lede">A page that loads data has to remember three things: the data, any error, and whether it&#39;s still waiting.</p>
+
+    
+
+    
+      <div class="slide-body"><p><code>HomePage</code> asks the API for its welcome message. While it waits, and
+after the answer arrives, the page has to remember three things:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 0.21: the page&#x27;s state (src/pages/HomePage.jsx, excerpt)</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">HomePage</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> [welcome, setWelcome] = <span class="hljs-title function_">useState</span>(<span class="hljs-literal">null</span>);
+  <span class="hljs-keyword">const</span> [errorMessage, setErrorMessage] = <span class="hljs-title function_">useState</span>(<span class="hljs-string">&#x27;&#x27;</span>);
+  <span class="hljs-keyword">const</span> [isLoading, setIsLoading] = <span class="hljs-title function_">useState</span>(<span class="hljs-literal">true</span>);
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>Starts as</th>
+<th>Why that starting value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>welcome</code></td>
+<td><code>null</code></td>
+<td>there's no data until the API answers</td>
+</tr>
+<tr>
+<td><code>errorMessage</code></td>
+<td><code>''</code> (empty)</td>
+<td>nothing has gone wrong yet</td>
+</tr>
+<tr>
+<td><code>isLoading</code></td>
+<td><code>true</code></td>
+<td>the request starts as soon as the page appears, so it's waiting from the very start</td>
+</tr>
+</tbody>
+</table>
+<p>Between them, they describe every moment in the page's life:</p>
+<ol>
+<li><strong>Waiting:</strong> <code>isLoading</code> is <code>true</code>, the other two are empty.</li>
+<li><strong>Success:</strong> <code>welcome</code> holds the data, <code>isLoading</code> is <code>false</code>.</li>
+<li><strong>Failure:</strong> <code>errorMessage</code> holds the reason, <code>isLoading</code> is <code>false</code>.</li>
+</ol>
+<p>Each one gets its own <code>useState</code>, with a name that says what it holds.
+The names matter: <code>isLoading</code> reads like a yes/no question, which is
+exactly what it is.</p>
+<h2>The pattern you'll repeat</h2>
+<p>Every page that loads data from the API needs these same three things:
+the data, an error message, and a loading flag. A ticket list page would
+have <code>tickets</code> instead of <code>welcome</code>; a booking page would have <code>booking</code>.
+The other two stay the same. When you write your own pages, start with
+these three lines.</p>
+<h2>Compared with Laravel</h2>
+<p>In Laravel the controller <strong>waited</strong> for the database, then passed
+finished data to the view, so a Blade view never had a &quot;still loading&quot;
+moment. In the browser, the page appears <strong>first</strong> and the data arrives
+later, so the page has to describe what to show in the meantime. That's
+why the loading state exists at all.</p>
+</div>
+    
+  </main>
+</body>
+</html>

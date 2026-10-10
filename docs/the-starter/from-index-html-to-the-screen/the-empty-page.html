@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Empty Page — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/the-starter/the-toolchain/env-and-the-vite-prefix.html">← .env and the VITE_ Prefix</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/the-starter/from-index-html-to-the-screen/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/the-starter/from-index-html-to-the-screen/components-are-functions.html">Components Are Functions →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>The Empty Page</h1>
+    <p class="lede">The only HTML file in the app has almost nothing in it. Everything you see is added by JavaScript.</p>
+
+    
+
+    
+      <div class="slide-body"><p>A single-page application has exactly one HTML page. Figure 0.6 is all of
+it:</p>
+<pre><code class="hljs language-html"><span class="hljs-comment">&lt;!-- Figure 0.6: the app&#x27;s only HTML page (index.html) --&gt;</span>
+<span class="hljs-meta">&lt;!doctype <span class="hljs-keyword">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">html</span> <span class="hljs-attr">lang</span>=<span class="hljs-string">&quot;en&quot;</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">charset</span>=<span class="hljs-string">&quot;UTF-8&quot;</span> /&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;icon&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;image/svg+xml&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;/favicon.svg&quot;</span> /&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;viewport&quot;</span> <span class="hljs-attr">content</span>=<span class="hljs-string">&quot;width=device-width, initial-scale=1.0&quot;</span> /&gt;</span>
+    <span class="hljs-comment">&lt;!-- TODO (your case study): change the title to your app&#x27;s name. --&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>My App<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;root&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;/src/main.jsx&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>
+</code></pre>
+<p>Look at the <code>&lt;body&gt;</code>. There's no heading, no navigation, no text. Just:</p>
+<ul>
+<li>an empty <code>&lt;div&gt;</code> with the id <code>root</code></li>
+<li>a <code>&lt;script&gt;</code> that loads <code>src/main.jsx</code></li>
+</ul>
+<p>Compare that with a page from your Laravel app. When the browser asked for
+<code>/tickets</code>, the server ran Blade and sent back a <code>&lt;body&gt;</code> already full of
+headings, tables and links. Here the server (Vite, while you develop)
+sends this nearly-empty page for <strong>every</strong> URL. The JavaScript in
+<code>main.jsx</code> then builds the whole page <strong>inside</strong> <code>&lt;div id=&quot;root&quot;&gt;</code>, in
+the browser.</p>
+<p><code>type=&quot;module&quot;</code> tells the browser the script uses <code>import</code>/<code>export</code>, the
+same ES modules you used in the back-end.</p>
+<h2>Try it</h2>
+<p>Run the app and open <code>http://localhost:5173</code>. Then compare two views of
+the same page:</p>
+<ol>
+<li><strong>View Page Source</strong> (right-click, or Ctrl+U). This is the HTML the
+server sent. What's inside <code>&lt;div id=&quot;root&quot;&gt;</code>? (You'll also see one
+or two extra <code>&lt;script&gt;</code> tags that Vite adds while you develop, for
+updating the page when you save. They aren't part of your app.)</li>
+<li><strong>Inspect</strong> (right-click on the heading, or F12, then the Elements
+tab). This is the page as it is now, after JavaScript has run. What's
+inside <code>&lt;div id=&quot;root&quot;&gt;</code> this time?</li>
+</ol>
+<p>The difference between the two is everything React added. The rest of
+this topic is about how.</p>
+</div>
+    
+  </main>
+</body>
+</html>

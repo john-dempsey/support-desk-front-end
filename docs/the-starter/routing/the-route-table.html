@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Route Table — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/the-starter/from-index-html-to-the-screen/a-tree-of-components.html">← A Tree of Components</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/the-starter/routing/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/the-starter/routing/links-without-reloads.html">Links Without Reloads →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>The Route Table</h1>
+    <p class="lede">App.jsx maps each URL to a component, the way routes/index.js mapped each URI to a controller.</p>
+
+    
+
+    
+      <div class="slide-body"><p>In the back-end, a route connected a URI to the code that handled it
+(this is <code>ticket.routes.js</code>, mounted at <code>/tickets</code>, with its validation
+left out):</p>
+<pre><code class="hljs language-js">router.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;/&#x27;</span>, ticketController.<span class="hljs-property">getAllTickets</span>);
+</code></pre>
+<p>and in Laravel, <code>routes/web.php</code> did the same:</p>
+<pre><code class="hljs language-php"><span class="hljs-title class_">Route</span>::<span class="hljs-title function_ invoke__">get</span>(<span class="hljs-string">&#x27;/tickets&#x27;</span>, [<span class="hljs-title class_">TicketController</span>::<span class="hljs-variable language_">class</span>, <span class="hljs-string">&#x27;index&#x27;</span>]);
+</code></pre>
+<p>The front-end needs the same idea: <strong>which URL shows which page?</strong> In
+React, that's done by <strong>React Router</strong>, and the whole table lives in
+<code>App.jsx</code>:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 0.11: the route table (src/App.jsx, comments removed)</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Route</span>, <span class="hljs-title class_">Routes</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;react-router&#x27;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-title class_">NavBar</span> <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./components/NavBar.jsx&#x27;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-title class_">HomePage</span> <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./pages/HomePage.jsx&#x27;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-title class_">NotFoundPage</span> <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./pages/NotFoundPage.jsx&#x27;</span>;
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">App</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">return</span> (
+    <span class="language-xml"><span class="hljs-tag">&lt;&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">NavBar</span> /&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">main</span> <span class="hljs-attr">className</span>=<span class="hljs-string">&quot;container&quot;</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">Routes</span>&gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-name">Route</span> <span class="hljs-attr">path</span>=<span class="hljs-string">&quot;/&quot;</span> <span class="hljs-attr">element</span>=<span class="hljs-string">{</span>&lt;<span class="hljs-attr">HomePage</span> /&gt;</span>} /&gt;
+          <span class="hljs-tag">&lt;<span class="hljs-name">Route</span> <span class="hljs-attr">path</span>=<span class="hljs-string">&quot;*&quot;</span> <span class="hljs-attr">element</span>=<span class="hljs-string">{</span>&lt;<span class="hljs-attr">NotFoundPage</span> /&gt;</span>} /&gt;
+        <span class="hljs-tag">&lt;/<span class="hljs-name">Routes</span>&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">main</span>&gt;</span>
+    <span class="hljs-tag">&lt;/&gt;</span></span>
+  );
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-title class_">App</span>;
+</code></pre>
+<h2>Reading it</h2>
+<ul>
+<li>Each <strong><code>&lt;Route&gt;</code></strong> pairs a <code>path</code> with an <code>element</code>: the component to
+show when the URL matches. <code>element={&lt;HomePage /&gt;}</code> is an ordinary prop
+(topic 03), passed with <code>{ }</code> because its value is JSX, not a string.</li>
+<li><strong><code>&lt;Routes&gt;</code></strong> looks at the current URL, finds the route that matches
+it, and shows <strong>only that route's element</strong>. The others aren't shown at
+all.</li>
+<li>Routing is done with components, not a separate config file, so
+<code>Routes</code> and <code>Route</code> are imported and used like any other component.</li>
+</ul>
+<h2>Where the routes sit</h2>
+<p><code>&lt;NavBar /&gt;</code> is <strong>outside</strong> <code>&lt;Routes&gt;</code>, so it appears on every page.
+<code>&lt;Routes&gt;</code> is inside <code>&lt;main&gt;</code>, so whichever page matches is shown there.
+This is the Blade layout from the last topic, made concrete: <code>App</code> is the
+layout, and <code>&lt;Routes&gt;</code> is its <code>@yield('content')</code>.</p>
+<h2>No server involved</h2>
+<p>This is the biggest difference from the back-end. An Express route runs
+when an HTTP request <strong>arrives at the server</strong>. React Router runs <strong>in
+the browser</strong>: it reads the address bar (that's what <code>&lt;BrowserRouter&gt;</code> in
+<code>main.jsx</code> makes possible) and picks a component. Moving between pages
+doesn't send a request to anyone. The next slide shows how.</p>
+<h2>One place for every page</h2>
+<p>In your viva you'll be asked to trace a click through your code. The
+route table is where that trace starts: from a URL, it tells you which
+page component to open next. Keep every route in this one file, as the
+back-end kept every router in <code>routes/index.js</code>.</p>
+</div>
+    
+  </main>
+</body>
+</html>

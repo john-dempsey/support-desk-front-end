@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cleanup and the ignore Flag — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/the-starter/a-page-that-loads-data/useeffect.html">← useEffect: Loading After the First Render</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/the-starter/a-page-that-loads-data/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/the-starter/a-page-that-loads-data/tracing-a-page-load.html">Tracing a Page Load →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Cleanup and the ignore Flag</h1>
+    <p class="lede">What happens to a response that arrives after the page has gone, and why StrictMode sends every request twice.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Look at Figure 0.23 again. The effect starts with <code>let ignore = false</code>,
+every setter is wrapped in <code>if (!ignore)</code>, and the effect <strong>returns a
+function</strong>:</p>
+<pre><code class="hljs language-jsx">    <span class="hljs-keyword">return</span> <span class="hljs-function">() =&gt;</span> {
+      ignore = <span class="hljs-literal">true</span>;
+    };
+</code></pre>
+<p>That returned function is the effect's <strong>cleanup</strong>. React calls it when
+the component is removed from the page, for example when the user clicks
+a link to another page.</p>
+<h2>The problem it solves</h2>
+<p>A request takes time. Suppose the user opens the home page and, before
+the API has answered, clicks a link to another page. <code>HomePage</code> is
+removed. Then the response arrives, and <code>loadWelcome</code> carries on: it
+calls <code>setWelcome</code> for a page that isn't there any more.</p>
+<p>That's wasted work at best. In later pages it can be a real bug: if a
+page asks for ticket 1, then ticket 2, and ticket 1's slower answer
+arrives <strong>last</strong>, the page would show the wrong ticket.</p>
+<p>The fix is a flag. When the page goes, the cleanup sets <code>ignore</code> to
+<code>true</code>. When the late response arrives, every <code>if (!ignore)</code> is false,
+and nothing is changed.</p>
+<h2>How a variable can do this: closures</h2>
+<p><code>loadWelcome</code> and the cleanup function were both created inside the same
+run of the effect, so they share <strong>that run's</strong> <code>ignore</code> variable. This
+is a <strong>closure</strong>, which you met in the back-end's Lesson 1: a function
+keeps access to the variables around it, even after the code that
+created them has finished.</p>
+<p>Each time the effect runs, it creates a <strong>new</strong> <code>ignore</code>. Setting one to
+<code>true</code> doesn't affect any other.</p>
+<h2>StrictMode: every request twice</h2>
+<p>In topic 03, <code>main.jsx</code> wrapped the app in <code>&lt;StrictMode&gt;</code>, which &quot;makes
+React do some work twice on purpose&quot;. Here's that work. While you
+develop, StrictMode puts each component on the page, <strong>removes it</strong>, and
+puts it back, to check that its effects clean up properly. For
+<code>HomePage</code>, that means:</p>
+<ol>
+<li>The effect runs. <code>ignore</code> (the first one) is <code>false</code>. Request <strong>A</strong>
+starts.</li>
+<li>StrictMode removes the page, so the cleanup sets the first <code>ignore</code> to
+<code>true</code>.</li>
+<li>StrictMode puts the page back. The effect runs again with a <strong>new</strong>
+<code>ignore</code>, <code>false</code>. Request <strong>B</strong> starts.</li>
+<li>A's answer arrives. Its <code>ignore</code> is <code>true</code>, so it's ignored.</li>
+<li>B's answer arrives, and updates the page.</li>
+</ol>
+<p>So in development, <code>/welcome</code> is requested <strong>twice</strong>, and the page still
+shows one correct answer. That's StrictMode proving the cleanup works.
+In the production build (topic 09), StrictMode does nothing, and there's
+one request.</p>
+<h2>Try it</h2>
+<ol>
+<li>Open the <strong>Network</strong> tab and reload the home page. How many requests
+to <code>welcome</code> are there?</li>
+<li>Delete the <code>return () =&gt; { ignore = true; };</code> lines and reload. Does
+anything look different on the page? Why not? (Both responses carry
+the same message, so you can't see a problem here. The flag matters
+when two answers <strong>differ</strong>.) Put the lines back afterwards.</li>
+</ol>
+</div>
+    
+  </main>
+</body>
+</html>

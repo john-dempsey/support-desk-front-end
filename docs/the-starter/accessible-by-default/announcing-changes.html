@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Announcing Changes — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/the-starter/accessible-by-default/semantic-html.html">← Semantic HTML</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/the-starter/accessible-by-default/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/the-starter/accessible-by-default/colour-contrast-and-the-keyboard.html">Colour, Contrast and the Keyboard →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Announcing Changes</h1>
+    <p class="lede">A single-page app changes the page without loading a new one, so it has to tell screen readers when something new appears.</p>
+
+    
+
+    
+      <div class="slide-body"><p>When a Laravel app loaded a new page, a screen reader noticed and
+started reading it. A single-page app changes <strong>part</strong> of the page
+instead: a loading message appears, then an error, then the data. A
+screen reader user isn't looking at the screen, so unless something
+tells them, they don't know anything has changed.</p>
+<p><strong>Live regions</strong> fix that. An element with one of these roles tells
+screen readers: &quot;announce what appears in here&quot;.</p>
+<p>The starter's two shared message components each use one:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// in Loading.jsx (Figure 0.9)</span>
+&lt;p role=<span class="hljs-string">&quot;status&quot;</span> className=<span class="hljs-string">&quot;loading&quot;</span>&gt;
+  {message}
+&lt;/p&gt;
+
+<span class="hljs-comment">// in ErrorMessage.jsx (Figure 0.8)</span>
+<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">p</span> <span class="hljs-attr">role</span>=<span class="hljs-string">&quot;alert&quot;</span> <span class="hljs-attr">className</span>=<span class="hljs-string">&quot;error-message&quot;</span>&gt;</span>
+  {message}
+<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span></span>
+</code></pre>
+<h2><code>status</code> and <code>alert</code></h2>
+<ul>
+<li><strong><code>role=&quot;status&quot;</code></strong> is <strong>polite</strong>. The screen reader waits until it
+has finished what it's saying, then reads the message. Right for
+&quot;Connecting to the API…&quot;: useful, but not urgent.</li>
+<li><strong><code>role=&quot;alert&quot;</code></strong> is <strong>assertive</strong>. The screen reader interrupts what
+it's saying to read the message straight away. Right for errors, which
+the user needs to know about <strong>now</strong>. Keep it for real problems: being
+interrupted all the time is as annoying as it sounds.</li>
+</ul>
+<h2>Why this is in shared components</h2>
+<p>Because <code>Loading</code> and <code>ErrorMessage</code> are components, the right role is
+written <strong>once</strong>. Every page that uses them gets the announcements
+without having to remember. That's the same argument as <code>client.js</code> in
+topic 05: put the detail that's easy to get wrong in one place.</p>
+<h2>Roles and tests</h2>
+<p>These roles are also how the starter's tests find these messages:
+<code>screen.getByRole('status')</code> and <code>screen.findByRole('alert')</code>. A test
+that finds things the way a screen reader does checks accessibility for
+free. The testing topic explains that next.</p>
+</div>
+    
+  </main>
+</body>
+</html>

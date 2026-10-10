@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>JSX Is Almost HTML — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/the-starter/from-index-html-to-the-screen/components-are-functions.html">← Components Are Functions</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/the-starter/from-index-html-to-the-screen/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/the-starter/from-index-html-to-the-screen/props.html">Props: Passing Data In →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>JSX Is Almost HTML</h1>
+    <p class="lede">What JSX really is, how to put JavaScript values into it, and the handful of places it differs from HTML.</p>
+
+    
+
+    
+      <div class="slide-body"><p>JSX looks like HTML, but it's really a shorter way to write JavaScript.
+Before the browser sees it, Vite translates each tag into a function
+call. Roughly:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// What you write</span>
+&lt;h1 className=<span class="hljs-string">&quot;title&quot;</span>&gt;<span class="hljs-title class_">Hello</span>&lt;/h1&gt;
+
+<span class="hljs-comment">// What Vite turns it into (simplified)</span>
+<span class="hljs-title function_">jsx</span>(<span class="hljs-string">&#x27;h1&#x27;</span>, { <span class="hljs-attr">className</span>: <span class="hljs-string">&#x27;title&#x27;</span>, <span class="hljs-attr">children</span>: <span class="hljs-string">&#x27;Hello&#x27;</span> })
+</code></pre>
+<p>That call creates a small object describing the element. React uses
+those objects to build the real page. You'll never write the function
+call version yourself, but knowing it's there explains the rules below.</p>
+<h2>Putting values in: <code>{ }</code></h2>
+<p>Curly braces switch from markup back to JavaScript. Whatever is inside is
+worked out, and the result is shown:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-keyword">const</span> ticketCount = <span class="hljs-number">3</span>;
+
+<span class="hljs-keyword">return</span> <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>You have {ticketCount} open tickets.<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span></span>;
+</code></pre>
+<p>This is Blade's <code>{{ $ticketCount }}</code> with one pair of braces instead of
+two. Like Blade's <code>{{ }}</code>, JSX <strong>escapes</strong> what it shows: if a value
+contains <code>&lt;script&gt;</code>, it appears as text instead of running. You get
+protection against XSS without doing anything.</p>
+<p>Anything that produces a value works inside <code>{ }</code>: a variable,
+<code>ticket.subject</code>, <code>count + 1</code>, a function call. An <code>if</code> statement or a
+<code>for</code> loop doesn't, because they don't produce a value. Later topics show
+how to make decisions and repeat things in JSX.</p>
+<h2>Where JSX differs from HTML</h2>
+<table>
+<thead>
+<tr>
+<th>HTML</th>
+<th>JSX</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>class=&quot;loading&quot;</code></td>
+<td><code>className=&quot;loading&quot;</code></td>
+<td><code>class</code> is a reserved word in JavaScript, so JSX uses the browser's own JavaScript name for it</td>
+</tr>
+<tr>
+<td><code>&lt;label for=&quot;email&quot;&gt;</code></td>
+<td><code>&lt;label htmlFor=&quot;email&quot;&gt;</code></td>
+<td>same reason: <code>for</code> is a JavaScript keyword</td>
+</tr>
+<tr>
+<td><code>&lt;br&gt;</code>, <code>&lt;img ...&gt;</code></td>
+<td><code>&lt;br /&gt;</code>, <code>&lt;img ... /&gt;</code></td>
+<td>every tag must be closed, including components: <code>&lt;Greeting /&gt;</code></td>
+</tr>
+<tr>
+<td><code>&lt;!-- comment --&gt;</code></td>
+<td><code>{/* comment */}</code></td>
+<td>a JavaScript comment inside <code>{ }</code></td>
+</tr>
+<tr>
+<td>several elements side by side</td>
+<td>one parent around them</td>
+<td>a function can only return one thing</td>
+</tr>
+</tbody>
+</table>
+<h2>One parent: fragments</h2>
+<p>The last rule needs a fix. A component often needs to return a heading
+and a paragraph side by side, but a function returns <strong>one</strong> value.
+Wrapping them in a <code>&lt;div&gt;</code> works, but adds an extra element to the page
+for no reason. Instead, use an empty tag, called a <strong>fragment</strong>:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-keyword">return</span> (
+  <span class="language-xml"><span class="hljs-tag">&lt;&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>Page not found<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Sorry, there&#x27;s no page at this address.<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+  <span class="hljs-tag">&lt;/&gt;</span></span>
+);
+</code></pre>
+<p><code>&lt;&gt;</code> and <code>&lt;/&gt;</code> group the elements for JavaScript's sake, and then
+disappear: only the <code>&lt;h1&gt;</code> and <code>&lt;p&gt;</code> end up on the page. That's what
+<code>NotFoundPage</code> in Figure 0.7 does.</p>
+</div>
+    
+  </main>
+</body>
+</html>

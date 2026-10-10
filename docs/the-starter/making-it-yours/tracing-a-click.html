@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tracing a Click — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/the-starter/lint-build-and-preview/previewing-the-build.html">← Previewing the Build</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/the-starter/making-it-yours/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/the-starter/making-it-yours/your-starter-checklist.html">Your Starter Checklist →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Tracing a Click</h1>
+    <p class="lede">One click followed through every layer of the starter: the skill the viva asks for.</p>
+
+    
+
+    
+      <div class="slide-body"><p>In your viva, you'll be asked to trace a click through <strong>your own</strong> code,
+with no notes and no AI: which component, which API function, which HTTP
+request, which state change, and what is re-rendered. The starter is
+small enough to practise on now.</p>
+<p>Here's one click, all the way through. You're on
+<code>http://localhost:5173/no-such-page</code>, and you click <strong>Go to the home
+page</strong>:</p>
+<p><img src="/support-desk-front-end/assets/images/tracing-a-click.svg" alt="Diagram: eight steps from clicking a Link on NotFoundPage, through App.jsx's Routes, HomePage's first render and effect, welcome.api.js and client.js, to the state update and re-render in HomePage"></p>
+<p>It's the page-load trace from topic 06, starting one step earlier: with
+a <code>&lt;Link&gt;</code> (topic 04) instead of typing the URL. Notice that step 1
+sends <strong>no</strong> request. The only request is step 6, and it's for data, not
+for a page.</p>
+<h2>Questions to practise with</h2>
+<p>Answer these out loud, with the code open. Then try them again with it
+closed.</p>
+<ol>
+<li>When the link is clicked, why doesn't the browser load a new page?
+Which component makes that happen?</li>
+<li>How does the app know to show <code>HomePage</code> and not <code>NotFoundPage</code>?
+Which file would you open to check?</li>
+<li>Why is &quot;Connecting to the API…&quot; on screen before the request is even
+sent?</li>
+<li>Why is the request made inside <code>useEffect</code>, and not in the body of
+<code>HomePage</code>? What does the <code>[]</code> do?</li>
+<li><code>HomePage</code> calls <code>getWelcome()</code>, not <code>fetch()</code>. Name two things
+<code>client.js</code> does that <code>HomePage</code> doesn't have to know about.</li>
+<li>The API sends <code>{ &quot;data&quot;: { &quot;message&quot;: &quot;Hello world!&quot; } }</code>. Which
+function removes the <code>data</code> wrapper?</li>
+<li>Which two setters run when the answer arrives? What makes the message
+appear after they run?</li>
+<li>The API is stopped. Follow the same click. At which step does it go
+differently, and what does the user see?</li>
+</ol>
+</div>
+    
+  </main>
+</body>
+</html>

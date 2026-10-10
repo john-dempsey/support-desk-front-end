@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>useEffect: Loading After the First Render — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/the-starter/a-page-that-loads-data/showing-the-right-thing.html">← Showing the Right Thing</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/the-starter/a-page-that-loads-data/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/the-starter/a-page-that-loads-data/cleanup-and-the-ignore-flag.html">Cleanup and the ignore Flag →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>useEffect: Loading After the First Render</h1>
+    <p class="lede">Why the request can&#39;t go straight into the component, and how useEffect runs it once, after the page appears.</p>
+
+    
+
+    
+      <div class="slide-body"><h2>Why not just call the API?</h2>
+<p>The obvious place to ask for data is the top of the component:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-keyword">function</span> <span class="hljs-title function_">HomePage</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> [welcome, setWelcome] = <span class="hljs-title function_">useState</span>(<span class="hljs-literal">null</span>);
+  <span class="hljs-title function_">getWelcome</span>().<span class="hljs-title function_">then</span>(setWelcome);   <span class="hljs-comment">// don&#x27;t do this</span>
+  <span class="hljs-comment">// ...</span>
+}
+</code></pre>
+<p>Follow it through. React calls <code>HomePage()</code>, which starts a request.
+When the answer arrives, <code>setWelcome</code> changes the state, so React calls
+<code>HomePage()</code> <strong>again</strong>, which starts <strong>another</strong> request, whose answer
+changes the state again... The page would ask the API for data forever.</p>
+<p>A component function should just <strong>describe the page</strong>. Work that
+reaches outside it (like a network request) is called a <strong>side effect</strong>,
+and it goes in <strong><code>useEffect</code></strong>.</p>
+<h2><code>useEffect</code></h2>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 0.23: loading the data (src/pages/HomePage.jsx, excerpt)</span>
+  <span class="hljs-title function_">useEffect</span>(<span class="hljs-function">() =&gt;</span> {
+    <span class="hljs-keyword">let</span> ignore = <span class="hljs-literal">false</span>;
+
+    <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">loadWelcome</span>(<span class="hljs-params"></span>) {
+      <span class="hljs-keyword">try</span> {
+        <span class="hljs-keyword">const</span> welcomeData = <span class="hljs-keyword">await</span> <span class="hljs-title function_">getWelcome</span>();
+        <span class="hljs-keyword">if</span> (!ignore) {
+          <span class="hljs-title function_">setWelcome</span>(welcomeData);
+        }
+      } <span class="hljs-keyword">catch</span> (error) {
+        <span class="hljs-keyword">if</span> (!ignore) {
+          <span class="hljs-title function_">setErrorMessage</span>(error.<span class="hljs-property">message</span>);
+        }
+      } <span class="hljs-keyword">finally</span> {
+        <span class="hljs-keyword">if</span> (!ignore) {
+          <span class="hljs-title function_">setIsLoading</span>(<span class="hljs-literal">false</span>);
+        }
+      }
+    }
+
+    <span class="hljs-title function_">loadWelcome</span>();
+
+    <span class="hljs-keyword">return</span> <span class="hljs-function">() =&gt;</span> {
+      ignore = <span class="hljs-literal">true</span>;
+    };
+  }, []);
+</code></pre>
+<p><code>useEffect</code> takes two arguments:</p>
+<ol>
+<li><strong>A function to run.</strong> React runs it <strong>after</strong> the component's markup
+is on the page, so the user sees the heading and the loading message
+straight away.</li>
+<li><strong>A list of dependencies</strong>: <code>[]</code>. React runs the effect again only
+when something in this list changes. An empty list means &quot;nothing
+ever changes&quot;, so it runs <strong>once</strong>, when the page first appears.
+That's what breaks the loop.</li>
+</ol>
+<p>Ignore <code>ignore</code> for now. It's the next slide.</p>
+<h2>Inside the effect</h2>
+<ul>
+<li><strong>Why a separate <code>async function</code>?</strong> The function passed to
+<code>useEffect</code> must return nothing, or a cleanup function (the <code>return</code>
+at the bottom). An <code>async</code> function always returns a promise, so it
+can't be passed to <code>useEffect</code> directly. Instead, the effect
+<strong>defines</strong> an async function and <strong>calls</strong> it straight away.</li>
+<li><strong><code>try</code>:</strong> ask for the data. If it arrives, store it with
+<code>setWelcome</code>.</li>
+<li><strong><code>catch</code>:</strong> <code>client.js</code> threw an error (topic 05). Store its message,
+such as &quot;Can't reach the API...&quot;, with <code>setErrorMessage</code>.</li>
+<li><strong><code>finally</code>:</strong> runs after either one. Success or failure, the page has
+stopped waiting, so <code>setIsLoading(false)</code>.</li>
+</ul>
+<p>Each setter causes a re-render, and the <code>&amp;&amp;</code> lines from the last slide
+decide what appears.</p>
+</div>
+    
+  </main>
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Colour, Contrast and the Keyboard — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/the-starter/accessible-by-default/announcing-changes.html">← Announcing Changes</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/the-starter/accessible-by-default/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/the-starter/testing/the-testing-tools.html">The Testing Tools →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Colour, Contrast and the Keyboard</h1>
+    <p class="lede">Colours that are easy to read, a focus outline you can see, and never relying on colour alone.</p>
+
+    
+
+    
+      <div class="slide-body"><h2>Colours in one place</h2>
+<p><code>index.css</code> keeps every colour in a <strong>CSS variable</strong> (also called a
+custom property), defined once on <code>:root</code>:</p>
+<pre><code class="hljs language-css"><span class="hljs-comment">/* Figure 0.24: the colour palette (src/index.css, excerpt) */</span>
+<span class="hljs-selector-pseudo">:root</span> {
+  <span class="hljs-attr">--colour-text</span>: <span class="hljs-number">#1f2328</span>;
+  <span class="hljs-attr">--colour-background</span>: <span class="hljs-number">#ffffff</span>;
+  <span class="hljs-attr">--colour-muted</span>: <span class="hljs-number">#59636e</span>;
+  <span class="hljs-attr">--colour-border</span>: <span class="hljs-number">#d1d9e0</span>;
+  <span class="hljs-attr">--colour-header</span>: <span class="hljs-number">#f6f8fa</span>;
+  <span class="hljs-attr">--colour-link</span>: <span class="hljs-number">#0550ae</span>;
+  <span class="hljs-attr">--colour-error-text</span>: <span class="hljs-number">#82071e</span>;
+  <span class="hljs-attr">--colour-error-background</span>: <span class="hljs-number">#ffebe9</span>;
+  <span class="hljs-attr">--colour-focus</span>: <span class="hljs-number">#0969da</span>;
+}
+</code></pre>
+<p>Everything else uses them, e.g. <code>color: var(--colour-link);</code>. To change
+a colour across the whole app, you change one line.</p>
+<h2>Contrast</h2>
+<p>WCAG AA says normal-sized text needs a <strong>contrast ratio</strong> of at least
+<strong>4.5:1</strong> with its background. (1:1 is the same colour twice; 21:1 is
+black on white.) Every pair the starter uses passes comfortably:</p>
+<table>
+<thead>
+<tr>
+<th>Text</th>
+<th>Background</th>
+<th>Ratio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>body text</td>
+<td>white</td>
+<td>15.8:1</td>
+</tr>
+<tr>
+<td>links</td>
+<td>white</td>
+<td>7.6:1</td>
+</tr>
+<tr>
+<td>links</td>
+<td>navigation bar</td>
+<td>7.1:1</td>
+</tr>
+<tr>
+<td>loading message (muted)</td>
+<td>white</td>
+<td>6.1:1</td>
+</tr>
+<tr>
+<td>error text</td>
+<td>error background</td>
+<td>9.2:1</td>
+</tr>
+</tbody>
+</table>
+<p>Light grey text is the usual way apps fail. <code>#aaaaaa</code> on white looks
+fine to many people, but it's only 2.3:1.</p>
+<h2>A focus outline you can see</h2>
+<pre><code class="hljs language-css"><span class="hljs-comment">/* Figure 0.25: the keyboard focus outline (src/index.css, excerpt) */</span>
+<span class="hljs-selector-pseudo">:focus-visible</span> {
+  <span class="hljs-attribute">outline</span>: <span class="hljs-number">3px</span> solid <span class="hljs-built_in">var</span>(--colour-focus);
+  <span class="hljs-attribute">outline-offset</span>: <span class="hljs-number">2px</span>;
+}
+</code></pre>
+<p>Keyboard users press <strong>Tab</strong> to move from link to link, and the
+<strong>focus outline</strong> is the only way they can see where they are.
+<code>:focus-visible</code> shows the outline when the keyboard moved the focus, but
+not after a mouse click, so it doesn't bother mouse users. Never remove
+the outline without putting something as visible in its place.</p>
+<h2>Never colour alone</h2>
+<p>About 1 in 12 men and 1 in 200 women have some form of colour
+blindness. So the starter never shows information <strong>only</strong> with colour.
+The current page's link isn't just a different colour: it's <strong>bold</strong>,
+with a <strong>thicker underline</strong>, and it has <code>aria-current=&quot;page&quot;</code> (topic
+04). The error message has a border and says what went wrong in words.</p>
+<h2>Try it</h2>
+<ol>
+<li>Click in the address bar, then press <strong>Tab</strong> repeatedly. Can you see
+where you are at every step? Press <strong>Enter</strong> on a link.</li>
+<li>In Chrome's developer tools, open the <strong>Lighthouse</strong> tab, tick only
+<strong>Accessibility</strong>, and run a report on the home page. What score does
+the starter get?</li>
+<li>Change <code>--colour-link</code> to a light blue, <code>#6cb6ff</code>. Then right-click
+the <strong>Home</strong> link, choose <strong>Inspect</strong>, and in the <strong>Styles</strong> panel
+click the colour swatch next to <code>color</code>: it shows the contrast ratio.
+Does it pass? Change it back afterwards.</li>
+</ol>
+</div>
+    
+  </main>
+</body>
+</html>

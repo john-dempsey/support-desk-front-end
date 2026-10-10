@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>One Function per Endpoint — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/the-starter/talking-to-the-api/when-nothing-answers.html">← When Nothing Answers</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/the-starter/talking-to-the-api/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/the-starter/a-page-that-loads-data/state-data-that-changes.html">State: Data That Changes →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>One Function per Endpoint</h1>
+    <p class="lede">API modules give each endpoint a name, so pages ask for data without knowing any URLs.</p>
+
+    
+
+    
+      <div class="slide-body"><p><code>apiRequest()</code> knows <strong>how</strong> to talk to the API, but nothing about
+<strong>which</strong> endpoints exist. That's the job of the API modules: one file
+per back-end resource, with one function per endpoint. The starter has
+one:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 0.20: an API module (src/api/welcome.api.js, excerpt)</span>
+<span class="hljs-keyword">import</span> { apiRequest } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./client.js&#x27;</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">getWelcome</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> responseBody = <span class="hljs-keyword">await</span> <span class="hljs-title function_">apiRequest</span>(<span class="hljs-string">&#x27;/welcome&#x27;</span>);
+  <span class="hljs-keyword">return</span> responseBody.<span class="hljs-property">data</span>;
+}
+</code></pre>
+<p>It does two small things:</p>
+<ol>
+<li>It knows the <strong>URL</strong>: <code>/welcome</code>. Pages call <code>getWelcome()</code> and never
+see it. If the back-end ever renamed the endpoint, this would be the
+only front-end file to change.</li>
+<li>It <strong>unwraps</strong> the envelope. The API sends
+<code>{ &quot;data&quot;: { &quot;message&quot;: &quot;Hello world!&quot; } }</code>, but a page only cares
+about the inside, so <code>getWelcome()</code> returns <code>responseBody.data</code>:
+<code>{ message: 'Hello world!' }</code>.</li>
+</ol>
+<p>Errors don't need handling here. If <code>apiRequest()</code> throws, the error
+passes straight through <code>getWelcome()</code> to the page that called it.</p>
+<h2>Your own API modules</h2>
+<p>The comment at the top of this file has a <code>TODO (your case study)</code>. For a
+bookings API, you'd add <code>src/api/bookings.api.js</code>, something like:</p>
+<pre><code class="hljs language-js"><span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">getBookings</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> responseBody = <span class="hljs-keyword">await</span> <span class="hljs-title function_">apiRequest</span>(<span class="hljs-string">&#x27;/bookings&#x27;</span>);
+  <span class="hljs-keyword">return</span> responseBody.<span class="hljs-property">data</span>;
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">getBooking</span>(<span class="hljs-params">bookingId</span>) {
+  <span class="hljs-keyword">const</span> responseBody = <span class="hljs-keyword">await</span> <span class="hljs-title function_">apiRequest</span>(<span class="hljs-string">`/bookings/<span class="hljs-subst">${bookingId}</span>`</span>);
+  <span class="hljs-keyword">return</span> responseBody.<span class="hljs-property">data</span>;
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">createBooking</span>(<span class="hljs-params">newBooking</span>) {
+  <span class="hljs-keyword">const</span> responseBody = <span class="hljs-keyword">await</span> <span class="hljs-title function_">apiRequest</span>(<span class="hljs-string">&#x27;/bookings&#x27;</span>, {
+    <span class="hljs-attr">method</span>: <span class="hljs-string">&#x27;POST&#x27;</span>,
+    <span class="hljs-attr">body</span>: newBooking,
+  });
+  <span class="hljs-keyword">return</span> responseBody.<span class="hljs-property">data</span>;
+}
+</code></pre>
+<p>Every function is short, and they all look alike. That's the point:
+<code>client.js</code> does the hard part once, and each endpoint gets a name that
+says what it does.</p>
+<p>These files are the front-end's version of the back-end's <strong>services</strong>:
+the page (like a controller) decides <strong>what</strong> it needs, and the API
+module knows <strong>where</strong> to get it.</p>
+</div>
+    
+  </main>
+</body>
+</html>

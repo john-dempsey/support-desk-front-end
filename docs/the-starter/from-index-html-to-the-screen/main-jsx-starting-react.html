@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>main.jsx: Starting React — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/the-starter/from-index-html-to-the-screen/props.html">← Props: Passing Data In</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/the-starter/from-index-html-to-the-screen/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/the-starter/from-index-html-to-the-screen/a-tree-of-components.html">A Tree of Components →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>main.jsx: Starting React</h1>
+    <p class="lede">The file index.html loads: it finds the empty div, and hands it to React.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Back to the <code>&lt;script&gt;</code> tag in <code>index.html</code>, which loads <code>src/main.jsx</code>.
+Here it is:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 0.10: the entry point (src/main.jsx)</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">StrictMode</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;react&#x27;</span>;
+<span class="hljs-keyword">import</span> { createRoot } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;react-dom/client&#x27;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">BrowserRouter</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;react-router&#x27;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-title class_">App</span> <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./App.jsx&#x27;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-string">&#x27;./index.css&#x27;</span>;
+
+<span class="hljs-title function_">createRoot</span>(<span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;root&#x27;</span>)).<span class="hljs-title function_">render</span>(
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">StrictMode</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">BrowserRouter</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">App</span> /&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">BrowserRouter</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">StrictMode</span>&gt;</span></span>,
+);
+</code></pre>
+<p>It's the front-end's version of the back-end's <code>server.js</code>: a short file
+whose only job is to start everything. The last statement does the work,
+in two steps:</p>
+<ol>
+<li><strong><code>createRoot(document.getElementById('root'))</code></strong>. You've used
+<code>document.getElementById</code> in plain JavaScript. It finds the empty
+<code>&lt;div id=&quot;root&quot;&gt;</code> from <code>index.html</code>. <code>createRoot</code> (from <code>react-dom</code>,
+the package that connects React to web pages) tells React to take
+charge of that <code>&lt;div&gt;</code>.</li>
+<li><strong><code>.render(...)</code></strong> tells React what to show there. React calls the
+components, turns what they return into real HTML elements, and puts
+them inside the <code>&lt;div&gt;</code>.</li>
+</ol>
+<p>From now on, React owns everything inside <code>&lt;div id=&quot;root&quot;&gt;</code>. Your code
+never adds or removes elements there directly. You change <strong>data</strong>, and
+React updates the page to match (more on that in a later topic).</p>
+<h2>What gets rendered</h2>
+<p><code>&lt;App /&gt;</code> is the app's top component, and the rest of the app is inside
+it. It's wrapped in two components that add features rather than
+markup:</p>
+<ul>
+<li><strong><code>&lt;StrictMode&gt;</code></strong> turns on extra checks that help find mistakes. They
+only run while you develop, never in the built app. One of them makes
+React do some work twice on purpose, which you'll come back to later.</li>
+<li><strong><code>&lt;BrowserRouter&gt;</code></strong> connects the app to the browser's address bar, so
+any component inside it can find out the current URL and change it.
+That's what the routing topic builds on.</li>
+</ul>
+<p>Wrapping a component like this is how React adds a feature to
+<strong>everything inside</strong> it: all of <code>App</code> gets both.</p>
+<h2><code>import './index.css'</code></h2>
+<p>This <code>import</code> doesn't give you anything to use: it's there for its side
+effect, like the back-end's <code>import 'dotenv/config'</code>. Vite sees a CSS
+file being imported and adds the stylesheet to the page. That's how the
+app's global styles get loaded without a <code>&lt;link&gt;</code> tag in <code>index.html</code>.</p>
+</div>
+    
+  </main>
+</body>
+</html>

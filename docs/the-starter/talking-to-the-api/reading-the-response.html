@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reading the Response — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/the-starter/talking-to-the-api/sending-a-request.html">← Sending a Request</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/the-starter/talking-to-the-api/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/the-starter/talking-to-the-api/when-nothing-answers.html">When Nothing Answers →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Reading the Response</h1>
+    <p class="lede">Success, 204 No Content, and the error envelope: the three kinds of answer the API can give.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Once a response has arrived, <code>apiRequest()</code> decides what kind it is:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 0.16: making sense of the response (src/api/client.js, excerpt)</span>
+  <span class="hljs-keyword">if</span> (response.<span class="hljs-property">status</span> === <span class="hljs-number">204</span>) {
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;
+  }
+
+  <span class="hljs-keyword">const</span> responseBody = <span class="hljs-keyword">await</span> <span class="hljs-title function_">readJson</span>(response);
+
+  <span class="hljs-keyword">if</span> (!response.<span class="hljs-property">ok</span>) {
+    <span class="hljs-keyword">const</span> message =
+      responseBody?.<span class="hljs-property">error</span>?.<span class="hljs-property">message</span> ||
+      <span class="hljs-string">`Request failed with status <span class="hljs-subst">${response.status}</span>`</span>;
+    <span class="hljs-keyword">throw</span> <span class="hljs-title function_">createApiError</span>(
+      response.<span class="hljs-property">status</span>,
+      message,
+      responseBody?.<span class="hljs-property">error</span>?.<span class="hljs-property">details</span>,
+    );
+  }
+
+  <span class="hljs-keyword">return</span> responseBody;
+}
+</code></pre>
+<p>(The last two statements are split over several lines here to fit the
+page. Each is one line in the file.)</p>
+<p>There are three possible outcomes.</p>
+<h2>1. <code>204 No Content</code>: return <code>null</code></h2>
+<p>The back-end answers a successful <code>DELETE</code> with <code>204</code> and <strong>no body at
+all</strong>. Calling <code>response.json()</code> on an empty body would fail, so this
+case is handled first: there's nothing to read, so the function returns
+<code>null</code>.</p>
+<h2>2. An error status: throw</h2>
+<p><strong><code>response.ok</code></strong> is <code>true</code> for any status from 200 to 299, and <code>false</code>
+for anything else. When it's <code>false</code>, the back-end has sent its error
+envelope:</p>
+<pre><code class="hljs language-json"><span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;error&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;message&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Validation failed&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;details&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span> ... <span class="hljs-punctuation">]</span> <span class="hljs-punctuation">}</span> <span class="hljs-punctuation">}</span>
+</code></pre>
+<p><code>apiRequest()</code> turns that into a JavaScript error and <strong>throws</strong> it, so
+the page that made the request ends up in its <code>catch</code> block. That's the
+same idea as <code>throw new ApiError(...)</code> in the back-end's controllers: an
+error stops the normal flow and goes to the code whose job is handling
+it.</p>
+<p>The error is made by a small helper:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 0.17: an error with extra information (src/api/client.js, excerpt)</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">createApiError</span>(<span class="hljs-params">status, message, details</span>) {
+  <span class="hljs-keyword">const</span> error = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(message);
+  error.<span class="hljs-property">status</span> = status;
+  error.<span class="hljs-property">details</span> = details;
+  <span class="hljs-keyword">return</span> error;
+}
+</code></pre>
+<p>A plain <code>Error</code> only has a <code>message</code>. This one also carries the HTTP
+<strong><code>status</code></strong> (so a page can tell a <code>404</code> from a <code>400</code>) and the
+<strong><code>details</code></strong> list from a validation failure (so a form can show each
+problem next to its field). It's a plain function, the same style as the
+rest of the starter, rather than a class.</p>
+<h2>3. Success: return the body</h2>
+<p>Anything else is a success, and the whole body (<code>{ data }</code> or
+<code>{ data, meta }</code>) is returned.</p>
+<h2><code>?.</code>: optional chaining</h2>
+<pre><code class="hljs language-js">responseBody?.<span class="hljs-property">error</span>?.<span class="hljs-property">message</span>
+</code></pre>
+<p><code>?.</code> means &quot;if the thing on the left is <code>null</code> or <code>undefined</code>, stop and
+give <code>undefined</code>, instead of crashing&quot;. Without it,
+<code>responseBody.error.message</code> would throw a <code>TypeError</code> whenever an error
+response didn't use the expected envelope (for example, an error page
+from some other server). With it, the expression just gives <code>undefined</code>,
+and <code>||</code> falls back to a general message:
+<code>Request failed with status 502</code>.</p>
+</div>
+    
+  </main>
+</body>
+</html>

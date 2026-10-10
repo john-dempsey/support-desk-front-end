@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Props: Passing Data In — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/the-starter/from-index-html-to-the-screen/jsx-is-almost-html.html">← JSX Is Almost HTML</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/the-starter/from-index-html-to-the-screen/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/the-starter/from-index-html-to-the-screen/main-jsx-starting-react.html">main.jsx: Starting React →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Props: Passing Data In</h1>
+    <p class="lede">Attributes on a component become an object passed to its function, so one component can show different things in different places.</p>
+
+    
+
+    
+      <div class="slide-body"><p>A component that always shows the same thing isn't very reusable. The
+starter's <code>ErrorMessage</code> shows <strong>whatever</strong> error it's given:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 0.8: a component with a prop (src/components/ErrorMessage.jsx)</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">ErrorMessage</span>(<span class="hljs-params">{ message }</span>) {
+  <span class="hljs-keyword">return</span> (
+    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">p</span> <span class="hljs-attr">role</span>=<span class="hljs-string">&quot;alert&quot;</span> <span class="hljs-attr">className</span>=<span class="hljs-string">&quot;error-message&quot;</span>&gt;</span>
+      {message}
+    <span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span></span>
+  );
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-title class_">ErrorMessage</span>;
+</code></pre>
+<p>And this is how another component uses it:</p>
+<pre><code class="hljs language-jsx">&lt;<span class="hljs-title class_">ErrorMessage</span> message=<span class="hljs-string">&quot;Can&#x27;t reach the API&quot;</span> /&gt;
+</code></pre>
+<h2>How it works</h2>
+<p>When React meets <code>&lt;ErrorMessage message=&quot;...&quot; /&gt;</code>, it collects the
+attributes into one object and passes it to the function:</p>
+<pre><code class="hljs language-js"><span class="hljs-title class_">ErrorMessage</span>({ <span class="hljs-attr">message</span>: <span class="hljs-string">&quot;Can&#x27;t reach the API&quot;</span> })
+</code></pre>
+<p>That object is called <strong>props</strong> (short for properties). The function
+could take it as one parameter and read <code>props.message</code>:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-keyword">function</span> <span class="hljs-title function_">ErrorMessage</span>(<span class="hljs-params">props</span>) {
+  <span class="hljs-keyword">return</span> <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">p</span> <span class="hljs-attr">className</span>=<span class="hljs-string">&quot;error-message&quot;</span>&gt;</span>{props.message}<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span></span>;
+}
+</code></pre>
+<p>The starter uses <strong>destructuring</strong> in the parameter list instead:
+<code>{ message }</code> pulls the <code>message</code> property out of the props object
+straight away. It's the same destructuring you used on <code>req.body</code> in the
+back-end (<code>const { subject, description } = req.body</code>), just written
+where the parameter goes. It also lists, right at the top, every prop the
+component expects.</p>
+<p>(<code>role=&quot;alert&quot;</code> is for screen readers. It's explained in the
+accessibility topic.)</p>
+<h2>Strings and everything else</h2>
+<pre><code class="hljs language-jsx">&lt;<span class="hljs-title class_">ErrorMessage</span> message=<span class="hljs-string">&quot;Can&#x27;t reach the API&quot;</span> /&gt;   <span class="hljs-comment">// a fixed string: quotes</span>
+<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">ErrorMessage</span> <span class="hljs-attr">message</span>=<span class="hljs-string">{errorMessage}</span> /&gt;</span></span>           <span class="hljs-comment">// a variable: braces</span>
+</code></pre>
+<p>Quotes pass a plain string. For anything else (a variable, a number, an
+object) use <code>{ }</code>, just like anywhere else in JSX.</p>
+<h2>Default values</h2>
+<p><code>Loading</code> has a prop that's optional:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 0.9: a prop with a default (src/components/Loading.jsx, excerpt)</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">Loading</span>(<span class="hljs-params">{ message = <span class="hljs-string">&#x27;Loading…&#x27;</span> }</span>) {
+  <span class="hljs-keyword">return</span> (
+    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">p</span> <span class="hljs-attr">role</span>=<span class="hljs-string">&quot;status&quot;</span> <span class="hljs-attr">className</span>=<span class="hljs-string">&quot;loading&quot;</span>&gt;</span>
+      {message}
+    <span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span></span>
+  );
+}
+</code></pre>
+<p><code>= 'Loading…'</code> is a default value, the same as for any JavaScript
+parameter. <code>&lt;Loading /&gt;</code> shows &quot;Loading…&quot;, and
+<code>&lt;Loading message=&quot;Connecting to the API…&quot; /&gt;</code> shows that message instead.</p>
+<h2>Props are read-only</h2>
+<p>A component <strong>reads</strong> its props and never changes them. The component
+that passes a prop owns that value. If the value needs to change, the
+owner changes it, and React calls the component again with the new
+props. That's how data flows in React: <strong>down</strong>, from parent to child.</p>
+<h2>Compared with Blade</h2>
+<p>Props are like the array you passed to a partial, or the attributes on a
+Blade component:</p>
+<pre><code class="hljs language-php">@<span class="hljs-keyword">include</span>(<span class="hljs-string">&#x27;partials.error&#x27;</span>, [<span class="hljs-string">&#x27;message&#x27;</span> =&gt; <span class="hljs-variable">$error</span>])
+&lt;x-error-message :message=<span class="hljs-string">&quot;<span class="hljs-subst">$error</span>&quot;</span> /&gt;
+</code></pre>
+<p>Even the default value has a Blade equivalent:
+<code>@props(['message' =&gt; 'Loading…'])</code>.</p>
+</div>
+    
+  </main>
+</body>
+</html>

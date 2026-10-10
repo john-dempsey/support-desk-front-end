@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Testing Tools — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/the-starter/accessible-by-default/colour-contrast-and-the-keyboard.html">← Colour, Contrast and the Keyboard</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/the-starter/testing/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/the-starter/testing/testing-the-client.html">Testing the Client With a Fake fetch →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>The Testing Tools</h1>
+    <p class="lede">Vitest runs the tests, jsdom pretends to be a browser, and Testing Library looks at the page the way a user would.</p>
+
+    
+
+    
+      <div class="slide-body"><p>You tested the back-end with Jest. The front-end's tests look almost the
+same (<code>describe</code>, <code>it</code>, <code>expect</code>), but they need a few more tools,
+because they test things that normally only happen in a browser.</p>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Its job</th>
+<th>Back-end equivalent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Vitest</strong></td>
+<td>finds and runs the tests (<code>describe</code>, <code>it</code>, <code>expect</code>, <code>vi</code>)</td>
+<td>Jest (<code>jest</code> becomes <code>vi</code>)</td>
+</tr>
+<tr>
+<td><strong>jsdom</strong></td>
+<td>a pretend browser: <code>document</code>, <code>window</code> and HTML elements, inside Node</td>
+<td>none needed: the back-end had no browser</td>
+</tr>
+<tr>
+<td><strong>React Testing Library</strong></td>
+<td>puts a component on that pretend page, and finds things on it</td>
+<td>Supertest, which sent pretend requests to the API</td>
+</tr>
+<tr>
+<td><strong>jest-dom</strong></td>
+<td>extra checks such as <code>toBeInTheDocument()</code></td>
+<td>none</td>
+</tr>
+</tbody>
+</table>
+<p>Vitest is built on Vite, so it understands JSX and <code>import.meta.env</code>
+with no extra setup. (Jest would need extra configuration for both.)</p>
+<h2>The settings</h2>
+<p>Vitest reads the <code>test</code> section of <code>vite.config.js</code>, the part topic 02
+left out:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 0.26: the test settings (vite.config.js, excerpt)</span>
+  <span class="hljs-attr">test</span>: {
+    <span class="hljs-attr">environment</span>: <span class="hljs-string">&#x27;jsdom&#x27;</span>,
+    <span class="hljs-attr">setupFiles</span>: <span class="hljs-string">&#x27;./src/test/setup.js&#x27;</span>,
+    <span class="hljs-attr">unstubGlobals</span>: <span class="hljs-literal">true</span>,
+    <span class="hljs-attr">mockReset</span>: <span class="hljs-literal">true</span>,
+  },
+</code></pre>
+<ul>
+<li><strong><code>environment: 'jsdom'</code></strong> gives every test the pretend browser.</li>
+<li><strong><code>setupFiles</code></strong> runs <code>setup.js</code> (below) before each test file.</li>
+<li><strong><code>unstubGlobals</code></strong> and <strong><code>mockReset</code></strong> undo every fake after each
+test, so one test can't leak into the next. The next two slides show
+the fakes they undo.</li>
+</ul>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 0.27: before every test file (src/test/setup.js)</span>
+<span class="hljs-keyword">import</span> { afterEach } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;vitest&#x27;</span>;
+<span class="hljs-keyword">import</span> { cleanup } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@testing-library/react&#x27;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-string">&#x27;@testing-library/jest-dom/vitest&#x27;</span>;
+
+<span class="hljs-title function_">afterEach</span>(<span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-title function_">cleanup</span>();
+});
+</code></pre>
+<p>The <code>import</code> adds jest-dom's checks to <code>expect</code>. <code>cleanup()</code> removes
+whatever the last test put on the pretend page, so every test starts
+with an empty one.</p>
+<h2>Running the tests</h2>
+<pre><code class="hljs language-bash">npm <span class="hljs-built_in">test</span>               <span class="hljs-comment"># run every test once</span>
+npm run <span class="hljs-built_in">test</span>:watch     <span class="hljs-comment"># re-run the tests every time you save; q to quit</span>
+</code></pre>
+<p>A passing run of the starter ends like this:</p>
+<pre><code class="hljs"> Test Files  3 passed (3)
+      Tests  13 passed (13)
+</code></pre>
+<p>Test files sit next to the file they test, with <code>.test</code> in the name:
+<code>HomePage.jsx</code> and <code>HomePage.test.jsx</code>. You never need to tell Vitest
+where they are.</p>
+</div>
+    
+  </main>
+</body>
+</html>

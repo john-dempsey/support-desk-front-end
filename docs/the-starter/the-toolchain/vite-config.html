@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>vite.config.js — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/the-starter/the-toolchain/package-json-for-a-front-end.html">← package.json for a Front-End</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/the-starter/the-toolchain/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/the-starter/the-toolchain/env-and-the-vite-prefix.html">.env and the VITE_ Prefix →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>vite.config.js</h1>
+    <p class="lede">Vite&#39;s settings: the React plugin, and a fixed port so the front-end and API never collide.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Vite works with no settings at all, but this project needs to change two
+things. Figure 0.3 is <code>vite.config.js</code>, with its comments and the test
+settings left out:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 0.3: Vite&#x27;s settings (vite.config.js, excerpt)</span>
+<span class="hljs-keyword">import</span> react <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@vitejs/plugin-react&#x27;</span>;
+<span class="hljs-keyword">import</span> { defineConfig } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;vitest/config&#x27;</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-title function_">defineConfig</span>({
+  <span class="hljs-attr">plugins</span>: [<span class="hljs-title function_">react</span>()],
+  <span class="hljs-attr">server</span>: {
+    <span class="hljs-attr">port</span>: <span class="hljs-number">5173</span>,
+    <span class="hljs-attr">strictPort</span>: <span class="hljs-literal">true</span>,
+  },
+  <span class="hljs-attr">test</span>: {
+    <span class="hljs-comment">// ... settings for the tests</span>
+  },
+});
+</code></pre>
+<p>The file exports one settings object. <code>defineConfig()</code> doesn't change the
+object; it just lets your editor know what settings are allowed, so it can
+autocomplete them and spot typos.</p>
+<h2><code>plugins: [react()]</code></h2>
+<p>On its own, Vite knows about JavaScript, CSS and HTML, but not JSX. The
+React plugin teaches it two things:</p>
+<ul>
+<li>how to translate JSX into plain JavaScript</li>
+<li>how to update a component that changed <strong>without</strong> reloading the page,
+so the rest of the page keeps its state. This is the React version of
+the hot module replacement from the first slide, called <strong>Fast
+Refresh</strong>.</li>
+</ul>
+<h2><code>server.port</code> and <code>strictPort</code></h2>
+<p>5173 is Vite's default port anyway. It's written out here for two reasons.
+It makes the port obvious to anyone reading the file. More importantly,
+<code>strictPort: true</code> changes what happens if 5173 is already in use (for
+example, if you forgot to stop another project's dev server). Without it,
+Vite quietly moves to 5174, and you end up looking at the wrong app in
+the browser. With it, Vite stops with an error that tells you the port is
+taken.</p>
+<p>The API has 3000, so the two never clash.</p>
+<h2>The <code>test</code> section</h2>
+<p>The same file also holds the settings for <strong>Vitest</strong>, the test runner.
+That's why <code>defineConfig</code> is imported from <code>'vitest/config'</code> instead of
+<code>'vite'</code>: Vitest's version understands the <code>test</code> section as well. Vite
+itself ignores that section. The settings inside it are explained in the
+testing topic.</p>
+</div>
+    
+  </main>
+</body>
+</html>

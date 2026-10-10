@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Building for Production — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/the-starter/lint-build-and-preview/linting-with-oxlint.html">← Linting With oxlint</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/the-starter/lint-build-and-preview/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/the-starter/lint-build-and-preview/previewing-the-build.html">Previewing the Build →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Building for Production</h1>
+    <p class="lede">npm run build turns the whole app into a few plain files that any web server can host.</p>
+
+    
+
+    
+      <div class="slide-body"><p><code>npm run dev</code> is for working on the app. It's not how the app is given
+to users: it translates files every time they're asked for, and it
+includes extra code for hot updates and StrictMode's checks.</p>
+<p>For users, the app is <strong>built</strong> once:</p>
+<pre><code class="hljs language-bash">npm run build
+</code></pre>
+<p>For the starter, the output looks like this:</p>
+<pre><code class="hljs">dist/index.html                   0.53 kB │ gzip:  0.34 kB
+dist/assets/index-BQTvWgPy.css    1.17 kB │ gzip:  0.54 kB
+dist/assets/index-DhwRkgzD.js   259.54 kB │ gzip: 82.58 kB
+✓ built in 158ms
+</code></pre>
+<h2>What's in <code>dist/</code></h2>
+<p>All your components, React itself, React Router and your CSS end up in
+just <strong>three files</strong>:</p>
+<ul>
+<li><strong><code>index.html</code></strong>: the same empty page from topic 03, now pointing at
+the files below instead of <code>src/main.jsx</code></li>
+<li><strong>one <code>.css</code> file</strong>: every stylesheet the app imports, combined</li>
+<li><strong>one <code>.js</code> file</strong>: every component, every library in
+<code>dependencies</code>, and none of the <code>devDependencies</code>, all translated from
+JSX into plain JavaScript and <strong>minified</strong> (spaces, comments and long
+names removed to make it smaller)</li>
+</ul>
+<p>The <code>gzip</code> column is the size after the server compresses it, which is
+roughly what a user downloads: about 83 kB of JavaScript, most of it
+React.</p>
+<h2>The odd file names</h2>
+<p><code>index-DhwRkgzD.js</code> has a <strong>hash</strong> in its name, made from the file's
+contents. Browsers keep downloaded files for a while (they <strong>cache</strong>
+them). When you change the code and build again, the contents change, so
+the name changes, so browsers know to download the new version instead
+of using an old one.</p>
+<h2>Things to know about the build</h2>
+<ul>
+<li><strong><code>.env</code> is read at build time.</strong> <code>VITE_API_URL</code> is copied into the
+<code>.js</code> file (topic 02). To point a built app at a different API, change
+<code>.env</code> and build again.</li>
+<li><strong><code>dist/</code> is never committed.</strong> It's in <code>.gitignore</code>, like
+<code>node_modules</code>, because it can always be made again from the source.</li>
+<li><strong>No Node or Vite is needed to host it.</strong> These are ordinary static
+files. Any web server can send them, as long as it sends <code>index.html</code>
+for URLs it doesn't recognise: the <strong>fallback</strong> from topic 04.</li>
+</ul>
+</div>
+    
+  </main>
+</body>
+</html>

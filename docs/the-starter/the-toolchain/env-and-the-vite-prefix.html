@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>.env and the VITE_ Prefix — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/the-starter/the-toolchain/vite-config.html">← vite.config.js</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/the-starter/the-toolchain/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/the-starter/from-index-html-to-the-screen/the-empty-page.html">The Empty Page →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>.env and the VITE_ Prefix</h1>
+    <p class="lede">Config works much like it did in the back-end, with one big difference: nothing in a front-end&#39;s .env is secret.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The front-end needs one setting: the address of the API. Like the
+back-end's <code>PORT</code>, it lives in a <code>.env</code> file, so it can change from one
+machine to another without editing code. And as in the back-end, <code>.env</code>
+is never committed (see <code>.gitignore</code>). <code>.env.example</code> is the committed
+template:</p>
+<pre><code class="hljs language-bash"><span class="hljs-comment"># Figure 0.4: the settings template (.env.example, excerpt)</span>
+VITE_API_URL=http://localhost:3000
+</code></pre>
+<p>The one file that reads it is the API client:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 0.5: reading the setting (src/api/client.js, excerpt)</span>
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">API_URL</span> = <span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">env</span>.<span class="hljs-property">VITE_API_URL</span> || <span class="hljs-string">&#x27;http://localhost:3000&#x27;</span>;
+</code></pre>
+<p>Three things here are different from the back-end.</p>
+<h2>1. <code>import.meta.env</code>, not <code>process.env</code></h2>
+<p>There's no <code>process</code> in a browser: it's a Node object, and the browser
+isn't running Node. Instead, Vite reads <code>.env</code> itself (no <code>dotenv</code>
+needed) and makes the values available as <code>import.meta.env</code>.</p>
+<p>Vite doesn't look the value up while the app runs. It <strong>copies the value
+into your code</strong> when it sends the file to the browser (or, for
+<code>npm run build</code>, when it builds it). So when you edit <code>.env</code>, Vite has to
+start again to pick up the new value. It does that by itself: save <code>.env</code>
+and the terminal shows <code>.env changed, restarting server...</code>. Then reload
+the page.</p>
+<h2>2. Only <code>VITE_</code> variables are exposed</h2>
+<p>Every value your front-end can read gets copied into JavaScript that is
+sent to the browser. Anyone using the app can open the developer tools
+and read it.</p>
+<p>So Vite refuses to expose a variable unless its name starts with <code>VITE_</code>.
+That prefix is you saying &quot;I know this will be public&quot;. It stops a
+database password, say, from leaking just because it happened to be in
+the same <code>.env</code>.</p>
+<p>The rule this leads to: <strong>a front-end can't keep a secret.</strong> A URL is
+fine. A password or private API key never belongs in a front-end's
+<code>.env</code>, prefix or not. Secrets stay in the back-end.</p>
+<p>(Laravel uses the same rule. Its default <code>.env</code> has a line
+<code>VITE_APP_NAME=&quot;${APP_NAME}&quot;</code>, which copies the app's name somewhere Vite
+is allowed to read it.)</p>
+<h2>3. A default instead of failing fast</h2>
+<p>The back-end's <code>env.js</code> stopped at startup if <code>PORT</code> was missing. Here,
+<code>|| 'http://localhost:3000'</code> uses a default instead. A front-end has no
+startup step where it could stop with a clear message: by the time this
+line runs, it's already running in a user's browser. And
+<code>localhost:3000</code> is the right answer for every student's machine in this
+module, so a fresh clone works even before you create <code>.env</code>.</p>
+<h2>Setting up a fresh clone</h2>
+<pre><code class="hljs language-bash">npm install
+<span class="hljs-built_in">cp</span> .env.example .<span class="hljs-built_in">env</span>    <span class="hljs-comment"># change VITE_API_URL if your API isn&#x27;t on port 3000</span>
+npm run dev
+</code></pre>
+<h2>Try it</h2>
+<p>With both projects running, change <code>VITE_API_URL</code> in <code>.env</code> to
+<code>http://localhost:3001</code> and save. Watch Vite's terminal, then reload the
+page. What message do you see, and which file wrote it? Put the value
+back when you're done.</p>
+</div>
+    
+  </main>
+</body>
+</html>

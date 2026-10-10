@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Testing Routes — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/the-starter/testing/finding-things-like-a-user.html">← Finding Things Like a User</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/the-starter/testing/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/the-starter/lint-build-and-preview/linting-with-oxlint.html">Linting With oxlint →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Testing Routes</h1>
+    <p class="lede">MemoryRouter starts the app at any URL, so a test can check which page shows where.</p>
+
+    
+
+    
+      <div class="slide-body"><p><code>App.test.jsx</code> checks the route table: does each URL show the right page?</p>
+<p>There's a problem. In the real app, <code>&lt;BrowserRouter&gt;</code> (in <code>main.jsx</code>)
+reads the browser's address bar. A test has no address bar, so it uses
+<strong><code>MemoryRouter</code></strong> instead: a router that keeps the URL in memory and
+starts at whatever URL you give it.</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 0.31: starting the app at a URL (src/App.test.jsx, excerpt)</span>
+vi.<span class="hljs-title function_">mock</span>(<span class="hljs-string">&#x27;./api/welcome.api.js&#x27;</span>);
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">renderAppAt</span>(<span class="hljs-params">url</span>) {
+  <span class="hljs-title function_">render</span>(
+    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">MemoryRouter</span> <span class="hljs-attr">initialEntries</span>=<span class="hljs-string">{[url]}</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">App</span> /&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">MemoryRouter</span>&gt;</span></span>,
+  );
+}
+
+<span class="hljs-title function_">describe</span>(<span class="hljs-string">&#x27;App routes&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-title function_">it</span>(<span class="hljs-string">&#x27;shows the not found page for an unknown URL&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
+    <span class="hljs-title function_">renderAppAt</span>(<span class="hljs-string">&#x27;/no-such-page&#x27;</span>);
+
+    <span class="hljs-title function_">expect</span>(
+      screen.<span class="hljs-title function_">getByRole</span>(<span class="hljs-string">&#x27;heading&#x27;</span>, { <span class="hljs-attr">level</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Page not found&#x27;</span> }),
+    ).<span class="hljs-title function_">toBeInTheDocument</span>();
+  });
+</code></pre>
+<p>(The <code>expect</code> is split over three lines here to fit the page.)</p>
+<ul>
+<li><strong><code>initialEntries={[url]}</code></strong> is the list of URLs the router starts
+with. One URL means &quot;start here&quot;.</li>
+<li><strong><code>renderAppAt</code></strong> is a small helper, so each test is one line of set-up
+instead of five.</li>
+<li><strong><code>vi.mock('./api/welcome.api.js')</code></strong> is needed even in a routing test.
+At <code>/</code>, <code>App</code> shows <code>HomePage</code>, which calls <code>getWelcome()</code>. Without the
+fake, the test would try to reach a real API.</li>
+</ul>
+<p>The file's three tests check that <code>/</code> shows the home page, that an
+unknown URL shows the not-found page, and that the navigation appears on
+every page.</p>
+<h2>Try it</h2>
+<ol>
+<li><strong>Make a test fail on purpose.</strong> In <code>NotFoundPage.jsx</code>, change the
+heading to &quot;Not found&quot;. Run <code>npm test</code>. Read the failure message: which
+test failed, what did it look for, and what did it find instead?
+Change it back.</li>
+<li><strong>Write a test.</strong> Add a test to <code>HomePage.test.jsx</code> that checks the
+page shows <strong>no</strong> error while it's still loading. (You'll need
+<code>queryByRole</code>.)</li>
+<li><strong>Watch mode.</strong> Run <code>npm run test:watch</code>, then edit and save a test.
+What happens?</li>
+</ol>
+</div>
+    
+  </main>
+</body>
+</html>

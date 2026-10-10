@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Your Starter Checklist — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/the-starter/making-it-yours/tracing-a-click.html">← Tracing a Click</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/the-starter/making-it-yours/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/the-starter/making-it-yours/try-it-yourself.html">Try It Yourself →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Your Starter Checklist</h1>
+    <p class="lede">The first changes to make when the starter becomes your own case study&#39;s front-end, and the order to build the rest in.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The starter is the beginning of <strong>your</strong> front-end for Assignment 2, for
+your own case-study API. Before you add anything, make it yours.</p>
+<h2>1. Check it runs</h2>
+<pre><code class="hljs language-bash">npm install
+<span class="hljs-built_in">cp</span> .env.example .<span class="hljs-built_in">env</span>    <span class="hljs-comment"># change VITE_API_URL if your API isn&#x27;t on port 3000</span>
+npm run dev
+</code></pre>
+<p>With your API running, the home page should say <strong>&quot;The API says: Hello
+world!&quot;</strong>. Then run <code>npm test</code> (13 passing) and <code>npm run lint</code> (no
+output). If all three work, commit straight away, so you have a known
+good starting point to come back to.</p>
+<h2>2. Follow the TODOs</h2>
+<p>The starter marks every place you're expected to change with
+<code>TODO (your case study)</code>. Search for it (Ctrl+Shift+F in VS Code). There
+are four:</p>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>What to do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>index.html</code></td>
+<td>change <code>&lt;title&gt;</code> to your app's name</td>
+</tr>
+<tr>
+<td><code>src/components/NavBar.jsx</code></td>
+<td>change <code>APP_NAME</code>, and add a <code>NavLink</code> for each new page</td>
+</tr>
+<tr>
+<td><code>src/App.jsx</code></td>
+<td>add a <code>&lt;Route&gt;</code> for each new page</td>
+</tr>
+<tr>
+<td><code>src/api/welcome.api.js</code></td>
+<td>add a file like this for each of your own resources</td>
+</tr>
+</tbody>
+</table>
+<h2>3. Adding a page: always three steps</h2>
+<p>Every new page is the same three changes:</p>
+<ol>
+<li><strong>The page:</strong> <code>src/pages/BookingListPage.jsx</code>, a component that
+returns its own <code>&lt;h1&gt;</code>.</li>
+<li><strong>The route:</strong> <code>&lt;Route path=&quot;/bookings&quot; element={&lt;BookingListPage /&gt;} /&gt;</code>
+in <code>App.jsx</code>.</li>
+<li><strong>The link:</strong> <code>&lt;NavLink to=&quot;/bookings&quot;&gt;Bookings&lt;/NavLink&gt;</code> in
+<code>NavBar.jsx</code>, if it belongs in the navigation.</li>
+</ol>
+<p>Then a test in <code>App.test.jsx</code> that checks it shows at its URL.</p>
+<h2>4. Build in stages</h2>
+<p>Don't try to build everything at once. Each step should run and pass its
+tests before the next one starts:</p>
+<ol>
+<li><strong>Show your main entity</strong> with a list page and a detail page, using a
+hard-coded array before you fetch anything.</li>
+<li><strong>Fetch it from your API</strong> with a new <code>*.api.js</code> file, and the three
+pieces of state from topic 06.</li>
+<li><strong>Full CRUD:</strong> forms to create and edit, delete with a confirmation,
+and the API's validation messages next to each field.</li>
+<li><strong>Login and roles</strong>, only if your API has authentication.</li>
+<li><strong>Notifications</strong>, only if your API has them.</li>
+</ol>
+<p>Steps 4 and 5 are optional. If your API stops at step 3, so does your
+front-end, and it's still a complete, working app.</p>
+<p>The Support Desk worked example follows these same stages, one per
+lesson.</p>
+</div>
+    
+  </main>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Previewing the Build — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/the-starter/lint-build-and-preview/building-for-production.html">← Building for Production</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/the-starter/lint-build-and-preview/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/the-starter/making-it-yours/tracing-a-click.html">Tracing a Click →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Previewing the Build</h1>
+    <p class="lede">npm run preview serves dist/ on your own machine, so you can check the real thing before it&#39;s deployed.</p>
+
+    
+
+    
+      <div class="slide-body"><p>A build can behave differently from the dev server. A missing file, or a
+<code>.env</code> value you forgot to set, only shows up in the built version. So
+before deploying, try the build on your own machine:</p>
+<pre><code class="hljs language-bash">npm run build
+npm run preview
+</code></pre>
+<p><code>npm run preview</code> serves the files in <code>dist/</code> at
+<strong><code>http://localhost:4173</code></strong>. Unlike <code>npm run dev</code>, it doesn't translate
+anything or watch for changes. It just sends the built files, like a
+real web server would, including the <code>index.html</code> fallback for unknown
+URLs. If you change the code, you have to build again.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><code>npm run dev</code></th>
+<th><code>npm run preview</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Serves</td>
+<td>your source files, translated on request</td>
+<td>the built files in <code>dist/</code></td>
+</tr>
+<tr>
+<td>Port</td>
+<td>5173</td>
+<td>4173</td>
+</tr>
+<tr>
+<td>Updates when you save</td>
+<td>yes</td>
+<td>no: build again</td>
+</tr>
+<tr>
+<td>StrictMode checks</td>
+<td>on</td>
+<td>off</td>
+</tr>
+<tr>
+<td>Used for</td>
+<td>working on the app</td>
+<td>checking the build before deploying</td>
+</tr>
+</tbody>
+</table>
+<h2>Try it</h2>
+<p>With the API running:</p>
+<ol>
+<li>Run <code>npm run build</code>, then <code>npm run preview</code>, and open
+<code>http://localhost:4173</code>. Does the home page look the same as on
+port 5173?</li>
+<li>Open the <strong>Network</strong> tab and reload. How many requests to <code>welcome</code>
+are there now? Compare that with topic 06's StrictMode slide: why is
+it different?</li>
+<li>Open the <code>.js</code> file in <code>dist/assets/</code> in your editor. Can you find
+the text <code>Connecting to the API</code>? Can you find the name <code>HomePage</code>?
+What happened to it?</li>
+<li>Go to <code>http://localhost:4173/no-such-page</code>. Which part of the app
+shows the &quot;Page not found&quot; message: the preview server or React?</li>
+</ol>
+<p>Stop the preview server with <strong>Ctrl+C</strong> when you're done.</p>
+</div>
+    
+  </main>
+</body>
+</html>

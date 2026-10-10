@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Components Are Functions — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/the-starter/from-index-html-to-the-screen/the-empty-page.html">← The Empty Page</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/the-starter/from-index-html-to-the-screen/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/the-starter/from-index-html-to-the-screen/jsx-is-almost-html.html">JSX Is Almost HTML →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Components Are Functions</h1>
+    <p class="lede">A React component is a plain JavaScript function that returns the markup for one piece of the page.</p>
+
+    
+
+    
+      <div class="slide-body"><p>React builds a page out of <strong>components</strong>. A component is one piece of
+the page (a navigation bar, an error message, a whole page) and it's
+written as an ordinary JavaScript function that <strong>returns the markup</strong> for
+that piece:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-keyword">function</span> <span class="hljs-title function_">Greeting</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">return</span> <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>Hello, Support Desk<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span></span>;
+}
+</code></pre>
+<p>Yes, that's HTML-like markup in the middle of JavaScript, with no quotes
+around it. It's called <strong>JSX</strong>, and it's the subject of the next slide.
+For now, read it as &quot;this function returns an <code>&lt;h1&gt;</code>&quot;.</p>
+<p>Once a function like this exists, you <strong>use</strong> it as if it were a new HTML
+tag:</p>
+<pre><code class="hljs language-jsx">&lt;<span class="hljs-title class_">Greeting</span> /&gt;
+</code></pre>
+<p>React calls the function and puts whatever it returns on the page at that
+spot.</p>
+<h2>A real one</h2>
+<p>Figure 0.7 is the starter's &quot;page not found&quot; page, a complete component
+file. (From here on, figures leave out the comment at the top of each
+file. Open the file itself to read it.)</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 0.7: a component file (src/pages/NotFoundPage.jsx)</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Link</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;react-router&#x27;</span>;
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">NotFoundPage</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">return</span> (
+    <span class="language-xml"><span class="hljs-tag">&lt;&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>Page not found<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Sorry, there&#x27;s no page at this address.<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">Link</span> <span class="hljs-attr">to</span>=<span class="hljs-string">&quot;/&quot;</span>&gt;</span>Go to the home page<span class="hljs-tag">&lt;/<span class="hljs-name">Link</span>&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+    <span class="hljs-tag">&lt;/&gt;</span></span>
+  );
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-title class_">NotFoundPage</span>;
+</code></pre>
+<ul>
+<li>The function returns several lines of markup, so they're wrapped in
+<code>( )</code> to keep <code>return</code> and the markup together.</li>
+<li><code>&lt;Link&gt;</code> is a link to another page of the app. For now, read it as
+<code>&lt;a href=&quot;/&quot;&gt;</code>. The routing topic explains why it isn't a plain <code>&lt;a&gt;</code>.</li>
+<li><code>export default</code> makes the component available to other files, which
+<code>import</code> it, exactly as in the back-end. There's one component per file,
+and the file is named after it.</li>
+<li>The file ends in <code>.jsx</code> to say &quot;this file contains JSX&quot;.</li>
+</ul>
+<h2>Two rules for component names</h2>
+<ul>
+<li><strong>Start with a capital letter</strong>: <code>NotFoundPage</code>, not <code>notFoundPage</code>.
+That's how React tells your components apart from HTML tags: <code>&lt;p&gt;</code> is
+HTML, <code>&lt;Greeting&gt;</code> is a component. A lowercase <code>&lt;greeting&gt;</code> would be
+treated as an (unknown) HTML tag, and your function would never run.</li>
+<li><strong>Name it for what it shows</strong>, in PascalCase, like <code>ErrorMessage</code>.</li>
+</ul>
+<h2>Compared with Blade</h2>
+<p>A component is closest to a <strong>Blade view or partial</strong>: a reusable chunk
+of markup in its own file. The difference is that it's a JavaScript
+function. That means it can take inputs, make decisions and call other
+functions in the same language as the rest of your code, with no separate
+template language to learn.</p>
+</div>
+    
+  </main>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Catch-All Route — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/the-starter/routing/navlink-and-the-active-page.html">← NavLink and the Active Page</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/the-starter/routing/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/the-starter/talking-to-the-api/one-door-to-the-api.html">One Door to the API →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>The Catch-All Route</h1>
+    <p class="lede">path=&quot;*&quot; shows a not-found page for any URL the app doesn&#39;t have, like the back-end&#39;s notFound middleware.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The second route in <code>App.jsx</code> (Figure 0.11) is:</p>
+<pre><code class="hljs language-jsx">&lt;<span class="hljs-title class_">Route</span> path=<span class="hljs-string">&quot;*&quot;</span> element={<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">NotFoundPage</span> /&gt;</span></span>} /&gt;
+</code></pre>
+<p><code>*</code> matches <strong>any</strong> URL. So when no other route fits, the user sees
+<code>NotFoundPage</code> instead of a blank space. It's the front-end's version of
+the back-end's <code>middleware/notFound.js</code>:</p>
+<pre><code class="hljs language-js"><span class="hljs-keyword">export</span> <span class="hljs-title function_">default</span> (req, res, next) =&gt; {
+  res.<span class="hljs-title function_">status</span>(<span class="hljs-number">404</span>).<span class="hljs-title function_">json</span>({
+    <span class="hljs-attr">error</span>: { <span class="hljs-attr">message</span>: <span class="hljs-string">`Not found: <span class="hljs-subst">${req.method}</span> <span class="hljs-subst">${req.originalUrl}</span>`</span> },
+  });
+};
+</code></pre>
+<h2>Order doesn't matter (but keep it last)</h2>
+<p>In Express, <code>notFound</code> <strong>had</strong> to be registered after every route.
+Express tries each one in order and stops at the first match, so a
+catch-all at the top would have caught everything.</p>
+<p>React Router works differently. It compares <strong>every</strong> route with the URL
+and picks the <strong>most specific</strong> match. <code>/</code> is more specific than <code>*</code>,
+so <code>/</code> wins at the home page wherever the two routes are written.
+<code>*</code> only wins when nothing else matches at all. The starter still puts it
+last, because a table that reads from most specific to least is easier to
+follow.</p>
+<h2>Who answers a URL that doesn't exist?</h2>
+<p>Type <code>http://localhost:5173/no-such-page</code> into the address bar and press
+Enter. This time it's a real request to the server (Vite), because you
+typed the URL yourself instead of clicking a <code>&lt;Link&gt;</code>. Here's what
+happens:</p>
+<ol>
+<li>Vite has no file called <code>no-such-page</code>. Instead of a 404, it sends
+back <code>index.html</code>, the same page it sends for every URL.</li>
+<li>The browser runs <code>main.jsx</code>, and React starts.</li>
+<li>React Router reads <code>/no-such-page</code> from the address bar, finds no
+route but <code>*</code>, and shows <code>NotFoundPage</code>.</li>
+</ol>
+<p>So the &quot;not found&quot; message comes from <strong>React</strong>, not from the server. The
+HTTP status of that request was <strong>200 OK</strong>: as far as Vite is concerned,
+it successfully sent <code>index.html</code>. Only the app knows the page doesn't
+exist.</p>
+<p>Sending <code>index.html</code> for every URL is called a <strong>fallback</strong>, and it's
+what makes a single-page app work at all. Without it, refreshing on any
+page except <code>/</code> would show the server's own error. Vite's dev server does
+it for you. When the app is deployed on a different server, that server
+must be set up to do it too, which comes up again when the app is built
+for production.</p>
+<h2>Try it</h2>
+<p>With the <strong>Network</strong> tab open, go to <code>http://localhost:5173/no-such-page</code>.
+Find the <code>document</code> request. What status does it have? Now compare it
+with the request the back-end gets: open <code>http://localhost:3000/no-such-page</code>.
+What status and body does the <strong>API</strong> send?</p>
+</div>
+    
+  </main>
+</body>
+</html>

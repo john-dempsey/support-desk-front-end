@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What Runs Where — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/the-starter/why-a-separate-front-end/from-blade-to-a-client-app.html">← From Blade to a Client App</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/the-starter/why-a-separate-front-end/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/the-starter/why-a-separate-front-end/cors-from-the-other-side.html">CORS From the Other Side →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>What Runs Where</h1>
+    <p class="lede">Two projects, two terminals, two ports, and a browser that talks to both.</p>
+
+    
+
+    
+      <div class="slide-body"><p>While you develop, three programs work together:</p>
+<p><img src="/support-desk-front-end/assets/images/what-runs-where.svg" alt="Diagram: the browser loads the app from the Vite dev server on port 5173, then calls the API on port 3000 directly, which reads and writes MySQL"></p>
+<ol>
+<li><strong>The API</strong>, on <code>http://localhost:3000</code>. This is the Support Desk API
+you built, started with <code>npm run dev</code> in its own folder. It talks to
+MySQL and sends back JSON.</li>
+<li><strong>The Vite dev server</strong>, on <code>http://localhost:5173</code>. Vite is the tool
+that runs the front-end while you work on it. It's also started with
+<code>npm run dev</code>, but in the <strong>front-end's</strong> folder. Its job is to send the
+front-end's files (one HTML page, plus your JavaScript and CSS) to the
+browser, and to refresh the browser whenever you save a file.</li>
+<li><strong>The browser.</strong> It loads the page from Vite, then runs your React
+code. When that code needs data, the browser sends a request
+<strong>straight to the API</strong> on port 3000.</li>
+</ol>
+<p>Notice what's missing: Vite never talks to the API. Once the browser has
+the front-end's files, every request for data goes directly from the
+browser to the API. That's why the API has to be running for the
+front-end to show any data, and why the front-end needs to know the API's
+address (you'll see where that's set in the toolchain topic).</p>
+<h2>Two terminals</h2>
+<p>So in practice you'll have two terminals open, one for each project:</p>
+<pre><code class="hljs language-bash"><span class="hljs-comment"># Terminal 1: the API (in your back-end folder)</span>
+npm run dev        <span class="hljs-comment"># API on http://localhost:3000</span>
+
+<span class="hljs-comment"># Terminal 2: the front-end (in your front-end folder)</span>
+npm run dev        <span class="hljs-comment"># front-end on http://localhost:5173</span>
+</code></pre>
+<p>Both commands are called <code>npm run dev</code>, so check which folder you're in.
+Each project's <code>package.json</code> decides what its own <code>dev</code> script does.</p>
+<p>Then open <code>http://localhost:5173</code> in the browser, <strong>not</strong> port 3000.
+Port 3000 is the API, which only ever answers with JSON.</p>
+<h2>Laravel comparison</h2>
+<p>In Laravel, <code>php artisan serve</code> did all of this in one process: it served
+the pages <em>and</em> ran the code that read the database. Here those jobs are
+split between two programs. The browser is the only thing that connects
+them.</p>
+</div>
+    
+  </main>
+</body>
+</html>

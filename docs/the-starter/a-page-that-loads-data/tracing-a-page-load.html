@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tracing a Page Load — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/the-starter/a-page-that-loads-data/cleanup-and-the-ignore-flag.html">← Cleanup and the ignore Flag</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/the-starter/a-page-that-loads-data/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/the-starter/accessible-by-default/semantic-html.html">Semantic HTML →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Tracing a Page Load</h1>
+    <p class="lede">Everything from this lesson in order: what happens, in which file, from opening the home page to seeing the API&#39;s message.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Here is everything that happens when you open <code>http://localhost:5173/</code>
+with the API running, in order. Each step names the file it happens in.</p>
+<ol>
+<li><strong><code>index.html</code>.</strong> The browser loads the empty page, which loads
+<code>main.jsx</code>.</li>
+<li><strong><code>main.jsx</code>.</strong> <code>createRoot</code> takes over <code>&lt;div id=&quot;root&quot;&gt;</code> and renders
+<code>&lt;App /&gt;</code>.</li>
+<li><strong><code>App.jsx</code>.</strong> <code>&lt;Routes&gt;</code> sees the URL <code>/</code> and picks
+<code>&lt;HomePage /&gt;</code>. <code>NavBar</code> is rendered above it.</li>
+<li><strong><code>HomePage.jsx</code>, first render.</strong> The three <code>useState</code> calls give
+their starting values: <code>welcome</code> is <code>null</code>, <code>errorMessage</code> is <code>''</code>,
+<code>isLoading</code> is <code>true</code>. The page returns the heading and
+<code>&lt;Loading message=&quot;Connecting to the API…&quot; /&gt;</code>. React puts it on
+screen.</li>
+<li><strong><code>HomePage.jsx</code>, the effect.</strong> Now that the page is showing,
+<code>useEffect</code> runs <code>loadWelcome()</code>, which calls <code>getWelcome()</code>.</li>
+<li><strong><code>welcome.api.js</code>.</strong> <code>getWelcome()</code> calls <code>apiRequest('/welcome')</code>.</li>
+<li><strong><code>client.js</code>.</strong> <code>apiRequest</code> builds the headers (no token, so no
+<code>Authorization</code>) and calls
+<code>fetch('http://localhost:3000/welcome')</code>.</li>
+<li><strong>The API.</strong> The request crosses to the back-end, which answers
+<code>200</code> with <code>{ &quot;data&quot;: { &quot;message&quot;: &quot;Hello world!&quot; } }</code>.</li>
+<li><strong><code>client.js</code>.</strong> <code>response.ok</code> is <code>true</code>, so <code>apiRequest</code> returns the
+body.</li>
+<li><strong><code>welcome.api.js</code>.</strong> <code>getWelcome</code> returns <code>responseBody.data</code>:
+<code>{ message: 'Hello world!' }</code>.</li>
+<li><strong><code>HomePage.jsx</code>, the state updates.</strong> <code>setWelcome(...)</code> stores the
+data. Then <code>finally</code> runs <code>setIsLoading(false)</code>. The two happen one
+straight after the other, so React waits for both and re-renders
+once.</li>
+<li><strong><code>HomePage.jsx</code>, second render.</strong> React calls <code>HomePage()</code> again.
+Now <code>isLoading</code> is <code>false</code>, so <code>Loading</code> disappears, and <code>welcome</code> is
+set, so &quot;The API says: <strong>Hello world!</strong>&quot; appears.</li>
+</ol>
+<p>(In development, StrictMode adds the extra run from the previous slide
+between steps 5 and 8.)</p>
+<h2>And if the API is down?</h2>
+<p>Steps 1 to 7 are the same. At step 7, <code>fetch()</code> rejects, <code>apiRequest</code>
+throws its &quot;Can't reach the API&quot; error, it passes up through
+<code>getWelcome</code>, and <code>HomePage</code>'s <code>catch</code> stores the message with
+<code>setErrorMessage</code>. On the second render, <code>errorMessage &amp;&amp; ...</code> shows
+<code>&lt;ErrorMessage&gt;</code>.</p>
+<h2>Practise saying it</h2>
+<p>This is exactly the kind of trace the viva asks for: component, API
+module, HTTP request, state update, re-render. Try explaining it out
+loud, with the code open, without reading these steps. Then close the
+code and try again.</p>
+</div>
+    
+  </main>
+</body>
+</html>

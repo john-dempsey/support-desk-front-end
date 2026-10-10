@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NavLink and the Active Page — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/the-starter/routing/links-without-reloads.html">← Links Without Reloads</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/the-starter/routing/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/the-starter/routing/the-catch-all-route.html">The Catch-All Route →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>NavLink and the Active Page</h1>
+    <p class="lede">A link that knows when it points at the current page, so the navigation can show the user where they are.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The navigation bar should show which page you're on. <code>NavLink</code> is a
+<code>Link</code> that does exactly that. Here's the starter's <code>NavBar</code>:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 0.12: the navigation (src/components/NavBar.jsx, excerpt)</span>
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">APP_NAME</span> = <span class="hljs-string">&#x27;My App&#x27;</span>;
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">NavBar</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">return</span> (
+    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">header</span> <span class="hljs-attr">className</span>=<span class="hljs-string">&quot;site-header&quot;</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">p</span> <span class="hljs-attr">className</span>=<span class="hljs-string">&quot;app-name&quot;</span>&gt;</span>{APP_NAME}<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">nav</span> <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Main&quot;</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">ul</span> <span class="hljs-attr">className</span>=<span class="hljs-string">&quot;nav-links&quot;</span>&gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-name">li</span>&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">NavLink</span> <span class="hljs-attr">to</span>=<span class="hljs-string">&quot;/&quot;</span> <span class="hljs-attr">end</span>&gt;</span>
+              Home
+            <span class="hljs-tag">&lt;/<span class="hljs-name">NavLink</span>&gt;</span>
+          <span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-name">ul</span>&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">nav</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">header</span>&gt;</span></span>
+  );
+}
+</code></pre>
+<p>When a <code>NavLink</code> points at the current page, React Router adds two
+things to the <code>&lt;a&gt;</code> it creates:</p>
+<ul>
+<li>
+<p><strong><code>class=&quot;active&quot;</code></strong>, so CSS can style it. The starter makes the
+current page's link bold, with a thicker underline:</p>
+<pre><code class="hljs language-css"><span class="hljs-comment">/* Figure 0.13: the active link (src/index.css, excerpt) */</span>
+<span class="hljs-selector-class">.nav-links</span> <span class="hljs-selector-tag">a</span><span class="hljs-selector-class">.active</span> {
+  <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">700</span>;
+  <span class="hljs-attribute">text-decoration-thickness</span>: <span class="hljs-number">3px</span>;
+}
+</code></pre>
+</li>
+<li>
+<p><strong><code>aria-current=&quot;page&quot;</code></strong>, so a screen reader says &quot;current page&quot; when
+it reads the link. Users who can't see the bold text still find out
+where they are.</p>
+</li>
+</ul>
+<p>You don't write either of these yourself. <code>NavLink</code> adds and removes them
+as the URL changes.</p>
+<h2>What counts as &quot;active&quot;? The <code>end</code> prop</h2>
+<p>By default, a <code>NavLink</code> is active on its own URL <strong>and every URL below
+it</strong>. A link to <code>/bookings</code> would be active on <code>/bookings</code>, and also on
+<code>/bookings/7</code>. That's usually what you want: while you look at one
+booking, you're still in the &quot;Bookings&quot; part of the app.</p>
+<p>Adding <strong><code>end</code></strong> makes a link active only on <strong>exactly</strong> its own URL.
+React Router already treats a link to <code>/</code> that way (otherwise &quot;Home&quot;
+would be active on every page), so the <code>end</code> on the Home link doesn't
+change anything. It's there to make the intention obvious to anyone
+reading the code.</p>
+<h2>Two more details</h2>
+<ul>
+<li><code>APP_NAME</code> is a constant at the top of the file, with a
+<code>TODO (your case study)</code> comment above it. Changing your app's name is
+one of the first things you'll do.</li>
+<li><code>aria-label=&quot;Main&quot;</code> gives the <code>&lt;nav&gt;</code> a name, so screen reader users
+can tell it apart from any other navigation on the page. The
+accessibility topic covers this.</li>
+</ul>
+</div>
+    
+  </main>
+</body>
+</html>

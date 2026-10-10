@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sending a Request — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/the-starter/talking-to-the-api/one-door-to-the-api.html">← One Door to the API</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/the-starter/talking-to-the-api/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/the-starter/talking-to-the-api/reading-the-response.html">Reading the Response →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Sending a Request</h1>
+    <p class="lede">fetch(), the request options, and why the Authorization header is only sent when there&#39;s a token.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The browser's built-in way to send an HTTP request is <strong><code>fetch()</code></strong>. It
+takes a URL and an options object, and returns a <strong>promise</strong> (the same
+<code>async</code>/<code>await</code> you used throughout the back-end):</p>
+<pre><code class="hljs language-js"><span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-string">&#x27;http://localhost:3000/welcome&#x27;</span>);
+<span class="hljs-keyword">const</span> body = <span class="hljs-keyword">await</span> response.<span class="hljs-title function_">json</span>();
+</code></pre>
+<p>Two <code>await</code>s: the first waits for the response to <strong>start</strong> arriving
+(its status and headers), and <code>response.json()</code> waits for the rest of
+the body and turns it from JSON text into a JavaScript object.</p>
+<p>Here's how <code>apiRequest()</code> calls it:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 0.14: sending the request (src/api/client.js, excerpt)</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">apiRequest</span>(<span class="hljs-params">path, options = {}</span>) {
+  <span class="hljs-keyword">const</span> method = options.<span class="hljs-property">method</span> || <span class="hljs-string">&#x27;GET&#x27;</span>;
+  <span class="hljs-keyword">const</span> hasBody = options.<span class="hljs-property">body</span> !== <span class="hljs-literal">undefined</span>;
+
+  <span class="hljs-keyword">let</span> response;
+  <span class="hljs-keyword">try</span> {
+    response = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-string">`<span class="hljs-subst">${API_URL}</span><span class="hljs-subst">${path}</span>`</span>, {
+      method,
+      <span class="hljs-attr">headers</span>: <span class="hljs-title function_">buildHeaders</span>(hasBody),
+      <span class="hljs-attr">body</span>: hasBody ? <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(options.<span class="hljs-property">body</span>) : <span class="hljs-literal">undefined</span>,
+    });
+  } <span class="hljs-keyword">catch</span> {
+    <span class="hljs-comment">// ... see &quot;When Nothing Answers&quot;</span>
+  }
+</code></pre>
+<ul>
+<li><strong><code>path</code></strong> is just the part after the base URL, such as <code>'/welcome'</code>.
+<code>API_URL</code> (topic 02) is added here, so no other file needs to know it.</li>
+<li><strong><code>options</code></strong> is optional (<code>= {}</code>). A plain <code>apiRequest('/welcome')</code> is
+a <code>GET</code> with no body.</li>
+<li><strong><code>body</code></strong> is a normal JavaScript object. <code>JSON.stringify()</code> turns it
+into JSON text, which is what goes over the network. It's the reverse
+of the <code>express.json()</code> middleware in the back-end, which turned that
+text back into <code>req.body</code>.</li>
+</ul>
+<h2>The headers</h2>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 0.15: the request headers (src/api/client.js, excerpt)</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">getToken</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;
+}
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">buildHeaders</span>(<span class="hljs-params">hasBody</span>) {
+  <span class="hljs-keyword">const</span> headers = {};
+
+  <span class="hljs-keyword">if</span> (hasBody) {
+    headers[<span class="hljs-string">&#x27;Content-Type&#x27;</span>] = <span class="hljs-string">&#x27;application/json&#x27;</span>;
+  }
+
+  <span class="hljs-keyword">const</span> token = <span class="hljs-title function_">getToken</span>();
+  <span class="hljs-keyword">if</span> (token) {
+    headers.<span class="hljs-property">Authorization</span> = <span class="hljs-string">`Bearer <span class="hljs-subst">${token}</span>`</span>;
+  }
+
+  <span class="hljs-keyword">return</span> headers;
+}
+</code></pre>
+<ul>
+<li><strong><code>Content-Type: application/json</code></strong> tells the API the body is JSON, so
+<code>express.json()</code> knows to read it. It's only sent when there <strong>is</strong> a
+body.</li>
+<li><strong><code>Authorization: Bearer ...</code></strong> is how the back-end's <code>authenticate</code>
+middleware expects a token. But <code>getToken()</code> returns <code>null</code>: the
+starter has no login. So <strong>no <code>Authorization</code> header is sent at all</strong>.</li>
+</ul>
+<p>That second point is deliberate. Not every API in this module has
+authentication. A client that always sent a header (even an empty one)
+could confuse an API that doesn't expect one. A client that sends one
+<strong>only when there's a token</strong> works unchanged against an API with
+authentication and one without. If your app gets a login page later,
+<code>getToken()</code> is the only function in this file that changes.</p>
+</div>
+    
+  </main>
+</body>
+</html>

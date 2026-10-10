@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Finding Things Like a User — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/the-starter/testing/testing-a-page.html">← Testing a Page With a Fake API</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/the-starter/testing/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/the-starter/testing/testing-routes.html">Testing Routes →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Finding Things Like a User</h1>
+    <p class="lede">getBy, queryBy and findBy, and why tests look for roles and text instead of class names.</p>
+
+    
+
+    
+      <div class="slide-body"><p>After <code>render(&lt;HomePage /&gt;)</code>, the test has to find things on the page.
+Testing Library's <code>screen</code> object has a set of <strong>queries</strong> for that, and
+their names follow a pattern: <strong>how</strong> they behave, then <strong>what</strong> they
+search by.</p>
+<h2>How: <code>getBy</code>, <code>queryBy</code>, <code>findBy</code></h2>
+<table>
+<thead>
+<tr>
+<th>Query</th>
+<th>If it finds it</th>
+<th>If it doesn't</th>
+<th>Use it when</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>getBy...</code></td>
+<td>returns it</td>
+<td><strong>fails the test</strong> straight away</td>
+<td>it should already be there</td>
+</tr>
+<tr>
+<td><code>queryBy...</code></td>
+<td>returns it</td>
+<td>returns <code>null</code></td>
+<td>checking something is <strong>not</strong> there</td>
+</tr>
+<tr>
+<td><code>findBy...</code></td>
+<td>returns it (in a promise, so <code>await</code> it)</td>
+<td>keeps trying for up to a second, then fails</td>
+<td>it appears <strong>later</strong>, e.g. after a fake request</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="hljs language-js"><span class="hljs-comment">// it&#x27;s there straight away: the loading message</span>
+<span class="hljs-title function_">expect</span>(screen.<span class="hljs-title function_">getByRole</span>(<span class="hljs-string">&#x27;status&#x27;</span>)).<span class="hljs-title function_">toHaveTextContent</span>(<span class="hljs-string">&#x27;Connecting&#x27;</span>);
+
+<span class="hljs-comment">// it appears after the fake getWelcome() resolves</span>
+<span class="hljs-title function_">expect</span>(<span class="hljs-keyword">await</span> screen.<span class="hljs-title function_">findByText</span>(<span class="hljs-string">&#x27;Hello world!&#x27;</span>)).<span class="hljs-title function_">toBeInTheDocument</span>();
+
+<span class="hljs-comment">// it should not be there at all</span>
+<span class="hljs-title function_">expect</span>(screen.<span class="hljs-title function_">queryByRole</span>(<span class="hljs-string">&#x27;alert&#x27;</span>)).<span class="hljs-property">not</span>.<span class="hljs-title function_">toBeInTheDocument</span>();
+</code></pre>
+<p>Forgetting <code>await</code> before a <code>findBy</code> is the most common mistake. The test
+then checks a promise instead of an element, and the result is
+confusing.</p>
+<h2>What: by role, text or label</h2>
+<table>
+<thead>
+<tr>
+<th>Query ends in</th>
+<th>Finds</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ByRole</code></td>
+<td>an element by what it <strong>is</strong></td>
+<td><code>getByRole('heading', { level: 1, name: 'Welcome' })</code></td>
+</tr>
+<tr>
+<td><code>ByText</code></td>
+<td>an element by the text it shows</td>
+<td><code>findByText('Hello world!')</code></td>
+</tr>
+<tr>
+<td><code>ByLabelText</code></td>
+<td>a form input by its <code>&lt;label&gt;</code></td>
+<td><code>getByLabelText('Email')</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>ByRole</code> is the first choice.</strong> It finds elements the way a screen
+reader does (topic 07): a <code>heading</code>, a <code>link</code>, a <code>navigation</code>, a
+<code>status</code>. The <code>name</code> option is the element's accessible name, usually
+its text. If a test can't find a button by role, often a screen reader
+user can't either. So these tests check accessibility as well.</p>
+<h2>Not by class name</h2>
+<p>You could find the error with <code>document.querySelector('.error-message')</code>.
+Don't. A user can't see class names. If someone renamed the class, the
+page would look and work exactly the same, but the test would fail. A
+test should only fail when something <strong>the user notices</strong> is broken.</p>
+<h2>The checks: jest-dom</h2>
+<table>
+<thead>
+<tr>
+<th>Check</th>
+<th>Passes when</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>toBeInTheDocument()</code></td>
+<td>the element is on the page</td>
+</tr>
+<tr>
+<td><code>toHaveTextContent('...')</code></td>
+<td>the element's text contains this</td>
+</tr>
+<tr>
+<td><code>toHaveAttribute('href', '/')</code></td>
+<td>the element has this attribute and value</td>
+</tr>
+</tbody>
+</table>
+</div>
+    
+  </main>
+</body>
+</html>

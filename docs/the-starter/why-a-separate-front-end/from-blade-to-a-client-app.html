@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>From Blade to a Client App — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/the-starter/why-a-separate-front-end/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/the-starter/why-a-separate-front-end/what-runs-where.html">What Runs Where →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>From Blade to a Client App</h1>
+    <p class="lede">In Laravel the server built every page. Your API doesn&#39;t build pages at all, so the browser has to.</p>
+
+    
+
+    
+      <div class="slide-body"><p>In Year 2, every page your Laravel app showed was built <strong>on the server</strong>.
+A request came in, a route sent it to a controller, the controller loaded
+some models and handed them to a Blade view, and Blade turned them into a
+complete HTML page:</p>
+<pre><code class="hljs language-php"><span class="hljs-comment">// Laravel: the server returns a finished page</span>
+<span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">index</span>(<span class="hljs-params"></span>)
+</span>{
+    <span class="hljs-variable">$tickets</span> = <span class="hljs-title class_">Ticket</span>::<span class="hljs-title function_ invoke__">all</span>();
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_ invoke__">view</span>(<span class="hljs-string">&#x27;tickets.index&#x27;</span>, [<span class="hljs-string">&#x27;tickets&#x27;</span> =&gt; <span class="hljs-variable">$tickets</span>]);
+}
+</code></pre>
+<p>The browser's only job was to display that HTML. Clicking a link sent a
+new request, and the server built and sent a whole new page.</p>
+<p>The Support Desk API you built in Node works differently. It never returns
+HTML. Ask it for <code>GET /tickets</code> and you get <strong>JSON</strong>:</p>
+<pre><code class="hljs language-json"><span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;data&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;subject&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Cannot log in&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;status&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;open&quot;</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">]</span> <span class="hljs-punctuation">}</span>
+</code></pre>
+<p>That's ideal for a program, but it isn't a page anyone can use. Something
+has to take that JSON and turn it into headings, tables, buttons and forms.
+In this module that something is a <strong>JavaScript program running in the
+browser</strong>: the <strong>front-end</strong>, or <strong>client</strong>.</p>
+<h2>A single-page application</h2>
+<p>The front-end you'll build is a <strong>single-page application</strong> (SPA). The
+browser loads <strong>one</strong> HTML page, once. From then on, JavaScript does what
+the server used to do:</p>
+<ul>
+<li>it <strong>asks the API for data</strong> (JSON) when a page needs it</li>
+<li>it <strong>builds the HTML</strong> for that data in the browser</li>
+<li>when you click a link, it <strong>swaps what's on screen</strong> without asking the
+server for a new page</li>
+</ul>
+<p>To build it you'll use <strong>React</strong>, a JavaScript library for building user
+interfaces out of small, reusable pieces called <strong>components</strong>. You've
+never used a front-end library like this before, so this lesson introduces
+React from the start.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Laravel + Blade</th>
+<th>API + React</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Who builds the HTML?</td>
+<td>the server, using Blade</td>
+<td>the browser, using React</td>
+</tr>
+<tr>
+<td>What the server sends</td>
+<td>a finished HTML page</td>
+<td>JSON data</td>
+</tr>
+<tr>
+<td>Clicking a link</td>
+<td>a new request and a whole new page</td>
+<td>JavaScript changes part of the page</td>
+</tr>
+<tr>
+<td>Where page logic runs</td>
+<td>PHP, on the server</td>
+<td>JavaScript, in the browser</td>
+</tr>
+</tbody>
+</table>
+<h2>Why split it in two?</h2>
+<ul>
+<li><strong>One API, many clients.</strong> The same API can serve this website, a
+mobile app, or another company's system, because it only deals in data.</li>
+<li><strong>Separate jobs.</strong> The back-end owns the data and the rules; the
+front-end owns what the user sees. Each can be changed, tested and
+deployed on its own.</li>
+<li><strong>A smoother experience.</strong> Only the part of the page that changes is
+redrawn, so moving around the app feels quicker than reloading every
+page.</li>
+</ul>
+<p>It isn't free. The browser has to download and run more JavaScript before
+anything appears, and you now have two projects to run instead of one. The
+next slide shows what that looks like on your machine.</p>
+</div>
+    
+  </main>
+</body>
+</html>

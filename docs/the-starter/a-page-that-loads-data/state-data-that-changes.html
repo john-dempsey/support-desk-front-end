@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>State: Data That Changes — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/the-starter/talking-to-the-api/one-function-per-endpoint.html">← One Function per Endpoint</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/the-starter/a-page-that-loads-data/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/the-starter/a-page-that-loads-data/three-pieces-of-state.html">Three Pieces of State →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>State: Data That Changes</h1>
+    <p class="lede">Blade drew a page once per request. A React component is drawn again every time its data changes, and useState is how it gets that data.</p>
+
+    
+
+    
+      <div class="slide-body"><p>A Blade view ran <strong>once</strong> per request. The controller gathered the data,
+Blade turned it into HTML, and that page never changed again. To show
+something new, the browser asked for a whole new page.</p>
+<p>A React page stays on screen while things happen: a click, a response
+from the API, a timer. When something changes, the component has to be
+drawn again with the new data. React calls this <strong>re-rendering</strong>, and the
+data that triggers it is called <strong>state</strong>.</p>
+<h2>A small example</h2>
+<p>This isn't in the starter. It's the smallest possible example of state:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-keyword">import</span> { useState } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;react&#x27;</span>;
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">Counter</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> [count, setCount] = <span class="hljs-title function_">useState</span>(<span class="hljs-number">0</span>);
+
+  <span class="hljs-keyword">return</span> (
+    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">onClick</span>=<span class="hljs-string">{()</span> =&gt;</span> setCount(count + 1)}&gt;
+      Clicked {count} times
+    <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span></span>
+  );
+}
+</code></pre>
+<ul>
+<li><strong><code>useState(0)</code></strong> creates one piece of state, starting at <code>0</code>. It
+returns two things in an array, which are unpacked with array
+destructuring: the <strong>current value</strong> (<code>count</code>) and a <strong>function to
+change it</strong> (<code>setCount</code>).</li>
+<li><strong><code>onClick</code></strong> is how React attaches a click handler: a prop that takes
+a function. (Event props are camelCase: <code>onClick</code>, not <code>onclick</code>.)</li>
+<li>Clicking calls <code>setCount(count + 1)</code>. React stores the new value, then
+<strong>calls <code>Counter()</code> again</strong>. This time <code>useState</code> gives back <code>1</code>, the
+function returns a button that says &quot;Clicked 1 times&quot;, and React
+updates the page to match.</li>
+</ul>
+<p>React compares what the component returned this time with last time,
+and only changes the parts of the real page that are different. Here,
+that's just the text inside the button.</p>
+<h2>Why not an ordinary variable?</h2>
+<pre><code class="hljs language-jsx"><span class="hljs-keyword">function</span> <span class="hljs-title function_">Counter</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">let</span> count = <span class="hljs-number">0</span>;   <span class="hljs-comment">// doesn&#x27;t work</span>
+  <span class="hljs-keyword">return</span> <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">onClick</span>=<span class="hljs-string">{()</span> =&gt;</span> count++}&gt;Clicked {count} times<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span></span>;
+}
+</code></pre>
+<p>Two reasons this fails. First, changing <code>count</code> doesn't tell React
+anything has changed, so nothing is redrawn. Second, even if React did
+call <code>Counter()</code> again, the function would start from the top and set
+<code>count</code> back to <code>0</code>. State lives <strong>outside</strong> the function, kept by React
+between calls. The setter is how you change it <strong>and</strong> tell React to
+redraw.</p>
+<h2>Hooks</h2>
+<p><code>useState</code> is a <strong>hook</strong>: a React function whose name starts with <code>use</code>.
+Hooks have one rule that matters: <strong>call them at the top level of the
+component</strong>, never inside an <code>if</code>, a loop or a nested function. React
+tells the pieces of state apart by the <strong>order</strong> the hooks are called
+in, so that order must be the same every time the component runs. The
+linter (topic 09) checks this for you.</p>
+</div>
+    
+  </main>
+</body>
+</html>

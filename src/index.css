@@ -1,0 +1,93 @@
+/* Global styles for the whole app. Colours are CSS variables so they can be
+   changed in one place. Every text/background pair below meets the WCAG AA
+   contrast ratio (at least 4.5:1). If a component needs styles of its own,
+   give it a CSS Module next to it, e.g. BookingList.module.css. */
+
+:root {
+  --colour-text: #1f2328;
+  --colour-background: #ffffff;
+  --colour-muted: #59636e;
+  --colour-border: #d1d9e0;
+  --colour-header: #f6f8fa;
+  --colour-link: #0550ae;
+  --colour-error-text: #82071e;
+  --colour-error-background: #ffebe9;
+  --colour-focus: #0969da;
+
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.5;
+  color: var(--colour-text);
+  background-color: var(--colour-background);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+a {
+  color: var(--colour-link);
+}
+
+/* A clearly visible outline for keyboard users, on every focusable element. */
+:focus-visible {
+  outline: 3px solid var(--colour-focus);
+  outline-offset: 2px;
+}
+
+.container {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+}
+
+/* ---- NavBar ---- */
+
+.site-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 2rem;
+  padding: 0.75rem 1rem;
+  background-color: var(--colour-header);
+  border-bottom: 1px solid var(--colour-border);
+}
+
+.app-name {
+  margin: 0;
+  font-weight: 700;
+  font-size: 1.125rem;
+}
+
+.nav-links {
+  display: flex;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* NavLink adds the "active" class to the link for the current page. */
+.nav-links a.active {
+  font-weight: 700;
+  text-decoration-thickness: 3px;
+}
+
+/* ---- Loading and ErrorMessage ---- */
+
+.loading {
+  color: var(--colour-muted);
+}
+
+.error-message {
+  padding: 0.75rem 1rem;
+  color: var(--colour-error-text);
+  background-color: var(--colour-error-background);
+  border: 1px solid var(--colour-error-text);
+  border-radius: 0.375rem;
+}

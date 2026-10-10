@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 600" width="680" height="600" role="img" aria-labelledby="title desc" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <title id="title">Tracing a click</title>
+  <desc id="desc">Eight steps from clicking "Go to the home page" to seeing the API's message. 1, NotFoundPage.jsx: the Link changes the URL to /. 2, App.jsx: Routes picks HomePage. 3, HomePage.jsx: first render shows the loading message. 4, HomePage.jsx: useEffect calls getWelcome. 5, welcome.api.js: getWelcome calls apiRequest('/welcome'). 6, client.js: fetch sends GET /welcome to the API, which answers with JSON. 7, HomePage.jsx: setWelcome and setIsLoading update the state. 8, HomePage.jsx: React re-renders and the message appears.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#1a1a1a"/>
+    </marker>
+  </defs>
+  <rect width="680" height="600" fill="#ffffff"/>
+
+  <!-- Group labels on the left -->
+  <text x="20" y="62" font-size="13" font-weight="700" fill="#0550ae">ROUTING</text>
+  <text x="20" y="190" font-size="13" font-weight="700" fill="#116329">COMPONENT</text>
+  <text x="20" y="306" font-size="13" font-weight="700" fill="#7d4e00">API MODULE</text>
+  <text x="20" y="364" font-size="13" font-weight="700" fill="#7d4e00">HTTP</text>
+  <text x="20" y="480" font-size="13" font-weight="700" fill="#116329">STATE</text>
+  <text x="20" y="538" font-size="13" font-weight="700" fill="#116329">RE-RENDER</text>
+
+  <!-- Step boxes: x=120, width=540, height=44, spacing 58 -->
+  <g font-size="15" fill="#1a1a1a">
+    <rect x="120" y="20" width="540" height="44" rx="6" fill="#ddf4ff" stroke="#0550ae" stroke-width="1.5"/>
+    <text x="134" y="47"><tspan font-weight="700">1</tspan>  Click &lt;Link to="/"&gt;: the URL changes, no request</text>
+    <text x="646" y="47" text-anchor="end" font-size="13" fill="#59636e">NotFoundPage.jsx</text>
+
+    <rect x="120" y="78" width="540" height="44" rx="6" fill="#ddf4ff" stroke="#0550ae" stroke-width="1.5"/>
+    <text x="134" y="105"><tspan font-weight="700">2</tspan>  &lt;Routes&gt; matches "/" and picks &lt;HomePage /&gt;</text>
+    <text x="646" y="105" text-anchor="end" font-size="13" fill="#59636e">App.jsx</text>
+
+    <rect x="120" y="136" width="540" height="44" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+    <text x="134" y="163"><tspan font-weight="700">3</tspan>  First render: isLoading is true, so &lt;Loading /&gt;</text>
+    <text x="646" y="163" text-anchor="end" font-size="13" fill="#59636e">HomePage.jsx</text>
+
+    <rect x="120" y="194" width="540" height="44" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+    <text x="134" y="221"><tspan font-weight="700">4</tspan>  useEffect runs and calls getWelcome()</text>
+    <text x="646" y="221" text-anchor="end" font-size="13" fill="#59636e">HomePage.jsx</text>
+
+    <rect x="120" y="282" width="540" height="44" rx="6" fill="#fff8c5" stroke="#7d4e00" stroke-width="1.5"/>
+    <text x="134" y="309"><tspan font-weight="700">5</tspan>  getWelcome() calls apiRequest('/welcome')</text>
+    <text x="646" y="309" text-anchor="end" font-size="13" fill="#59636e">welcome.api.js</text>
+
+    <rect x="120" y="340" width="540" height="44" rx="6" fill="#fff8c5" stroke="#7d4e00" stroke-width="1.5"/>
+    <text x="134" y="367"><tspan font-weight="700">6</tspan>  fetch() sends GET /welcome; the API answers JSON</text>
+    <text x="646" y="367" text-anchor="end" font-size="13" fill="#59636e">client.js</text>
+
+    <rect x="120" y="456" width="540" height="44" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+    <text x="134" y="483"><tspan font-weight="700">7</tspan>  setWelcome(...) and setIsLoading(false)</text>
+    <text x="646" y="483" text-anchor="end" font-size="13" fill="#59636e">HomePage.jsx</text>
+
+    <rect x="120" y="514" width="540" height="44" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+    <text x="134" y="541"><tspan font-weight="700">8</tspan>  React calls HomePage() again: the message shows</text>
+    <text x="646" y="541" text-anchor="end" font-size="13" fill="#59636e">HomePage.jsx</text>
+  </g>
+
+  <!-- Arrows between steps -->
+  <g stroke="#1a1a1a" stroke-width="2" marker-end="url(#arrow)">
+    <line x1="390" y1="64" x2="390" y2="76"/>
+    <line x1="390" y1="122" x2="390" y2="134"/>
+    <line x1="390" y1="180" x2="390" y2="192"/>
+    <line x1="390" y1="238" x2="390" y2="280"/>
+    <line x1="390" y1="326" x2="390" y2="338"/>
+    <line x1="390" y1="384" x2="390" y2="454"/>
+    <line x1="390" y1="500" x2="390" y2="512"/>
+  </g>
+  <text x="402" y="264" font-size="13" fill="#59636e">the page asks for data</text>
+  <text x="402" y="414" font-size="13" fill="#59636e">the data comes back up:</text>
+  <text x="402" y="432" font-size="13" fill="#59636e">client.js → welcome.api.js → HomePage</text>
+</svg>

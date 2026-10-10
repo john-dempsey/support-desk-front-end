@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Testing a Page With a Fake API — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/the-starter/testing/testing-the-client.html">← Testing the Client With a Fake fetch</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/the-starter/testing/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/the-starter/testing/finding-things-like-a-user.html">Finding Things Like a User →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Testing a Page With a Fake API</h1>
+    <p class="lede">Replacing a whole API module with fakes, so a page test controls exactly what &quot;the API&quot; says.</p>
+
+    
+
+    
+      <div class="slide-body"><p><code>HomePage</code> gets its data from <code>getWelcome()</code>. A test of the page needs to
+control what <code>getWelcome()</code> gives back, so it can check the page shows
+the message, the loading state and the error.</p>
+<p>This time the test doesn't fake <code>fetch()</code>. It fakes the <strong>whole API
+module</strong>:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 0.30: faking an API module (src/pages/HomePage.test.jsx, excerpt)</span>
+<span class="hljs-keyword">import</span> <span class="hljs-title class_">HomePage</span> <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./HomePage.jsx&#x27;</span>;
+<span class="hljs-keyword">import</span> { getWelcome } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;../api/welcome.api.js&#x27;</span>;
+
+vi.<span class="hljs-title function_">mock</span>(<span class="hljs-string">&#x27;../api/welcome.api.js&#x27;</span>);
+
+<span class="hljs-title function_">describe</span>(<span class="hljs-string">&#x27;HomePage&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-title function_">it</span>(<span class="hljs-string">&quot;shows the API&#x27;s welcome message&quot;</span>, <span class="hljs-title function_">async</span> () =&gt; {
+    getWelcome.<span class="hljs-title function_">mockResolvedValue</span>({ <span class="hljs-attr">message</span>: <span class="hljs-string">&#x27;Hello world!&#x27;</span> });
+
+    <span class="hljs-title function_">render</span>(<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">HomePage</span> /&gt;</span></span>);
+
+    <span class="hljs-title function_">expect</span>(<span class="hljs-keyword">await</span> screen.<span class="hljs-title function_">findByText</span>(<span class="hljs-string">&#x27;Hello world!&#x27;</span>)).<span class="hljs-title function_">toBeInTheDocument</span>();
+  });
+</code></pre>
+<p><strong><code>vi.mock('../api/welcome.api.js')</code></strong> replaces every function that file
+exports with a <code>vi.fn()</code> fake. <code>HomePage</code> still imports <code>getWelcome</code> and
+calls it as normal, but it gets the fake. Vitest moves <code>vi.mock</code> to the
+top of the file before anything runs, so the order of the lines doesn't
+matter. (In the back-end, <code>jest.unstable_mockModule</code> did the same job,
+but needed an <code>await import(...)</code> afterwards. <code>vi.mock</code> doesn't.)</p>
+<p>Each test then tells the fake what to do, and <code>mockReset</code> in the
+settings wipes that before the next test.</p>
+<h2>Three answers, three tests</h2>
+<table>
+<thead>
+<tr>
+<th>The test wants</th>
+<th>It tells the fake</th>
+<th>The page should show</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>success</td>
+<td><code>getWelcome.mockResolvedValue({ message: 'Hello world!' })</code></td>
+<td>the message</td>
+</tr>
+<tr>
+<td>still waiting</td>
+<td><code>getWelcome.mockReturnValue(new Promise(() =&gt; {}))</code></td>
+<td>the loading message</td>
+</tr>
+<tr>
+<td>failure</td>
+<td><code>getWelcome.mockRejectedValue(new Error(&quot;Can't reach the API&quot;))</code></td>
+<td>the error</td>
+</tr>
+</tbody>
+</table>
+<p>The middle one is a neat trick: a promise that <strong>never</strong> settles keeps
+the page waiting forever, so the test can look at the loading state
+without racing against it.</p>
+<h2>Why fake the module, not <code>fetch()</code>?</h2>
+<p>Because of the layers from topic 05. <code>HomePage</code> doesn't know about
+<code>fetch()</code>, URLs or JSON. It knows &quot;I call <code>getWelcome()</code>, and I get data
+or an error&quot;. Its test should work at the same level. If <code>client.js</code>
+changed how it sends requests, the page tests wouldn't need to change at
+all. <code>client.test.js</code> already covers that layer.</p>
+<p>The rule: <strong>page tests fake the API modules; only <code>client.test.js</code>
+fakes <code>fetch()</code>.</strong></p>
+</div>
+    
+  </main>
+</body>
+</html>

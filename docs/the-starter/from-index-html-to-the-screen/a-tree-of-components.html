@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A Tree of Components — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/the-starter/from-index-html-to-the-screen/main-jsx-starting-react.html">← main.jsx: Starting React</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/the-starter/from-index-html-to-the-screen/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/the-starter/routing/the-route-table.html">The Route Table →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>A Tree of Components</h1>
+    <p class="lede">Components contain components. Seeing the whole tree makes it clear where every part of the page comes from.</p>
+
+    
+
+    
+      <div class="slide-body"><p><code>main.jsx</code> renders <code>App</code>. <code>App</code> renders more components, and they render
+others. The result is a <strong>tree</strong>. This is the starter's tree on the home
+page:</p>
+<pre><code class="hljs">&lt;div id=&quot;root&quot;&gt;                (index.html)
+└── StrictMode                 (main.jsx)
+    └── BrowserRouter          (main.jsx)
+        └── App                (App.jsx)
+            ├── NavBar         ← shown on every page
+            └── &lt;main&gt;
+                └── HomePage   ← changes with the URL
+                    ├── Loading        while waiting for the API
+                    └── ErrorMessage   if something went wrong
+</code></pre>
+<p>Each component only knows about the ones directly inside it.
+<code>HomePage</code> uses <code>Loading</code> and <code>ErrorMessage</code> without knowing or caring
+where <code>HomePage</code> itself sits. That's what makes a component reusable: the
+same <code>ErrorMessage</code> can go into any page.</p>
+<p>Data flows <strong>down</strong> this tree as props. <code>HomePage</code> decides what the error
+message is and passes it to <code>ErrorMessage</code>, which just displays it.</p>
+<h2>Compared with Blade layouts</h2>
+<p><code>App</code> does the same job as a Blade <strong>layout</strong>. In Laravel, a page said
+<code>@extends('layouts.app')</code>, and the layout had the shared navigation plus
+a <code>@yield('content')</code> where the page went. Here, <code>App</code> contains <code>NavBar</code>
+and a <code>&lt;main&gt;</code>, and the page for the current URL goes inside <code>&lt;main&gt;</code>
+(the routing topic shows how).</p>
+<p>The difference is the direction. In Blade, the <strong>page</strong> picks its layout.
+In React, the <strong>parent</strong> decides which children to show.</p>
+<h2>Try it: see the tree</h2>
+<p>Install the <strong>React Developer Tools</strong> browser extension (it's free, for
+Chrome, Edge and Firefox). Open the app, open the developer tools, and
+choose the new <strong>Components</strong> tab.</p>
+<ol>
+<li>Find <code>HomePage</code> in the tree. Click on <code>ErrorMessage</code> or <code>Loading</code> (if
+it's showing) and look at its <strong>props</strong> in the right-hand panel.</li>
+<li>Compare the tree with the <strong>Elements</strong> tab. Which components appear
+as HTML elements there, and which leave no trace at all? (Hint:
+<code>StrictMode</code>, <code>BrowserRouter</code> and the <code>&lt;&gt;</code> fragments.)</li>
+</ol>
+</div>
+    
+  </main>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 250" width="760" height="250" role="img" aria-labelledby="title desc" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <title id="title">What runs where</title>
+  <desc id="desc">The browser loads the app's files from the Vite dev server on port 5173, then sends requests for data straight to the API on port 3000, which reads and writes MySQL. Vite and the API never talk to each other.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#1a1a1a"/>
+    </marker>
+  </defs>
+  <rect width="760" height="250" fill="#ffffff"/>
+
+  <!-- Browser (centre) -->
+  <rect x="270" y="20" width="220" height="90" rx="8" fill="#ddf4ff" stroke="#0550ae" stroke-width="2"/>
+  <text x="380" y="55" text-anchor="middle" font-size="18" font-weight="700" fill="#1a1a1a">Browser</text>
+  <text x="380" y="80" text-anchor="middle" font-size="14" fill="#1a1a1a">runs your React code</text>
+
+  <!-- Vite (bottom left) -->
+  <rect x="20" y="150" width="220" height="80" rx="8" fill="#fff8c5" stroke="#7d4e00" stroke-width="2"/>
+  <text x="130" y="183" text-anchor="middle" font-size="18" font-weight="700" fill="#1a1a1a">Vite dev server</text>
+  <text x="130" y="207" text-anchor="middle" font-size="14" fill="#1a1a1a">localhost:5173</text>
+
+  <!-- API (bottom right) -->
+  <rect x="420" y="150" width="190" height="80" rx="8" fill="#dafbe1" stroke="#116329" stroke-width="2"/>
+  <text x="515" y="183" text-anchor="middle" font-size="18" font-weight="700" fill="#1a1a1a">Support Desk API</text>
+  <text x="515" y="207" text-anchor="middle" font-size="14" fill="#1a1a1a">localhost:3000</text>
+
+  <!-- MySQL -->
+  <rect x="650" y="160" width="95" height="60" rx="8" fill="#f6f8fa" stroke="#59636e" stroke-width="2"/>
+  <text x="697" y="195" text-anchor="middle" font-size="16" font-weight="700" fill="#1a1a1a">MySQL</text>
+
+  <!-- Browser <-> Vite -->
+  <line x1="300" y1="112" x2="190" y2="146" stroke="#1a1a1a" stroke-width="2" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+  <text x="70" y="128" font-size="14" fill="#1a1a1a">1. HTML, JS and CSS files</text>
+
+  <!-- Browser <-> API -->
+  <line x1="460" y1="112" x2="510" y2="146" stroke="#1a1a1a" stroke-width="2" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+  <text x="500" y="128" font-size="14" fill="#1a1a1a">2. requests for data (JSON)</text>
+
+  <!-- API <-> MySQL -->
+  <line x1="612" y1="190" x2="646" y2="190" stroke="#1a1a1a" stroke-width="2" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+</svg>

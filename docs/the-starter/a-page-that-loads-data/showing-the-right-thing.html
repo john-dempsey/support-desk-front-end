@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Showing the Right Thing — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/the-starter/a-page-that-loads-data/three-pieces-of-state.html">← Three Pieces of State</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/the-starter/a-page-that-loads-data/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/the-starter/a-page-that-loads-data/useeffect.html">useEffect: Loading After the First Render →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Showing the Right Thing</h1>
+    <p class="lede">Using &amp;&amp; to show a piece of the page only when a condition is true.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Here's what <code>HomePage</code> returns:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 0.22: what the page shows (src/pages/HomePage.jsx, excerpt)</span>
+  <span class="hljs-keyword">return</span> (
+    <span class="language-xml"><span class="hljs-tag">&lt;&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>Welcome<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>
+      {isLoading &amp;&amp; <span class="hljs-tag">&lt;<span class="hljs-name">Loading</span> <span class="hljs-attr">message</span>=<span class="hljs-string">&quot;Connecting to the API…&quot;</span> /&gt;</span>}
+      {errorMessage &amp;&amp; <span class="hljs-tag">&lt;<span class="hljs-name">ErrorMessage</span> <span class="hljs-attr">message</span>=<span class="hljs-string">{errorMessage}</span> /&gt;</span>}
+      {welcome &amp;&amp; (
+        <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>
+          The API says: <span class="hljs-tag">&lt;<span class="hljs-name">strong</span>&gt;</span>{welcome.message}<span class="hljs-tag">&lt;/<span class="hljs-name">strong</span>&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+      )}
+    <span class="hljs-tag">&lt;/&gt;</span></span>
+  );
+</code></pre>
+<p>The heading is always shown. Each of the other three lines shows its
+piece <strong>only if</strong> a condition is true. That's done with <code>&amp;&amp;</code>.</p>
+<h2>How <code>&amp;&amp;</code> works here</h2>
+<p>You know <code>&amp;&amp;</code> as &quot;and&quot;. In JavaScript, <code>a &amp;&amp; b</code> gives back:</p>
+<ul>
+<li><code>a</code>, if <code>a</code> is <strong>falsy</strong> (<code>false</code>, <code>null</code>, <code>undefined</code>, <code>''</code>, <code>0</code>)</li>
+<li>otherwise, <code>b</code></li>
+</ul>
+<p>And React shows <strong>nothing</strong> for <code>false</code>, <code>null</code>, <code>undefined</code> or <code>''</code>. So:</p>
+<table>
+<thead>
+<tr>
+<th>Expression</th>
+<th>When the condition is false</th>
+<th>When it's true</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>{isLoading &amp;&amp; &lt;Loading /&gt;}</code></td>
+<td><code>false</code>: nothing shown</td>
+<td>the <code>&lt;Loading&gt;</code> component</td>
+</tr>
+<tr>
+<td><code>{errorMessage &amp;&amp; &lt;ErrorMessage /&gt;}</code></td>
+<td><code>''</code>: nothing shown</td>
+<td>the <code>&lt;ErrorMessage&gt;</code> component</td>
+</tr>
+<tr>
+<td><code>{welcome &amp;&amp; &lt;p&gt;...&lt;/p&gt;}</code></td>
+<td><code>null</code>: nothing shown</td>
+<td>the paragraph</td>
+</tr>
+</tbody>
+</table>
+<p>Read each line as &quot;if this, then show that&quot;. It's JSX's version of
+Blade's <code>@if ... @endif</code>. Remember <code>if</code> statements can't go inside <code>{ }</code>
+(topic 03), but <code>&amp;&amp;</code> is an expression, so it can.</p>
+<p><code>{welcome &amp;&amp; ...}</code> also protects the line inside it. While <code>welcome</code> is
+<code>null</code>, reading <code>welcome.message</code> would crash the page. <code>&amp;&amp;</code> stops
+before it gets there.</p>
+<h2>One trap: <code>0</code></h2>
+<p>React <strong>does</strong> show the number <code>0</code>. So with a count:</p>
+<pre><code class="hljs language-jsx">{ticketCount &amp;&amp; <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>You have {ticketCount} tickets<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span></span>}
+</code></pre>
+<p>when <code>ticketCount</code> is <code>0</code>, the page shows a lone <strong>0</strong>. Write a real
+true/false condition instead: <code>{ticketCount &gt; 0 &amp;&amp; ...}</code>.</p>
+<h2>Either-or: <code>? :</code></h2>
+<p>When you want <strong>one thing or another</strong> (rather than &quot;something or
+nothing&quot;), use the conditional operator:</p>
+<pre><code class="hljs language-jsx">{isLoading ? <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">Loading</span> /&gt;</span></span> : <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Done!<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span></span>}
+</code></pre>
+<p>That's Blade's <code>@if ... @else ... @endif</code>.</p>
+</div>
+    
+  </main>
+</body>
+</html>

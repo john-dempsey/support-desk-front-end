@@ -1,0 +1,17 @@
+node_modules
+dist
+
+# Secrets — your real .env is never committed; .env.example is the template.
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor and OS files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
