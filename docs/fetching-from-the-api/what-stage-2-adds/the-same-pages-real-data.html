@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Same Pages, Real Data — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/foundations/making-it-yours/try-it-yourself.html">← Try It Yourself</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/fetching-from-the-api/what-stage-2-adds/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/fetching-from-the-api/what-stage-2-adds/what-changes-and-what-doesnt.html">What Changes, and What Doesn&#39;t →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>The Same Pages, Real Data</h1>
+    <p class="lede">Stage 2 keeps every page from Stage 1, and changes only where their tickets come from: the API, instead of a hard-coded array.</p>
+
+    
+
+    
+      <div class="slide-body"><p>At the end of Stage 1, the app had a list of tickets and a page for each
+ticket. Both showed tickets from a hard-coded array, <code>sampleTickets.js</code>,
+whose top comment said <strong>TEMPORARY</strong>.</p>
+<p>Stage 2 deletes that array. The same two pages now ask the Support Desk
+API for their tickets:</p>
+<table>
+<thead>
+<tr>
+<th>URL</th>
+<th>Page</th>
+<th>Asks the API for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/</code></td>
+<td><code>HomePage</code></td>
+<td>nothing (unchanged)</td>
+</tr>
+<tr>
+<td><code>/tickets</code></td>
+<td><code>TicketListPage</code></td>
+<td><code>GET /tickets</code></td>
+</tr>
+<tr>
+<td><code>/tickets/2</code></td>
+<td><code>TicketDetailPage</code></td>
+<td><code>GET /tickets/2</code></td>
+</tr>
+<tr>
+<td>anything else</td>
+<td><code>NotFoundPage</code></td>
+<td>nothing (unchanged)</td>
+</tr>
+</tbody>
+</table>
+<p>You've seen this move before. In the back-end, Lesson 1 kept the tickets
+in an in-memory array, and Lesson 2 swapped it for Prisma queries
+against MySQL. Stage 1 was the front-end's Lesson 1. This is its
+Lesson 2.</p>
+<h2>What's new: waiting, and failing</h2>
+<p>With the array, the tickets were there the moment the page appeared, and
+nothing could go wrong. A request to the API is different:</p>
+<ul>
+<li>it <strong>takes time</strong>, so the page needs something to show while it waits</li>
+<li>it <strong>can fail</strong>: the API isn't running, the token is wrong, or the
+ticket doesn't exist</li>
+<li>it <strong>can come back empty</strong>: a customer with no tickets gets <code>[]</code></li>
+</ul>
+<p>So each page now has the states you met in the starter's <code>HomePage</code>:
+loading, error and success, plus &quot;empty&quot; for the list. The pattern is
+the same one, applied to tickets.</p>
+<h2>What this lesson covers</h2>
+<table>
+<thead>
+<tr>
+<th>Topic</th>
+<th>Idea</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>02</td>
+<td>Starting the API, and a token to send until there's a login page</td>
+</tr>
+<tr>
+<td>03</td>
+<td><code>tickets.api.js</code>: one function per ticket endpoint</td>
+</tr>
+<tr>
+<td>04</td>
+<td>The list page loads its tickets</td>
+</tr>
+<tr>
+<td>05</td>
+<td>The detail page loads one ticket, and decides what &quot;not found&quot; means</td>
+</tr>
+<tr>
+<td>06</td>
+<td>Following one request from the click to the screen</td>
+</tr>
+<tr>
+<td>07</td>
+<td>Testing pages whose data comes from the API</td>
+</tr>
+<tr>
+<td>08</td>
+<td>Tracing a click, and doing the same for your own case study</td>
+</tr>
+</tbody>
+</table>
+<h2>Try it</h2>
+<p>The array is deleted, but git still has it. This prints the file as it
+was at the end of Stage 1, without changing any of your files:</p>
+<pre><code class="hljs language-bash">git show stage-01:src/data/sampleTickets.js
+</code></pre>
+<p>Note each ticket's subject and status. At the end of the next topic,
+you'll see the API's tickets. Which are the same, and which are
+different?</p>
+</div>
+    
+  </main>
+</body>
+</html>

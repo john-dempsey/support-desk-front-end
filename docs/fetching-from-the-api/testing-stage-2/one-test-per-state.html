@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>One Test per State — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/fetching-from-the-api/testing-stage-2/testing-an-api-module.html">← Testing an API Module</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/fetching-from-the-api/testing-stage-2/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/fetching-from-the-api/testing-stage-2/errors-with-a-status.html">Errors with a Status →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>One Test per State</h1>
+    <p class="lede">The list page has four states, and the fake API can put it in each one: waiting, success, empty and failed.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Stage 0's <code>HomePage</code> test showed how to make a fake API module answer
+with data (<code>mockResolvedValue</code>) or never answer (<code>mockReturnValue</code> with
+a promise that never settles). <code>TicketListPage.test.jsx</code> uses both, and
+adds the other two states the page can be in:</p>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>The fake</th>
+<th>The test expects</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>waiting</td>
+<td><code>getTickets.mockReturnValue(new Promise(() =&gt; {}))</code></td>
+<td>&quot;Loading tickets…&quot;</td>
+</tr>
+<tr>
+<td>success</td>
+<td><code>getTickets.mockResolvedValue(testTickets)</code></td>
+<td>a link for each ticket</td>
+</tr>
+<tr>
+<td>empty</td>
+<td><code>getTickets.mockResolvedValue([])</code></td>
+<td>&quot;There are no tickets to show.&quot;</td>
+</tr>
+<tr>
+<td>failed</td>
+<td><code>getTickets.mockRejectedValue(new Error(...))</code></td>
+<td>the error message</td>
+</tr>
+</tbody>
+</table>
+<p>Here are the last two:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 2.18: empty and failed (src/pages/TicketListPage.test.jsx,</span>
+<span class="hljs-comment">// excerpt)</span>
+  <span class="hljs-title function_">it</span>(<span class="hljs-string">&#x27;shows a message when the API sends no tickets&#x27;</span>, <span class="hljs-title function_">async</span> () =&gt; {
+    getTickets.<span class="hljs-title function_">mockResolvedValue</span>([]);
+
+    <span class="hljs-title function_">renderWithProviders</span>(<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">TicketListPage</span> /&gt;</span></span>);
+
+    <span class="hljs-title function_">expect</span>(
+      <span class="hljs-keyword">await</span> screen.<span class="hljs-title function_">findByText</span>(<span class="hljs-string">&#x27;There are no tickets to show.&#x27;</span>),
+    ).<span class="hljs-title function_">toBeInTheDocument</span>();
+  });
+
+  <span class="hljs-title function_">it</span>(<span class="hljs-string">&quot;shows the API&#x27;s error message when the request fails&quot;</span>, <span class="hljs-title function_">async</span> () =&gt; {
+    getTickets.<span class="hljs-title function_">mockRejectedValue</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&#x27;Invalid or expired token&#x27;</span>));
+
+    <span class="hljs-title function_">renderWithProviders</span>(<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">TicketListPage</span> /&gt;</span></span>);
+
+    <span class="hljs-title function_">expect</span>(<span class="hljs-keyword">await</span> screen.<span class="hljs-title function_">findByRole</span>(<span class="hljs-string">&#x27;alert&#x27;</span>)).<span class="hljs-title function_">toHaveTextContent</span>(
+      <span class="hljs-string">&#x27;Invalid or expired token&#x27;</span>,
+    );
+    <span class="hljs-title function_">expect</span>(screen.<span class="hljs-title function_">queryByRole</span>(<span class="hljs-string">&#x27;table&#x27;</span>)).<span class="hljs-property">not</span>.<span class="hljs-title function_">toBeInTheDocument</span>();
+  });
+</code></pre>
+<p>(The two <code>expect</code>s with <code>await</code> are one line each in the file. They're
+split here to fit.)</p>
+<h2>mockRejectedValue</h2>
+<p><code>mockRejectedValue(error)</code> is the opposite of <code>mockResolvedValue</code>: the
+fake <code>getTickets()</code> throws that error when it's awaited, just as the
+real one does when <code>apiRequest()</code> throws. So the page's <code>catch</code> runs,
+with no API to break.</p>
+<h2>Checking what's missing</h2>
+<p>The failed test checks two things: the message <strong>is</strong> there, and the
+table <strong>isn't</strong>. <code>queryByRole</code> returns <code>null</code> instead of throwing when
+nothing matches (Stage 0, topic 08), which is what you want when you're
+checking that something is absent.</p>
+<p>That second check is the <code>null</code> from topic 04 at work: after a failure,
+<code>tickets</code> is still <code>null</code>, so <code>TicketList</code> is never shown.</p>
+<h2>Each test makes the API do one thing</h2>
+<p>None of these tests needs a running API, a token or a network. Making a
+real API fail on demand, or answer slowly enough to see &quot;Loading…&quot;, is
+hard. Making a fake do it takes one line.</p>
+<h2>Try it</h2>
+<p>In <code>TicketListPage.jsx</code>, change <code>useState(null)</code> to <code>useState([])</code> for
+<code>tickets</code> (as in topic 04's &quot;Try it&quot;), and run <code>npm test</code>. Every test
+still passes, but the page now says &quot;There are no tickets to show.&quot;
+while it's loading. The tests have a gap.</p>
+<p>Close it: add one line to the loading test that fails with <code>[]</code> and
+passes with <code>null</code>. (Hint: <code>queryByText</code> and <code>.not.toBeInTheDocument()</code>.)
+Check that it fails with <code>[]</code>, then put <code>null</code> back and check that it
+passes.</p>
+</div>
+    
+  </main>
+</body>
+</html>

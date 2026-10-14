@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>null Isn&#39;t Empty — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/fetching-from-the-api/the-list-page-loads-its-tickets/from-an-array-to-state.html">← From an Array to State</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/fetching-from-the-api/the-list-page-loads-its-tickets/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/fetching-from-the-api/the-list-page-loads-its-tickets/the-empty-state-is-real.html">The Empty State Is Real →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>null Isn&#39;t Empty</h1>
+    <p class="lede">Starting with null instead of [] lets the page tell &#39;not loaded yet&#39; apart from &#39;loaded, and there are none&#39;.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Here's what the page shows:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 2.9: what the page shows (src/pages/TicketListPage.jsx, excerpt)</span>
+  <span class="hljs-keyword">return</span> (
+    <span class="language-xml"><span class="hljs-tag">&lt;&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>Tickets<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>
+      {isLoading &amp;&amp; <span class="hljs-tag">&lt;<span class="hljs-name">Loading</span> <span class="hljs-attr">message</span>=<span class="hljs-string">&quot;Loading tickets…&quot;</span> /&gt;</span>}
+      {errorMessage &amp;&amp; <span class="hljs-tag">&lt;<span class="hljs-name">ErrorMessage</span> <span class="hljs-attr">message</span>=<span class="hljs-string">{errorMessage}</span> /&gt;</span>}
+      {tickets &amp;&amp; <span class="hljs-tag">&lt;<span class="hljs-name">TicketList</span> <span class="hljs-attr">tickets</span>=<span class="hljs-string">{tickets}</span> /&gt;</span>}
+    <span class="hljs-tag">&lt;/&gt;</span></span>
+  );
+</code></pre>
+<p>It's the same <code>&amp;&amp;</code> shape as <code>HomePage</code> (Stage 0, topic 06): the heading
+always, then each piece only when its condition is true.</p>
+<h2>Why start with null?</h2>
+<p><code>tickets</code> could have started as an empty array, <code>useState([])</code>. It
+seems tidier: an array of tickets that's empty until they arrive. But
+look at what <code>TicketList</code> does with an empty array: it says
+<strong>&quot;There are no tickets to show.&quot;</strong></p>
+<p>So with <code>[]</code>, the first render would show &quot;Loading tickets…&quot; <strong>and</strong>
+&quot;There are no tickets to show.&quot; For a moment, the page would tell the
+user something false, and then change its mind.</p>
+<p><code>null</code> and <code>[]</code> mean different things, and the page needs both:</p>
+<table>
+<thead>
+<tr>
+<th><code>tickets</code> is</th>
+<th>It means</th>
+<th>The page shows</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>null</code></td>
+<td>not loaded yet (or the request failed)</td>
+<td>no list at all</td>
+</tr>
+<tr>
+<td><code>[]</code></td>
+<td>loaded, and there are none</td>
+<td>&quot;There are no tickets to show.&quot;</td>
+</tr>
+<tr>
+<td><code>[ ... ]</code></td>
+<td>loaded</td>
+<td>the table</td>
+</tr>
+</tbody>
+</table>
+<p><code>{tickets &amp;&amp; ...}</code> only shows <code>TicketList</code> once <code>tickets</code> isn't <code>null</code>.
+An empty array is <strong>truthy</strong> in JavaScript (only <code>null</code>, <code>undefined</code>,
+<code>false</code>, <code>0</code>, <code>''</code> and <code>NaN</code> are falsy), so <code>[]</code> does reach <code>TicketList</code>,
+which then shows its empty message.</p>
+<h2>Each state has one job</h2>
+<ul>
+<li><code>isLoading</code> decides whether &quot;Loading tickets…&quot; shows.</li>
+<li><code>errorMessage</code> decides whether an error shows.</li>
+<li><code>tickets</code> decides whether the list shows, and <code>TicketList</code> decides
+between the table and the empty message.</li>
+</ul>
+<h2>Try it</h2>
+<p>The API answers too quickly to see the problem, so slow it down. In the
+browser's developer tools, open the <strong>Network</strong> tab and change
+<strong>No throttling</strong> to <strong>3G</strong>. Reload the Tickets page: &quot;Loading tickets…&quot;
+stays on screen for a while.</p>
+<p>Now change <code>useState(null)</code> to <code>useState([])</code> for <code>tickets</code> and reload.
+What do you see while the tickets load? Change it back, and set the
+throttling back to <strong>No throttling</strong>.</p>
+</div>
+    
+  </main>
+</body>
+</html>

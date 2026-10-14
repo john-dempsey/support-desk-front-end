@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Starting the API — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/fetching-from-the-api/what-stage-2-adds/what-changes-and-what-doesnt.html">← What Changes, and What Doesn&#39;t</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/fetching-from-the-api/a-token-for-now/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/fetching-from-the-api/a-token-for-now/logging-in-by-hand.html">Logging In by Hand →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Starting the API</h1>
+    <p class="lede">From now on the front-end needs the Support Desk API running, with its database migrated and seeded.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Stage 1 didn't need the API at all. From this stage on, the ticket pages
+get everything from it, so it has to be running first.</p>
+<h2>The API</h2>
+<p>Since Lesson 6, the whole back-end runs in Docker: MySQL, Redis,
+Mailpit, the API and the worker. In the <strong>back-end's</strong> folder
+(<code>support-desk-student</code>), start them all, then set up the database from
+inside the API's container:</p>
+<pre><code class="hljs language-bash">docker compose up -d
+docker compose <span class="hljs-built_in">exec</span> api npx prisma migrate deploy
+docker compose <span class="hljs-built_in">exec</span> api npm run db:seed
+</code></pre>
+<ol>
+<li><strong>Start every container</strong> in the background (<code>-d</code>). The first time,
+Docker builds the API's image from its <code>Dockerfile</code> first, which
+takes a minute. The API is then on <code>http://localhost:3000</code>.</li>
+<li><strong>Migrate</strong>: create the tables. Only needed the first time, or after
+a new migration.</li>
+<li><strong>Seed</strong>: fill the tables with the sample users and tickets. The seed
+deletes everything first, so running it again puts the tickets back
+the way they started.</li>
+</ol>
+<p><code>docker compose exec api</code> runs a command <strong>inside</strong> the running <code>api</code>
+container, where the API's code and <code>node_modules</code> are. Prisma connects
+to MySQL from there, the same way the API does.</p>
+<p>Migrating uses <code>migrate deploy</code>, not <code>npm run db:migrate</code>. The script
+runs <code>migrate dev</code>, which is for creating new migrations while you
+change the schema, and it fails inside the container. <code>migrate deploy</code>
+only applies the migrations that already exist, which is all that's
+needed here.</p>
+<p>If you've changed the back-end's code since its image was built, add
+<code>--build</code> (<code>docker compose up -d --build</code>) so the container runs your
+latest code.</p>
+<h2>The front-end</h2>
+<p>In a <strong>second</strong> terminal, in this project's folder:</p>
+<pre><code class="hljs language-bash">npm install
+<span class="hljs-built_in">cp</span> .env.example .<span class="hljs-built_in">env</span>
+npm run dev
+</code></pre>
+<p><code>npm install</code> is only needed the first time, or when <code>package.json</code>
+changes. If you made a <code>.env</code> in Stage 0, skip the <code>cp</code>, which would
+overwrite it. The app is on <code>http://localhost:5173</code>.</p>
+<h2>Ask the API first</h2>
+<p>Before involving the front-end, check that the API answers. In a REST
+client, send:</p>
+<pre><code class="hljs">GET http://localhost:3000/tickets
+</code></pre>
+<p>The answer is not a list of tickets:</p>
+<pre><code class="hljs">401 Unauthorized
+
+{ &quot;error&quot;: { &quot;message&quot;: &quot;Authentication required&quot; } }
+</code></pre>
+<p>In Lesson 4, the back-end's <code>authenticate</code> middleware went in front of
+every route except <code>/auth/register</code> and <code>/auth/login</code>. A request with no
+<code>Authorization</code> header never reaches the ticket controller.</p>
+<h2>Try it</h2>
+<p>Open <code>http://localhost:5173/tickets</code>. The page isn't broken: it shows the
+same message as the REST client. Where did the page get that text from?
+(Hint: Stage 0's <code>apiRequest()</code> reads <code>error.message</code> from the
+response.)</p>
+</div>
+    
+  </main>
+</body>
+</html>

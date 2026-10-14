@@ -46,12 +46,25 @@ describe('apiRequest', () => {
   });
 
   it('sends no Authorization header when there is no token', async () => {
+    // Vitest reads your .env too, so without this the test would see your
+    // real VITE_DEV_TOKEN. stubEnv() replaces it for this test only.
+    vi.stubEnv('VITE_DEV_TOKEN', '');
     const fakeFetch = fakeFetchResponding(200, { data: {} });
 
     await apiRequest('/welcome');
 
     const requestOptions = fakeFetch.mock.calls[0][1];
     expect(requestOptions.headers.Authorization).toBeUndefined();
+  });
+
+  it('sends the token as a Bearer Authorization header', async () => {
+    vi.stubEnv('VITE_DEV_TOKEN', 'test-token');
+    const fakeFetch = fakeFetchResponding(200, { data: {} });
+
+    await apiRequest('/welcome');
+
+    const requestOptions = fakeFetch.mock.calls[0][1];
+    expect(requestOptions.headers.Authorization).toBe('Bearer test-token');
   });
 
   it('returns null for 204 No Content', async () => {

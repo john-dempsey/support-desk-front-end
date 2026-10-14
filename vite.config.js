@@ -19,9 +19,11 @@ export default defineConfig({
     setupFiles: './src/test/setup.js',
     // Undo every fake between tests, so one test can never leak a fake
     // fetch or a fake response into the next: unstubGlobals undoes
-    // vi.stubGlobal(), and mockReset clears what each vi.fn() / vi.mock()
-    // fake was told to return (and puts vi.spyOn() spies back).
+    // vi.stubGlobal(), unstubEnvs undoes vi.stubEnv(), and mockReset clears
+    // what each vi.fn() / vi.mock() fake was told to return (and puts
+    // vi.spyOn() spies back).
     unstubGlobals: true,
+    unstubEnvs: true,
     mockReset: true,
   },
 });

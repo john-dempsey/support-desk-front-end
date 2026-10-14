@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>When the ID Changes — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/fetching-from-the-api/the-detail-page-loads-one-ticket/one-ticket-from-the-url.html">← One Ticket, from the URL</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/fetching-from-the-api/the-detail-page-loads-one-ticket/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/fetching-from-the-api/the-detail-page-loads-one-ticket/what-a-status-means.html">What a Status Means →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>When the ID Changes</h1>
+    <p class="lede">The effect lists ticketId as a dependency, so if the URL moves to another ticket while the page is showing, the page starts again and loads that ticket.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The list page's effect ended with <code>[]</code>: run once, when the page first
+appears. The detail page's ends with <code>[ticketId]</code>.</p>
+<p>The array lists the values from the component that the effect uses.
+After every render, React compares each one with its value last time.
+If any of them changed, React runs the cleanup function, then the
+effect again.</p>
+<ul>
+<li><code>[]</code> lists nothing, so nothing can change: the effect runs once.</li>
+<li><code>[ticketId]</code> means: run again whenever the ticket ID changes.</li>
+</ul>
+<h2>When does that happen?</h2>
+<p>Going from the list to a ticket, the page appears for the first time,
+so the effect runs anyway. But React Router keeps the <strong>same</strong>
+<code>TicketDetailPage</code> on screen when the URL changes from <code>/tickets/1</code> to
+<code>/tickets/2</code>, since both match <code>/tickets/:ticketId</code>. Only <code>useParams()</code>
+gives a new value. (Nothing in Stage 2 links one ticket to another yet.
+The &quot;Try it&quot; below adds a link that does, and a later stage will too.)</p>
+<p>With <code>[]</code>, the effect wouldn't run again. The URL would say ticket 2,
+and the page would still show ticket 1.</p>
+<h2>Starting again</h2>
+<p>Running the effect again isn't quite enough. The page's state still
+describes the <strong>old</strong> ticket: its details, or <code>isNotFound</code> if it didn't
+exist. Nothing in the effect sets <code>isNotFound</code> back to <code>false</code>, so after
+a ticket that wasn't found, every ticket would say &quot;Ticket not found&quot;.</p>
+<p>So the cleanup function, which React runs before the effect runs again,
+puts everything back to how it started:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 2.13: starting again (src/pages/TicketDetailPage.jsx, excerpt)</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-function">() =&gt;</span> {
+      ignore = <span class="hljs-literal">true</span>;
+      <span class="hljs-title function_">setTicket</span>(<span class="hljs-literal">null</span>);
+      <span class="hljs-title function_">setErrorMessage</span>(<span class="hljs-string">&#x27;&#x27;</span>);
+      <span class="hljs-title function_">setIsNotFound</span>(<span class="hljs-literal">false</span>);
+      <span class="hljs-title function_">setIsLoading</span>(<span class="hljs-literal">true</span>);
+    };
+  }, [ticketId]);
+</code></pre>
+<p>(The file has a comment above the four <code>set</code> calls, left out here.)</p>
+<p>The cleanup already meant &quot;this ticket is finished with&quot;: <code>ignore</code>
+stops its late answer from being used. Now it also forgets everything
+it found out. The page shows &quot;Loading the ticket…&quot; again, and the
+effect asks for the new one.</p>
+<h2>The linter checks the array for you</h2>
+<p>Leaving a value out of the array is an easy mistake, and oxlint catches
+it. With <code>[]</code> instead of <code>[ticketId]</code>, <code>npm run lint</code> says:</p>
+<pre><code class="hljs">warning react-hooks(exhaustive-deps): React Hook useEffect has a
+missing dependency: &#x27;ticketId&#x27;
+</code></pre>
+<p>(The warning is on one line. It's split here to fit.) The rule is called
+<strong>exhaustive deps</strong>: list every dependency the effect uses.</p>
+<h2>Try it</h2>
+<p>Add a temporary link under the &quot;Back to all tickets&quot; link at the top of
+the ticket's page:</p>
+<pre><code class="hljs language-jsx">&lt;<span class="hljs-title class_">Link</span> to={<span class="hljs-string">`/tickets/<span class="hljs-subst">${ticket.id + <span class="hljs-number">1</span>}</span>`</span>}&gt;<span class="hljs-title class_">Next</span> ticket&lt;/<span class="hljs-title class_">Link</span>&gt;
+</code></pre>
+<p>Open ticket 1 and click <strong>Next ticket</strong> until you reach a ticket that
+doesn't exist, then press the browser's <strong>Back</strong> button. Now comment out
+the four <code>set</code> lines in the cleanup and do it again. What goes wrong?
+Then put them back, change <code>[ticketId]</code> to <code>[]</code>, and try once more. What
+does <code>npm run lint</code> say? Put <code>[ticketId]</code> back and remove the link.</p>
+</div>
+    
+  </main>
+</body>
+</html>

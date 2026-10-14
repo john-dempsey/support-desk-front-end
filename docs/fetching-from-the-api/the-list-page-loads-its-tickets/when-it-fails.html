@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>When It Fails — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/fetching-from-the-api/the-list-page-loads-its-tickets/the-empty-state-is-real.html">← The Empty State Is Real</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/fetching-from-the-api/the-list-page-loads-its-tickets/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/fetching-from-the-api/the-detail-page-loads-one-ticket/one-ticket-from-the-url.html">One Ticket, from the URL →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>When It Fails</h1>
+    <p class="lede">Whatever goes wrong, the page shows the error&#39;s message and stops loading, and the list never appears.</p>
+
+    
+
+    
+      <div class="slide-body"><p><code>TicketListPage</code> doesn't try to tell one failure from another. Whether
+the API is down, the token has expired or the server crashed, the page
+does the same thing:</p>
+<ol>
+<li><code>getTickets()</code> throws (it's <code>apiRequest()</code>'s error, passed through).</li>
+<li><code>catch</code> stores the error's message with <code>setErrorMessage</code>.</li>
+<li><code>finally</code> turns off loading with <code>setIsLoading(false)</code>.</li>
+<li><code>tickets</code> is still <code>null</code>, so <code>TicketList</code> doesn't appear.</li>
+</ol>
+<p>So the page shows the heading and one message, in <code>ErrorMessage</code>'s
+<code>role=&quot;alert&quot;</code> paragraph, which a screen reader reads out as soon as it
+appears (Stage 0, topic 07).</p>
+<h2>What the user reads</h2>
+<p>The message comes from wherever the problem was found:</p>
+<table>
+<thead>
+<tr>
+<th>Problem</th>
+<th>Message</th>
+<th>Written by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The API isn't running</td>
+<td>Can't reach the API at http://localhost:3000 — is the back-end running?</td>
+<td><code>client.js</code></td>
+</tr>
+<tr>
+<td>No token in <code>.env</code></td>
+<td>Authentication required</td>
+<td>the API</td>
+</tr>
+<tr>
+<td>A wrong or expired token</td>
+<td>Invalid or expired token</td>
+<td>the API</td>
+</tr>
+</tbody>
+</table>
+<p>When the API answers, its own <code>error.message</code> is shown. When nothing
+answers, there's no API message to show, so <code>client.js</code> writes one
+itself (Stage 0, topic 05).</p>
+<h2>Is one message for everything enough?</h2>
+<p>For a list, yes. Every one of these failures means the same thing to
+the user: the tickets can't be shown right now. The message says why,
+and none of them can be fixed by clicking something on the page.</p>
+<p>The detail page is different. There, one kind of failure, &quot;there's no
+such ticket&quot;, is a normal answer that deserves its own message. That's
+the next topic.</p>
+<h2>Try it</h2>
+<p>In the back-end's folder, stop the API's container:</p>
+<pre><code class="hljs language-bash">docker compose stop api
+</code></pre>
+<p>Reload the Tickets page. Which message appears? Which file wrote it?
+Start the API again with <code>docker compose start api</code>, and reload. Do you
+need to restart the front-end?</p>
+</div>
+    
+  </main>
+</body>
+</html>

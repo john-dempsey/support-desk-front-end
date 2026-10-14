@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Try It Yourself — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/fetching-from-the-api/making-it-yours/your-stage-2-checklist.html">← Your Stage 2 Checklist</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/fetching-from-the-api/making-it-yours/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Try It Yourself</h1>
+    <p class="lede">Challenges that use everything in this lesson. Run the tests after each one, and commit when they pass.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Each of these builds on something from this lesson. After each one, run
+<code>npm test</code> and <code>npm run lint</code>, and commit when both pass.</p>
+<h2>Warm-up</h2>
+<ol>
+<li><strong>Close the gap.</strong> If you didn't do it in topic 07, add the line to
+the list page's loading test that fails when <code>tickets</code> starts as
+<code>[]</code>.</li>
+<li><strong>The agent's email.</strong> Show the assigned agent's email under their
+name on the ticket's page. Did you need to change anything in
+<code>tickets.api.js</code>? Why not? Which test should check it?</li>
+</ol>
+<h2>Build something</h2>
+<ol start="3">
+<li><strong>A Try again button.</strong> When the list page fails, show a
+<strong>Try again</strong> button under the error. Clicking it sends the request
+again. (Hint: add a piece of state, <code>attemptNumber</code>, starting at <code>1</code>.
+Put it in the effect's dependency array, and make the button add one
+to it. What else must the cleanup reset, as on the detail page?)
+Test it with <code>getTickets.mockRejectedValueOnce(...)</code> followed by
+<code>getTickets.mockResolvedValue(...)</code>, and <code>userEvent.click</code>.</li>
+<li><strong>The tab's title.</strong> On the ticket's page, set the browser tab's
+title to the ticket's subject, with a second <code>useEffect</code> that sets
+<code>document.title</code>. What should its dependency array be? What should
+its cleanup set the title back to? (Screen reader users hear the
+page's title first, so this helps them too.)</li>
+</ol>
+<h2>Investigate</h2>
+<ol start="5">
+<li><strong>Someone else's ticket.</strong> Put Casey's token in <code>.env</code> (log in as
+<code>casey@example.com</code>). Which tickets does the list show? Now open the
+URL of a ticket Casey <strong>can't</strong> see. What status does the API send,
+and what does the page say? Why might the API prefer <code>404</code> to <code>403</code>
+here? (Lesson 4, &quot;Hiding What You Can't See&quot;.) Put Ada's token back.</li>
+<li><strong>Offline.</strong> In the <strong>Network</strong> tab, change the throttling to
+<strong>Offline</strong>, and reload the Tickets page. Which message appears? Can
+the front-end tell &quot;you're offline&quot; apart from &quot;the API isn't
+running&quot;? Why not?</li>
+<li><strong>Fresh or cached?</strong> Tick <strong>Disable cache</strong> in the <strong>Network</strong> tab,
+open a ticket, and note its status. Untick it and reload. What
+changed, and did the page look any different?</li>
+</ol>
+<h2>Commit</h2>
+<pre><code class="hljs language-bash">git add .
+git commit -m <span class="hljs-string">&quot;Stage 2: try again, tab titles, ...&quot;</span>
+</code></pre>
+<p>When your own case study loads its list and detail pages from your API,
+with loading, error and empty states and a test for each, it's ready
+for Stage 3: creating, editing and deleting.</p>
+</div>
+    
+  </main>
+</body>
+</html>

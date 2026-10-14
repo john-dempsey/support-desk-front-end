@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tests That Read .env — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/fetching-from-the-api/testing-stage-2/when-the-url-changes.html">← When the URL Changes</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/fetching-from-the-api/testing-stage-2/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/fetching-from-the-api/testing-stage-2/running-everything.html">Running Everything →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Tests That Read .env</h1>
+    <p class="lede">Vitest loads your .env, so a test about &#39;no token&#39; has to set the token itself, and the config puts it back afterwards.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Stage 0's <code>client.test.js</code> had a test, &quot;sends no Authorization header
+when there is no token&quot;. In Stage 0, <code>getToken()</code> always returned
+<code>null</code>, so it always passed.</p>
+<p>In Stage 2, <code>getToken()</code> reads <code>VITE_DEV_TOKEN</code>. And Vitest loads
+<code>.env</code> the same way Vite does, so in a test, <code>import.meta.env</code> holds
+<strong>your</strong> token. The test would fail on any machine with a token in
+<code>.env</code>, and pass on any machine without one.</p>
+<h2>vi.stubEnv</h2>
+<p>So the test sets the value it needs:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 2.24: no token, whatever .env says (src/api/client.test.js,</span>
+<span class="hljs-comment">// excerpt)</span>
+  <span class="hljs-title function_">it</span>(<span class="hljs-string">&#x27;sends no Authorization header when there is no token&#x27;</span>, <span class="hljs-title function_">async</span> () =&gt; {
+    <span class="hljs-comment">// Vitest reads your .env too, so without this the test would see your</span>
+    <span class="hljs-comment">// real VITE_DEV_TOKEN. stubEnv() replaces it for this test only.</span>
+    vi.<span class="hljs-title function_">stubEnv</span>(<span class="hljs-string">&#x27;VITE_DEV_TOKEN&#x27;</span>, <span class="hljs-string">&#x27;&#x27;</span>);
+    <span class="hljs-keyword">const</span> fakeFetch = <span class="hljs-title function_">fakeFetchResponding</span>(<span class="hljs-number">200</span>, { <span class="hljs-attr">data</span>: {} });
+
+    <span class="hljs-keyword">await</span> <span class="hljs-title function_">apiRequest</span>(<span class="hljs-string">&#x27;/welcome&#x27;</span>);
+
+    <span class="hljs-keyword">const</span> requestOptions = fakeFetch.<span class="hljs-property">mock</span>.<span class="hljs-property">calls</span>[<span class="hljs-number">0</span>][<span class="hljs-number">1</span>];
+    <span class="hljs-title function_">expect</span>(requestOptions.<span class="hljs-property">headers</span>.<span class="hljs-property">Authorization</span>).<span class="hljs-title function_">toBeUndefined</span>();
+  });
+</code></pre>
+<p><code>vi.stubEnv(name, value)</code> replaces one <code>import.meta.env</code> value. It's the
+<code>.env</code> version of <code>vi.stubGlobal()</code>, which this file already uses to
+fake <code>fetch</code>.</p>
+<p>A new test next to it does the opposite: <code>vi.stubEnv('VITE_DEV_TOKEN', 'test-token')</code>, then checks for the header
+<code>Authorization: Bearer test-token</code>.</p>
+<h2>Putting it back</h2>
+<p><code>vite.config.js</code> has one new line in its <code>test</code> section:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 2.25: undoing stubEnv (vite.config.js, excerpt)</span>
+    <span class="hljs-attr">unstubGlobals</span>: <span class="hljs-literal">true</span>,
+    <span class="hljs-attr">unstubEnvs</span>: <span class="hljs-literal">true</span>,
+    <span class="hljs-attr">mockReset</span>: <span class="hljs-literal">true</span>,
+</code></pre>
+<p><code>unstubEnvs: true</code> puts every stubbed value back after each test, the
+way <code>unstubGlobals</code> already undid <code>vi.stubGlobal()</code>. Without it, the
+empty token from one test would still be empty in the next.</p>
+<h2>A test should give the same answer everywhere</h2>
+<p>A test that passes on your laptop and fails on a classmate's is worse
+than no test, because nobody trusts it. Anything outside the code that
+can differ between machines, such as <code>.env</code>, the time, or a running
+API, should be set by the test itself.</p>
+<h2>Try it</h2>
+<p>Comment out the <code>vi.stubEnv('VITE_DEV_TOKEN', '')</code> line and run
+<code>npm test</code>. Does the test fail? Now empty <code>VITE_DEV_TOKEN</code> in your
+<code>.env</code> and run it again. Put both back.</p>
+</div>
+    
+  </main>
+</body>
+</html>

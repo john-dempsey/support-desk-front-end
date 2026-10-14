@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>When the URL Changes — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/fetching-from-the-api/testing-stage-2/errors-with-a-status.html">← Errors with a Status</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/fetching-from-the-api/testing-stage-2/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/fetching-from-the-api/testing-stage-2/tests-that-read-env.html">Tests That Read .env →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>When the URL Changes</h1>
+    <p class="lede">A test for topic 05&#39;s bug: a fake that answers differently for each ID, and a click that changes the URL while the page stays on screen.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Topic 05 showed why the cleanup resets the page's state: after a ticket
+that wasn't found, the next ticket must not say &quot;Ticket not found&quot;. This
+test checks it, and it needs two things the other tests don't.</p>
+<h2>1. A fake that depends on what it's asked</h2>
+<p><code>mockResolvedValue</code> gives the same answer to every call. Here the fake
+must answer <code>404</code> for one ID and a ticket for another, so the test gives
+it a whole function instead, with <code>mockImplementation</code>:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 2.22: a fake with a rule (src/pages/TicketDetailPage.test.jsx,</span>
+<span class="hljs-comment">// excerpt)</span>
+    <span class="hljs-comment">// Ticket 999 doesn&#x27;t exist; ticket 2 does.</span>
+    getTicket.<span class="hljs-title function_">mockImplementation</span>(<span class="hljs-title function_">async</span> (ticketId) =&gt; {
+      <span class="hljs-keyword">if</span> (ticketId === <span class="hljs-string">&#x27;999&#x27;</span>) {
+        <span class="hljs-keyword">throw</span> <span class="hljs-title function_">createApiError</span>(<span class="hljs-number">404</span>, <span class="hljs-string">&#x27;Ticket 999 not found&#x27;</span>);
+      }
+      <span class="hljs-keyword">return</span> unassignedTicket;
+    });
+</code></pre>
+<p>Every time the page calls <code>getTicket(ticketId)</code>, this function runs
+instead. It's <code>async</code>, so <code>throw</code> and <code>return</code> work the same way as
+<code>mockRejectedValue</code> and <code>mockResolvedValue</code>.</p>
+<h2>2. A click</h2>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 2.23: changing the URL (src/pages/TicketDetailPage.test.jsx,</span>
+<span class="hljs-comment">// excerpt)</span>
+    <span class="hljs-title function_">renderWithProviders</span>(
+      <span class="language-xml"><span class="hljs-tag">&lt;&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">Link</span> <span class="hljs-attr">to</span>=<span class="hljs-string">&quot;/tickets/2&quot;</span>&gt;</span>Go to ticket 2<span class="hljs-tag">&lt;/<span class="hljs-name">Link</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">TicketDetailPage</span> /&gt;</span>
+      <span class="hljs-tag">&lt;/&gt;</span></span>,
+      { <span class="hljs-attr">route</span>: <span class="hljs-string">&#x27;/tickets/999&#x27;</span>, <span class="hljs-attr">path</span>: <span class="hljs-variable constant_">DETAIL_PATH</span> },
+    );
+    <span class="hljs-keyword">await</span> screen.<span class="hljs-title function_">findByRole</span>(<span class="hljs-string">&#x27;heading&#x27;</span>, {
+      <span class="hljs-attr">level</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Ticket not found&#x27;</span>,
+    });
+
+    <span class="hljs-keyword">await</span> userEvent.<span class="hljs-title function_">click</span>(
+      screen.<span class="hljs-title function_">getByRole</span>(<span class="hljs-string">&#x27;link&#x27;</span>, { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Go to ticket 2&#x27;</span> }),
+    );
+
+    <span class="hljs-title function_">expect</span>(
+      <span class="hljs-keyword">await</span> screen.<span class="hljs-title function_">findByRole</span>(<span class="hljs-string">&#x27;heading&#x27;</span>, {
+        <span class="hljs-attr">level</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Invoice discrepancy&#x27;</span>,
+      }),
+    ).<span class="hljs-title function_">toBeInTheDocument</span>();
+</code></pre>
+<p>(The test's opening line is left out, and the long calls are reflowed
+to fit.)</p>
+<ul>
+<li>The <code>Link</code> is rendered next to the page, inside the same route. So
+clicking it changes the URL, but the same <code>TicketDetailPage</code> stays on
+screen, which is exactly the case the cleanup is for.</li>
+<li><code>userEvent.click()</code> clicks the way a user does. It comes from
+<code>@testing-library/user-event</code>, which the starter installed. It's
+<code>async</code>, so it's awaited.</li>
+<li>The first <code>findByRole</code> waits for &quot;Ticket not found&quot; <strong>before</strong> the
+click, so the test knows the page really was in that state.</li>
+</ul>
+<h2>A test that was written after a bug</h2>
+<p>This test was written when the bug was found, and it failed until the
+cleanup reset the state. That's a good habit: when you fix a bug, write
+a test that fails because of it first. Then you know the test can catch
+it, and it'll catch the bug if it ever comes back.</p>
+<h2>Try it</h2>
+<p>Comment out the four <code>set</code> lines in the cleanup of
+<code>TicketDetailPage.jsx</code> and run this test. What does the failure say was
+on the screen? Put them back.</p>
+</div>
+    
+  </main>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Empty State Is Real — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/fetching-from-the-api/the-list-page-loads-its-tickets/null-is-not-empty.html">← null Isn&#39;t Empty</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/fetching-from-the-api/the-list-page-loads-its-tickets/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/fetching-from-the-api/the-list-page-loads-its-tickets/when-it-fails.html">When It Fails →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>The Empty State Is Real</h1>
+    <p class="lede">Stage 1 wrote an empty state that could never show. With real data, a new customer sees it straight away.</p>
+
+    
+
+    
+      <div class="slide-body"><p><code>TicketList</code> has handled an empty list since Stage 1:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 2.10: the empty state (src/components/TicketList.jsx, excerpt)</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">TicketList</span>(<span class="hljs-params">{ tickets }</span>) {
+  <span class="hljs-comment">// The &quot;empty&quot; state: the API can send an empty list, e.g. for a</span>
+  <span class="hljs-comment">// brand-new customer who hasn&#x27;t reported anything yet.</span>
+  <span class="hljs-keyword">if</span> (tickets.<span class="hljs-property">length</span> === <span class="hljs-number">0</span>) {
+    <span class="hljs-keyword">return</span> <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>There are no tickets to show.<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span></span>;
+  }
+</code></pre>
+<p>In Stage 1, this could never happen: <code>sampleTickets</code> always had four
+tickets. Its comment said so. Stage 2 changed only that comment, because
+now it <strong>can</strong> happen.</p>
+<h2>Who sees an empty list?</h2>
+<p>The API decides which tickets each person sees (Lesson 4), so the same
+page shows different lists to different people:</p>
+<table>
+<thead>
+<tr>
+<th>Logged in as</th>
+<th><code>GET /tickets</code> gives</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ada (admin)</td>
+<td>every ticket</td>
+</tr>
+<tr>
+<td>Alex (agent)</td>
+<td>the tickets assigned to Alex, plus unassigned ones</td>
+</tr>
+<tr>
+<td>Casey (customer)</td>
+<td>only Casey's own tickets</td>
+</tr>
+<tr>
+<td>a customer who just registered</td>
+<td><code>[]</code></td>
+</tr>
+</tbody>
+</table>
+<p>The front-end doesn't filter anything. It shows what it's given. A
+list page with no empty state would show a bare heading to every new
+customer, who'd wonder whether the page was broken.</p>
+<h2>Why empty isn't an error</h2>
+<p>An empty list is a <strong>successful</strong> answer: <code>200</code>, with <code>data: []</code> and
+<code>meta.total</code> of <code>0</code>. Nothing went wrong, so the page shouldn't say
+anything went wrong. It should say what's true: there's nothing here yet.</p>
+<p>That's why the empty message lives in <code>TicketList</code>, next to the table,
+and not in the page's error handling.</p>
+<h2>Try it</h2>
+<p>Register a brand-new customer in your REST client:</p>
+<pre><code class="hljs">POST http://localhost:3000/auth/register
+Content-Type: application/json
+
+{ &quot;name&quot;: &quot;Sam Newcomer&quot;, &quot;email&quot;: &quot;sam@example.com&quot;,
+  &quot;password&quot;: &quot;password123&quot; }
+</code></pre>
+<p>Put the <code>token</code> from the response in <code>.env</code> as <code>VITE_DEV_TOKEN</code>, save,
+and reload the Tickets page. What do you see? Then try Casey's token
+(log in as <code>casey@example.com</code>). Which tickets does Casey see? Put Ada's
+token back when you're done.</p>
+<p>(Registering counts towards the 10-a-quarter-hour limit, like logging
+in. Seeding the database again removes Sam.)</p>
+</div>
+    
+  </main>
+</body>
+</html>

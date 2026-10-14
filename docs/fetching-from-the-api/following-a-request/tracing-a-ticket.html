@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tracing a Ticket — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/fetching-from-the-api/the-detail-page-loads-one-ticket/one-return-per-state.html">← One Return per State</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/fetching-from-the-api/following-a-request/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/fetching-from-the-api/following-a-request/watching-it-in-the-network-tab.html">Watching It in the Network Tab →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Tracing a Ticket</h1>
+    <p class="lede">Every step from clicking a ticket to seeing it, through each file, across to the API and back, including the way back when there&#39;s no such ticket.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Stage 0 traced the starter's home page, from a click to the API's
+message (Stage 0, topic 06). Here's the same trace for a ticket. It has
+the same shape, with three new things: a value from the URL, a token,
+and two ways back.</p>
+<p><img src="/support-desk-front-end/assets/images/tracing-a-ticket-request.svg" alt="Diagram: seven steps down, then two columns. 1, TicketList.jsx: clicking a subject's Link changes the URL to /tickets/2. 2, App.jsx: Routes matches /tickets/:ticketId and picks the detail page. 3, TicketDetailPage.jsx: useParams gives '2', and the first render shows Loading. 4, useEffect calls getTicket('2'). 5, tickets.api.js: getTicket calls apiRequest('/tickets/2'). 6, client.js: fetch sends GET /tickets/2 with an Authorization: Bearer header. 7, the back-end: authenticate, validate the ID, find the ticket in MySQL. Then, for 200 OK: apiRequest returns the body and getTicket returns its data; setTicket and, in finally, setIsLoading(false); React re-renders and the ticket shows. For 404 Not Found: apiRequest throws with status 404 and the error passes through getTicket; catch calls setIsNotFound(true) and finally calls setIsLoading(false); React re-renders and the page says Ticket not found."></p>
+<h2>What's new since Stage 0</h2>
+<ul>
+<li><strong>Step 3: the URL.</strong> <code>useParams()</code> reads <code>'2'</code> from the URL (Stage 1).
+It's the only reason the page knows which ticket to ask for.</li>
+<li><strong>Step 6: the token.</strong> <code>buildHeaders()</code> adds
+<code>Authorization: Bearer ...</code>, because <code>getToken()</code> now returns
+<code>VITE_DEV_TOKEN</code> (topic 02).</li>
+<li><strong>Step 7: the back-end you built.</strong> The request passes through the
+same layers you wrote: the <code>authenticate</code> middleware (Lesson 4), the
+ID's validation (Lesson 3), then the controller, the service and
+Prisma. A failure at any of these ends the request early, with its own
+status: <code>401</code>, <code>400</code> or <code>404</code>.</li>
+<li><strong>Two ways back.</strong> On a <code>200</code>, the data comes back up as a return
+value. On a <code>404</code>, it comes back up as a thrown error. Both end in the
+page's state, and both end in a re-render.</li>
+</ul>
+<h2>Where the layers line up</h2>
+<p>Each front-end layer has a partner in the back-end:</p>
+<table>
+<thead>
+<tr>
+<th>The front-end</th>
+<th>Its job</th>
+<th>The back-end</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>App.jsx</code>, <code>&lt;Routes&gt;</code></td>
+<td>which URL shows which page</td>
+<td><code>routes/</code>: which URL runs which controller</td>
+</tr>
+<tr>
+<td><code>TicketDetailPage.jsx</code></td>
+<td>asks for data, decides what to show</td>
+<td><code>ticket.controller.js</code></td>
+</tr>
+<tr>
+<td><code>tickets.api.js</code></td>
+<td>knows where tickets come from</td>
+<td><code>ticket.service.js</code></td>
+</tr>
+<tr>
+<td><code>client.js</code></td>
+<td>talks HTTP, reads the envelope</td>
+<td><code>utils/response.js</code>, <code>errorHandler.js</code></td>
+</tr>
+</tbody>
+</table>
+<h2>Practise saying it</h2>
+<p>This is the trace the viva asks for. With the code open, explain the
+<code>200</code> path out loud, file by file, without reading the diagram. Then do
+the <code>404</code> path: where does it leave the <code>200</code> path, and where does it
+join the page again?</p>
+</div>
+    
+  </main>
+</body>
+</html>

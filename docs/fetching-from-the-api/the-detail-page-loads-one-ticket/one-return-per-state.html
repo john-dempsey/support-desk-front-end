@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>One Return per State — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/fetching-from-the-api/the-detail-page-loads-one-ticket/what-a-status-means.html">← What a Status Means</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/fetching-from-the-api/the-detail-page-loads-one-ticket/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/fetching-from-the-api/following-a-request/tracing-a-ticket.html">Tracing a Ticket →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>One Return per State</h1>
+    <p class="lede">The detail page shows a whole different page for each state, so it uses early returns instead of &amp;&amp;.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The list page shows its states with <code>&amp;&amp;</code>, all inside one <code>return</code>
+(Figure 2.9). The detail page uses <strong>early returns</strong>, as Stage 1's
+&quot;Ticket not found&quot; did: one <code>if</code> and one <code>return</code> for each state, before
+the main one.</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 2.15: the early returns (src/pages/TicketDetailPage.jsx, excerpt)</span>
+  <span class="hljs-keyword">if</span> (isLoading) {
+    <span class="hljs-keyword">return</span> <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">Loading</span> <span class="hljs-attr">message</span>=<span class="hljs-string">&quot;Loading the ticket…&quot;</span> /&gt;</span></span>;
+  }
+
+  <span class="hljs-keyword">if</span> (isNotFound) {
+    <span class="hljs-keyword">return</span> (
+      <span class="language-xml"><span class="hljs-tag">&lt;&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>Ticket not found<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>There&#x27;s no ticket with the ID &quot;{ticketId}&quot;.<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-name">Link</span> <span class="hljs-attr">to</span>=<span class="hljs-string">&quot;/tickets&quot;</span>&gt;</span>Back to all tickets<span class="hljs-tag">&lt;/<span class="hljs-name">Link</span>&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+      <span class="hljs-tag">&lt;/&gt;</span></span>
+    );
+  }
+
+  <span class="hljs-keyword">if</span> (errorMessage) {
+    <span class="hljs-keyword">return</span> (
+      <span class="language-xml"><span class="hljs-tag">&lt;&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>Couldn&#x27;t load the ticket<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">ErrorMessage</span> <span class="hljs-attr">message</span>=<span class="hljs-string">{errorMessage}</span> /&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-name">Link</span> <span class="hljs-attr">to</span>=<span class="hljs-string">&quot;/tickets&quot;</span>&gt;</span>Back to all tickets<span class="hljs-tag">&lt;/<span class="hljs-name">Link</span>&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+      <span class="hljs-tag">&lt;/&gt;</span></span>
+    );
+  }
+</code></pre>
+<p>After these comes the <code>return</code> you know from Stage 1, which shows the
+ticket.</p>
+<h2>Why not <code>&amp;&amp;</code>?</h2>
+<p>On the list page, the heading &quot;Tickets&quot; is right in every state, and
+only the part under it changes. Here, each state is a <strong>different page</strong>:
+&quot;Ticket not found&quot; and &quot;Couldn't load the ticket&quot; need their own <code>&lt;h1&gt;</code>,
+and a page should have only one. With <code>&amp;&amp;</code>, you'd need a condition on
+the heading as well as on everything under it.</p>
+<p>With early returns, each state is written out once, in full, and you
+can read each <code>if</code> on its own.</p>
+<h2>Getting past them means there's a ticket</h2>
+<p>The last <code>return</code> reads <code>ticket.subject</code>, <code>ticket.customer.name</code> and so
+on. If <code>ticket</code> were <code>null</code>, that would crash the page. It can't be:
+any time <code>ticket</code> is still <code>null</code>, the page is loading, the ticket
+wasn't found, or there was an error, and one of the returns above has
+already ended the function.</p>
+<p>Only one of the three states is ever true at a time, so the order of
+the three <code>if</code>s doesn't change anything. What matters is that <strong>all</strong> of
+them come before the last <code>return</code>.</p>
+<h2>Try it</h2>
+<p>Delete the <code>if (isLoading)</code> block (or comment it out) and open a
+ticket. What happens? Open the <strong>Console</strong> in the developer tools and
+read the error. Which line of the file does it point to, and why is
+<code>ticket</code> <code>null</code> there? Put the block back.</p>
+</div>
+    
+  </main>
+</body>
+</html>

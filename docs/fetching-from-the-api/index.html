@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fetching from the API — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Fetching from the API</h1>
+    <p class="lede">The ticket pages stop using a hard-coded array and load real tickets from the Support Desk API, with loading, error and empty states.</p>
+
+    
+      <ul class="listing">
+        
+          <li>
+            <a href="/support-desk-front-end/fetching-from-the-api/what-stage-2-adds/index.html">What Stage 2 Adds</a>
+            <p>The same two pages as Stage 1, now showing real tickets from the API, and which files had to change to get there.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/fetching-from-the-api/a-token-for-now/index.html">A Token for Now</a>
+            <p>Every ticket route needs a token, and there&#39;s no login page yet, so for now you log in by hand and paste the token into .env.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/fetching-from-the-api/one-file-for-ticket-requests/index.html">One File for Ticket Requests</a>
+            <p>tickets.api.js gives each ticket endpoint a name, so the pages ask for tickets without knowing a single URL.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/fetching-from-the-api/the-list-page-loads-its-tickets/index.html">The List Page Loads Its Tickets</a>
+            <p>TicketListPage swaps its hard-coded array for three pieces of state and one effect, the same pattern as the starter&#39;s HomePage.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/fetching-from-the-api/the-detail-page-loads-one-ticket/index.html">The Detail Page Loads One Ticket</a>
+            <p>TicketDetailPage loads the ticket whose ID is in the URL, reloads when that ID changes, and decides what each error status means.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/fetching-from-the-api/following-a-request/index.html">Following a Request</a>
+            <p>One ticket request from the click to the screen: through each file, across the network, and back, and how to watch it in the browser.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/fetching-from-the-api/testing-stage-2/index.html">Testing Stage 2</a>
+            <p>Tests for an API module, for pages whose data comes from a faked API, for a page whose URL changes, and for code that reads .env.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/fetching-from-the-api/making-it-yours/index.html">Making It Yours</a>
+            <p>Tracing a click through Stage 2, then loading your own case study&#39;s data from your API.</p>
+          </li>
+        
+      </ul>
+    
+
+    
+  </main>
+</body>
+</html>

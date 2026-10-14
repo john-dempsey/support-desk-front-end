@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>getToken() — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/fetching-from-the-api/a-token-for-now/the-token-in-env.html">← The Token in .env</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/fetching-from-the-api/a-token-for-now/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/fetching-from-the-api/a-token-for-now/a-token-is-not-a-setting.html">A Token Isn&#39;t a Setting →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>getToken()</h1>
+    <p class="lede">One small function in client.js now returns the token from .env. It&#39;s the only change to the API client in this stage.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Stage 0's API client already knew how to send a token. It just never
+had one: <code>getToken()</code> returned <code>null</code> (Figure 0.15). Stage 2 changes that
+one function:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 2.3: where the token comes from (src/api/client.js, excerpt)</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">getToken</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">env</span>.<span class="hljs-property">VITE_DEV_TOKEN</span> || <span class="hljs-literal">null</span>;
+}
+</code></pre>
+<p>If <code>.env</code> has a token, <code>getToken()</code> returns it. If the setting is empty
+or missing, <code>import.meta.env.VITE_DEV_TOKEN</code> is <code>''</code> or <code>undefined</code>, and
+<code>|| null</code> turns either of those into <code>null</code>, the same &quot;no token&quot; value as
+before.</p>
+<h2>The rest of the client is unchanged</h2>
+<p><code>buildHeaders()</code> is exactly as it was in Stage 0:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 2.4: the headers, unchanged (src/api/client.js, excerpt)</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">buildHeaders</span>(<span class="hljs-params">hasBody</span>) {
+  <span class="hljs-keyword">const</span> headers = {};
+
+  <span class="hljs-keyword">if</span> (hasBody) {
+    headers[<span class="hljs-string">&#x27;Content-Type&#x27;</span>] = <span class="hljs-string">&#x27;application/json&#x27;</span>;
+  }
+
+  <span class="hljs-keyword">const</span> token = <span class="hljs-title function_">getToken</span>();
+  <span class="hljs-keyword">if</span> (token) {
+    headers.<span class="hljs-property">Authorization</span> = <span class="hljs-string">`Bearer <span class="hljs-subst">${token}</span>`</span>;
+  }
+
+  <span class="hljs-keyword">return</span> headers;
+}
+</code></pre>
+<p>Every request goes through <code>apiRequest()</code>, and <code>apiRequest()</code> calls
+<code>buildHeaders()</code>. So once <code>getToken()</code> returns a token, <strong>every</strong> request
+carries an <code>Authorization: Bearer ...</code> header, without a single page
+knowing about it. That's the header the back-end's <code>authenticate</code>
+middleware reads.</p>
+<h2>A stand-in, like customerId</h2>
+<p>The back-end did the same thing in Lesson 2. With no authentication yet,
+<code>createTicket</code> took a <code>customerId</code> from the request body, a stand-in
+marked as temporary, until Lesson 4 replaced it with <code>req.user.id</code>.</p>
+<p><code>VITE_DEV_TOKEN</code> is the front-end's stand-in. In Stage 4, <code>getToken()</code>
+will return the token of whoever logged in, and <code>VITE_DEV_TOKEN</code> will be
+deleted. Nothing else in <code>client.js</code> will change.</p>
+<h2>If your API has no authentication</h2>
+<p>Leave <code>VITE_DEV_TOKEN</code> empty. <code>getToken()</code> returns <code>null</code>, no
+<code>Authorization</code> header is sent, and every page works exactly the same.
+That's why Stage 0 built the client to add the header <strong>only when there's
+a token</strong>.</p>
+<h2>Try it</h2>
+<p>Add <code>console.log('token:', getToken());</code> as the first line inside
+<code>buildHeaders()</code>, save, and open the Tickets page with the <strong>Console</strong>
+open. How many times is it logged, and why? (Stage 0, topic 06,
+explained StrictMode.) Then empty <code>VITE_DEV_TOKEN</code> in <code>.env</code>,
+save, and reload. What's logged now, and what does the page show? Put the
+token back and remove the <code>console.log</code>.</p>
+</div>
+    
+  </main>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Testing an API Module — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/fetching-from-the-api/testing-stage-2/test-data-in-one-place.html">← Test Data in One Place</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/fetching-from-the-api/testing-stage-2/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/fetching-from-the-api/testing-stage-2/one-test-per-state.html">One Test per State →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Testing an API Module</h1>
+    <p class="lede">tickets.api.js is tested by faking the layer under it, client.js, and checking the URL it asks for and what it returns.</p>
+
+    
+
+    
+      <div class="slide-body"><p><code>tickets.api.js</code> has two jobs per function: ask <code>apiRequest()</code> for the
+right path, and return the right part of the answer. Its test checks
+exactly those two things, and nothing else:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 2.17: testing getTickets() (src/api/tickets.api.test.js,</span>
+<span class="hljs-comment">// excerpt)</span>
+<span class="hljs-keyword">import</span> { getTicket, getTickets } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./tickets.api.js&#x27;</span>;
+<span class="hljs-keyword">import</span> { apiRequest } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./client.js&#x27;</span>;
+
+vi.<span class="hljs-title function_">mock</span>(<span class="hljs-string">&#x27;./client.js&#x27;</span>);
+
+<span class="hljs-title function_">describe</span>(<span class="hljs-string">&#x27;tickets.api&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-title function_">it</span>(<span class="hljs-string">&#x27;getTickets() calls GET /tickets and returns the tickets&#x27;</span>,
+    <span class="hljs-title function_">async</span> () =&gt; {
+    <span class="hljs-keyword">const</span> tickets = [{ <span class="hljs-attr">id</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">subject</span>: <span class="hljs-string">&#x27;Cannot log in&#x27;</span> }];
+    apiRequest.<span class="hljs-title function_">mockResolvedValue</span>({ <span class="hljs-attr">data</span>: tickets, <span class="hljs-attr">meta</span>: { <span class="hljs-attr">total</span>: <span class="hljs-number">1</span> } });
+
+    <span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> <span class="hljs-title function_">getTickets</span>();
+
+    <span class="hljs-title function_">expect</span>(apiRequest).<span class="hljs-title function_">toHaveBeenCalledWith</span>(<span class="hljs-string">&#x27;/tickets&#x27;</span>);
+    <span class="hljs-title function_">expect</span>(result).<span class="hljs-title function_">toEqual</span>(tickets);
+  });
+</code></pre>
+<p>(The <code>it(...)</code> line is one line in the file. It's split here to fit.)</p>
+<h2>One layer down</h2>
+<p>The page tests fake <code>tickets.api.js</code>, the layer <strong>under</strong> the page. This
+test fakes <code>client.js</code>, the layer under <code>tickets.api.js</code>. Each file is
+tested on its own, with whatever it calls replaced by a fake:</p>
+<table>
+<thead>
+<tr>
+<th>Test file</th>
+<th>Fakes</th>
+<th>So it checks only</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>TicketListPage.test.jsx</code></td>
+<td><code>tickets.api.js</code></td>
+<td>what the page shows</td>
+</tr>
+<tr>
+<td><code>tickets.api.test.js</code></td>
+<td><code>client.js</code></td>
+<td>the path, and unwrapping <code>data</code></td>
+</tr>
+<tr>
+<td><code>client.test.js</code></td>
+<td><code>fetch</code></td>
+<td>HTTP: headers, JSON, errors</td>
+</tr>
+</tbody>
+</table>
+<p><code>vi.mock('./client.js')</code> works the same way as Stage 0's
+<code>vi.mock('../api/welcome.api.js')</code>. It replaces every function the file
+exports with a fake that does nothing until a test tells it what to
+return.</p>
+<h2>What it proves</h2>
+<ul>
+<li><code>toHaveBeenCalledWith('/tickets')</code>: the function asked for the right
+path. A typo such as <code>'/ticket'</code> would fail here, without a back-end
+running.</li>
+<li><code>toEqual(tickets)</code>: it returned <code>data</code>, not the whole body. The fake
+sends a <code>meta</code> too, so returning <code>responseBody</code> by mistake would fail.</li>
+</ul>
+<p>The tickets here only have <code>id</code> and <code>subject</code>. This test never shows
+them on a page, so they don't need every field: it only checks that they
+come back unchanged.</p>
+<h2>Try it</h2>
+<p>In <code>tickets.api.js</code>, change <code>return responseBody.data;</code> in <code>getTickets()</code>
+to <code>return responseBody;</code>, and run <code>npm test</code>. Which tests fail? Why does
+<code>TicketListPage.test.jsx</code> still pass? Put it back.</p>
+</div>
+    
+  </main>
+</body>
+</html>

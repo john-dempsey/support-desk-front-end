@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Your Stage 2 Checklist — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/fetching-from-the-api/making-it-yours/tracing-a-click.html">← Tracing a Click</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/fetching-from-the-api/making-it-yours/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/fetching-from-the-api/making-it-yours/try-it-yourself.html">Try It Yourself →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Your Stage 2 Checklist</h1>
+    <p class="lede">The same steps for your own case study: your API running, an API module, pages that load data, and tests for every state.</p>
+
+    
+
+    
+      <div class="slide-body"><p>At the end of Stage 1, your own front-end had a list page and a detail
+page, showing a hard-coded array. Here's how to load the real data,
+using the steps Stage 2 took. The examples use a booking system; swap in
+your own entity.</p>
+<p>Run <code>npm test</code> and look at the page in the browser after <strong>every</strong> step,
+and commit when both work.</p>
+<h2>1. Your API, and a token if it needs one</h2>
+<p>Start your API, and send <code>GET /bookings</code> in a REST client. Does it
+answer <code>200</code>, or <code>401</code>?</p>
+<ul>
+<li><strong><code>401</code></strong>: your API has authentication. Log in with a REST client, put
+the token in <code>.env</code> as <code>VITE_DEV_TOKEN</code>, and add the line, empty, to
+<code>.env.example</code>, with a <strong>TEMPORARY</strong> comment. Change <code>getToken()</code> in
+<code>client.js</code> to return it (Figure 2.3).</li>
+<li><strong><code>200</code></strong>: your API has no authentication. Leave <code>getToken()</code> alone.
+No header is sent, and nothing else changes.</li>
+</ul>
+<h2>2. An API module</h2>
+<p><code>src/api/bookings.api.js</code>, with <code>getBookings()</code> and <code>getBooking(id)</code>,
+each returning <code>responseBody.data</code> (Figure 2.5).</p>
+<h2>3. The list page</h2>
+<p>In <code>BookingListPage.jsx</code>, replace the sample array with three pieces of
+state (the list starting as <code>null</code>), and an effect with the <code>ignore</code>
+flag (Figures 2.7 to 2.9). Your list component shouldn't change.</p>
+<h2>4. The detail page</h2>
+<p>In <code>BookingDetailPage.jsx</code>: the same pattern, with <code>[bookingId]</code> and a
+cleanup that resets the state (Figures 2.11 to 2.13), and early returns
+for each state.</p>
+<p>Before you write the <code>catch</code>, find out what <strong>your</strong> API answers. In a
+REST client, try <code>/bookings/99999</code>, <code>/bookings/abc</code> and <code>/bookings/0</code>.
+Which statuses come back? Decide which of them mean &quot;not found&quot; to your
+user.</p>
+<h2>5. Delete the sample data</h2>
+<p>Delete <code>src/data/sampleBookings.js</code> once nothing imports it. Search for
+its name to check.</p>
+<h2>6. Tests</h2>
+<ul>
+<li><code>src/test/testBookings.js</code>, in your API's shape, named for the cases
+they cover.</li>
+<li><code>bookings.api.test.js</code>, faking <code>client.js</code> (Figure 2.17).</li>
+<li>One test per state for each page (Figures 2.18 to 2.21), and the URL
+change test if your detail page has the cleanup.</li>
+<li>Fake <code>bookings.api.js</code> in <code>App.test.jsx</code>, and use <code>findBy</code> for
+anything that appears after loading.</li>
+<li>If you changed <code>getToken()</code>: <code>vi.stubEnv</code> in the &quot;no token&quot; test, and
+<code>unstubEnvs: true</code> in <code>vite.config.js</code> (Figures 2.24 and 2.25).</li>
+</ul>
+<h2>7. Watch it work</h2>
+<p>Open the <strong>Network</strong> tab and click through your pages. Is every request
+the one you expected? Does each have an <code>Authorization</code> header (if your
+API needs one)?</p>
+</div>
+    
+  </main>
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Running Everything — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/fetching-from-the-api/testing-stage-2/tests-that-read-env.html">← Tests That Read .env</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/fetching-from-the-api/testing-stage-2/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/fetching-from-the-api/making-it-yours/tracing-a-click.html">Tracing a Click →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Running Everything</h1>
+    <p class="lede">Stage 2 ends with 37 passing tests in nine files, no lint warnings and a working build.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Stage 2 adds one test file and changes four:</p>
+<table>
+<thead>
+<tr>
+<th>Test file</th>
+<th>Tests</th>
+<th>In Stage 2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>api/tickets.api.test.js</code></td>
+<td>2</td>
+<td><strong>new</strong>: each function's path, and unwrapping <code>data</code></td>
+</tr>
+<tr>
+<td><code>api/client.test.js</code></td>
+<td>8</td>
+<td><code>stubEnv</code> for &quot;no token&quot;, and a new test for the Bearer header</td>
+</tr>
+<tr>
+<td><code>pages/TicketListPage.test.jsx</code></td>
+<td>4</td>
+<td>rewritten: waiting, success, empty, failed</td>
+</tr>
+<tr>
+<td><code>pages/TicketDetailPage.test.jsx</code></td>
+<td>8</td>
+<td>rewritten: the ID asked for, waiting, success, 404, 400, other errors, a URL change, the back link</td>
+</tr>
+<tr>
+<td><code>App.test.jsx</code></td>
+<td>5</td>
+<td>fakes <code>tickets.api.js</code>, and waits for the ticket</td>
+</tr>
+<tr>
+<td><code>components/TicketList.test.jsx</code></td>
+<td>4</td>
+<td>unchanged</td>
+</tr>
+<tr>
+<td><code>components/StatusBadge.test.jsx</code></td>
+<td>2</td>
+<td>unchanged</td>
+</tr>
+<tr>
+<td><code>utils/formatDate.test.js</code></td>
+<td>2</td>
+<td>unchanged</td>
+</tr>
+<tr>
+<td><code>pages/HomePage.test.jsx</code></td>
+<td>2</td>
+<td>unchanged</td>
+</tr>
+</tbody>
+</table>
+<h2>App.test.jsx</h2>
+<p><code>App.test.jsx</code> renders the whole app at a URL. At <code>/tickets</code> and
+<code>/tickets/1</code>, that now means a page that calls the API, so the test
+file fakes <code>tickets.api.js</code> too, with the shared <code>testTickets</code>.</p>
+<p>At <code>/tickets</code>, the test checks the heading &quot;Tickets&quot;, which is there
+from the first render, so <code>getByRole</code> still works. At <code>/tickets/1</code>, the
+ticket's heading only appears once the (fake) request has finished, so
+that test changed from <code>getByRole</code> to <code>await findByRole</code>, which waits.
+The other three tests didn't change.</p>
+<h2>Run the checks</h2>
+<pre><code class="hljs language-bash">npm <span class="hljs-built_in">test</span>
+npm run lint
+npm run build
+</code></pre>
+<p>A passing test run ends like this:</p>
+<pre><code class="hljs"> Test Files  9 passed (9)
+      Tests  37 passed (37)
+</code></pre>
+<p><code>npm run lint</code> prints nothing at all when there's nothing to report,
+and <code>npm run build</code> should end with a <code>built in</code> line. If all three
+pass, Stage 2 is done.</p>
+<p>None of these needed the API running. Try it: stop the API with
+<code>docker compose stop api</code> and run <code>npm test</code> again.</p>
+<h2>Commit</h2>
+<pre><code class="hljs language-bash">git add .
+git commit -m <span class="hljs-string">&quot;Stage 2: load tickets from the API&quot;</span>
+</code></pre>
+<p>Check that <code>.env</code> isn't in the list <code>git status</code> shows before you
+commit. It holds your token, and <code>.gitignore</code> should keep it out.</p>
+<h2>Try it</h2>
+<p>Run <code>npm run test:watch</code>, and in <code>TicketDetailPage.jsx</code> change &quot;Ticket
+not found&quot; to &quot;No such ticket&quot;. Which tests fail? Now change the same
+words in the test file to match. Is that the right fix, or should the
+test have stopped you? Change both back, and press <strong>q</strong> to stop
+watching.</p>
+</div>
+    
+  </main>
+</body>
+</html>

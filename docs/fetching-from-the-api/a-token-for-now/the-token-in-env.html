@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Token in .env — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/fetching-from-the-api/a-token-for-now/logging-in-by-hand.html">← Logging In by Hand</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/fetching-from-the-api/a-token-for-now/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/fetching-from-the-api/a-token-for-now/gettoken.html">getToken() →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>The Token in .env</h1>
+    <p class="lede">The token goes in .env as VITE_DEV_TOKEN, a setting the API client can read, and .env.example lists it, empty.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The token needs to be somewhere the front-end's code can read it, but
+not written into the code itself: it's different for every student, and
+it runs out. That's the job <code>.env</code> already does for <code>VITE_API_URL</code>
+(Stage 0, topic 02).</p>
+<p>So <code>.env.example</code> gains a second setting:</p>
+<pre><code class="hljs language-bash"><span class="hljs-comment"># Figure 2.2: the stand-in token&#x27;s setting (.env.example, excerpt)</span>
+<span class="hljs-comment"># TEMPORARY (Stages 2 and 3 only): a token to send with every request,</span>
+<span class="hljs-comment"># until Stage 4 adds a login page. Log in once with a REST client</span>
+<span class="hljs-comment"># (POST /auth/login), and paste the `token` from the response here, without</span>
+<span class="hljs-comment"># quotes. Leave it empty if your API has no authentication.</span>
+VITE_DEV_TOKEN=
+</code></pre>
+<p>It's empty in <code>.env.example</code> on purpose. That file is committed, so it
+lists the settings without anyone's values. Your token goes in <code>.env</code>,
+which git ignores.</p>
+<h2>Adding it to your .env</h2>
+<p>If your <code>.env</code> came from Stage 0's <code>.env.example</code>, it doesn't have this
+line yet. Add it, with the token you copied on the last slide pasted
+after the <code>=</code>:</p>
+<pre><code class="hljs language-bash">VITE_API_URL=http://localhost:3000
+VITE_DEV_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIi...
+</code></pre>
+<p>No quotes, and no spaces around the <code>=</code>. Save the file. As in Stage 0,
+Vite notices and restarts itself (<code>.env changed, restarting server...</code>), and you reload the page.</p>
+<h2>The name</h2>
+<ul>
+<li><strong><code>VITE_</code></strong>: without this prefix, Vite wouldn't let the browser code
+read it at all (Stage 0, topic 02).</li>
+<li><strong><code>DEV_</code></strong>: it's for development only. A real user never pastes a
+token into a file; they log in.</li>
+<li><strong><code>TEMPORARY</code></strong> in the comment: the same word as at the top of
+Stage 1's <code>sampleTickets.js</code>, and for the same reason. It marks
+something a later stage removes.</li>
+</ul>
+<h2>Try it</h2>
+<p>Reload <code>http://localhost:5173/tickets</code>. You should see a table of
+tickets instead of &quot;Authentication required&quot;.</p>
+<p>Now change one character in the middle of the token in <code>.env</code>, save,
+and reload. What does the page say now? How is that different from
+having no token at all? Put the token back the way it was before you go
+on.</p>
+</div>
+    
+  </main>
+</body>
+</html>

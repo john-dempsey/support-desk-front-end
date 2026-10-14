@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>One Ticket, from the URL — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/fetching-from-the-api/the-list-page-loads-its-tickets/when-it-fails.html">← When It Fails</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/fetching-from-the-api/the-detail-page-loads-one-ticket/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/fetching-from-the-api/the-detail-page-loads-one-ticket/when-the-id-changes.html">When the ID Changes →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>One Ticket, from the URL</h1>
+    <p class="lede">TicketDetailPage reads the ID from the URL as before, then asks the API for that ticket, using the same pattern as the list with one extra piece of state.</p>
+
+    
+
+    
+      <div class="slide-body"><p>In Stage 1, <code>TicketDetailPage</code> read the ID with <code>useParams()</code> and looked
+for it in the array with <code>find()</code>. The first half stays. The second half
+becomes a request:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 2.11: the page&#x27;s state (src/pages/TicketDetailPage.jsx, excerpt)</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">TicketDetailPage</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> { ticketId } = <span class="hljs-title function_">useParams</span>();
+  <span class="hljs-keyword">const</span> [ticket, setTicket] = <span class="hljs-title function_">useState</span>(<span class="hljs-literal">null</span>);
+  <span class="hljs-keyword">const</span> [errorMessage, setErrorMessage] = <span class="hljs-title function_">useState</span>(<span class="hljs-string">&#x27;&#x27;</span>);
+  <span class="hljs-keyword">const</span> [isNotFound, setIsNotFound] = <span class="hljs-title function_">useState</span>(<span class="hljs-literal">false</span>);
+  <span class="hljs-keyword">const</span> [isLoading, setIsLoading] = <span class="hljs-title function_">useState</span>(<span class="hljs-literal">true</span>);
+</code></pre>
+<p>The list page had three pieces of state. This page has a fourth,
+<code>isNotFound</code>, because &quot;there's no such ticket&quot; isn't the same as
+&quot;something went wrong&quot;, and the page shows them differently. Slide 03
+shows how it gets set.</p>
+<h2>The effect</h2>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 2.12: loading the ticket (src/pages/TicketDetailPage.jsx,</span>
+<span class="hljs-comment">// excerpt)</span>
+  <span class="hljs-title function_">useEffect</span>(<span class="hljs-function">() =&gt;</span> {
+    <span class="hljs-keyword">let</span> ignore = <span class="hljs-literal">false</span>;
+
+    <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">loadTicket</span>(<span class="hljs-params"></span>) {
+      <span class="hljs-keyword">try</span> {
+        <span class="hljs-keyword">const</span> ticketData = <span class="hljs-keyword">await</span> <span class="hljs-title function_">getTicket</span>(ticketId);
+        <span class="hljs-keyword">if</span> (!ignore) {
+          <span class="hljs-title function_">setTicket</span>(ticketData);
+        }
+      } <span class="hljs-keyword">catch</span> (error) {
+        <span class="hljs-comment">// ... see slide 03</span>
+      } <span class="hljs-keyword">finally</span> {
+        <span class="hljs-keyword">if</span> (!ignore) {
+          <span class="hljs-title function_">setIsLoading</span>(<span class="hljs-literal">false</span>);
+        }
+      }
+    }
+
+    <span class="hljs-title function_">loadTicket</span>();
+
+    <span class="hljs-keyword">return</span> <span class="hljs-function">() =&gt;</span> {
+      ignore = <span class="hljs-literal">true</span>;
+      <span class="hljs-comment">// ... see slide 02</span>
+    };
+  }, [ticketId]);
+</code></pre>
+<p>(The comments in the file are left out, and the <code>catch</code> and the cleanup
+function are shortened.)</p>
+<p>It's the same pattern again. Two things are new:</p>
+<ul>
+<li><code>getTicket(ticketId)</code> passes the ID from the URL to the API module,
+which puts it in the request's path: <code>/tickets/2</code>. The ID is still the
+string <code>'2'</code>, and that's fine here. In Stage 1, <code>find()</code> compared it
+with numbers, so it needed <code>Number()</code>. Now it just goes into a URL,
+which is text anyway, and the API's validation turns it into a number.</li>
+<li>The dependency array is <code>[ticketId]</code>, not <code>[]</code>. That's the next slide.</li>
+</ul>
+<h2>Try it</h2>
+<p>Open the <strong>Network</strong> tab in the developer tools, then click a ticket on
+the Tickets page. Find the request for that ticket in the list. What's
+its full URL? Where in the code did each part of it come from: the
+<code>http://localhost:3000</code>, the <code>/tickets/</code> and the number?</p>
+</div>
+    
+  </main>
+</body>
+</html>

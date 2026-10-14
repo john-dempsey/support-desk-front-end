@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tracing a Click — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/fetching-from-the-api/testing-stage-2/running-everything.html">← Running Everything</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/fetching-from-the-api/making-it-yours/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/fetching-from-the-api/making-it-yours/your-stage-2-checklist.html">Your Stage 2 Checklist →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Tracing a Click</h1>
+    <p class="lede">Questions to practise the viva&#39;s trace with: Stage 2 has every part of it, from the component to the API and back.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Stage 1's trace stopped at routes, components and props. Stage 2 adds
+the rest, so its trace is the full one the viva asks for: <strong>component →
+API module → HTTP request → state update → re-render</strong>. Topic 06's
+diagram has it step by step, for both a <code>200</code> and a <code>404</code>.</p>
+<h2>Questions to practise with</h2>
+<p>Answer these out loud, with the code open. Then try them again with it
+closed.</p>
+<ol>
+<li>You click <strong>Tickets</strong> in the navigation. Name every file the request
+passes through on the way to the API, in order.</li>
+<li>What does <code>TicketListPage</code> show on its <strong>first</strong> render, before any
+answer has arrived? Which three values decide that?</li>
+<li>Why does <code>tickets</code> start as <code>null</code>, not <code>[]</code>? What would the user see
+with <code>[]</code>?</li>
+<li>Where does the <code>Authorization</code> header come from? Which function would
+you change to send a different token?</li>
+<li>The API answers <code>401</code>. Which line throws, which <code>catch</code> catches it,
+and what does the user see?</li>
+<li>You open <code>/tickets/abc</code>. What status does the API send, and why does
+the page say &quot;Ticket not found&quot; and not &quot;Validation failed&quot;? Which
+file made that decision?</li>
+<li>What does <code>[ticketId]</code> at the end of the effect do? What goes wrong
+if it's <code>[]</code>, and what tells you before you even run the app?</li>
+<li>In development, every ticket is requested twice. Why, and why doesn't
+the page show it twice?</li>
+<li>The cleanup function does two things. What are they, and when does
+React run it?</li>
+<li>Which files did Stage 2 <strong>not</strong> change, and why didn't they need to?</li>
+</ol>
+<h2>Try it</h2>
+<p>Pick one question you couldn't answer with the code closed. Find the
+answer in the code, then explain it to someone else without looking.</p>
+</div>
+    
+  </main>
+</body>
+</html>

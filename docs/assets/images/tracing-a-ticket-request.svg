@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 700" width="760" height="700" role="img" aria-labelledby="title desc" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <title id="title">Tracing a ticket request</title>
+  <desc id="desc">Seven steps from clicking a ticket to the API's answer, then two ways back. 1, TicketList.jsx: the Link changes the URL to /tickets/2. 2, App.jsx: Routes matches /tickets/:ticketId and picks TicketDetailPage. 3, TicketDetailPage.jsx: useParams gives the string '2', and the first render shows the loading message. 4, TicketDetailPage.jsx: useEffect calls getTicket('2'). 5, tickets.api.js: getTicket calls apiRequest('/tickets/2'). 6, client.js: fetch sends GET /tickets/2 with an Authorization: Bearer header. 7, the back-end: authenticate, validate the ID, find the ticket in MySQL. If the answer is 200: apiRequest returns the body and getTicket returns its data; the page calls setTicket and, in finally, setIsLoading(false); React re-renders and the ticket shows. If the answer is 404: apiRequest throws an error with status 404, which passes through getTicket; the page's catch calls setIsNotFound(true) and finally calls setIsLoading(false); React re-renders and the page says Ticket not found.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#1a1a1a"/>
+    </marker>
+  </defs>
+  <rect width="760" height="700" fill="#ffffff"/>
+
+  <!-- Group labels on the left -->
+  <text x="20" y="76" font-size="13" font-weight="700" fill="#0550ae">ROUTING</text>
+  <text x="20" y="192" font-size="13" font-weight="700" fill="#116329">COMPONENT</text>
+  <text x="20" y="279" font-size="13" font-weight="700" fill="#7d4e00">API MODULE</text>
+  <text x="20" y="337" font-size="13" font-weight="700" fill="#7d4e00">HTTP</text>
+  <text x="20" y="395" font-size="13" font-weight="700" fill="#59636e">THE API</text>
+  <text x="20" y="497" font-size="13" font-weight="700" fill="#7d4e00">BACK UP</text>
+  <text x="20" y="581" font-size="13" font-weight="700" fill="#116329">STATE</text>
+  <text x="20" y="654" font-size="13" font-weight="700" fill="#116329">RE-RENDER</text>
+
+  <!-- Steps 1 to 7: x=130, width=610, height=44, spacing 58 -->
+  <g font-size="15" fill="#1a1a1a">
+    <rect x="130" y="20" width="610" height="44" rx="6" fill="#ddf4ff" stroke="#0550ae" stroke-width="1.5"/>
+    <text x="144" y="47"><tspan font-weight="700">1</tspan>  Click a subject's &lt;Link&gt;: the URL becomes /tickets/2</text>
+    <text x="726" y="47" text-anchor="end" font-size="13" fill="#59636e">TicketList.jsx</text>
+
+    <rect x="130" y="78" width="610" height="44" rx="6" fill="#ddf4ff" stroke="#0550ae" stroke-width="1.5"/>
+    <text x="144" y="105"><tspan font-weight="700">2</tspan>  &lt;Routes&gt; matches /tickets/:ticketId, picks the detail page</text>
+    <text x="726" y="105" text-anchor="end" font-size="13" fill="#59636e">App.jsx</text>
+
+    <rect x="130" y="136" width="610" height="44" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+    <text x="144" y="163"><tspan font-weight="700">3</tspan>  useParams() gives '2'. First render: &lt;Loading /&gt;</text>
+    <text x="726" y="163" text-anchor="end" font-size="13" fill="#59636e">TicketDetailPage.jsx</text>
+
+    <rect x="130" y="194" width="610" height="44" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+    <text x="144" y="221"><tspan font-weight="700">4</tspan>  useEffect runs and calls getTicket('2')</text>
+    <text x="726" y="221" text-anchor="end" font-size="13" fill="#59636e">TicketDetailPage.jsx</text>
+
+    <rect x="130" y="252" width="610" height="44" rx="6" fill="#fff8c5" stroke="#7d4e00" stroke-width="1.5"/>
+    <text x="144" y="279"><tspan font-weight="700">5</tspan>  getTicket('2') calls apiRequest('/tickets/2')</text>
+    <text x="726" y="279" text-anchor="end" font-size="13" fill="#59636e">tickets.api.js</text>
+
+    <rect x="130" y="310" width="610" height="44" rx="6" fill="#fff8c5" stroke="#7d4e00" stroke-width="1.5"/>
+    <text x="144" y="337"><tspan font-weight="700">6</tspan>  fetch() sends GET /tickets/2 + Authorization: Bearer …</text>
+    <text x="726" y="337" text-anchor="end" font-size="13" fill="#59636e">client.js</text>
+
+    <rect x="130" y="368" width="610" height="44" rx="6" fill="#f6f8fa" stroke="#59636e" stroke-width="1.5"/>
+    <text x="144" y="395"><tspan font-weight="700">7</tspan>  authenticate → validate the ID → find the ticket in MySQL</text>
+    <text x="726" y="395" text-anchor="end" font-size="13" fill="#59636e">the back-end</text>
+  </g>
+
+  <!-- Arrows between steps 1 to 7 -->
+  <g stroke="#1a1a1a" stroke-width="2" marker-end="url(#arrow)">
+    <line x1="435" y1="64" x2="435" y2="76"/>
+    <line x1="435" y1="122" x2="435" y2="134"/>
+    <line x1="435" y1="180" x2="435" y2="192"/>
+    <line x1="435" y1="238" x2="435" y2="250"/>
+    <line x1="435" y1="296" x2="435" y2="308"/>
+    <line x1="435" y1="354" x2="435" y2="366"/>
+    <!-- the split -->
+    <line x1="400" y1="412" x2="290" y2="460"/>
+    <line x1="470" y1="412" x2="580" y2="460"/>
+  </g>
+  <text x="290" y="438" text-anchor="end" font-size="14" font-weight="700" fill="#116329">200 OK</text>
+  <text x="580" y="438" font-size="14" font-weight="700" fill="#cf222e">404 Not Found</text>
+
+  <!-- Two ways back: left x=130 width=295, right x=445 width=295 -->
+  <g font-size="14" fill="#1a1a1a">
+    <!-- row 1: back through the API layer -->
+    <rect x="130" y="464" width="295" height="66" rx="6" fill="#fff8c5" stroke="#7d4e00" stroke-width="1.5"/>
+    <text x="144" y="486">apiRequest() returns the body;</text>
+    <text x="144" y="504">getTicket() returns its data</text>
+    <text x="144" y="522" font-size="12" fill="#59636e">client.js → tickets.api.js</text>
+
+    <rect x="445" y="464" width="295" height="66" rx="6" fill="#fff8c5" stroke="#7d4e00" stroke-width="1.5"/>
+    <text x="459" y="486">apiRequest() throws (status 404);</text>
+    <text x="459" y="504">it passes through getTicket()</text>
+    <text x="459" y="522" font-size="12" fill="#59636e">client.js → tickets.api.js</text>
+
+    <!-- row 2: state -->
+    <rect x="130" y="548" width="295" height="66" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+    <text x="144" y="570">setTicket(ticketData)</text>
+    <text x="144" y="588">finally: setIsLoading(false)</text>
+    <text x="144" y="606" font-size="12" fill="#59636e">TicketDetailPage.jsx</text>
+
+    <rect x="445" y="548" width="295" height="66" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+    <text x="459" y="570">catch: setIsNotFound(true)</text>
+    <text x="459" y="588">finally: setIsLoading(false)</text>
+    <text x="459" y="606" font-size="12" fill="#59636e">TicketDetailPage.jsx</text>
+
+    <!-- row 3: re-render -->
+    <rect x="130" y="632" width="295" height="48" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+    <text x="144" y="652">React re-renders: the ticket shows</text>
+    <text x="144" y="670" font-size="12" fill="#59636e">TicketDetailPage.jsx</text>
+
+    <rect x="445" y="632" width="295" height="48" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+    <text x="459" y="652">React re-renders: "Ticket not found"</text>
+    <text x="459" y="670" font-size="12" fill="#59636e">TicketDetailPage.jsx</text>
+  </g>
+
+  <!-- Arrows down each column -->
+  <g stroke="#1a1a1a" stroke-width="2" marker-end="url(#arrow)">
+    <line x1="277" y1="530" x2="277" y2="546"/>
+    <line x1="277" y1="614" x2="277" y2="630"/>
+    <line x1="592" y1="530" x2="592" y2="546"/>
+    <line x1="592" y1="614" x2="592" y2="630"/>
+  </g>
+</svg>

@@ -8,38 +8,40 @@ It started as a copy of the front-end starter (Stage 0). Each stage adds
 one thing, and the code is tagged at the end of each stage (`stage-00`,
 `stage-01`, ...), so you can look at, or go back to, any stage.
 
-## Where we are: Stage 1, Foundations
+## Where we are: Stage 2, Fetching from the API
 
-The app has a list of tickets and a page for each ticket. The tickets are
-a **hard-coded array** (`src/data/sampleTickets.js`), the same idea as the
-in-memory array in Lesson 1 of the back-end, so this stage doesn't need the
-API at all. Stage 2 replaces the array with real data from `GET /tickets`.
+The ticket pages now load real tickets from the Support Desk API. The
+hard-coded array from Stage 1 is gone.
 
 | URL | Page |
 |---|---|
 | `/` | `HomePage`: a welcome and a link to the tickets |
-| `/tickets` | `TicketListPage`: every ticket in a table |
-| `/tickets/:ticketId` | `TicketDetailPage`: one ticket, e.g. `/tickets/2` |
+| `/tickets` | `TicketListPage`: every ticket, from `GET /tickets` |
+| `/tickets/:ticketId` | `TicketDetailPage`: one ticket, from `GET /tickets/:id` |
 | anything else | `NotFoundPage` |
 
 New in this stage:
 
-- **Components and props.** `TicketListPage` owns the tickets and passes
-  them to `TicketList` as a prop. `TicketList` passes each status to
-  `StatusBadge`. Components only display what they're given.
-- **Route parameters.** `TicketDetailPage` reads `:ticketId` from the URL
-  with `useParams()`, like `req.params` in Express.
-- **Lists and keys.** `tickets.map(...)` makes one table row per ticket,
-  with `key={ticket.id}`.
-- **A CSS Module.** `StatusBadge.module.css` holds styles that only apply
-  to `StatusBadge`.
-- **A utility function.** `formatDate()` turns the API's ISO dates into
-  readable ones, using the browser's built-in `Intl.DateTimeFormat`.
+- **An API module.** `src/api/tickets.api.js` has one function per
+  endpoint: `getTickets()` and `getTicket(id)`. Pages call these and
+  never build URLs or call `fetch()` themselves.
+- **`useEffect` and `useState`.** Each page loads its data when it first
+  appears, using the same pattern as the Stage 0 starter's home page.
+- **Loading, error and empty states.** While the request is on its way
+  the page says "Loading…". If it fails, the page shows why. If the
+  API sends an empty list, the page says there are no tickets.
+- **Status codes mean something.** `TicketDetailPage` shows "Ticket not
+  found" for a `404` (and for a `400`, which the API sends for an ID like
+  `abc`), and an error message for anything else.
+- **A stand-in token.** Every Support Desk ticket route needs a token,
+  but there's no login page until Stage 4. For now you paste one into
+  `.env` by hand (see below).
 
 ## What you need
 
 - Node.js 22 or later
-- From Stage 2: the Support Desk API running on `http://localhost:3000`
+- The Support Desk API running on `http://localhost:3000`, with its
+  database migrated and seeded (see the back-end's README)
 
 ## Running it
 
@@ -49,7 +51,8 @@ cp .env.example .env    # then change VITE_API_URL if your API isn't on port 300
 npm run dev             # front-end on http://localhost:5173
 ```
 
-Open <http://localhost:5173> and click **Tickets**.
+Then get a token for `.env` (next section), open
+<http://localhost:5173> and click **Tickets**.
 
 | Command | What it does |
 |---|---|
@@ -63,6 +66,41 @@ Open <http://localhost:5173> and click **Tickets**.
 If you change `.env`, save it and Vite restarts itself (the terminal shows
 `.env changed, restarting server...`). Then reload the page.
 
+## The stand-in token (Stages 2 and 3 only)
+
+The API only answers ticket requests that carry a token. Until Stage 4
+adds a login page, log in once by hand and paste the token into `.env`:
+
+1. In a REST client, send
+   `POST http://localhost:3000/auth/login` with the JSON body
+   `{ "email": "ada@example.com", "password": "password123" }`.
+   Ada is an admin, so she can see every ticket. (The API allows only 10
+   logins every 15 minutes. If you get `429 Too many requests`, wait a
+   few minutes.)
+2. Copy the `token` from the response (the long string, without the
+   quotes) into `.env`:
+
+   ```
+   VITE_DEV_TOKEN=eyJhbGciOi...
+   ```
+
+3. Save `.env`. Vite restarts itself; reload the page.
+
+`api/client.js` sends this token in an `Authorization: Bearer ...`
+header with every request. Stage 4 removes `VITE_DEV_TOKEN` and uses the
+token of whoever logs in instead.
+
+**If your own API has no authentication**, leave `VITE_DEV_TOKEN` empty.
+No header is sent, and everything works the same.
+
+If the tickets page shows an error instead of tickets:
+
+| Message | What it means |
+|---|---|
+| Can't reach the API at http://localhost:3000 — is the back-end running? | The API isn't running, or `VITE_API_URL` is wrong |
+| Authentication required | `VITE_DEV_TOKEN` is empty or missing |
+| Invalid or expired token | The token is wrong, or has expired. Log in again and paste the new one. (Tokens last as long as `JWT_EXPIRES_IN` in the API's `.env`) |
+
 ## How it's organised
 
 ```
@@ -73,8 +111,7 @@ src/
   index.css             global styles
   api/
     client.js           apiRequest(): the only code that calls fetch()
-  data/
-    sampleTickets.js    hard-coded tickets (Stage 1 only)
+    tickets.api.js      getTickets(), getTicket(id)
   pages/                one component per URL: HomePage, TicketListPage,
                         TicketDetailPage, NotFoundPage
   components/           reusable pieces: NavBar, TicketList, StatusBadge,
@@ -86,6 +123,7 @@ src/
   test/
     setup.js            runs before the tests
     renderWithProviders.jsx   renders a component inside a router, for tests
+    testTickets.js      tickets for the tests to "receive from the API"
 ```
 
 It mirrors the layers you know from the back-end:
@@ -95,7 +133,7 @@ It mirrors the layers you know from the back-end:
 | `routes/index.js`: which URL goes to which controller | `App.jsx`: which URL shows which page |
 | `req.params.id` | `useParams()` |
 | controllers: handle a request, call a service | pages: hold the data, call an API function, decide what to show |
-| services: the only code that talks to the database | `api/*.api.js`: the only code that talks to the API (from Stage 2) |
+| services: the only code that talks to the database | `api/*.api.js`: the only code that talks to the API |
 | `utils/response.js` + `errorHandler.js`: one response/error shape | `api/client.js`: reads that shape back |
 | `middleware/notFound.js` | `pages/NotFoundPage.jsx` |
 
@@ -112,8 +150,8 @@ npm test
 You should see:
 
 ```
- Test Files  8 passed (8)
-      Tests  28 passed (28)
+ Test Files  9 passed (9)
+      Tests  36 passed (36)
 ```
 
 Test files sit next to the file they test (`TicketList.jsx` →
@@ -127,19 +165,24 @@ Test files sit next to the file they test (`TicketList.jsx` →
 - `src/components/TicketList.test.jsx` and the page tests use
   `renderWithProviders()`, because anything with a `<Link>` or
   `useParams()` needs a router around it.
+- The page tests replace `tickets.api.js` with a fake
+  (`vi.mock('../api/tickets.api.js')`), so each test decides what "the
+  API" sends back: tickets, an empty list, or an error. The back-end
+  doesn't need to be running for `npm test`.
 - `src/App.test.jsx` checks which page shows at which URL.
 - `src/api/client.test.js` replaces `fetch()` with a fake, to test the API
-  client without a back-end.
+  client without a back-end. `src/api/tickets.api.test.js` replaces
+  `apiRequest()` with a fake, to check each function asks for the right
+  URL.
 
 Find elements the way a user would: by role, label or text (`getByRole`,
 `getByLabelText`, `findByText`), not by CSS class.
 
 ## Stages
 
-1. **Foundations** (you are here): components, props, routes, a
-   hard-coded list.
-2. **Fetching from the API:** load the tickets with `GET /tickets`, with
-   loading, error and "nothing here yet" states.
+1. **Foundations:** components, props, routes, a hard-coded list.
+2. **Fetching from the API** (you are here): load the tickets with
+   `GET /tickets`, with loading, error and "nothing here yet" states.
 3. **Full CRUD:** create, edit and delete tickets, comments, tags,
    filtering, sorting and pagination.
 4. **Login and roles** *(needs authentication in the back-end)*.
@@ -151,17 +194,25 @@ Find elements the way a user would: by role, label or text (`getByRole`,
 
 Run `npm test` after each change, and commit when it passes.
 
-1. Add a fifth ticket to `sampleTickets.js`. Which pages show it, and which
-   files did you have to change? Why is that the point of passing data as
-   props?
-2. Change `key={ticket.id}` in `TicketList.jsx` to `key={ticket.subject}`,
-   then give two tickets the same subject. Open the browser's developer
-   tools console. What does React warn you about, and why does the `id`
-   make a better key? (Change it back afterwards.)
-3. In `TicketDetailPage.jsx`, remove `Number()` from around `ticketId`.
-   What happens when you open `/tickets/1`? Which test fails, and why?
-4. Add a **Description** column to the ticket table. Then write a test in
-   `TicketList.test.jsx` that checks a ticket's description is shown.
-5. Make `StatusBadge` accept a second, optional prop (e.g. `size="large"`)
-   and use it on the detail page. Add a class for it to
-   `StatusBadge.module.css`.
+1. Open the browser's developer tools, go to the **Network** tab, and
+   reload `/tickets`. Find the request to `/tickets`. What status did it
+   get, what headers did it send, and what did the response look like?
+   Why are there two requests in development? (Hint: `StrictMode` in
+   `main.jsx`.)
+2. Stop the API, then reload `/tickets`. Then start it again, empty
+   `VITE_DEV_TOKEN` in `.env`, and reload. Which message does each
+   problem give, and which file wrote each message?
+3. Log in as `casey@example.com` instead of Ada, and use Casey's token.
+   How many tickets do you see now, and why? Open `/tickets/2`. What
+   does the page say, and why does the API answer `404` and not `403`?
+4. In `TicketListPage.jsx`, change `useState(null)` to `useState([])`.
+   What does the page show for a moment before the tickets arrive?
+   Change it back, then explain in your own words why `null` and `[]`
+   mean different things here.
+5. Add a test to `TicketDetailPage.test.jsx` that checks the ticket's
+   customer name is shown. Use `unassignedTicket` from
+   `src/test/testTickets.js`.
+6. **Challenge:** the API also has `GET /tickets/:ticketId/comments`. Add
+   a `getComments(ticketId)` function in a new `src/api/comments.api.js`,
+   and show the comments under the ticket's description, with their own
+   loading and error states.

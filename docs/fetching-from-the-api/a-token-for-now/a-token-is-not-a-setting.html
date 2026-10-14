@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A Token Isn&#39;t a Setting — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/fetching-from-the-api/a-token-for-now/gettoken.html">← getToken()</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/fetching-from-the-api/a-token-for-now/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/fetching-from-the-api/one-file-for-ticket-requests/tickets-api-js.html">tickets.api.js →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>A Token Isn&#39;t a Setting</h1>
+    <p class="lede">Stage 0 said a front-end can&#39;t keep a secret. VITE_DEV_TOKEN breaks that rule on purpose, so it&#39;s only safe on your own machine, and only for now.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Stage 0 ended its slide on <code>.env</code> with a rule: <strong>a front-end can't keep
+a secret.</strong> Vite copies every <code>VITE_</code> value into the JavaScript it sends
+to the browser, where anyone can read it.</p>
+<p>A token <strong>is</strong> a secret. While it lasts, it works like Ada's password:
+anyone who has it can send requests as Ada, an admin. And
+<code>VITE_DEV_TOKEN</code> is copied into the code exactly like <code>VITE_API_URL</code>.
+Run <code>npm run build</code> with a token in <code>.env</code>, search the files in
+<code>dist/assets/</code>, and you'll find the whole token in the JavaScript.</p>
+<p>So <code>VITE_DEV_TOKEN</code> breaks Stage 0's rule, on purpose. That's acceptable
+only because of where and how long it's used:</p>
+<ul>
+<li><strong>Only on your machine.</strong> The app runs on <code>localhost</code>, against an API
+on <code>localhost</code>, with seeded users whose password is <code>password123</code>.
+There's nothing real to steal.</li>
+<li><strong>Never committed.</strong> It lives in <code>.env</code>, which git ignores. Only the
+empty line in <code>.env.example</code> is committed.</li>
+<li><strong>Never deployed.</strong> Don't put a build made with a token anywhere
+other people can reach it.</li>
+<li><strong>Only until Stage 4.</strong> Then each user logs in and gets their own
+token, and <code>VITE_DEV_TOKEN</code> is deleted.</li>
+</ul>
+<h2>Tokens run out</h2>
+<p>A JWT has an expiry time inside it. The Support Desk API's tokens last
+one day, so tomorrow every request will fail with
+<code>401 Invalid or expired token</code>. The fix takes a minute: log in again
+with your REST client and paste the new token into <code>.env</code>.</p>
+<h2>When the Tickets page shows an error</h2>
+<table>
+<thead>
+<tr>
+<th>Message</th>
+<th>What it means</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Can't reach the API at http://localhost:3000 — is the back-end running?</td>
+<td>The API isn't running, or <code>VITE_API_URL</code> is wrong</td>
+</tr>
+<tr>
+<td>Authentication required</td>
+<td><code>VITE_DEV_TOKEN</code> is empty or missing</td>
+</tr>
+<tr>
+<td>Invalid or expired token</td>
+<td>The token was copied wrongly, or it has expired. Log in again</td>
+</tr>
+</tbody>
+</table>
+<h2>Try it</h2>
+<p>Open the Tickets page and compare it with the Stage 1 sample tickets you
+printed in topic 01. Which subjects are the same? Which statuses are
+different, and why? (Hint: Stage 1's &quot;The same shape as the API&quot; slide
+said something about the seed's statuses.)</p>
+</div>
+    
+  </main>
+</body>
+</html>

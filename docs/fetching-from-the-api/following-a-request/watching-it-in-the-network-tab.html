@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Watching It in the Network Tab — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/fetching-from-the-api/following-a-request/tracing-a-ticket.html">← Tracing a Ticket</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/fetching-from-the-api/following-a-request/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/fetching-from-the-api/following-a-request/the-preflight.html">The Preflight →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Watching It in the Network Tab</h1>
+    <p class="lede">The browser&#39;s Network tab shows steps 6 and 7 of the trace for real: the request, its token, the status and the JSON that came back.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Steps 6 and 7 of the trace happen between the browser and the API, so
+you can't see them in the code. The browser records them, though. Open
+the developer tools (F12), choose the <strong>Network</strong> tab, click
+<strong>Fetch/XHR</strong> so it lists only requests made by JavaScript, and open
+<code>http://localhost:5173/tickets/2</code>.</p>
+<p><img src="/support-desk-front-end/assets/images/network-tab-ticket.png" alt="Screenshot: Chrome's developer tools, Network tab, filtered to Fetch/XHR, after opening the Tickets page and then ticket 2. The list shows two requests named tickets and two named 2. The second 2 is selected, and its Headers panel shows the Request URL http://localhost:3000/tickets/2, the Request Method GET, the Status Code 304 Not Modified, and, under Request headers, Authorization: Bearer followed by the token."></p>
+<h2>What to look at</h2>
+<p>Click a request named <code>2</code> and read its <strong>Headers</strong>:</p>
+<ul>
+<li><strong>Request URL</strong> <code>http://localhost:3000/tickets/2</code>: <code>API_URL</code> from
+<code>.env</code>, plus the path <code>getTicket()</code> built (topic 03).</li>
+<li><strong>Request Method</strong> <code>GET</code>: <code>apiRequest()</code>'s default.</li>
+<li><strong>Status Code</strong> <code>200 OK</code>, or <code>304 Not Modified</code> as in the
+screenshot: the answer step 7 sent. See below for <code>304</code>.</li>
+<li><strong>Request Headers</strong>, <code>Authorization: Bearer eyJ...</code>: the header
+<code>buildHeaders()</code> added, with your token from <code>.env</code>.</li>
+</ul>
+<p>Then click <strong>Response</strong> (or <strong>Preview</strong>, which lays it out as a tree).
+That's the JSON <code>{ &quot;data&quot;: { ... } }</code> that <code>apiRequest()</code> read, and
+<code>getTicket()</code> unwrapped.</p>
+<h2>304 Not Modified</h2>
+<p>The first time the browser asks for ticket 2, the API answers <code>200</code>
+with the JSON, plus an <code>ETag</code> header: a short fingerprint of that JSON
+(Express adds it). The browser keeps a copy of the response.</p>
+<p>Next time, the browser sends the fingerprint back, in the
+<code>If-None-Match</code> header you can see in the screenshot. If the ticket
+hasn't changed, the API answers <code>304 Not Modified</code> with no body, and
+the browser uses its copy.</p>
+<p>Your code never sees the <code>304</code>. <code>fetch()</code> hands <code>apiRequest()</code> the copy,
+as a <code>200</code>, so <code>response.ok</code> is <code>true</code> and nothing in <code>client.js</code> needs
+to know about it. To see <code>200</code> every time while you investigate, tick
+<strong>Disable cache</strong> at the top of the Network tab.</p>
+<h2>Why two requests?</h2>
+<p>In development, StrictMode runs every effect twice, so the page asks for
+the ticket twice. The first request's answer is ignored by the <code>ignore</code>
+flag (Stage 0, topic 06). A production build sends one.</p>
+<h2>Try it</h2>
+<p>With the <strong>Network</strong> tab open, open <code>/tickets/999</code>. What colour is the
+request, and what's its status? Click <strong>Response</strong>: which part of it
+did the page use? Then open <code>/tickets</code>. How many requests for <code>tickets</code>
+are there, and what's in the <code>meta</code> of the response?</p>
+</div>
+    
+  </main>
+</body>
+</html>

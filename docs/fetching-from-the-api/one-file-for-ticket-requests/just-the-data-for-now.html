@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Just the Data, for Now — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/fetching-from-the-api/one-file-for-ticket-requests/tickets-api-js.html">← tickets.api.js</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/fetching-from-the-api/one-file-for-ticket-requests/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/fetching-from-the-api/one-file-for-ticket-requests/when-the-ticket-isnt-there.html">When the Ticket Isn&#39;t There →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Just the Data, for Now</h1>
+    <p class="lede">GET /tickets sends the tickets and a meta object. getTickets() returns only the tickets, because nothing uses meta yet.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Here's what <code>GET /tickets</code> sends back with Ada's token, shortened to
+one ticket with some of its fields left out:</p>
+<pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;data&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span>
+    <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;subject&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Invoice discrepancy&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;status&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;open&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;customer&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Priya Patel&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;email&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;...&quot;</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;assignedAgent&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">null</span></span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;createdAt&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2026-10-14T17:08:18.447Z&quot;</span>
+    <span class="hljs-punctuation">}</span>
+  <span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;meta&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;page&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;pageSize&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;total&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">4</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;totalPages&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span> <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<p>That's the back-end's list envelope from <code>utils/response.js</code>: the
+records in <code>data</code>, and facts about the whole list in <code>meta</code>.</p>
+<h2>What getTickets() returns</h2>
+<p><code>apiRequest()</code> returns the whole body. <code>getTickets()</code> returns only
+<code>responseBody.data</code>, the array. So the page gets exactly what Stage 1's
+<code>sampleTickets</code> was: an array of tickets, ready to pass to <code>TicketList</code>.</p>
+<p><code>meta</code> is thrown away for now. It says which <strong>page</strong> of results this
+is: the API sends at most 10 tickets at a time unless asked for more.
+With 4 seeded tickets, page 1 holds them all, so nothing is missing yet.
+Stage 3 adds filtering and paging, and that's when <code>getTickets()</code> will
+return <code>meta</code> as well.</p>
+<p>Returning only what the pages use today keeps each stage small. When
+Stage 3 needs <code>meta</code>, it changes this one function and the page that
+calls it.</p>
+<h2>Fields nobody shows</h2>
+<p>The real tickets also have fields that Stage 1's samples left out:
+<code>customerId</code>, <code>assignedAgentId</code> and <code>slaBreachedAt</code>. They come with the
+response, and no component reads them, so they make no difference.
+<code>TicketList</code> reads <code>ticket.subject</code>, <code>ticket.status</code> and so on, and
+ignores everything else in the object.</p>
+<h2>Try it</h2>
+<p>In your REST client, send <code>GET /tickets?pageSize=2</code> with Ada's token.
+How many tickets are in <code>data</code>? What does <code>meta</code> say now? The Tickets
+page would only show those 2 if it sent the same query. Which file would
+you change to make it do that?</p>
+</div>
+    
+  </main>
+</body>
+</html>

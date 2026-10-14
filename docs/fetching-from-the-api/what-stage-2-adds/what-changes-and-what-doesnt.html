@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What Changes, and What Doesn&#39;t — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/fetching-from-the-api/what-stage-2-adds/the-same-pages-real-data.html">← The Same Pages, Real Data</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/fetching-from-the-api/what-stage-2-adds/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/fetching-from-the-api/a-token-for-now/starting-the-api.html">Starting the API →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>What Changes, and What Doesn&#39;t</h1>
+    <p class="lede">Only the pages and the API layer change. The components that display tickets don&#39;t, because they never knew where the tickets came from.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Here's the whole of Stage 1's list page:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 2.1: the Tickets page in Stage 1 (src/pages/TicketListPage.jsx,</span>
+<span class="hljs-comment">// at stage-01)</span>
+<span class="hljs-keyword">import</span> <span class="hljs-title class_">TicketList</span> <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;../components/TicketList.jsx&#x27;</span>;
+<span class="hljs-keyword">import</span> sampleTickets <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;../data/sampleTickets.js&#x27;</span>;
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">TicketListPage</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">return</span> (
+    <span class="language-xml"><span class="hljs-tag">&lt;&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>Tickets<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">TicketList</span> <span class="hljs-attr">tickets</span>=<span class="hljs-string">{sampleTickets}</span> /&gt;</span>
+    <span class="hljs-tag">&lt;/&gt;</span></span>
+  );
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-title class_">TicketListPage</span>;
+</code></pre>
+<p>The page <strong>owns</strong> the data, and <code>TicketList</code> <strong>displays</strong> whatever it's
+given as its <code>tickets</code> prop. That split, from Stage 1, is what makes
+Stage 2 small. The page has to get its tickets from somewhere new, but
+<code>TicketList</code> will still get an array of tickets in the same shape, so it
+doesn't need to change.</p>
+<h2>The files</h2>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>In Stage 2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>src/data/sampleTickets.js</code></td>
+<td><strong>deleted</strong></td>
+</tr>
+<tr>
+<td><code>src/api/tickets.api.js</code></td>
+<td><strong>new</strong>: <code>getTickets()</code> and <code>getTicket(id)</code></td>
+</tr>
+<tr>
+<td><code>src/api/client.js</code></td>
+<td><code>getToken()</code> changes. Nothing else does</td>
+</tr>
+<tr>
+<td><code>.env.example</code></td>
+<td>gains <code>VITE_DEV_TOKEN</code></td>
+</tr>
+<tr>
+<td><code>src/pages/TicketListPage.jsx</code></td>
+<td>loads the tickets from the API</td>
+</tr>
+<tr>
+<td><code>src/pages/TicketDetailPage.jsx</code></td>
+<td>loads one ticket from the API</td>
+</tr>
+<tr>
+<td><code>src/components/TicketList.jsx</code></td>
+<td>only a comment changes</td>
+</tr>
+<tr>
+<td><code>StatusBadge.jsx</code>, <code>formatDate.js</code></td>
+<td>unchanged</td>
+</tr>
+<tr>
+<td><code>App.jsx</code>, <code>NavBar.jsx</code></td>
+<td>unchanged: no new pages, no new links</td>
+</tr>
+</tbody>
+</table>
+<p>The tests change too. Topic 07 covers them.</p>
+<h2>Why the shape mattered</h2>
+<p>Stage 1's sample tickets used the API's own field names and shapes:
+<code>subject</code>, <code>assignedAgent</code> as an object or <code>null</code>, and dates as ISO
+strings. That was the reason. If the sample data had used <code>title</code> and a
+plain agent name, every component would have to change now. Because it
+didn't, the code that displays tickets is finished, and this stage is
+only about <strong>getting</strong> them.</p>
+<p>It's the same in the back-end. When Lesson 2 swapped the array for
+Prisma, the controllers didn't change, because they only ever called the
+service.</p>
+<h2>Try it</h2>
+<p>Git can list every file in <code>src/</code> that changed between the end of
+Stage 1 and the end of Stage 2:</p>
+<pre><code class="hljs language-bash">git diff --<span class="hljs-built_in">stat</span> stage-01 stage-02 -- src
+</code></pre>
+<p>Is <code>TicketList.jsx</code> in the list? See exactly what changed in it:</p>
+<pre><code class="hljs language-bash">git diff stage-01 stage-02 -- src/components/TicketList.jsx
+</code></pre>
+<p>Does anything that changed affect what it shows on the screen?</p>
+</div>
+    
+  </main>
+</body>
+</html>

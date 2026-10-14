@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A Token for Now — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/fetching-from-the-api/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>A Token for Now</h1>
+    <p class="lede">Every ticket route needs a token, and there&#39;s no login page yet, so for now you log in by hand and paste the token into .env.</p>
+
+    
+      <ul class="listing">
+        
+          <li>
+            <a href="/support-desk-front-end/fetching-from-the-api/a-token-for-now/starting-the-api.html">Starting the API</a>
+            <p>From now on the front-end needs the Support Desk API running, with its database migrated and seeded.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/fetching-from-the-api/a-token-for-now/logging-in-by-hand.html">Logging In by Hand</a>
+            <p>There&#39;s no login page until Stage 4, so you log in once with a REST client and keep the token it sends back.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/fetching-from-the-api/a-token-for-now/the-token-in-env.html">The Token in .env</a>
+            <p>The token goes in .env as VITE_DEV_TOKEN, a setting the API client can read, and .env.example lists it, empty.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/fetching-from-the-api/a-token-for-now/gettoken.html">getToken()</a>
+            <p>One small function in client.js now returns the token from .env. It&#39;s the only change to the API client in this stage.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/fetching-from-the-api/a-token-for-now/a-token-is-not-a-setting.html">A Token Isn&#39;t a Setting</a>
+            <p>Stage 0 said a front-end can&#39;t keep a secret. VITE_DEV_TOKEN breaks that rule on purpose, so it&#39;s only safe on your own machine, and only for now.</p>
+          </li>
+        
+      </ul>
+    
+
+    
+  </main>
+</body>
+</html>

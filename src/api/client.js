@@ -10,12 +10,17 @@
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
-// Where the auth token comes from. There's no login yet, so there is never
-// a token and no Authorization header is sent — which is exactly right for
-// an API with no authentication. If you add login later (Stage 4), this is
-// the only function in this file you need to change.
+// Where the auth token comes from. TEMPORARY: there's no login page until
+// Stage 4, so for now the token is one you pasted into .env by hand
+// (VITE_DEV_TOKEN). It's the same idea as the back-end's hard-coded
+// customerId before it had authentication. Stage 4 removes it and returns
+// the logged-in user's token instead; nothing else in this file changes.
+//
+// If your API has no authentication, leave VITE_DEV_TOKEN empty: this
+// returns null, no Authorization header is sent, and everything still
+// works.
 export function getToken() {
-  return null;
+  return import.meta.env.VITE_DEV_TOKEN || null;
 }
 
 // A plain Error with the extra information a page needs to decide what to

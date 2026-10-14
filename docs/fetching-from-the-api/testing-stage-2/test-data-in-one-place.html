@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Test Data in One Place — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/fetching-from-the-api/following-a-request/the-preflight.html">← The Preflight</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/fetching-from-the-api/testing-stage-2/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/fetching-from-the-api/testing-stage-2/testing-an-api-module.html">Testing an API Module →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Test Data in One Place</h1>
+    <p class="lede">The page tests no longer use the app&#39;s sample data, so they get tickets of their own, in the API&#39;s shape, in one shared file.</p>
+
+    
+
+    
+      <div class="slide-body"><p>In Stage 1, the page tests used <code>sampleTickets.js</code>, the same array the
+app showed. Stage 1's last &quot;Try it&quot; showed the catch: change a subject
+in the app's data, and tests fail.</p>
+<p>Stage 2 deleted <code>sampleTickets.js</code>, so the tests need tickets of their
+own. The page tests and <code>App.test.jsx</code> all need the same kind of ticket,
+so they share one file in <code>src/test/</code>:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 2.16: tickets for the tests (src/test/testTickets.js, excerpt)</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> ticketAssignedToAlex = {
+  <span class="hljs-attr">id</span>: <span class="hljs-number">1</span>,
+  <span class="hljs-attr">subject</span>: <span class="hljs-string">&#x27;Cannot log in&#x27;</span>,
+  <span class="hljs-attr">description</span>: <span class="hljs-string">&#x27;Password reset email never arrives&#x27;</span>,
+  <span class="hljs-attr">status</span>: <span class="hljs-string">&#x27;open&#x27;</span>,
+  <span class="hljs-attr">customer</span>: { <span class="hljs-attr">id</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Casey Customer&#x27;</span>, <span class="hljs-attr">email</span>: <span class="hljs-string">&#x27;casey@example.com&#x27;</span> },
+  <span class="hljs-attr">assignedAgent</span>: { <span class="hljs-attr">id</span>: <span class="hljs-number">3</span>, <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Alex Agent&#x27;</span>, <span class="hljs-attr">email</span>: <span class="hljs-string">&#x27;alex@example.com&#x27;</span> },
+  <span class="hljs-attr">createdAt</span>: <span class="hljs-string">&#x27;2026-10-08T09:15:00.000Z&#x27;</span>,
+  <span class="hljs-attr">updatedAt</span>: <span class="hljs-string">&#x27;2026-10-08T09:15:00.000Z&#x27;</span>,
+};
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> unassignedTicket = {
+  <span class="hljs-attr">id</span>: <span class="hljs-number">2</span>,
+  <span class="hljs-attr">subject</span>: <span class="hljs-string">&#x27;Invoice discrepancy&#x27;</span>,
+  <span class="hljs-comment">// ... the same fields, with assignedAgent: null</span>
+};
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> testTickets = [ticketAssignedToAlex, unassignedTicket];
+</code></pre>
+<h2>Named for what makes them different</h2>
+<p>Each ticket is named for the case it covers: one with an agent, one
+without. A test that needs an unassigned ticket asks for
+<code>unassignedTicket</code>, and anyone reading the test can see why that one was
+chosen. <code>testTickets</code> puts both in an array, for the list page.</p>
+<h2>The same shape as the API</h2>
+<p>These are what the fake API &quot;sends&quot; in the page tests, so they have
+exactly the fields the real API sends and the pages read. If they had a
+different shape, a page could pass its tests and still break against the
+real API.</p>
+<p>It's the same rule Stage 1 followed for <code>sampleTickets</code>, for the same
+reason.</p>
+<h2>Only for tests</h2>
+<p>The file lives in <code>src/test/</code>, next to <code>setup.js</code> and
+<code>renderWithProviders.jsx</code>. Nothing outside a test imports it, so the app
+never shows these tickets, and changing the app's real data (now in the
+database) can't break a test.</p>
+<h2>Try it</h2>
+<p>Change the subject of <code>ticketAssignedToAlex</code> to <code>Cannot sign in</code> and run
+<code>npm test</code>. Which tests fail, and in which files? Are any of them about
+the app's real data? Change it back.</p>
+</div>
+    
+  </main>
+</body>
+</html>

@@ -1,13 +1,14 @@
 // Shows a list of tickets as a table. It's a component, not a page: it
-// doesn't know or care where the tickets came from (a hard-coded array now,
-// the API from Stage 2). It just displays whatever `tickets` it's given.
+// doesn't know or care where the tickets came from (a hard-coded array in
+// Stage 1, the API since Stage 2). It just displays whatever `tickets` it's
+// given.
 import { Link } from 'react-router';
 import StatusBadge from './StatusBadge.jsx';
 import { formatDate } from '../utils/formatDate.js';
 
 function TicketList({ tickets }) {
-  // The "empty" state. Not possible with the hard-coded tickets, but it
-  // will be once the list comes from the API (e.g. a brand-new customer).
+  // The "empty" state: the API can send an empty list, e.g. for a
+  // brand-new customer who hasn't reported anything yet.
   if (tickets.length === 0) {
     return <p>There are no tickets to show.</p>;
   }

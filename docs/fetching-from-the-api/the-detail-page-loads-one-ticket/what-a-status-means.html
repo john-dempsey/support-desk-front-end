@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What a Status Means — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/fetching-from-the-api/the-detail-page-loads-one-ticket/when-the-id-changes.html">← When the ID Changes</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/fetching-from-the-api/the-detail-page-loads-one-ticket/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/fetching-from-the-api/the-detail-page-loads-one-ticket/one-return-per-state.html">One Return per State →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>What a Status Means</h1>
+    <p class="lede">The page, not the API module, decides what each error means to the user: 404 and 400 mean &#39;no such ticket&#39;, and anything else is a real error.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Topic 03 left a question open: <code>getTicket()</code> lets every error through,
+with its <code>status</code>, so who decides what to show? The page does, in its
+<code>catch</code>:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 2.14: choosing what to show (src/pages/TicketDetailPage.jsx,</span>
+<span class="hljs-comment">// excerpt)</span>
+      } <span class="hljs-keyword">catch</span> (error) {
+        <span class="hljs-keyword">if</span> (ignore) {
+          <span class="hljs-keyword">return</span>;
+        }
+        <span class="hljs-comment">// The page decides what each status means to the user. 404:</span>
+        <span class="hljs-comment">// there&#x27;s no ticket with that ID. 400: the API&#x27;s validation</span>
+        <span class="hljs-comment">// rejected the ID itself (e.g. /tickets/abc). Either way, there&#x27;s</span>
+        <span class="hljs-comment">// no such ticket. Anything else (the API is down, a 500, ...) is</span>
+        <span class="hljs-comment">// a real error.</span>
+        <span class="hljs-keyword">if</span> (error.<span class="hljs-property">status</span> === <span class="hljs-number">404</span> || error.<span class="hljs-property">status</span> === <span class="hljs-number">400</span>) {
+          <span class="hljs-title function_">setIsNotFound</span>(<span class="hljs-literal">true</span>);
+        } <span class="hljs-keyword">else</span> {
+          <span class="hljs-title function_">setErrorMessage</span>(error.<span class="hljs-property">message</span>);
+        }
+      }
+</code></pre>
+<p>(The comment is reflowed to fit.)</p>
+<p><code>if (ignore) return;</code> comes first, and covers both branches at once:
+an answer for a ticket the page has moved on from changes nothing.</p>
+<h2>Why 400 counts as &quot;not found&quot;</h2>
+<p>To the API, <code>/tickets/abc</code> and <code>/tickets/999</code> are different mistakes.
+<code>abc</code> fails validation before any database query (<code>400</code>), and <code>999</code>
+passes validation but isn't in the table (<code>404</code>).</p>
+<p>To someone who typed a URL, they're the same: there's no such ticket.
+&quot;Validation failed&quot; would be confusing on this page, because the user
+didn't fill in a form. So the page treats both the same way.</p>
+<h2>From Stage 1 to Stage 2</h2>
+<p>The page shows the same thing for the same URLs as in Stage 1. Only the
+way it finds out has changed:</p>
+<table>
+<thead>
+<tr>
+<th>URL</th>
+<th>Stage 1 found out with</th>
+<th>Stage 2 finds out from</th>
+<th>The page shows</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/tickets/2</code></td>
+<td><code>find()</code> found it</td>
+<td><code>200</code></td>
+<td>ticket 2</td>
+</tr>
+<tr>
+<td><code>/tickets/999</code></td>
+<td><code>find()</code> gave <code>undefined</code></td>
+<td><code>404</code></td>
+<td>Ticket not found</td>
+</tr>
+<tr>
+<td><code>/tickets/abc</code></td>
+<td><code>Number('abc')</code> is <code>NaN</code></td>
+<td><code>400</code></td>
+<td>Ticket not found</td>
+</tr>
+<tr>
+<td><code>/tickets/2.0</code></td>
+<td><code>Number('2.0')</code> is <code>2</code></td>
+<td><code>200</code></td>
+<td>ticket 2</td>
+</tr>
+</tbody>
+</table>
+<h2>Every other error</h2>
+<p>Anything else, such as the API being down (status <code>0</code>), an expired
+token (<code>401</code>) or a server crash (<code>500</code>), is a real problem, and the
+page shows the error's message, as the list page does.</p>
+<h2>Try it</h2>
+<p>Open <code>/tickets/abc</code> and <code>/tickets/999</code>, and check the <strong>Network</strong> tab:
+which status did each one get? Then stop the API with
+<code>docker compose stop api</code> and open <code>/tickets/2</code>. Which branch of the
+<code>if</code> ran? Start the API again with <code>docker compose start api</code>.</p>
+</div>
+    
+  </main>
+</body>
+</html>
