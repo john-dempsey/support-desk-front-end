@@ -1,0 +1,37 @@
+/* The app's first CSS Module. Vite gives each class here a unique name
+   (e.g. "badge" becomes "_badge_85lrl_6"), so these styles only ever apply
+   to StatusBadge, and can't clash with a "badge" class anywhere else.
+   Every text/background pair meets the WCAG AA contrast ratio. */
+
+.badge {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  border: 1px solid currentColor;
+  border-radius: 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* One class per status, named exactly like the API's status values. */
+
+.open {
+  color: #0550ae;
+  background-color: #ddf4ff;
+}
+
+.in_progress {
+  color: #7d4e00;
+  background-color: #fff8c5;
+}
+
+.resolved {
+  color: #116329;
+  background-color: #dafbe1;
+}
+
+.closed,
+.unknown {
+  color: #59636e;
+  background-color: #f6f8fa;
+}

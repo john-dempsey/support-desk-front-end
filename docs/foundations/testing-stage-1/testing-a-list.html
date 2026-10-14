@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Testing a List — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/foundations/testing-stage-1/giving-useparams-a-route.html">← Giving useParams() a Route</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/foundations/testing-stage-1/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/foundations/testing-stage-1/running-everything.html">Running Everything →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Testing a List</h1>
+    <p class="lede">TicketList&#39;s tests bring their own tickets, count the rows, look inside one row with within(), and check the empty state.</p>
+
+    
+
+    
+      <div class="slide-body"><p><code>TicketList</code>'s tests don't use <code>sampleTickets</code>. They have a small array
+of their own, <code>testTickets</code>: two tickets made up for the test, one
+assigned to Alex and one (<code>Mouse missing</code>) with <code>assignedAgent: null</code>.
+The test decides exactly which cases it needs, and nobody can break it by
+editing the sample data.</p>
+<h2>Counting rows</h2>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 1.35: one row per ticket (src/components/TicketList.test.jsx,</span>
+<span class="hljs-comment">// excerpt)</span>
+<span class="hljs-title function_">it</span>(<span class="hljs-string">&#x27;shows one row for each ticket, plus the heading row&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-title function_">renderWithProviders</span>(<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">TicketList</span> <span class="hljs-attr">tickets</span>=<span class="hljs-string">{testTickets}</span> /&gt;</span></span>);
+
+  <span class="hljs-title function_">expect</span>(screen.<span class="hljs-title function_">getAllByRole</span>(<span class="hljs-string">&#x27;row&#x27;</span>)).<span class="hljs-title function_">toHaveLength</span>(<span class="hljs-number">3</span>);
+});
+</code></pre>
+<p><code>getAllBy...</code> is like <code>getBy...</code>, but it finds <strong>every</strong> match and
+returns an array (and fails if there are none). Two tickets give three
+rows, because the heading row in <code>&lt;thead&gt;</code> is a row too.</p>
+<h2>Looking inside one row</h2>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 1.36: within one row (src/components/TicketList.test.jsx, excerpt)</span>
+<span class="hljs-title function_">it</span>(<span class="hljs-string">&#x27;shows &quot;Unassigned&quot; when a ticket has no agent&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-title function_">renderWithProviders</span>(<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">TicketList</span> <span class="hljs-attr">tickets</span>=<span class="hljs-string">{testTickets}</span> /&gt;</span></span>);
+
+  <span class="hljs-comment">// within() limits the search to one row, so the test checks the right</span>
+  <span class="hljs-comment">// ticket, not just that &quot;Unassigned&quot; appears somewhere on the page.</span>
+  <span class="hljs-keyword">const</span> mouseRow = screen.<span class="hljs-title function_">getByRole</span>(<span class="hljs-string">&#x27;row&#x27;</span>, { <span class="hljs-attr">name</span>: <span class="hljs-regexp">/Mouse missing/</span> });
+  <span class="hljs-title function_">expect</span>(<span class="hljs-title function_">within</span>(mouseRow).<span class="hljs-title function_">getByText</span>(<span class="hljs-string">&#x27;Unassigned&#x27;</span>)).<span class="hljs-title function_">toBeInTheDocument</span>();
+});
+</code></pre>
+<ul>
+<li><strong><code>{ name: /Mouse missing/ }</code></strong> finds the row by its accessible name,
+which for a row is all the text in its cells. The <code>/.../</code> is a regular
+expression, so it matches if the name <strong>contains</strong> &quot;Mouse missing&quot;.</li>
+<li><strong><code>within(mouseRow)</code></strong> gives the same queries as <code>screen</code>, but only
+searching inside that one row.</li>
+</ul>
+<p>Without <code>within()</code>, the test would pass if &quot;Unassigned&quot; appeared in
+<strong>any</strong> row, even the wrong one.</p>
+<h2>The empty state</h2>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 1.37: no tickets (src/components/TicketList.test.jsx, excerpt)</span>
+<span class="hljs-title function_">it</span>(<span class="hljs-string">&#x27;shows a message when there are no tickets&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-title function_">renderWithProviders</span>(<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">TicketList</span> <span class="hljs-attr">tickets</span>=<span class="hljs-string">{[]}</span> /&gt;</span></span>);
+
+  <span class="hljs-title function_">expect</span>(
+    screen.<span class="hljs-title function_">getByText</span>(<span class="hljs-string">&#x27;There are no tickets to show.&#x27;</span>),
+  ).<span class="hljs-title function_">toBeInTheDocument</span>();
+  <span class="hljs-title function_">expect</span>(screen.<span class="hljs-title function_">queryByRole</span>(<span class="hljs-string">&#x27;table&#x27;</span>)).<span class="hljs-property">not</span>.<span class="hljs-title function_">toBeInTheDocument</span>();
+});
+</code></pre>
+<p>(The first <code>expect</code> is one line in the file; it's split here to fit.)</p>
+<p>Passing <code>[]</code> tests the early return from topic 03, which the sample data
+can never reach. The second <code>expect</code> uses <code>queryBy</code>, from the starter,
+to check the table is <strong>not</strong> there.</p>
+<h2>Try it</h2>
+<p>Add a third ticket to <code>testTickets</code> (copy one and give it <code>id: 9</code> and a
+new subject). Which test now fails, and why? Fix the test, not the
+component.</p>
+</div>
+    
+  </main>
+</body>
+</html>

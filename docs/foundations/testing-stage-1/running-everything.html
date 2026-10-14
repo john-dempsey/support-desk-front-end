@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Running Everything — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/foundations/testing-stage-1/testing-a-list.html">← Testing a List</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/foundations/testing-stage-1/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/foundations/making-it-yours/tracing-a-click.html">Tracing a Click →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Running Everything</h1>
+    <p class="lede">Stage 1 ends with 28 passing tests in eight files, no lint errors and a working build.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Stage 1 has a test for every new piece, next to the file it tests:</p>
+<table>
+<thead>
+<tr>
+<th>Test file</th>
+<th>Tests</th>
+<th>Checks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>utils/formatDate.test.js</code></td>
+<td>2</td>
+<td>a readable date; <code>Unknown date</code> for bad values</td>
+</tr>
+<tr>
+<td><code>components/StatusBadge.test.jsx</code></td>
+<td>2</td>
+<td>a known and an unknown status</td>
+</tr>
+<tr>
+<td><code>components/TicketList.test.jsx</code></td>
+<td>4</td>
+<td>rows, links, <code>Unassigned</code>, the empty state</td>
+</tr>
+<tr>
+<td><code>pages/TicketListPage.test.jsx</code></td>
+<td>2</td>
+<td>the heading and the sample tickets</td>
+</tr>
+<tr>
+<td><code>pages/TicketDetailPage.test.jsx</code></td>
+<td>4</td>
+<td>a found ticket, two kinds of missing ticket, the back link</td>
+</tr>
+<tr>
+<td><code>pages/HomePage.test.jsx</code></td>
+<td>2</td>
+<td>the welcome heading and the link to the tickets</td>
+</tr>
+<tr>
+<td><code>App.test.jsx</code></td>
+<td>5</td>
+<td>each URL shows the right page; the navigation</td>
+</tr>
+<tr>
+<td><code>api/client.test.js</code></td>
+<td>7</td>
+<td>unchanged from the starter</td>
+</tr>
+</tbody>
+</table>
+<h2>Run the checks</h2>
+<pre><code class="hljs language-bash">npm <span class="hljs-built_in">test</span>
+npm run lint
+npm run build
+</code></pre>
+<p>A passing test run ends like this:</p>
+<pre><code class="hljs"> Test Files  8 passed (8)
+      Tests  28 passed (28)
+</code></pre>
+<p><code>npm run lint</code> should print no errors, and <code>npm run build</code> should end
+with a <code>built in</code> line. If all three pass, Stage 1 is done.</p>
+<h2>What changed in the starter's tests</h2>
+<p>Stage 1 deleted <code>welcome.api.js</code>, so the tests that faked it changed:</p>
+<ul>
+<li><code>HomePage.test.jsx</code> no longer uses <code>vi.mock</code>, because the home page
+doesn't call the API any more.</li>
+<li><code>App.test.jsx</code> no longer mocks <code>welcome.api.js</code>, uses
+<code>renderWithProviders</code>, and checks the two new routes and the new
+<strong>Tickets</strong> link.</li>
+</ul>
+<p><code>client.test.js</code> didn't change at all, because <code>client.js</code> didn't. It's
+ready for Stage 2.</p>
+<h2>Commit</h2>
+<pre><code class="hljs language-bash">git add .
+git commit -m <span class="hljs-string">&quot;Stage 1: ticket list and detail pages&quot;</span>
+</code></pre>
+<h2>Try it</h2>
+<p>Run <code>npm run test:watch</code>. Leave it running, and change the subject of
+ticket 1 in <code>sampleTickets.js</code>. Which tests run again, and which fail?
+What does that tell you about tests that depend on the sample data?
+Change it back, and press <strong>q</strong> to stop watching.</p>
+</div>
+    
+  </main>
+</body>
+</html>

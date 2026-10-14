@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Testing a Component With Props — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/foundations/testing-stage-1/testing-a-plain-function.html">← Testing a Plain Function</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/foundations/testing-stage-1/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/foundations/testing-stage-1/renderwithproviders.html">renderWithProviders →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Testing a Component With Props</h1>
+    <p class="lede">StatusBadge only uses its props, so its test renders it with different props and checks what a user would read.</p>
+
+    
+
+    
+      <div class="slide-body"><p><code>StatusBadge</code> has no links, no URL and no API, just a <code>status</code> prop. So
+its test can use a plain <code>render()</code>, the way the starter's tests did:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 1.32: badge tests (src/components/StatusBadge.test.jsx, excerpt)</span>
+<span class="hljs-title function_">describe</span>(<span class="hljs-string">&#x27;StatusBadge&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-title function_">it</span>(<span class="hljs-string">&#x27;shows a readable label for the status&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
+    <span class="hljs-title function_">render</span>(<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">StatusBadge</span> <span class="hljs-attr">status</span>=<span class="hljs-string">&quot;in_progress&quot;</span> /&gt;</span></span>);
+
+    <span class="hljs-title function_">expect</span>(screen.<span class="hljs-title function_">getByText</span>(<span class="hljs-string">&#x27;In progress&#x27;</span>)).<span class="hljs-title function_">toBeInTheDocument</span>();
+  });
+
+  <span class="hljs-title function_">it</span>(<span class="hljs-string">&#x27;shows an unknown status as it is&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
+    <span class="hljs-title function_">render</span>(<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">StatusBadge</span> <span class="hljs-attr">status</span>=<span class="hljs-string">&quot;on_hold&quot;</span> /&gt;</span></span>);
+
+    <span class="hljs-title function_">expect</span>(screen.<span class="hljs-title function_">getByText</span>(<span class="hljs-string">&#x27;on_hold&#x27;</span>)).<span class="hljs-title function_">toBeInTheDocument</span>();
+  });
+});
+</code></pre>
+<p>Testing a component with props is like calling a function with
+arguments: give it an input, check the output. Each test passes a
+different <code>status</code>, and checks the words that appear.</p>
+<h2>Which cases to test</h2>
+<p>The two tests cover the two paths through <code>StatusBadge</code>:</p>
+<ul>
+<li>a status it <strong>knows</strong>: does the lookup turn <code>in_progress</code> into
+<code>In progress</code>?</li>
+<li>a status it <strong>doesn't</strong> know: does the <code>||</code> fallback show the raw
+value instead of nothing?</li>
+</ul>
+<p>There's no need for a test per status. <code>open</code>, <code>resolved</code> and <code>closed</code>
+go through exactly the same line as <code>in_progress</code>, so one test covers
+that path.</p>
+<h2>What it doesn't test: the colour</h2>
+<p>There's no test that an <code>in_progress</code> badge is yellow. The colour comes
+from a generated class name like <code>_in_progress_85lrl_23</code>, and the
+starter's rule was not to test class names: a user can't see them, and
+renaming one would break the test without breaking anything the user
+notices. What the user <strong>must</strong> get, the status in words, is exactly
+what the tests check. That's also the part that makes the badge
+accessible.</p>
+<h2>Try it</h2>
+<p>Write a third test in <code>StatusBadge.test.jsx</code> that checks a <code>resolved</code>
+status shows <code>Resolved</code>. Run <code>npm test</code> and check it passes. Then break
+it on purpose: change <code>Resolved</code> in <code>STATUS_LABELS</code> to <code>Done</code>. Which
+tests fail? Put it back.</p>
+</div>
+    
+  </main>
+</body>
+</html>

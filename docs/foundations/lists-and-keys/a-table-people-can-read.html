@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A Table People Can Read — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/foundations/lists-and-keys/the-empty-state.html">← The Empty State</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/foundations/lists-and-keys/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/foundations/statusbadge-and-css-modules/from-code-values-to-words.html">From Code Values to Words →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>A Table People Can Read</h1>
+    <p class="lede">Tickets are tabular data, so they go in a real table, with column headers a screen reader can announce and a wrapper for narrow screens.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The tickets are shown in an HTML <code>&lt;table&gt;</code>, because they <strong>are</strong> a table:
+every ticket has the same fields, and you read across a row to see one
+ticket, or down a column to compare them. (The comment above the <code>&lt;div&gt;</code>
+is left out here.)</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 1.14: the headings (src/components/TicketList.jsx, excerpt)</span>
+&lt;div className=<span class="hljs-string">&quot;table-wrapper&quot;</span>&gt;
+  &lt;table&gt;
+    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">thead</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">tr</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">th</span> <span class="hljs-attr">scope</span>=<span class="hljs-string">&quot;col&quot;</span>&gt;</span>Subject<span class="hljs-tag">&lt;/<span class="hljs-name">th</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">th</span> <span class="hljs-attr">scope</span>=<span class="hljs-string">&quot;col&quot;</span>&gt;</span>Status<span class="hljs-tag">&lt;/<span class="hljs-name">th</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">th</span> <span class="hljs-attr">scope</span>=<span class="hljs-string">&quot;col&quot;</span>&gt;</span>Customer<span class="hljs-tag">&lt;/<span class="hljs-name">th</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">th</span> <span class="hljs-attr">scope</span>=<span class="hljs-string">&quot;col&quot;</span>&gt;</span>Assigned to<span class="hljs-tag">&lt;/<span class="hljs-name">th</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">th</span> <span class="hljs-attr">scope</span>=<span class="hljs-string">&quot;col&quot;</span>&gt;</span>Created<span class="hljs-tag">&lt;/<span class="hljs-name">th</span>&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">tr</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">thead</span>&gt;</span></span>
+</code></pre>
+<h2>Headings a screen reader can use</h2>
+<p>A sighted user looks up to the top of a column to see what a cell means.
+A screen reader user can't, so the screen reader does it for them: when
+it reads a cell, it also reads that cell's column heading, as in
+&quot;Assigned to: Unassigned&quot;.</p>
+<p>That only works if the headings are real <code>&lt;th&gt;</code> elements, not <code>&lt;td&gt;</code>s
+styled in bold. <code>scope=&quot;col&quot;</code> says each heading belongs to the column
+below it (rather than to the row beside it). <code>&lt;thead&gt;</code> and <code>&lt;tbody&gt;</code>
+separate the heading row from the data rows.</p>
+<p>This is the semantic HTML from the starter's accessibility topic, applied
+to a table: use the element that says what the content <strong>is</strong>.</p>
+<h2>Narrow screens</h2>
+<p>Five columns don't fit on a phone. Without help, the table would make the
+<strong>whole page</strong> wider than the screen. The wrapper <code>&lt;div&gt;</code> fixes that:</p>
+<pre><code class="hljs language-css"><span class="hljs-comment">/* Figure 1.15: scrolling the table (src/index.css, excerpt) */</span>
+<span class="hljs-selector-class">.table-wrapper</span> {
+  <span class="hljs-attribute">overflow-x</span>: auto;
+}
+</code></pre>
+<p><code>overflow-x: auto</code> lets the wrapper scroll sideways when what's inside is
+too wide. The table scrolls; the page doesn't.</p>
+<p>The table's styles live in the global <code>index.css</code>, because every table
+in the app should look the same. The next topic shows the other kind of
+style: one that belongs to a single component.</p>
+<h2>Try it</h2>
+<p>Open the developer tools and turn on the device toolbar
+(Ctrl+Shift+M), then pick a phone size. Scroll the table sideways. Now
+remove <code>className=&quot;table-wrapper&quot;</code> from the <code>&lt;div&gt;</code> and look again. What
+scrolls now? Put the class back.</p>
+</div>
+    
+  </main>
+</body>
+</html>

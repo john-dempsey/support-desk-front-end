@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pages Own the Data — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/foundations/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Pages Own the Data</h1>
+    <p class="lede">A page gets the data and passes it down; a component only displays what it&#39;s given. That split is what lets Stage 2 change where the tickets come from without touching how they&#39;re shown.</p>
+
+    
+      <ul class="listing">
+        
+          <li>
+            <a href="/support-desk-front-end/foundations/pages-own-the-data/a-page-and-a-component.html">A Page and a Component</a>
+            <p>TicketListPage gets the tickets; TicketList shows them. One decides what to show, the other decides how it looks.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/foundations/pages-own-the-data/from-the-page-down.html">From the Page Down</a>
+            <p>The tickets pass down the tree one level at a time, and each component is given only the part it needs.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/foundations/pages-own-the-data/same-component-different-data.html">Same Component, Different Data</a>
+            <p>Because a component only uses its props, it works with any data it&#39;s given: on another page, in a test, or from the API in Stage 2.</p>
+          </li>
+        
+      </ul>
+    
+
+    
+  </main>
+</body>
+</html>

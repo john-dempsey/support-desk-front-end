@@ -91,3 +91,43 @@ a {
   border: 1px solid var(--colour-error-text);
   border-radius: 0.375rem;
 }
+
+/* ---- Tables (e.g. TicketList) ---- */
+
+/* Lets a wide table scroll sideways on a narrow screen, instead of making
+   the whole page wider than the screen. */
+.table-wrapper {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--colour-border);
+}
+
+th {
+  background-color: var(--colour-header);
+}
+
+/* ---- Label/value lists (e.g. TicketDetailPage) ---- */
+
+.details-list {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.25rem 1.5rem;
+}
+
+.details-list dt {
+  font-weight: 600;
+}
+
+.details-list dd {
+  margin: 0;
+}

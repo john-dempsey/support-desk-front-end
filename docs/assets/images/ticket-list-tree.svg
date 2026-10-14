@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 340" width="760" height="340" role="img" aria-labelledby="title desc" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <title id="title">How the tickets reach the screen</title>
+  <desc id="desc">TicketListPage imports the sampleTickets array and passes it to TicketList as the tickets prop. For each ticket, TicketList renders one table row, which uses a Link (given the ticket's id and subject), a StatusBadge (given the ticket's status) and the formatDate function (given the ticket's createdAt date). Only the page touches the data; everything below it gets data as props.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#1a1a1a"/>
+    </marker>
+  </defs>
+  <rect width="760" height="340" fill="#ffffff"/>
+
+  <!-- The data -->
+  <rect x="20" y="40" width="170" height="70" rx="8" fill="#f6f8fa" stroke="#59636e" stroke-width="2"/>
+  <text x="105" y="70" text-anchor="middle" font-size="16" font-weight="700" fill="#1a1a1a">sampleTickets.js</text>
+  <text x="105" y="94" text-anchor="middle" font-size="13" fill="#1a1a1a">an array of 4 tickets</text>
+
+  <!-- The page -->
+  <rect x="290" y="40" width="180" height="70" rx="8" fill="#ddf4ff" stroke="#0550ae" stroke-width="2"/>
+  <text x="380" y="70" text-anchor="middle" font-size="16" font-weight="700" fill="#1a1a1a">TicketListPage</text>
+  <text x="380" y="94" text-anchor="middle" font-size="13" fill="#1a1a1a">gets the data</text>
+
+  <!-- The list component -->
+  <rect x="570" y="40" width="170" height="70" rx="8" fill="#dafbe1" stroke="#116329" stroke-width="2"/>
+  <text x="655" y="70" text-anchor="middle" font-size="16" font-weight="700" fill="#1a1a1a">TicketList</text>
+  <text x="655" y="94" text-anchor="middle" font-size="13" fill="#1a1a1a">shows a table</text>
+
+  <!-- data -> page -> list -->
+  <line x1="192" y1="75" x2="286" y2="75" stroke="#1a1a1a" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="239" y="65" text-anchor="middle" font-size="13" fill="#1a1a1a">import</text>
+  <line x1="472" y1="75" x2="566" y2="75" stroke="#1a1a1a" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="519" y="65" text-anchor="middle" font-size="13" font-family="ui-monospace, Consolas, monospace" fill="#1a1a1a">tickets</text>
+
+  <!-- list -> each row -->
+  <line x1="655" y1="112" x2="655" y2="166" stroke="#1a1a1a" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- One row per ticket -->
+  <rect x="230" y="170" width="510" height="110" rx="8" fill="none" stroke="#59636e" stroke-width="2" stroke-dasharray="6 4"/>
+  <text x="245" y="192" font-size="13" fill="#1a1a1a">for each ticket, one table row:</text>
+
+  <rect x="245" y="205" width="150" height="60" rx="8" fill="#dafbe1" stroke="#116329" stroke-width="2"/>
+  <text x="320" y="230" text-anchor="middle" font-size="15" font-weight="700" fill="#1a1a1a">Link</text>
+  <text x="320" y="252" text-anchor="middle" font-size="13" font-family="ui-monospace, Consolas, monospace" fill="#1a1a1a">id, subject</text>
+
+  <rect x="410" y="205" width="150" height="60" rx="8" fill="#dafbe1" stroke="#116329" stroke-width="2"/>
+  <text x="485" y="230" text-anchor="middle" font-size="15" font-weight="700" fill="#1a1a1a">StatusBadge</text>
+  <text x="485" y="252" text-anchor="middle" font-size="13" font-family="ui-monospace, Consolas, monospace" fill="#1a1a1a">status</text>
+
+  <rect x="575" y="205" width="150" height="60" rx="8" fill="#f6f8fa" stroke="#59636e" stroke-width="2"/>
+  <text x="650" y="230" text-anchor="middle" font-size="15" font-weight="700" fill="#1a1a1a">formatDate()</text>
+  <text x="650" y="252" text-anchor="middle" font-size="13" font-family="ui-monospace, Consolas, monospace" fill="#1a1a1a">createdAt</text>
+
+  <!-- Legend -->
+  <rect x="20" y="305" width="16" height="16" rx="3" fill="#ddf4ff" stroke="#0550ae" stroke-width="2"/>
+  <text x="44" y="318" font-size="13" fill="#1a1a1a">page</text>
+  <rect x="100" y="305" width="16" height="16" rx="3" fill="#dafbe1" stroke="#116329" stroke-width="2"/>
+  <text x="124" y="318" font-size="13" fill="#1a1a1a">component</text>
+  <rect x="215" y="305" width="16" height="16" rx="3" fill="#f6f8fa" stroke="#59636e" stroke-width="2"/>
+  <text x="239" y="318" font-size="13" fill="#1a1a1a">plain JavaScript (data or a function)</text>
+  <text x="740" y="318" text-anchor="end" font-size="13" fill="#1a1a1a">code text = what each one is given</text>
+</svg>

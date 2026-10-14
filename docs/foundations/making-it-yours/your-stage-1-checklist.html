@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Your Stage 1 Checklist — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/foundations/making-it-yours/tracing-a-click.html">← Tracing a Click</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/foundations/making-it-yours/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/foundations/making-it-yours/try-it-yourself.html">Try It Yourself →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Your Stage 1 Checklist</h1>
+    <p class="lede">The same steps for your own case study: sample data in your API&#39;s shape, a list page, a detail page, and tests for each.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The starter's checklist said the first step for your own front-end was:
+<strong>show your main entity with a list page and a detail page, using a
+hard-coded array</strong>. Here's how, using the steps Stage 1 took. The
+examples use a booking system; swap in your own entity.</p>
+<p>Run <code>npm test</code> and look at the page in the browser after <strong>every</strong> step,
+and commit when both work.</p>
+<h2>1. Sample data in your API's shape</h2>
+<p>Call your API's list endpoint (for example <code>GET /bookings</code>) in Thunder
+Client or Postman, and copy three or four items from its <code>data</code> into
+<code>src/data/sampleBookings.js</code>. Mark the file <strong>TEMPORARY</strong>.</p>
+<p>Then check the copy:</p>
+<ul>
+<li>the field names are exactly the API's</li>
+<li>related records (a customer, a room) are objects, if your API includes
+them</li>
+<li>at least one item has <code>null</code> wherever your API can send <code>null</code></li>
+<li>every value of a status or category field appears at least once</li>
+</ul>
+<h2>2. A list component</h2>
+<p><code>src/components/BookingList.jsx</code>, taking one prop: <code>bookings</code>. A table
+with <code>&lt;th scope=&quot;col&quot;&gt;</code> headings, one row per item with <code>.map()</code>, <code>key</code>
+from the <code>id</code>, a <code>Link</code> to each item's own page, a <code>? :</code> for every field
+that can be <code>null</code>, and an empty state.</p>
+<h2>3. A list page</h2>
+<p><code>src/pages/BookingListPage.jsx</code>: an <code>&lt;h1&gt;</code>, and
+<code>&lt;BookingList bookings={sampleBookings} /&gt;</code>. Then a <code>&lt;Route&gt;</code> for
+<code>/bookings</code> in <code>App.jsx</code>, and a <code>NavLink</code> in <code>NavBar.jsx</code>.</p>
+<h2>4. A detail page</h2>
+<p><code>src/pages/BookingDetailPage.jsx</code> at <code>/bookings/:bookingId</code>:
+<code>useParams()</code>, <code>Number()</code>, <code>find()</code>, a &quot;not found&quot; branch, and a <code>&lt;dl&gt;</code>
+for the details.</p>
+<h2>5. Small pieces you can reuse</h2>
+<ul>
+<li><code>formatDate.js</code> works for any API that sends ISO dates: copy it as it
+is.</li>
+<li>If your entity has a status or category, write a badge like
+<code>StatusBadge</code>, with your own labels and a CSS Module. Keep the words:
+never colour alone.</li>
+<li><code>renderWithProviders.jsx</code> has nothing Support Desk-specific in it:
+copy it into <code>src/test/</code>.</li>
+</ul>
+<h2>6. The starter's leftovers</h2>
+<p>Replace <code>HomePage</code>'s connection check with a welcome and a link to your
+list. Delete <code>welcome.api.js</code> once nothing imports it, and update the
+tests that used it. Do the <code>TODO</code>s: the title and <code>APP_NAME</code>.</p>
+<h2>7. Tests</h2>
+<p>One test file next to each new file, following Stage 1's: a function
+test for anything in <code>utils/</code>, a props test for each component, and page
+tests that pass <code>route</code> and <code>path</code>. Add your two routes to
+<code>App.test.jsx</code>.</p>
+</div>
+    
+  </main>
+</body>
+</html>

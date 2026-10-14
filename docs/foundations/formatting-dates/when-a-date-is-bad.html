@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>When a Date Is Bad — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/foundations/formatting-dates/intl-datetimeformat.html">← Intl.DateTimeFormat</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/foundations/formatting-dates/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/foundations/formatting-dates/one-function-many-places.html">One Function, Many Places →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>When a Date Is Bad</h1>
+    <p class="lede">new Date() doesn&#39;t fail on a bad string. It gives an Invalid Date, and formatting that would crash the page, so formatDate checks first.</p>
+
+    
+
+    
+      <div class="slide-body"><p>What if a date is missing, or isn't a date at all? Here's the whole
+function:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 1.23: checking the date (src/utils/formatDate.js, excerpt)</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">formatDate</span>(<span class="hljs-params">isoString</span>) {
+  <span class="hljs-keyword">const</span> date = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Date</span>(isoString);
+
+  <span class="hljs-comment">// new Date() doesn&#x27;t throw for a bad string; it gives an &quot;Invalid Date&quot;</span>
+  <span class="hljs-comment">// whose time is NaN. Without this check, format() would throw and the</span>
+  <span class="hljs-comment">// whole page would crash because of one bad date.</span>
+  <span class="hljs-keyword">if</span> (<span class="hljs-title class_">Number</span>.<span class="hljs-built_in">isNaN</span>(date.<span class="hljs-title function_">getTime</span>())) {
+    <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;Unknown date&#x27;</span>;
+  }
+
+  <span class="hljs-keyword">return</span> dateFormatter.<span class="hljs-title function_">format</span>(date);
+}
+</code></pre>
+<h2>A quiet failure, then a loud one</h2>
+<p><code>new Date('not a date')</code> doesn't throw an error. It gives back a <code>Date</code>
+object anyway, an <strong>Invalid Date</strong>. You only find out when you use it:</p>
+<ul>
+<li><code>date.getTime()</code> (the date as a number of milliseconds) is <code>NaN</code>,
+&quot;not a number&quot;</li>
+<li><code>dateFormatter.format(date)</code> <strong>throws</strong>:
+<code>RangeError: Invalid time value</code></li>
+</ul>
+<p>You saw in topic 03 what one error while drawing does: the whole app
+goes blank. One bad date in one row would take the whole Tickets page
+with it.</p>
+<h2>The check</h2>
+<p><code>Number.isNaN(date.getTime())</code> is the reliable way to ask &quot;is this an
+Invalid Date?&quot;. (<code>NaN</code> is the one value that isn't equal to itself, so
+<code>date.getTime() === NaN</code> is always <code>false</code>, and can't be used.) If the
+date is invalid, the function returns <code>'Unknown date'</code> and never calls
+<code>format()</code>.</p>
+<p>The API should never send a bad date. But <code>formatDate</code> can't know where
+its string came from, so it handles the bad case itself and says so
+honestly, rather than trusting every caller.</p>
+<h2>Try it</h2>
+<p><code>formatDate.test.js</code> checks that <code>formatDate('not a date')</code> and
+<code>formatDate(undefined)</code> both give <code>'Unknown date'</code>. Now predict what
+<code>formatDate(null)</code> gives, then check it: add
+<code>console.log(formatDate(null));</code> to the top of <code>TicketList</code> and look in
+the <strong>Console</strong>. Is it what you expected? What does <code>new Date(null)</code>
+mean? Remove the line afterwards.</p>
+</div>
+    
+  </main>
+</body>
+</html>

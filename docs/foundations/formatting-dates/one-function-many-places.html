@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>One Function, Many Places — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/foundations/formatting-dates/when-a-date-is-bad.html">← When a Date Is Bad</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/foundations/formatting-dates/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/foundations/a-page-for-each-ticket/a-route-with-a-parameter.html">A Route With a Parameter →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>One Function, Many Places</h1>
+    <p class="lede">formatDate is a plain function in src/utils/, used by both ticket pages, the same way the back-end keeps small shared helpers in its utils folder.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Three places in Stage 1 show a date: the <strong>Created</strong> column in
+<code>TicketList</code>, and the <strong>Created</strong> and <strong>Last updated</strong> rows on
+<code>TicketDetailPage</code>. All three call the same function, like the
+<code>{formatDate(ticket.createdAt)}</code> cell in Figure 1.8.</p>
+<p>So every date in the app looks the same, and changing how dates look
+means changing one file. Try it in the previous slide's <strong>Try it</strong> if
+you haven't: one change to <code>'en-US'</code> changed every date on every page.</p>
+<h2>Why <code>src/utils/</code></h2>
+<p><code>formatDate</code> doesn't return JSX, so it isn't a component (topic 02). It
+doesn't belong to a page, and it doesn't talk to the API. It's a small,
+general-purpose helper, so it goes in <code>src/utils/</code>, the same idea as the
+back-end's <code>utils/</code> folder, which holds helpers like <code>sendResource()</code> in
+<code>response.js</code>.</p>
+<h2>A named export</h2>
+<p>Components are <strong>default</strong> exports (<code>export default TicketList;</code>),
+imported without braces. <code>formatDate.js</code> uses a <strong>named</strong> export instead,
+like the back-end's <code>utils/response.js</code>. Shortened, the two ends look
+like this:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// in formatDate.js</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">formatDate</span>(<span class="hljs-params">isoString</span>) { <span class="hljs-comment">/* ... */</span> }
+
+<span class="hljs-comment">// in TicketList.jsx</span>
+<span class="hljs-keyword">import</span> { formatDate } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;../utils/formatDate.js&#x27;</span>;
+</code></pre>
+<p>With a named export, the braces must use the exported name exactly. A
+utils file can then grow to hold several related helpers, each imported
+by name, just like <code>sendResource</code> and <code>sendCollection</code> in the back-end.</p>
+<h2>Easy to test</h2>
+<p>Because <code>formatDate</code> is just a function (string in, string out, no
+React, no browser page), its test only has to call it and check what
+comes back. Topic 07 shows that test.</p>
+<h2>Try it</h2>
+<p>Find every place <code>formatDate</code> is used: in VS Code, right-click
+<code>formatDate</code> in <code>formatDate.js</code> and choose <strong>Find All References</strong>
+(Shift+Alt+F12). How many are there, and which of them are tests?</p>
+</div>
+    
+  </main>
+</body>
+</html>

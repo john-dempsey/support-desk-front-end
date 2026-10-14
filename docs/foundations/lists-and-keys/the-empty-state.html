@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Empty State — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/foundations/lists-and-keys/checking-for-null.html">← Checking for null</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/foundations/lists-and-keys/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/foundations/lists-and-keys/a-table-people-can-read.html">A Table People Can Read →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>The Empty State</h1>
+    <p class="lede">When there are no tickets, TicketList returns a message instead of the table, using an early return.</p>
+
+    
+
+    
+      <div class="slide-body"><p>A list should always say something sensible when it has nothing in it.
+<code>TicketList</code> checks for that before it builds the table:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 1.13: nothing to show (src/components/TicketList.jsx, excerpt)</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">TicketList</span>(<span class="hljs-params">{ tickets }</span>) {
+  <span class="hljs-comment">// The &quot;empty&quot; state. Not possible with the hard-coded tickets, but it</span>
+  <span class="hljs-comment">// will be once the list comes from the API (e.g. a brand-new customer).</span>
+  <span class="hljs-keyword">if</span> (tickets.<span class="hljs-property">length</span> === <span class="hljs-number">0</span>) {
+    <span class="hljs-keyword">return</span> <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>There are no tickets to show.<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span></span>;
+  }
+
+  <span class="hljs-keyword">return</span> (
+    <span class="hljs-comment">// ... the table</span>
+</code></pre>
+<h2>An early return</h2>
+<p>A component is a function, so it can <code>return</code> more than once. When
+there are no tickets, the first <code>return</code> gives back the message, and
+nothing after it runs. The table code is only reached when there's at
+least one ticket.</p>
+<p>This is a normal JavaScript <code>if</code> statement. It's allowed here because
+it's <strong>outside</strong> the JSX, in the body of the function. Inside <code>{ }</code> it
+wouldn't be.</p>
+<h2>Why not <code>&amp;&amp;</code>?</h2>
+<p>The starter's <code>HomePage</code> used <code>&amp;&amp;</code> to show or hide <strong>one piece</strong> of the
+page, such as the error message. Here, the whole result is different:
+either a table, or a sentence. Building an empty table, with headings
+and no rows, would look broken. An early return keeps the two cases
+apart, and the main <code>return</code> doesn't have to worry about the empty case
+at all.</p>
+<h2>When it happens</h2>
+<p>Never, with the sample data, which always has four tickets. But from
+Stage 2 the tickets come from the API, and a customer who has only just
+registered has no tickets yet. Handling it now means <code>TicketList</code> is
+ready for that before it happens.</p>
+<h2>Try it</h2>
+<p>Change the message to <code>No tickets yet.</code> and run <code>npm test</code>. Which test
+fails, and what is it checking? Change the message back. (The previous
+topic's <strong>Try it</strong> showed you how to see the message in the browser.)</p>
+</div>
+    
+  </main>
+</body>
+</html>

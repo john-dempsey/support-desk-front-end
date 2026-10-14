@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Same Component, Different Data — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/foundations/pages-own-the-data/from-the-page-down.html">← From the Page Down</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/foundations/pages-own-the-data/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/foundations/lists-and-keys/arrow-functions-and-jsx.html">Arrow Functions and JSX →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Same Component, Different Data</h1>
+    <p class="lede">Because a component only uses its props, it works with any data it&#39;s given: on another page, in a test, or from the API in Stage 2.</p>
+
+    
+
+    
+      <div class="slide-body"><p>A component that only uses its props doesn't mind <strong>who</strong> gives it
+those props, or where they got them. Stage 1 already relies on that in
+three ways.</p>
+<h2>On another page</h2>
+<p>The ticket's own page, <code>TicketDetailPage</code>, shows the same badge:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 1.9: the badge again (src/pages/TicketDetailPage.jsx, excerpt)</span>
+&lt;h1&gt;{ticket.<span class="hljs-property">subject</span>}&lt;/h1&gt;
+<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">StatusBadge</span> <span class="hljs-attr">status</span>=<span class="hljs-string">{ticket.status}</span> /&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span></span>
+</code></pre>
+<p>Both pages import <code>StatusBadge</code> from the same file. If the badge's
+colours or wording ever change, they change in one place, and both pages
+get the change.</p>
+<p><code>TicketDetailPage</code> is a page, so, like <code>TicketListPage</code>, it gets its own
+data: it imports <code>sampleTickets</code> and finds the one ticket it needs
+(topic 06 shows how). The two pages each own their data. The component
+they share owns nothing.</p>
+<h2>In a test</h2>
+<p><code>TicketList</code>'s tests don't use <code>sampleTickets</code> at all. They pass in a
+small array of their own, made up to include exactly the cases they want
+to check, such as an unassigned ticket. Topic 07 shows how. <code>TicketList</code>
+can't tell the difference, because to <code>TicketList</code> it's just a <code>tickets</code>
+prop.</p>
+<h2>From the API, in Stage 2</h2>
+<p>In Stage 2, <code>TicketListPage</code> will get its tickets from <code>GET /tickets</code>
+instead of the import. That changes <strong>how the page gets</strong> <code>tickets</code>. The
+line that hands them over, <code>&lt;TicketList tickets={sampleTickets} /&gt;</code> in
+Figure 1.6, stays the same apart from the name of the variable passed
+in. <code>TicketList</code>, <code>StatusBadge</code> and <code>formatDate</code> won't change at all,
+the same way the back-end's controllers didn't change when Lesson 2
+swapped the in-memory array for Prisma.</p>
+<p>That's the payoff of the split: the code that <strong>gets</strong> the data and the
+code that <strong>shows</strong> it can each change without the other.</p>
+<h2>Try it</h2>
+<p>In <code>TicketListPage.jsx</code>, change the prop to each of these in turn, and
+save after each one:</p>
+<pre><code class="hljs language-jsx">&lt;<span class="hljs-title class_">TicketList</span> tickets={sampleTickets.<span class="hljs-title function_">slice</span>(<span class="hljs-number">0</span>, <span class="hljs-number">2</span>)} /&gt;
+<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">TicketList</span> <span class="hljs-attr">tickets</span>=<span class="hljs-string">{[]}</span> /&gt;</span></span>
+</code></pre>
+<p>(<code>slice(0, 2)</code> gives a new array with just the first two items.) What
+does the table show each time? Which file decided what to show when
+there are no tickets? Did you have to change <code>TicketList</code> for either
+one? Put the prop back to <code>sampleTickets</code> when you're done.</p>
+</div>
+    
+  </main>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tracing a Click — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/foundations/testing-stage-1/running-everything.html">← Running Everything</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/foundations/making-it-yours/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/foundations/making-it-yours/your-stage-1-checklist.html">Your Stage 1 Checklist →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Tracing a Click</h1>
+    <p class="lede">Two clicks followed through Stage 1&#39;s code: from the navigation to the list, and from the list to one ticket.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The viva asks you to trace a click through your own code. Stage 1 has no
+API calls yet, so its trace is shorter than the starter's: there's no
+API module, no HTTP request and no state. What's left is the part every
+trace starts with: <strong>routes, components and props</strong>. Stage 2 adds the
+rest back.</p>
+<h2>Click 1: Tickets</h2>
+<p>You're on the home page, and you click <strong>Tickets</strong> in the navigation.</p>
+<ol>
+<li><strong><code>NavBar.jsx</code></strong>: the <code>NavLink</code> changes the URL to <code>/tickets</code>. No
+request is sent.</li>
+<li><strong><code>App.jsx</code></strong>: <code>&lt;Routes&gt;</code> matches <code>/tickets</code> and shows
+<code>TicketListPage</code>. The <code>NavLink</code> becomes active.</li>
+<li><strong><code>TicketListPage.jsx</code></strong>: the page has the tickets (imported from
+<code>sampleTickets.js</code>) and renders <code>&lt;TicketList tickets={sampleTickets} /&gt;</code>.</li>
+<li><strong><code>TicketList.jsx</code></strong>: there are four tickets, so it skips the empty
+state, and <code>tickets.map(...)</code> makes one <code>&lt;tr&gt;</code> per ticket, each with a
+<code>key</code>.</li>
+<li><strong>For each row</strong>: a <code>Link</code> to <code>/tickets/</code> + the id, a <code>StatusBadge</code>
+given the status, the customer's name, the agent's name or
+&quot;Unassigned&quot;, and <code>formatDate(ticket.createdAt)</code>.</li>
+<li><strong><code>StatusBadge.jsx</code></strong>: looks up the label and the colour class for
+its <code>status</code>.</li>
+</ol>
+<h2>Click 2: a ticket</h2>
+<p>You click <strong>Invoice discrepancy</strong>. This is the journey in the diagram
+from topic 06:</p>
+<ol>
+<li><strong><code>TicketList.jsx</code></strong>: the <code>Link</code> changes the URL to <code>/tickets/2</code>.</li>
+<li><strong><code>App.jsx</code></strong>: <code>/tickets/:ticketId</code> matches, so <code>TicketDetailPage</code>
+is shown.</li>
+<li><strong><code>TicketDetailPage.jsx</code></strong>: <code>useParams()</code> gives <code>{ ticketId: '2' }</code>,
+and <code>find()</code> looks for the ticket whose <code>id</code> is <code>Number('2')</code>.</li>
+<li>It's found, so the page skips the &quot;not found&quot; branch and shows the
+subject, a <code>StatusBadge</code>, the details list and the description.</li>
+</ol>
+<h2>Questions to practise with</h2>
+<p>Answer these out loud, with the code open. Then try them again with it
+closed.</p>
+<ol>
+<li>In click 1, which file decides <strong>which</strong> tickets are shown, and which
+decides <strong>how</strong> they look?</li>
+<li>What is <code>tickets</code> inside <code>TicketList</code>, and where did it come from?</li>
+<li>Why does each <code>&lt;tr&gt;</code> need a <code>key</code>, and why is it <code>ticket.id</code>?</li>
+<li>Why does the &quot;Assigned to&quot; cell check <code>ticket.assignedAgent</code> before
+reading <code>.name</code>, when the &quot;Customer&quot; cell doesn't?</li>
+<li>In click 2, how does <code>TicketDetailPage</code> know which ticket to show?
+Why is <code>Number()</code> needed?</li>
+<li>You type <code>/tickets/999</code> instead. At which step does it go
+differently, and what does the user see? Which component shows it?</li>
+<li>In Stage 2, the tickets will come from the API. Which of the files
+above do you expect to change, and which won't?</li>
+</ol>
+</div>
+    
+  </main>
+</body>
+</html>

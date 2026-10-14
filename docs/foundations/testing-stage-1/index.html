@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Testing Stage 1 — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/foundations/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Testing Stage 1</h1>
+    <p class="lede">Tests for a plain function, a component with props, components that need a router, and a page that reads the URL, plus the helper they share.</p>
+
+    
+      <ul class="listing">
+        
+          <li>
+            <a href="/support-desk-front-end/foundations/testing-stage-1/testing-a-plain-function.html">Testing a Plain Function</a>
+            <p>formatDate has no React in it, so its test just calls it and checks what comes back.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/foundations/testing-stage-1/testing-a-component-with-props.html">Testing a Component With Props</a>
+            <p>StatusBadge only uses its props, so its test renders it with different props and checks what a user would read.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/foundations/testing-stage-1/renderwithproviders.html">renderWithProviders</a>
+            <p>Anything with a &lt;Link&gt; or useParams() needs a router around it. One shared helper provides it, so no test has to set it up itself.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/foundations/testing-stage-1/giving-useparams-a-route.html">Giving useParams() a Route</a>
+            <p>useParams() only knows a parameter when a &lt;Route&gt; with that pattern matched, so the page test passes both the URL and the pattern.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/foundations/testing-stage-1/testing-a-list.html">Testing a List</a>
+            <p>TicketList&#39;s tests bring their own tickets, count the rows, look inside one row with within(), and check the empty state.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/foundations/testing-stage-1/running-everything.html">Running Everything</a>
+            <p>Stage 1 ends with 28 passing tests in eight files, no lint errors and a working build.</p>
+          </li>
+        
+      </ul>
+    
+
+    
+  </main>
+</body>
+</html>

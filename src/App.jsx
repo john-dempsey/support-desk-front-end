@@ -4,6 +4,8 @@
 import { Route, Routes } from 'react-router';
 import NavBar from './components/NavBar.jsx';
 import HomePage from './pages/HomePage.jsx';
+import TicketListPage from './pages/TicketListPage.jsx';
+import TicketDetailPage from './pages/TicketDetailPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 
 function App() {
@@ -13,7 +15,10 @@ function App() {
       <main className="container">
         <Routes>
           <Route path="/" element={<HomePage />} />
-          {/* TODO (your case study): add a <Route> for each new page. */}
+          <Route path="/tickets" element={<TicketListPage />} />
+          {/* ":ticketId" matches any value, like "/tickets/:id" in Express.
+              The page reads it with useParams(). */}
+          <Route path="/tickets/:ticketId" element={<TicketDetailPage />} />
 
           {/* "*" matches any URL that no other route matches. React Router
               always picks the most specific match, so order doesn't

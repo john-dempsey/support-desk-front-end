@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dates From the API — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/foundations/statusbadge-and-css-modules/not-colour-alone.html">← Not Colour Alone</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/foundations/formatting-dates/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/foundations/formatting-dates/intl-datetimeformat.html">Intl.DateTimeFormat →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Dates From the API</h1>
+    <p class="lede">JSON has no date type, so the API sends every date as an ISO 8601 string. The front-end decides how a person should see it.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Every ticket has two dates, <code>createdAt</code> and <code>updatedAt</code>, and the API
+sends both as strings, like this:</p>
+<pre><code class="hljs language-json"><span class="hljs-attr">&quot;createdAt&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2026-10-08T09:15:00.000Z&quot;</span>
+</code></pre>
+<p>JSON has numbers, strings, booleans, arrays and objects, but <strong>no date
+type</strong>. So when Express turned Prisma's <code>Date</code> objects into JSON, it
+wrote each one as a string in the <strong>ISO 8601</strong> format.</p>
+<h2>Reading an ISO date</h2>
+<table>
+<thead>
+<tr>
+<th>Part</th>
+<th>Means</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>2026-10-08</code></td>
+<td>the date: year, month, day, biggest first</td>
+</tr>
+<tr>
+<td><code>T</code></td>
+<td>separates the date from the time</td>
+</tr>
+<tr>
+<td><code>09:15:00.000</code></td>
+<td>the time: hours, minutes, seconds, milliseconds</td>
+</tr>
+<tr>
+<td><code>Z</code></td>
+<td>the time is in <strong>UTC</strong> (no time zone offset)</td>
+</tr>
+</tbody>
+</table>
+<p>It's a good format for computers: there's only one way to read it
+(<code>10-08</code> is never &quot;10 August&quot;), and sorting the strings alphabetically
+sorts the dates too.</p>
+<p>It's not a good format for people. Nobody wants to read
+<code>2026-10-08T09:15:00.000Z</code> in a table.</p>
+<h2>Why the front-end formats it</h2>
+<p>The API could have sent <code>&quot;8 Oct 2026&quot;</code> instead. But the API doesn't know
+who's looking:</p>
+<ul>
+<li><strong>the time zone.</strong> <code>09:15</code> UTC is <code>10:15</code> in Ireland in October, and
+<code>05:15</code> in New York. Only the browser knows where the user is.</li>
+<li><strong>the language.</strong> Irish English writes <code>8 Oct 2026</code>; American English
+writes <code>Oct 8, 2026</code>.</li>
+<li><strong>the purpose.</strong> One page might want the full date and time, another
+just the day.</li>
+</ul>
+<p>So the API sends one exact, neutral value, and each client formats it
+for its own user. In Laravel, Blade did this on the server with Carbon
+(<code>$ticket-&gt;created_at-&gt;format('j M Y')</code>), because the server was building
+the page. Here, the page is built in the browser, so that's where the
+formatting happens.</p>
+<h2>Try it</h2>
+<p>On the Tickets page, find the first ticket's <strong>Created</strong> date. Its
+<code>createdAt</code> is <code>2026-10-08T09:15:00.000Z</code>. Why does the page show
+<code>10:15</code> and not <code>09:15</code>?</p>
+</div>
+    
+  </main>
+</body>
+</html>

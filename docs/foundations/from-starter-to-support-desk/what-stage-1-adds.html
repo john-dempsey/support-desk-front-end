@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What Stage 1 Adds — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/the-starter/making-it-yours/try-it-yourself.html">← Try It Yourself</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/foundations/from-starter-to-support-desk/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/foundations/from-starter-to-support-desk/hard-coded-tickets.html">Hard-Coded Tickets →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>What Stage 1 Adds</h1>
+    <p class="lede">Two new pages, a list of tickets and one ticket, built on the starter, with the tickets hard-coded so the API isn&#39;t needed yet.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The starter's checklist ended with a plan for building in stages. The
+first step was:</p>
+<blockquote>
+<p>Show your main entity with a list page and a detail page, using a
+hard-coded array before you fetch anything.</p>
+</blockquote>
+<p>For Support Desk, the main entity is the <strong>ticket</strong>. Stage 1 takes that
+first step, and by the end of it the app has these pages:</p>
+<table>
+<thead>
+<tr>
+<th>URL</th>
+<th>Page</th>
+<th>Shows</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/</code></td>
+<td><code>HomePage</code></td>
+<td>a welcome and a link to the tickets</td>
+</tr>
+<tr>
+<td><code>/tickets</code></td>
+<td><code>TicketListPage</code></td>
+<td>every ticket, in a table</td>
+</tr>
+<tr>
+<td><code>/tickets/2</code></td>
+<td><code>TicketDetailPage</code></td>
+<td>one ticket: its status, people, dates and description</td>
+</tr>
+<tr>
+<td>anything else</td>
+<td><code>NotFoundPage</code></td>
+<td>unchanged from the starter</td>
+</tr>
+</tbody>
+</table>
+<p>Each new page is added the way the checklist described: a page component
+in <code>src/pages/</code>, a <code>&lt;Route&gt;</code> in <code>App.jsx</code>, and a <code>NavLink</code> in
+<code>NavBar.jsx</code>.</p>
+<h2>One new thing at a time</h2>
+<p>The tickets in Stage 1 are a <strong>hard-coded array</strong> in the front-end. The
+API isn't involved at all, so you don't even need it running.</p>
+<p>You've seen this approach before. In the back-end's Lesson 1,
+<code>ticket.service.js</code> kept its tickets in an in-memory array, and Lesson 2
+swapped that array for real Prisma queries. Because the controllers only
+ever called the service, not one controller had to change.</p>
+<p>Stage 1 does the same thing for the front-end. Building the pages first,
+with data you control, means:</p>
+<ul>
+<li>if a page looks wrong, the problem is in how it <strong>displays</strong> tickets,
+not in a request, a token or the network</li>
+<li>you can see every case straight away (an unassigned ticket, each
+status), without having to set it up in the database first</li>
+<li>Stage 2 only has to change <strong>where</strong> the tickets come from. The parts
+that display them don't change at all.</li>
+</ul>
+<h2>What this lesson covers</h2>
+<table>
+<thead>
+<tr>
+<th>Topic</th>
+<th>Idea</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>02</td>
+<td>Pages own the data; components display what they're given</td>
+</tr>
+<tr>
+<td>03</td>
+<td>Turning an array into a list on the page, with <code>.map()</code> and keys</td>
+</tr>
+<tr>
+<td>04</td>
+<td><code>StatusBadge</code>, and styles that belong to one component</td>
+</tr>
+<tr>
+<td>05</td>
+<td>Turning the API's dates into dates people can read</td>
+</tr>
+<tr>
+<td>06</td>
+<td>A page for each ticket: reading the ID from the URL</td>
+</tr>
+<tr>
+<td>07</td>
+<td>Testing what this stage added</td>
+</tr>
+<tr>
+<td>08</td>
+<td>Tracing a click, and doing the same for your own case study</td>
+</tr>
+</tbody>
+</table>
+<h2>Try it</h2>
+<p>Run <code>npm run dev</code> and open <code>http://localhost:5173</code>. Click <strong>Tickets</strong>,
+then click a ticket's subject. Now type <code>http://localhost:5173/tickets/999</code>
+into the address bar. What does the page say? Is it the same page you
+get for <code>http://localhost:5173/no-such-page</code>?</p>
+</div>
+    
+  </main>
+</body>
+</html>

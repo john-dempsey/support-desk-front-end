@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A Page for Each Ticket — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/foundations/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>A Page for Each Ticket</h1>
+    <p class="lede">One route that matches every ticket&#39;s URL, a hook that reads the ID from it, and a page that finds the ticket and shows it, or says it isn&#39;t there.</p>
+
+    
+      <ul class="listing">
+        
+          <li>
+            <a href="/support-desk-front-end/foundations/a-page-for-each-ticket/a-route-with-a-parameter.html">A Route With a Parameter</a>
+            <p>/tickets/:ticketId is one route that matches every ticket&#39;s URL, the same idea as /tickets/:id in Express.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/foundations/a-page-for-each-ticket/useparams.html">useParams()</a>
+            <p>useParams() is a hook that reads the route&#39;s parameters from the current URL: the front-end&#39;s req.params.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/foundations/a-page-for-each-ticket/urls-are-text.html">URLs Are Text</a>
+            <p>The ID from the URL is a string, and the tickets&#39; ids are numbers, so the page converts it before comparing.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/foundations/a-page-for-each-ticket/when-there-is-no-such-ticket.html">When There&#39;s No Such Ticket</a>
+            <p>/tickets/999 matches the route, but there&#39;s no ticket 999. The page says so itself, the way the API will answer 404 from Stage 2.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/foundations/a-page-for-each-ticket/a-description-list.html">A Description List</a>
+            <p>The ticket&#39;s details are label-and-value pairs, so they go in a &lt;dl&gt;, with a little CSS grid to line them up.</p>
+          </li>
+        
+      </ul>
+    
+
+    
+  </main>
+</body>
+</html>

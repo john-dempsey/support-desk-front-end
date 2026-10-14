@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A Page and a Component — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/foundations/from-starter-to-support-desk/making-the-starter-support-desk.html">← Making the Starter Support Desk</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/foundations/pages-own-the-data/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/foundations/pages-own-the-data/from-the-page-down.html">From the Page Down →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>A Page and a Component</h1>
+    <p class="lede">TicketListPage gets the tickets; TicketList shows them. One decides what to show, the other decides how it looks.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The Tickets page is split across two files. The <strong>page</strong> is short:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 1.6: the Tickets page (src/pages/TicketListPage.jsx)</span>
+<span class="hljs-keyword">import</span> <span class="hljs-title class_">TicketList</span> <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;../components/TicketList.jsx&#x27;</span>;
+<span class="hljs-keyword">import</span> sampleTickets <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;../data/sampleTickets.js&#x27;</span>;
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">TicketListPage</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">return</span> (
+    <span class="language-xml"><span class="hljs-tag">&lt;&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>Tickets<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">TicketList</span> <span class="hljs-attr">tickets</span>=<span class="hljs-string">{sampleTickets}</span> /&gt;</span>
+    <span class="hljs-tag">&lt;/&gt;</span></span>
+  );
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-title class_">TicketListPage</span>;
+</code></pre>
+<p>It does two things: it gets the tickets (for now, by importing the
+array), and it hands them to <code>TicketList</code> as a prop called <code>tickets</code>.</p>
+<p><code>TicketList</code> does the displaying: the table, its headings and one row
+per ticket. It starts like this:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 1.7: the list&#x27;s one prop (src/components/TicketList.jsx, excerpt)</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">TicketList</span>(<span class="hljs-params">{ tickets }</span>) {
+</code></pre>
+<p>That one line is everything <code>TicketList</code> knows about where its data comes
+from: somebody passes it <code>tickets</code>. It never imports <code>sampleTickets</code>,
+and it will never call the API.</p>
+<h2>Two kinds of component</h2>
+<p>Both files are components (functions that return JSX), but they have
+different jobs, and they live in different folders:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Pages</strong> (<code>src/pages/</code>)</th>
+<th><strong>Components</strong> (<code>src/components/</code>)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Job</td>
+<td>get the data, decide <strong>what</strong> to show</td>
+<td>show what they're given, decide <strong>how</strong> it looks</td>
+</tr>
+<tr>
+<td>Gets its data from</td>
+<td>an import now; the API from Stage 2</td>
+<td>its props only</td>
+</tr>
+<tr>
+<td>Used</td>
+<td>once, by a <code>&lt;Route&gt;</code> in <code>App.jsx</code></td>
+<td>anywhere, by any page</td>
+</tr>
+<tr>
+<td>Back-end / Laravel equivalent</td>
+<td>a controller</td>
+<td>a Blade view or partial</td>
+</tr>
+</tbody>
+</table>
+<p>The starter compared pages with controllers, and the comparison carries
+on here. In Laravel, a controller loaded the tickets and passed them to
+a view:</p>
+<pre><code class="hljs language-php"><span class="hljs-keyword">return</span> <span class="hljs-title function_ invoke__">view</span>(<span class="hljs-string">&#x27;tickets.index&#x27;</span>, [<span class="hljs-string">&#x27;tickets&#x27;</span> =&gt; <span class="hljs-variable">$tickets</span>]);
+</code></pre>
+<p>The Blade view never ran a query. It looped over the <code>$tickets</code> it was
+given. <code>&lt;TicketList tickets={sampleTickets} /&gt;</code> is the same handover:
+<code>TicketListPage</code> is the controller, and <code>TicketList</code> is the view.</p>
+<h2>Try it</h2>
+<p>In <code>TicketListPage.jsx</code>, change the <code>&lt;h1&gt;</code> to <code>All tickets</code> and save.
+Which file did you have to change to change the page's heading, and
+which file would you change to add a column to the table? Change the
+heading back.</p>
+</div>
+    
+  </main>
+</body>
+</html>

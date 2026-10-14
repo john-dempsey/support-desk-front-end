@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>renderWithProviders — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/foundations/testing-stage-1/testing-a-component-with-props.html">← Testing a Component With Props</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/foundations/testing-stage-1/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/foundations/testing-stage-1/giving-useparams-a-route.html">Giving useParams() a Route →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>renderWithProviders</h1>
+    <p class="lede">Anything with a &lt;Link&gt; or useParams() needs a router around it. One shared helper provides it, so no test has to set it up itself.</p>
+
+    
+
+    
+      <div class="slide-body"><p><code>TicketList</code> contains <code>&lt;Link&gt;</code>s, and a <code>&lt;Link&gt;</code> only works inside a
+router. In the app, <code>main.jsx</code> provides one. A test that renders
+<code>TicketList</code> on its own has no router, and fails with this:</p>
+<blockquote>
+<p><code>Cannot destructure property 'basename' of 'React$1.useContext(...)' as it is null.</code></p>
+</blockquote>
+<p>That message doesn't mention a router at all. If you see it in a test,
+the component you rendered needs a router around it.</p>
+<h2>One helper for every test</h2>
+<p>The starter's <code>App.test.jsx</code> wrapped <code>App</code> in a <code>MemoryRouter</code> itself.
+Stage 1 has five test files that need a router, so instead of five
+copies, there's one shared helper in <code>src/test/</code>:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 1.33: the helper (src/test/renderWithProviders.jsx, excerpt)</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">renderWithProviders</span>(<span class="hljs-params">
+  componentToTest,
+  { route = <span class="hljs-string">&#x27;/&#x27;</span>, path } = {},
+</span>) {
+  <span class="hljs-keyword">let</span> content = componentToTest;
+  <span class="hljs-keyword">if</span> (path) {
+    content = (
+      <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">Routes</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">Route</span> <span class="hljs-attr">path</span>=<span class="hljs-string">{path}</span> <span class="hljs-attr">element</span>=<span class="hljs-string">{componentToTest}</span> /&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">Routes</span>&gt;</span></span>
+    );
+  }
+
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">render</span>(
+    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">MemoryRouter</span> <span class="hljs-attr">initialEntries</span>=<span class="hljs-string">{[route]}</span>&gt;</span>{content}<span class="hljs-tag">&lt;/<span class="hljs-name">MemoryRouter</span>&gt;</span></span>,
+  );
+}
+</code></pre>
+<p>(The first and last lines of the function are split to fit here.)</p>
+<p>It renders whatever component it's given, inside a <code>MemoryRouter</code>
+starting at <code>route</code>. The <code>if (path)</code> part is for pages that read the URL,
+on the next slide. Most tests just write:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-title function_">renderWithProviders</span>(<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">TicketList</span> <span class="hljs-attr">tickets</span>=<span class="hljs-string">{testTickets}</span> /&gt;</span></span>);
+</code></pre>
+<h2>The options object</h2>
+<p>The second parameter is an object of <strong>options</strong>, destructured with
+default values: <code>route</code> is <code>'/'</code> unless the test says otherwise, and
+<code>path</code> is <code>undefined</code>. The <code>= {}</code> at the end means the whole object can
+be left out. A test only passes the options it needs, by name:
+<code>{ route: '/tickets/2', path: '/tickets/:ticketId' }</code>.</p>
+<h2>Why &quot;providers&quot;?</h2>
+<p>A <strong>provider</strong> is a component that wraps the app and gives everything
+inside it something it needs. <code>MemoryRouter</code> provides the router. The
+helper's name says it provides whatever the app's components expect, so
+when the app later needs a second provider, it's added in this one file
+and every test gets it.</p>
+<p><code>App.test.jsx</code> uses it too now, so its <code>renderAppAt(url)</code> is one line:
+<code>renderWithProviders(&lt;App /&gt;, { route: url })</code>.</p>
+<h2>Try it</h2>
+<p>In <code>TicketList.test.jsx</code>, change one <code>renderWithProviders(</code> to <code>render(</code>
+and import <code>render</code> from <code>@testing-library/react</code>. Run the tests and
+read the error. Then undo the change.</p>
+</div>
+    
+  </main>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Keys — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/foundations/lists-and-keys/from-an-array-to-rows.html">← From an Array to Rows</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/foundations/lists-and-keys/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/foundations/lists-and-keys/checking-for-null.html">Checking for null →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Keys</h1>
+    <p class="lede">Each row gets a key from the ticket&#39;s id, so React can tell the rows apart when the list changes.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Every row from <code>.map()</code> has a <code>key</code>:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 1.11: the row&#x27;s key (src/components/TicketList.jsx, excerpt)</span>
+{tickets.<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">ticket</span>) =&gt;</span> (
+  <span class="hljs-comment">// React uses `key` to tell the rows apart when the list</span>
+  <span class="hljs-comment">// changes. The ticket&#x27;s id never changes, so it&#x27;s a safe key.</span>
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">tr</span> <span class="hljs-attr">key</span>=<span class="hljs-string">{ticket.id}</span>&gt;</span>
+</span></code></pre>
+<h2>Why React needs it</h2>
+<p>When a list changes (a ticket is added, deleted or sorted into a
+different order), React compares the new rows with the old ones and
+updates only what's different. It's much faster than rebuilding the
+whole table.</p>
+<p>To compare, React has to know which new row is which old row. The <code>key</code>
+tells it: the row with key <code>3</code> before is the row with key <code>3</code> now, even
+if it has moved. Without keys, React can only match rows by their
+<strong>position</strong>: the first row with the first row, and so on.</p>
+<p><code>key</code> is only for React. It doesn't appear in the HTML, and a component
+can't read it as a prop.</p>
+<h2>Choosing a key</h2>
+<p>A key must be:</p>
+<ul>
+<li><strong>unique</strong> among the rows in that list, so no two rows are confused</li>
+<li><strong>stable</strong>: the same row must get the same key every time</li>
+</ul>
+<p>The record's <code>id</code> is both, the same as a primary key in a database. So
+the rule is: <strong>use the record's <code>id</code></strong>.</p>
+<h2>Why not the array index?</h2>
+<p><code>.map()</code> can also give you each item's position (<code>0</code>, <code>1</code>, <code>2</code>, ...), and
+it's tempting to use that as the key. But positions aren't stable. Sort
+the list, or delete the first ticket, and key <code>0</code> now belongs to a
+different ticket. React then matches the wrong rows. In Stage 1 nothing
+visible goes wrong, because the rows hold nothing but text. Once rows
+hold anything that can change, such as a half-typed comment, it would
+end up next to the wrong ticket.</p>
+<h2>Try it</h2>
+<p>Delete <code>key={ticket.id}</code> from the <code>&lt;tr&gt;</code> and save. The page still looks
+the same, but open the browser's <strong>Console</strong>. What does React's warning
+say? Put the key back and reload: is the warning gone?</p>
+</div>
+    
+  </main>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>URLs Are Text — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/foundations/a-page-for-each-ticket/useparams.html">← useParams()</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/foundations/a-page-for-each-ticket/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/foundations/a-page-for-each-ticket/when-there-is-no-such-ticket.html">When There&#39;s No Such Ticket →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>URLs Are Text</h1>
+    <p class="lede">The ID from the URL is a string, and the tickets&#39; ids are numbers, so the page converts it before comparing.</p>
+
+    
+
+    
+      <div class="slide-body"><p>With the ID in hand, the page finds its ticket. The line is split here
+to fit; in the file it's one line:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 1.27: finding the ticket (src/pages/TicketDetailPage.jsx, excerpt)</span>
+<span class="hljs-comment">// Everything in a URL is text, so ticketId is the string &quot;2&quot;, not the</span>
+<span class="hljs-comment">// number 2. Without Number(), `ticket.id === ticketId` would always be</span>
+<span class="hljs-comment">// false, because 2 and &quot;2&quot; aren&#x27;t strictly equal.</span>
+<span class="hljs-keyword">const</span> ticket = sampleTickets.<span class="hljs-title function_">find</span>(
+  <span class="hljs-function">(<span class="hljs-params">sampleTicket</span>) =&gt;</span> sampleTicket.<span class="hljs-property">id</span> === <span class="hljs-title class_">Number</span>(ticketId),
+);
+</code></pre>
+<h2><code>Number()</code> before <code>===</code></h2>
+<p>Everything in a URL is text, so <code>ticketId</code> is <code>'2'</code>, a string. The
+tickets' <code>id</code>s are numbers. <code>===</code> compares the type as well as the value,
+so <code>2 === '2'</code> is <code>false</code>, and without <code>Number()</code> no ticket would ever
+match.</p>
+<p><code>Number('2')</code> is <code>2</code>, so the comparison works. It's the same fix as
+<code>Number(req.params.id)</code> in the back-end's Lesson 1 controllers, for the
+same reason.</p>
+<p>For a URL like <code>/tickets/hello</code>, <code>Number('hello')</code> is <code>NaN</code>. <code>NaN</code> isn't
+equal to anything, so no ticket matches, and that's handled on the next
+slide.</p>
+<h2><code>find()</code></h2>
+<p><code>find()</code> is the same method the back-end's in-memory <code>ticket.service.js</code>
+used: it calls the arrow function for each ticket and gives back the
+<strong>first</strong> one where it returns <code>true</code>, or <code>undefined</code> if none do.</p>
+<p>The arrow function's parameter is called <code>sampleTicket</code>, not <code>ticket</code>.
+That's deliberate: <code>ticket</code> is the name of the result, the variable this
+line creates. Using the same name for both would work, but you'd have to
+stop and think which <code>ticket</code> each one meant.</p>
+<h2>Try it</h2>
+<p>In the browser's <strong>Console</strong>, type each of these and press Enter. Can
+you explain each answer?</p>
+<pre><code class="hljs language-js"><span class="hljs-number">2</span> === <span class="hljs-string">&#x27;2&#x27;</span>
+<span class="hljs-number">2</span> == <span class="hljs-string">&#x27;2&#x27;</span>
+<span class="hljs-title class_">Number</span>(<span class="hljs-string">&#x27;2&#x27;</span>) === <span class="hljs-number">2</span>
+<span class="hljs-title class_">Number</span>(<span class="hljs-string">&#x27;two&#x27;</span>)
+<span class="hljs-title class_">Number</span>(<span class="hljs-string">&#x27;02&#x27;</span>)
+<span class="hljs-title class_">Number</span>(<span class="hljs-string">&#x27;2.0&#x27;</span>)
+</code></pre>
+<p>Now open <code>http://localhost:5173/tickets/02</code> and
+<code>http://localhost:5173/tickets/2.0</code>. Which ticket does each one show,
+and why? Is that a problem?</p>
+</div>
+    
+  </main>
+</body>
+</html>

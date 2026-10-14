@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Not Colour Alone — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/foundations/statusbadge-and-css-modules/picking-the-classes.html">← Picking the Classes</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/foundations/statusbadge-and-css-modules/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/foundations/formatting-dates/dates-from-the-api.html">Dates From the API →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Not Colour Alone</h1>
+    <p class="lede">The badge&#39;s colour helps people scan the list, but its words carry the meaning, and every colour pair passes WCAG AA.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The starter's accessibility topic set a rule: never show information
+<strong>only</strong> with colour. <code>StatusBadge</code> follows it.</p>
+<h2>The words carry the meaning</h2>
+<p>The colour helps you scan a long list: the blue badges stand out from
+the grey ones. But every badge also <strong>says</strong> its status in words. Someone
+who can't tell yellow from green, or who uses a screen reader, still gets
+the whole message, because the screen reader reads &quot;In progress&quot;, and
+the colour adds nothing they need.</p>
+<p>The badge's outline helps too. <code>border: 1px solid currentColor</code> draws the
+border in the same colour as the text, so the badge's shape stays
+visible even when its background colour is very close to the page's.</p>
+<h2>Contrast</h2>
+<p>Every text colour passes the WCAG AA ratio of at least 4.5:1 against its
+own background:</p>
+<table>
+<thead>
+<tr>
+<th>Badge</th>
+<th>Text</th>
+<th>Background</th>
+<th>Ratio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Open</td>
+<td><code>#0550ae</code></td>
+<td><code>#ddf4ff</code></td>
+<td>6.7:1</td>
+</tr>
+<tr>
+<td>In progress</td>
+<td><code>#7d4e00</code></td>
+<td><code>#fff8c5</code></td>
+<td>6.6:1</td>
+</tr>
+<tr>
+<td>Resolved</td>
+<td><code>#116329</code></td>
+<td><code>#dafbe1</code></td>
+<td>6.6:1</td>
+</tr>
+<tr>
+<td>Closed (and unknown)</td>
+<td><code>#59636e</code></td>
+<td><code>#f6f8fa</code></td>
+<td>5.7:1</td>
+</tr>
+</tbody>
+</table>
+<p>These colours are written straight into the module rather than as
+variables in <code>index.css</code>, because nothing outside the badge uses them.</p>
+<h2>Try it</h2>
+<p>In Chrome's developer tools, open the <strong>Rendering</strong> panel (the ⋮ menu,
+then <strong>More tools</strong>, then <strong>Rendering</strong>). Find <strong>Emulate vision
+deficiencies</strong> and choose <strong>Achromatopsia</strong>, which shows the page with no
+colour at all. Can you still tell every ticket's status? How? Set it back
+to <strong>No emulation</strong> when you're done.</p>
+</div>
+    
+  </main>
+</body>
+</html>

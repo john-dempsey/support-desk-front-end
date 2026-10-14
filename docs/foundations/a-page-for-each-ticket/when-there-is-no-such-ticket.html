@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>When There&#39;s No Such Ticket — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/foundations/a-page-for-each-ticket/urls-are-text.html">← URLs Are Text</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/foundations/a-page-for-each-ticket/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/foundations/a-page-for-each-ticket/a-description-list.html">A Description List →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>When There&#39;s No Such Ticket</h1>
+    <p class="lede">/tickets/999 matches the route, but there&#39;s no ticket 999. The page says so itself, the way the API will answer 404 from Stage 2.</p>
+
+    
+
+    
+      <div class="slide-body"><p><code>/tickets/999</code> matches <code>/tickets/:ticketId</code>, so React Router shows
+<code>TicketDetailPage</code>. But there's no ticket 999, so <code>find()</code> gives
+<code>undefined</code>. The page checks for that before anything else:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 1.28: no such ticket (src/pages/TicketDetailPage.jsx, excerpt)</span>
+<span class="hljs-comment">// find() gives undefined when nothing matches, e.g. /tickets/999. The API</span>
+<span class="hljs-comment">// will answer 404 in the same situation from Stage 2.</span>
+<span class="hljs-keyword">if</span> (!ticket) {
+  <span class="hljs-keyword">return</span> (
+    <span class="language-xml"><span class="hljs-tag">&lt;&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>Ticket not found<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>There&#x27;s no ticket with the ID &quot;{ticketId}&quot;.<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">Link</span> <span class="hljs-attr">to</span>=<span class="hljs-string">&quot;/tickets&quot;</span>&gt;</span>Back to all tickets<span class="hljs-tag">&lt;/<span class="hljs-name">Link</span>&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+    <span class="hljs-tag">&lt;/&gt;</span></span>
+  );
+}
+</code></pre>
+<p>It's an <strong>early return</strong>, like <code>TicketList</code>'s empty state in topic 03.
+<code>!ticket</code> is true when <code>ticket</code> is <code>undefined</code>, so the page returns the
+message, and none of the code below it runs. That matters: the code
+below reads <code>ticket.subject</code> and <code>ticket.customer.name</code>, which would
+crash on <code>undefined</code>.</p>
+<h2>Why not <code>NotFoundPage</code>?</h2>
+<p>The starter's <code>NotFoundPage</code> is for a URL that matches <strong>no route</strong>,
+like <code>/no-such-page</code>. That's a different problem:</p>
+<table>
+<thead>
+<tr>
+<th>URL</th>
+<th>Route matched?</th>
+<th>Ticket found?</th>
+<th>Shown</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/no-such-page</code></td>
+<td>no</td>
+<td>—</td>
+<td><code>NotFoundPage</code>: &quot;Page not found&quot;</td>
+</tr>
+<tr>
+<td><code>/tickets/999</code></td>
+<td>yes</td>
+<td>no</td>
+<td><code>TicketDetailPage</code>: &quot;Ticket not found&quot;</td>
+</tr>
+<tr>
+<td><code>/tickets/2</code></td>
+<td>yes</td>
+<td>yes</td>
+<td><code>TicketDetailPage</code>: ticket 2</td>
+</tr>
+</tbody>
+</table>
+<p>The page knows more than the router does, so it can say something more
+useful: <strong>which</strong> ID wasn't found, and a link back to the list rather
+than the home page. It shows <code>ticketId</code> exactly as it was typed, so
+<code>/tickets/hello</code> says there's no ticket with the ID &quot;hello&quot;.</p>
+<h2>The same as a 404</h2>
+<p>In the back-end, <code>GET /tickets/999</code> matched the <code>/:id</code> route, then the
+controller found no ticket and threw a <code>404</code>. This page does the same
+thing on the front-end. From Stage 2 it will ask the API instead of
+using <code>find()</code>, and show this message when the API answers <code>404</code>.</p>
+<h2>Try it</h2>
+<p>Open <code>/tickets/999</code>, <code>/tickets/hello</code> and <code>/no-such-page</code>. Which page
+component shows each one? Use the <strong>Components</strong> tab in the React
+Developer Tools to check.</p>
+</div>
+    
+  </main>
+</body>
+</html>

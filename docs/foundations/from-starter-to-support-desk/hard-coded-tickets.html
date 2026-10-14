@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hard-Coded Tickets — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/foundations/from-starter-to-support-desk/what-stage-1-adds.html">← What Stage 1 Adds</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/foundations/from-starter-to-support-desk/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/foundations/from-starter-to-support-desk/making-the-starter-support-desk.html">Making the Starter Support Desk →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Hard-Coded Tickets</h1>
+    <p class="lede">sampleTickets.js stands in for the API, so it gives every ticket the same shape the API will send.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Stage 1's tickets live in one file, <code>src/data/sampleTickets.js</code>. Its top
+comment starts with the word <strong>TEMPORARY</strong>: Stage 2 deletes the file and
+loads the tickets from <code>GET /tickets</code> instead.</p>
+<p>Here's the start of it (only two of the three people are shown, and each
+person is spread over three lines to fit, where the file has one line
+each):</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 1.1: the sample data (src/data/sampleTickets.js, excerpt)</span>
+<span class="hljs-keyword">const</span> casey = {
+  <span class="hljs-attr">id</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Casey Customer&#x27;</span>, <span class="hljs-attr">email</span>: <span class="hljs-string">&#x27;casey@example.com&#x27;</span>,
+};
+<span class="hljs-keyword">const</span> alex = {
+  <span class="hljs-attr">id</span>: <span class="hljs-number">3</span>, <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Alex Agent&#x27;</span>, <span class="hljs-attr">email</span>: <span class="hljs-string">&#x27;alex@example.com&#x27;</span>,
+};
+
+<span class="hljs-keyword">const</span> sampleTickets = [
+  {
+    <span class="hljs-attr">id</span>: <span class="hljs-number">1</span>,
+    <span class="hljs-attr">subject</span>: <span class="hljs-string">&#x27;Cannot log in&#x27;</span>,
+    <span class="hljs-attr">description</span>: <span class="hljs-string">&#x27;Password reset email never arrives&#x27;</span>,
+    <span class="hljs-attr">status</span>: <span class="hljs-string">&#x27;open&#x27;</span>,
+    <span class="hljs-attr">customer</span>: casey,
+    <span class="hljs-attr">assignedAgent</span>: alex,
+    <span class="hljs-attr">createdAt</span>: <span class="hljs-string">&#x27;2026-10-08T09:15:00.000Z&#x27;</span>,
+    <span class="hljs-attr">updatedAt</span>: <span class="hljs-string">&#x27;2026-10-08T09:15:00.000Z&#x27;</span>,
+  },
+  <span class="hljs-comment">// ... three more tickets</span>
+];
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> sampleTickets;
+</code></pre>
+<h2>The same shape as the API</h2>
+<p>The pages will display whatever the API sends, so every field they use
+has the same name and shape here as in the API's tickets:</p>
+<ul>
+<li>the same names: <code>subject</code>, <code>status</code>, <code>assignedAgent</code>, <code>createdAt</code></li>
+<li><code>customer</code> and <code>assignedAgent</code> are <strong>objects</strong> with an <code>id</code>, <code>name</code>
+and <code>email</code>, the same as the back-end's <code>include</code> adds to each ticket</li>
+<li><code>status</code> uses the API's values: <code>open</code>, <code>in_progress</code>, <code>resolved</code> or
+<code>closed</code></li>
+<li>dates are <strong>strings</strong>, because JSON has no date type. The API sends
+every date as an ISO string like this one. Topic 05 turns them into
+something a person can read.</li>
+</ul>
+<p>The API also sends a few fields that no page shows, such as
+<code>customerId</code>. Those are simply left out here.</p>
+<p>An unassigned ticket has <code>null</code> as its agent, exactly as the API sends
+it:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 1.2: a ticket with no agent (src/data/sampleTickets.js, excerpt)</span>
+<span class="hljs-attr">customer</span>: priya,
+<span class="hljs-comment">// null means &quot;not assigned to an agent yet&quot;. The API sends null, not an</span>
+<span class="hljs-comment">// empty object, so the pages must check for it before reading `.name`.</span>
+<span class="hljs-attr">assignedAgent</span>: <span class="hljs-literal">null</span>,
+</code></pre>
+<p><code>null.name</code> is an error in JavaScript, so any page that shows the agent's
+name has to check for <code>null</code> first. You'll see that check in topic 03.</p>
+<p>If the sample data used different names (say <code>title</code> instead of
+<code>subject</code>), every page would have to change when the real data arrived.
+With the same shape, Stage 2 changes <strong>where</strong> the tickets come from and
+nothing else.</p>
+<p>The people and subjects are the ones in the back-end's seed data, so
+Stage 2 will show the same tickets. Only the statuses differ: in the seed,
+every ticket is <code>open</code>, but here there's one of each status, so you can
+see every kind of badge.</p>
+<h2>Each person written once</h2>
+<p><code>casey</code> and <code>alex</code> are written once, as constants, and then used by more
+than one ticket. Casey is the customer on two tickets, and Alex is
+assigned to both of them. It saves repeating the same details, and it
+mirrors the API, which puts the same customer object into each of their
+tickets.</p>
+<h2>Try it</h2>
+<p>Add a fifth ticket to the array, with <code>id: 5</code> and <code>priya</code> as the
+customer. Which fields does it need? Save, and check that it shows on the
+Tickets page. Then delete its <code>customer</code> line, save again, and open the
+browser's <strong>Console</strong>. What went wrong, and why? Put the line back before
+you go on.</p>
+</div>
+    
+  </main>
+</body>
+</html>

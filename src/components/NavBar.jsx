@@ -3,9 +3,7 @@
 // app, and marks the link for the current page as active (see index.css).
 import { NavLink } from 'react-router';
 
-// TODO (your case study): change the app name, and add a link for each
-// page you create, e.g. <NavLink to="/bookings">Bookings</NavLink>
-const APP_NAME = 'My App';
+const APP_NAME = 'Support Desk';
 
 function NavBar() {
   return (
@@ -19,6 +17,11 @@ function NavBar() {
             <NavLink to="/" end>
               Home
             </NavLink>
+          </li>
+          <li>
+            {/* No `end` here, so "Tickets" stays active on a ticket's own
+                page (/tickets/2) as well as on /tickets. */}
+            <NavLink to="/tickets">Tickets</NavLink>
           </li>
         </ul>
       </nav>

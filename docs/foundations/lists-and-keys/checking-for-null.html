@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Checking for null — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/foundations/lists-and-keys/keys.html">← Keys</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/foundations/lists-and-keys/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/foundations/lists-and-keys/the-empty-state.html">The Empty State →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Checking for null</h1>
+    <p class="lede">An unassigned ticket&#39;s agent is null, so the cell checks before reading the name, and shows &quot;Unassigned&quot; instead.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Topic 01 showed that an unassigned ticket has <code>assignedAgent: null</code>. The
+&quot;Assigned to&quot; cell has to cope with that:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 1.12: the agent cell (src/components/TicketList.jsx, excerpt)</span>
+&lt;td&gt;{ticket.<span class="hljs-property">assignedAgent</span> ? ticket.<span class="hljs-property">assignedAgent</span>.<span class="hljs-property">name</span> : <span class="hljs-string">&#x27;Unassigned&#x27;</span>}&lt;/td&gt;
+</code></pre>
+<p>This is the conditional operator, <code>? :</code>, from the starter: Blade's
+<code>@if ... @else ... @endif</code> as an expression. Read it as &quot;if the ticket
+has an agent, show the agent's name, otherwise show <code>Unassigned</code>&quot;.
+<code>null</code> counts as false, so an unassigned ticket gets the second value.</p>
+<h2>Why the check matters</h2>
+<p>Without it, the cell would be <code>{ticket.assignedAgent.name}</code>. For an
+unassigned ticket that's <code>null.name</code>, and JavaScript stops with an
+error:</p>
+<pre><code class="hljs">TypeError: Cannot read properties of null (reading &#x27;name&#x27;)
+</code></pre>
+<p>One error while drawing a component stops React drawing the <strong>whole
+app</strong>, not just that cell, so the page goes blank.</p>
+<h2>Why not <code>&amp;&amp;</code>?</h2>
+<p><code>{ticket.assignedAgent &amp;&amp; ticket.assignedAgent.name}</code> would avoid the
+error too, but it shows <strong>nothing</strong> for an unassigned ticket. An empty
+cell is ambiguous: is the ticket unassigned, or did something fail to
+load? A screen reader would just say &quot;blank&quot;. Showing the word
+<code>Unassigned</code> says what's true.</p>
+<h2>Why only the agent?</h2>
+<p>The customer cell has no check: <code>{ticket.customer.name}</code>. Every ticket
+has a customer (the back-end won't create one without), so <code>customer</code>
+is never <code>null</code>. Check for <code>null</code> where the API can send it, and nowhere
+else, or the code fills up with checks that can never matter.</p>
+<h2>Try it</h2>
+<ol>
+<li>In <code>sampleTickets.js</code>, change the first ticket's <code>assignedAgent</code> to
+<code>null</code>. What does its row show now?</li>
+<li>In <code>TicketList.jsx</code>, replace the whole <code>? :</code> expression with
+<code>ticket.assignedAgent.name</code> and save. What happens to the page, and
+what does the <strong>Console</strong> say?</li>
+</ol>
+<p>Undo both changes before you go on.</p>
+</div>
+    
+  </main>
+</body>
+</html>

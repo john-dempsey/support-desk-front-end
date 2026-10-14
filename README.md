@@ -1,21 +1,45 @@
-# Front-end starter
+# Support Desk front-end
 
-A minimal React starting point for Assignment 2. It already has routing, a
-client for talking to the back-end API, and a test setup, but none of your
-case study's pages. Build your own front-end on top of this, the same way you
-built your API on top of the back-end starter.
+A React front-end for the **Support Desk** API, built step by step in class.
+It's the worked example for Assignment 2: you'll use the same techniques to
+build a front-end for your own case-study API.
 
-Right now it does one thing: the home page calls the back-end's
-`GET /welcome` endpoint and shows the message it sends back. If you see
-**"The API says: Hello world!"**, your front-end and back-end are talking to
-each other.
+It started as a copy of the front-end starter (Stage 0). Each stage adds
+one thing, and the code is tagged at the end of each stage (`stage-00`,
+`stage-01`, ...), so you can look at, or go back to, any stage.
+
+## Where we are: Stage 1, Foundations
+
+The app has a list of tickets and a page for each ticket. The tickets are
+a **hard-coded array** (`src/data/sampleTickets.js`), the same idea as the
+in-memory array in Lesson 1 of the back-end, so this stage doesn't need the
+API at all. Stage 2 replaces the array with real data from `GET /tickets`.
+
+| URL | Page |
+|---|---|
+| `/` | `HomePage`: a welcome and a link to the tickets |
+| `/tickets` | `TicketListPage`: every ticket in a table |
+| `/tickets/:ticketId` | `TicketDetailPage`: one ticket, e.g. `/tickets/2` |
+| anything else | `NotFoundPage` |
+
+New in this stage:
+
+- **Components and props.** `TicketListPage` owns the tickets and passes
+  them to `TicketList` as a prop. `TicketList` passes each status to
+  `StatusBadge`. Components only display what they're given.
+- **Route parameters.** `TicketDetailPage` reads `:ticketId` from the URL
+  with `useParams()`, like `req.params` in Express.
+- **Lists and keys.** `tickets.map(...)` makes one table row per ticket,
+  with `key={ticket.id}`.
+- **A CSS Module.** `StatusBadge.module.css` holds styles that only apply
+  to `StatusBadge`.
+- **A utility function.** `formatDate()` turns the API's ISO dates into
+  readable ones, using the browser's built-in `Intl.DateTimeFormat`.
 
 ## What you need
 
 - Node.js 22 or later
-- Your back-end API running on `http://localhost:3000` (any version of it
-  that still has `GET /welcome`, or change `src/api/welcome.api.js` to call
-  one of your own endpoints)
+- From Stage 2: the Support Desk API running on `http://localhost:3000`
 
 ## Running it
 
@@ -25,8 +49,7 @@ cp .env.example .env    # then change VITE_API_URL if your API isn't on port 300
 npm run dev             # front-end on http://localhost:5173
 ```
 
-Start your back-end first (`npm run dev` or `docker compose up` in your API
-project), then open <http://localhost:5173>.
+Open <http://localhost:5173> and click **Tickets**.
 
 | Command | What it does |
 |---|---|
@@ -37,10 +60,8 @@ project), then open <http://localhost:5173>.
 | `npm run build` | Builds the production version into `dist/` |
 | `npm run preview` | Serves the `dist/` build locally, to check it before you deploy |
 
-**If you see "Can't reach the API":** the back-end isn't running, or it's on
-a different port from the one in your `.env`. If you change `.env`, save
-it and Vite restarts itself (the terminal shows `.env changed, restarting
-server...`). Then reload the page.
+If you change `.env`, save it and Vite restarts itself (the terminal shows
+`.env changed, restarting server...`). Then reload the page.
 
 ## How it's organised
 
@@ -52,13 +73,19 @@ src/
   index.css             global styles
   api/
     client.js           apiRequest(): the only code that calls fetch()
-    welcome.api.js      one function per endpoint, e.g. getWelcome()
-  pages/                one component per URL, e.g. HomePage, NotFoundPage
-  components/           reusable pieces: NavBar, Loading, ErrorMessage
-  context/              shared app-wide state (later, for login)
-  hooks/                your own custom hooks (later)
-  utils/                small plain helper functions
-  test/setup.js         runs before the tests
+  data/
+    sampleTickets.js    hard-coded tickets (Stage 1 only)
+  pages/                one component per URL: HomePage, TicketListPage,
+                        TicketDetailPage, NotFoundPage
+  components/           reusable pieces: NavBar, TicketList, StatusBadge,
+                        Loading, ErrorMessage
+  utils/
+    formatDate.js       ISO date string → readable date
+  context/              shared app-wide state (Stage 4, for login)
+  hooks/                your own custom hooks (Stage 6)
+  test/
+    setup.js            runs before the tests
+    renderWithProviders.jsx   renders a component inside a router, for tests
 ```
 
 It mirrors the layers you know from the back-end:
@@ -66,32 +93,15 @@ It mirrors the layers you know from the back-end:
 | Back-end | Front-end |
 |---|---|
 | `routes/index.js`: which URL goes to which controller | `App.jsx`: which URL shows which page |
+| `req.params.id` | `useParams()` |
 | controllers: handle a request, call a service | pages: hold the data, call an API function, decide what to show |
-| services: the only code that talks to the database | `api/*.api.js`: the only code that talks to the API |
+| services: the only code that talks to the database | `api/*.api.js`: the only code that talks to the API (from Stage 2) |
 | `utils/response.js` + `errorHandler.js`: one response/error shape | `api/client.js`: reads that shape back |
 | `middleware/notFound.js` | `pages/NotFoundPage.jsx` |
 
 **Pages** own the data and **components** just display what they're given as
 props. Neither calls `fetch()` directly: every request goes through a
 function in `src/api/`.
-
-## Responses from the API
-
-`api/client.js` expects the response shapes your back-end sends:
-
-- success: `{ data }` or `{ data, meta }`. `apiRequest()` returns this body,
-  and your API functions return `data` (plus `meta` for paginated lists)
-- `204 No Content`: `apiRequest()` returns `null`
-- error: `{ error: { message, details } }`. `apiRequest()` throws an `Error`
-  with `message`, `status` and `details` (the list of validation problems on
-  a 400), so a page can show `error.message`, and a form can show each
-  `details` entry next to its field
-- API not running: `apiRequest()` throws an `Error` with status `0` and a
-  "Can't reach the API" message
-
-`apiRequest()` only sends an `Authorization` header if there's a token. There
-isn't one until you add login, so the starter works with an API that has no
-authentication.
 
 ## Tests
 
@@ -102,51 +112,56 @@ npm test
 You should see:
 
 ```
- Test Files  3 passed (3)
-      Tests  13 passed (13)
+ Test Files  8 passed (8)
+      Tests  28 passed (28)
 ```
 
-Test files sit next to the file they test (`HomePage.jsx` →
-`HomePage.test.jsx`). They use [Vitest](https://vitest.dev/) and
+Test files sit next to the file they test (`TicketList.jsx` →
+`TicketList.test.jsx`). They use [Vitest](https://vitest.dev/) and
 [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/).
-Read them before you write your own:
 
+- `src/utils/formatDate.test.js` tests a plain function: call it, check
+  what it returns.
+- `src/components/StatusBadge.test.jsx` renders a component with different
+  props.
+- `src/components/TicketList.test.jsx` and the page tests use
+  `renderWithProviders()`, because anything with a `<Link>` or
+  `useParams()` needs a router around it.
+- `src/App.test.jsx` checks which page shows at which URL.
 - `src/api/client.test.js` replaces `fetch()` with a fake, to test the API
   client without a back-end.
-- `src/pages/HomePage.test.jsx` replaces the API module with a fake
-  (`vi.mock`), to test what the user sees when the API succeeds, is slow, or
-  fails.
-- `src/App.test.jsx` uses `MemoryRouter` to check which page shows at which
-  URL.
 
 Find elements the way a user would: by role, label or text (`getByRole`,
 `getByLabelText`, `findByText`), not by CSS class.
 
-## Where to go from here
+## Stages
 
-Look for the `TODO (your case study)` comments. Then, one step at a time,
-testing and committing after each step:
-
-1. **Show your main entity.** Add a list page and a detail page for your
-   main entity (e.g. `/bookings` and `/bookings/:id`), starting with a
-   hard-coded array before you fetch anything.
-2. **Fetch it from your API.** Add `src/api/bookings.api.js` and load the
-   real data, with loading, error and "nothing here yet" states.
-3. **Full CRUD.** Forms to create and edit, delete with a confirmation, the
-   API's validation messages shown next to each field, and filtering,
-   sorting or pagination.
-4. **Login and roles** *(only if your API has authentication)*.
-5. **Notifications** *(only if your API has them)*.
+1. **Foundations** (you are here): components, props, routes, a
+   hard-coded list.
+2. **Fetching from the API:** load the tickets with `GET /tickets`, with
+   loading, error and "nothing here yet" states.
+3. **Full CRUD:** create, edit and delete tickets, comments, tags,
+   filtering, sorting and pagination.
+4. **Login and roles** *(needs authentication in the back-end)*.
+5. **Notifications** *(needs notifications in the back-end)*.
+6. **Hardening:** a `useFetch` hook, an error boundary, accessibility and
+   a production build.
 
 ## Try it yourself
 
-1. Change `My App` in `NavBar.jsx` and `index.html` to your case study's name.
-2. Stop your back-end and reload the page. What does the user see? Which file
-   decides that message?
-3. Add an `/about` page: create `src/pages/AboutPage.jsx`, add a `<Route>` in
-   `App.jsx` and a `<NavLink>` in `NavBar.jsx`. Then write a test in
-   `App.test.jsx` that checks it shows at `/about`.
-4. Open the browser's developer tools (Network tab) and reload the home
-   page. How many times is `/welcome` requested? Why? (Hint: look at
-   `<StrictMode>` in `main.jsx`.) Then read the comment about `ignore` in
-   `HomePage.jsx`. Why don't the two requests cause a problem?
+Run `npm test` after each change, and commit when it passes.
+
+1. Add a fifth ticket to `sampleTickets.js`. Which pages show it, and which
+   files did you have to change? Why is that the point of passing data as
+   props?
+2. Change `key={ticket.id}` in `TicketList.jsx` to `key={ticket.subject}`,
+   then give two tickets the same subject. Open the browser's developer
+   tools console. What does React warn you about, and why does the `id`
+   make a better key? (Change it back afterwards.)
+3. In `TicketDetailPage.jsx`, remove `Number()` from around `ticketId`.
+   What happens when you open `/tickets/1`? Which test fails, and why?
+4. Add a **Description** column to the ticket table. Then write a test in
+   `TicketList.test.jsx` that checks a ticket's description is shown.
+5. Make `StatusBadge` accept a second, optional prop (e.g. `size="large"`)
+   and use it on the detail page. Add a class for it to
+   `StatusBadge.module.css`.

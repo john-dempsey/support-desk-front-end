@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Making the Starter Support Desk — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/foundations/from-starter-to-support-desk/hard-coded-tickets.html">← Hard-Coded Tickets</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/foundations/from-starter-to-support-desk/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/foundations/pages-own-the-data/a-page-and-a-component.html">A Page and a Component →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Making the Starter Support Desk</h1>
+    <p class="lede">The starter&#39;s TODOs are done, and the home page&#39;s connection check is replaced by a plain welcome now that it has done its job.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The starter marked every place you were expected to change with
+<code>TODO (your case study)</code>. Stage 1 does each one for Support Desk, and
+then deletes the <code>TODO</code> comment, because there's nothing left to do
+there.</p>
+<h2>The name</h2>
+<p>The app's name appears in two places, and both change from <code>My App</code>:</p>
+<pre><code class="hljs language-html"><span class="hljs-comment">&lt;!-- Figure 1.3: the browser tab&#x27;s title (index.html, excerpt) --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>Support Desk<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span>
+</code></pre>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 1.4: the app&#x27;s name (src/components/NavBar.jsx, excerpt)</span>
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">APP_NAME</span> = <span class="hljs-string">&#x27;Support Desk&#x27;</span>;
+</code></pre>
+<p>The <code>TODO</code>s in <code>App.jsx</code> and <code>NavBar.jsx</code> also asked for a <code>&lt;Route&gt;</code> and
+a <code>NavLink</code> for each new page. Those are added in topic 06, along with
+the pages they point to.</p>
+<h2>A plain home page</h2>
+<p>In the starter, <code>HomePage</code> called <code>GET /welcome</code> to prove that the
+front-end and the API could talk to each other. That check has done its
+job. From Stage 2, the ticket pages talk to the API themselves, and if
+they can't reach it, they'll say so.</p>
+<p>So the home page is now just a welcome and a way in:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 1.5: the new home page (src/pages/HomePage.jsx)</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Link</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;react-router&#x27;</span>;
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">HomePage</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">return</span> (
+    <span class="language-xml"><span class="hljs-tag">&lt;&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>Welcome to Support Desk<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>
+        Report a problem, follow its progress, and see every ticket in
+        one place.
+      <span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">Link</span> <span class="hljs-attr">to</span>=<span class="hljs-string">&quot;/tickets&quot;</span>&gt;</span>View the tickets<span class="hljs-tag">&lt;/<span class="hljs-name">Link</span>&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+    <span class="hljs-tag">&lt;/&gt;</span></span>
+  );
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-title class_">HomePage</span>;
+</code></pre>
+<p>(The paragraph is one line in the file. It's split here to fit.)</p>
+<p>It has no state and no <code>useEffect</code>: there's nothing to load, so there's
+nothing to wait for and nothing that can fail.</p>
+<h2>What else went</h2>
+<p>With nothing calling <code>GET /welcome</code>, <code>src/api/welcome.api.js</code> has been
+deleted. Code that nothing uses is just something else to read and keep
+up to date. <code>client.js</code> stays exactly as it was: every request in
+Stage 2 goes through it.</p>
+<p>The tests changed to match. <code>HomePage.test.jsx</code> no longer mocks
+<code>welcome.api.js</code>, because there's nothing to mock, and the tests now look
+for the new heading. A test that looks for text that's gone fails, which
+is a useful reminder: when you change what a page shows, its tests have
+to change too.</p>
+<h2>Try it</h2>
+<p>Change the heading in <code>HomePage.jsx</code> to <code>Welcome!</code> and run <code>npm test</code>.
+How many tests fail, and in which files? Why does a test in
+<code>App.test.jsx</code> fail too, when you only changed <code>HomePage</code>? Change the
+heading back and check that every test passes again.</p>
+</div>
+    
+  </main>
+</body>
+</html>

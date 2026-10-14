@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A Description List — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/foundations/a-page-for-each-ticket/when-there-is-no-such-ticket.html">← When There&#39;s No Such Ticket</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/foundations/a-page-for-each-ticket/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/foundations/testing-stage-1/testing-a-plain-function.html">Testing a Plain Function →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>A Description List</h1>
+    <p class="lede">The ticket&#39;s details are label-and-value pairs, so they go in a &lt;dl&gt;, with a little CSS grid to line them up.</p>
+
+    
+
+    
+      <div class="slide-body"><p>When the ticket is found, the page shows it. The details are pairs: a
+label and a value. HTML has an element for exactly that (the comment
+above the <code>&lt;dl&gt;</code> is left out here):</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 1.29: the details (src/pages/TicketDetailPage.jsx, excerpt)</span>
+&lt;dl className=<span class="hljs-string">&quot;details-list&quot;</span>&gt;
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">dt</span>&gt;</span>Ticket ID<span class="hljs-tag">&lt;/<span class="hljs-name">dt</span>&gt;</span></span>
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">dd</span>&gt;</span>{ticket.id}<span class="hljs-tag">&lt;/<span class="hljs-name">dd</span>&gt;</span></span>
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">dt</span>&gt;</span>Customer<span class="hljs-tag">&lt;/<span class="hljs-name">dt</span>&gt;</span></span>
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">dd</span>&gt;</span>{ticket.customer.name}<span class="hljs-tag">&lt;/<span class="hljs-name">dd</span>&gt;</span></span>
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">dt</span>&gt;</span>Assigned to<span class="hljs-tag">&lt;/<span class="hljs-name">dt</span>&gt;</span></span>
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">dd</span>&gt;</span>{ticket.assignedAgent ? ticket.assignedAgent.name : &#x27;Unassigned&#x27;}<span class="hljs-tag">&lt;/<span class="hljs-name">dd</span>&gt;</span></span>
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">dt</span>&gt;</span>Created<span class="hljs-tag">&lt;/<span class="hljs-name">dt</span>&gt;</span></span>
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">dd</span>&gt;</span>{formatDate(ticket.createdAt)}<span class="hljs-tag">&lt;/<span class="hljs-name">dd</span>&gt;</span></span>
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">dt</span>&gt;</span>Last updated<span class="hljs-tag">&lt;/<span class="hljs-name">dt</span>&gt;</span></span>
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">dd</span>&gt;</span>{formatDate(ticket.updatedAt)}<span class="hljs-tag">&lt;/<span class="hljs-name">dd</span>&gt;</span></span>
+&lt;/dl&gt;
+</code></pre>
+<h2><code>&lt;dl&gt;</code>, <code>&lt;dt&gt;</code> and <code>&lt;dd&gt;</code></h2>
+<p>A <strong>description list</strong> (<code>&lt;dl&gt;</code>) holds pairs of a <strong>term</strong> (<code>&lt;dt&gt;</code>, the
+label) and its <strong>description</strong> (<code>&lt;dd&gt;</code>, the value). Screen readers
+announce it as a list and read each label with its value, so &quot;Assigned
+to: Unassigned&quot; stays together. With plain <code>&lt;p&gt;</code>s or <code>&lt;div&gt;</code>s, that link
+between label and value would only exist in how it looks.</p>
+<p>It's the same thinking as the ticket table's <code>&lt;th&gt;</code>s in topic 03: choose
+the element that says what the content <strong>is</strong>, and screen readers can
+do the rest.</p>
+<p>Notice the agent's value: it's the same <code>? :</code> check as in <code>TicketList</code>,
+for the same reason.</p>
+<h2>Lining them up</h2>
+<pre><code class="hljs language-css"><span class="hljs-comment">/* Figure 1.30: two columns (src/index.css, excerpt) */</span>
+<span class="hljs-selector-class">.details-list</span> {
+  <span class="hljs-attribute">display</span>: grid;
+  <span class="hljs-attribute">grid-template-columns</span>: max-content <span class="hljs-number">1</span>fr;
+  <span class="hljs-attribute">gap</span>: <span class="hljs-number">0.25rem</span> <span class="hljs-number">1.5rem</span>;
+}
+</code></pre>
+<p><code>display: grid</code> puts the <code>&lt;dt&gt;</code>s and <code>&lt;dd&gt;</code>s into a grid with two
+columns: the first is as wide as the longest label (<code>max-content</code>), and
+the second takes the rest of the space (<code>1fr</code>). Because the elements
+alternate (label, value, label, value), each pair lands on its own row.</p>
+<h2>The rest of the page</h2>
+<p>Around the list, the page has a <strong>Back to all tickets</strong> link, the
+subject as its one <code>&lt;h1&gt;</code>, the <code>StatusBadge</code> (Figure 1.9), and an <code>&lt;h2&gt;</code>
+for the description. One <code>&lt;h1&gt;</code> per page, with <code>&lt;h2&gt;</code>s for its parts,
+lets a screen reader user jump between sections, the same as the
+starter's pages.</p>
+<h2>Try it</h2>
+<p>Add a <strong>Customer email</strong> row to the list, after <strong>Customer</strong>. What do you
+need to add, and where does the value come from? Is there any risk that
+it's <code>null</code>? Then take it out again.</p>
+</div>
+    
+  </main>
+</body>
+</html>

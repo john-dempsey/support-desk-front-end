@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>useParams() — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/foundations/a-page-for-each-ticket/a-route-with-a-parameter.html">← A Route With a Parameter</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/foundations/a-page-for-each-ticket/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/foundations/a-page-for-each-ticket/urls-are-text.html">URLs Are Text →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>useParams()</h1>
+    <p class="lede">useParams() is a hook that reads the route&#39;s parameters from the current URL: the front-end&#39;s req.params.</p>
+
+    
+
+    
+      <div class="slide-body"><p><code>TicketDetailPage</code> needs to know <strong>which</strong> ticket the URL asks for. It
+asks React Router with the <code>useParams()</code> hook:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 1.26: reading the ID (src/pages/TicketDetailPage.jsx, excerpt)</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Link</span>, useParams } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;react-router&#x27;</span>;
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">TicketDetailPage</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> { ticketId } = <span class="hljs-title function_">useParams</span>();
+</code></pre>
+<p><code>useParams()</code> returns an object with one property for each parameter in
+the matched route's path. For the URL <code>/tickets/2</code> and the path
+<code>/tickets/:ticketId</code>, that's:</p>
+<pre><code class="hljs language-js">{ <span class="hljs-attr">ticketId</span>: <span class="hljs-string">&#x27;2&#x27;</span> }
+</code></pre>
+<p>The destructuring <code>{ ticketId }</code> takes the one property out. The name
+must match the <code>:ticketId</code> in <code>App.jsx</code> exactly. If the page asked for
+<code>{ id }</code> instead, it would get <code>undefined</code>, because the route has no
+parameter called <code>id</code>.</p>
+<h2>Another hook</h2>
+<p><code>useParams</code> is a hook, like <code>useState</code> and <code>useEffect</code> in the starter:
+a React function whose name starts with <code>use</code>, called at the top level
+of a component. It comes from React Router, not React itself, because
+only the router knows which route matched.</p>
+<p>It's also why <code>TicketDetailPage</code> only works inside a router. In the app,
+<code>main.jsx</code> provides one (<code>&lt;BrowserRouter&gt;</code>). Topic 07 shows what a test
+has to do instead.</p>
+<h2>From the URL to the page</h2>
+<p>The whole journey, from the address bar to the ticket on screen, takes
+five steps. This slide covered steps 1 to 3; the next two slides cover
+steps 4 and 5.</p>
+<p><img src="/support-desk-front-end/assets/images/url-to-ticket.svg" alt="Diagram: five steps. The address bar says /tickets/2; App.jsx matches /tickets/:ticketId and shows TicketDetailPage; useParams() gives { ticketId: '2' }, a string; find() looks for id === Number('2') and finds ticket 2; the page shows &quot;Invoice discrepancy&quot;"></p>
+<h2>Try it</h2>
+<p>Add <code>console.log(ticketId, typeof ticketId);</code> straight after the
+<code>useParams()</code> line, and open <code>/tickets/2</code>. What does the <strong>Console</strong>
+show? Then open <code>/tickets/hello</code>. Does the route still match? Remove the
+line afterwards.</p>
+</div>
+    
+  </main>
+</body>
+</html>

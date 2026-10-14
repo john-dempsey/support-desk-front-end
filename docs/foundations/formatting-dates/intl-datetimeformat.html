@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Intl.DateTimeFormat — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/foundations/formatting-dates/dates-from-the-api.html">← Dates From the API</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/foundations/formatting-dates/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/foundations/formatting-dates/when-a-date-is-bad.html">When a Date Is Bad →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Intl.DateTimeFormat</h1>
+    <p class="lede">The browser has date formatting built in. formatDate makes one formatter, set up once, and uses it for every date.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Browsers have a built-in way to format dates for people:
+<strong><code>Intl.DateTimeFormat</code></strong> (<code>Intl</code> is short for internationalisation). So
+the app doesn't need a date library. <code>src/utils/formatDate.js</code> sets one
+up:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 1.21: the formatter (src/utils/formatDate.js, excerpt)</span>
+<span class="hljs-comment">// Created once and reused, rather than on every call. &#x27;en-IE&#x27; gives Irish</span>
+<span class="hljs-comment">// formatting, e.g. &quot;8 Oct 2026, 10:15&quot;, in the user&#x27;s own time zone.</span>
+<span class="hljs-keyword">const</span> dateFormatter = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Intl</span>.<span class="hljs-title class_">DateTimeFormat</span>(<span class="hljs-string">&#x27;en-IE&#x27;</span>, {
+  <span class="hljs-attr">dateStyle</span>: <span class="hljs-string">&#x27;medium&#x27;</span>,
+  <span class="hljs-attr">timeStyle</span>: <span class="hljs-string">&#x27;short&#x27;</span>,
+});
+</code></pre>
+<h2>The two arguments</h2>
+<ul>
+<li><strong><code>'en-IE'</code></strong> is the <strong>locale</strong>: English, as written in Ireland. It
+decides the order and the words. <code>'en-US'</code> would give
+<code>Oct 8, 2026, 10:15 AM</code> instead.</li>
+<li><strong>The options</strong> say how much to show. <code>dateStyle: 'medium'</code> gives
+<code>8 Oct 2026</code> (<code>'long'</code> would give <code>8 October 2026</code>), and
+<code>timeStyle: 'short'</code> gives hours and minutes, <code>10:15</code>, with no seconds.</li>
+</ul>
+<p>The formatter turns a <code>Date</code> into text in the <strong>user's own time zone</strong>,
+which the browser knows from the computer's settings. That's how
+<code>09:15</code> UTC becomes <code>10:15</code> on a computer in Ireland in October.</p>
+<h2>Using it</h2>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 1.22: using the formatter (src/utils/formatDate.js, excerpt)</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">formatDate</span>(<span class="hljs-params">isoString</span>) {
+  <span class="hljs-keyword">const</span> date = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Date</span>(isoString);
+  <span class="hljs-comment">// ... a check for bad dates (next slide)</span>
+  <span class="hljs-keyword">return</span> dateFormatter.<span class="hljs-title function_">format</span>(date);
+}
+</code></pre>
+<p><code>new Date(isoString)</code> turns the ISO string into a JavaScript <code>Date</code>
+object, and <code>dateFormatter.format(date)</code> turns that into the text the
+page shows.</p>
+<h2>Why create it once?</h2>
+<p>Setting up a formatter takes some work: the browser has to load the
+rules for that locale. <code>dateFormatter</code> is created <strong>outside</strong> the
+function, once, when the file loads. Every call to <code>formatDate</code> reuses
+it. Creating a new formatter inside the function would repeat that work
+for every date on every page, for exactly the same result. It's the same
+reason <code>STATUS_LABELS</code> sits outside <code>StatusBadge</code>.</p>
+<h2>Try it</h2>
+<p>Change <code>'en-IE'</code> to <code>'en-US'</code>, then to <code>'de-DE'</code>, and look at the dates
+on the Tickets page each time. What changes besides the order? Then try
+<code>dateStyle: 'full'</code>. Put the original values back before you go on: a
+test checks the format.</p>
+</div>
+    
+  </main>
+</body>
+</html>

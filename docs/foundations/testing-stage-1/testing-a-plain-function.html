@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Testing a Plain Function — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/foundations/a-page-for-each-ticket/a-description-list.html">← A Description List</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/foundations/testing-stage-1/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/foundations/testing-stage-1/testing-a-component-with-props.html">Testing a Component With Props →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Testing a Plain Function</h1>
+    <p class="lede">formatDate has no React in it, so its test just calls it and checks what comes back.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Stage 1 adds five test files. The simplest is for <code>formatDate</code>, because
+it's an ordinary function: a string goes in, a string comes out.</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 1.31: testing formatDate (src/utils/formatDate.test.js, excerpt)</span>
+<span class="hljs-title function_">describe</span>(<span class="hljs-string">&#x27;formatDate&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-title function_">it</span>(<span class="hljs-string">&#x27;turns an ISO date string into a readable date&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
+    <span class="hljs-comment">// Midday UTC, so the day is the same in any time zone the tests run in.</span>
+    <span class="hljs-keyword">const</span> readableDate = <span class="hljs-title function_">formatDate</span>(<span class="hljs-string">&#x27;2026-10-08T12:00:00.000Z&#x27;</span>);
+
+    <span class="hljs-title function_">expect</span>(readableDate).<span class="hljs-title function_">toContain</span>(<span class="hljs-string">&#x27;8 Oct 2026&#x27;</span>);
+  });
+
+  <span class="hljs-title function_">it</span>(<span class="hljs-string">&#x27;returns &quot;Unknown date&quot; instead of crashing for a bad value&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
+    <span class="hljs-title function_">expect</span>(<span class="hljs-title function_">formatDate</span>(<span class="hljs-string">&#x27;not a date&#x27;</span>)).<span class="hljs-title function_">toBe</span>(<span class="hljs-string">&#x27;Unknown date&#x27;</span>);
+    <span class="hljs-title function_">expect</span>(<span class="hljs-title function_">formatDate</span>(<span class="hljs-literal">undefined</span>)).<span class="hljs-title function_">toBe</span>(<span class="hljs-string">&#x27;Unknown date&#x27;</span>);
+  });
+});
+</code></pre>
+<p>No <code>render()</code>, no <code>screen</code>, no page: just call it and check the result.
+It's the same kind of test as a back-end unit test for a helper in
+<code>utils/</code>. Functions like this are the easiest code to test, which is one
+more reason to keep logic like formatting out of components.</p>
+<h2>Choosing the test data</h2>
+<p>Two details make this test reliable on any computer:</p>
+<ul>
+<li><strong>Midday UTC.</strong> <code>formatDate</code> shows the date in the computer's own time
+zone. A time near midnight, like <code>23:30Z</code>, would be the 9th in Ireland
+but still the 8th in New York, so the test would pass on one computer
+and fail on another. Midday is the same day almost everywhere.</li>
+<li><strong><code>toContain</code>, not <code>toBe</code>.</strong> The test checks the <strong>date</strong> part only.
+The time part depends on the time zone, so checking the whole string
+with <code>toBe</code> would have the same problem.</li>
+</ul>
+<h2>The bad cases</h2>
+<p>The second test checks the case from topic 05: a bad value
+gives <code>'Unknown date'</code> instead of a crash. One <code>it</code> can hold more than
+one <code>expect</code>, as long as they test the same idea.</p>
+<h2>Try it</h2>
+<p>Change the date in the first test to <code>'2026-10-08T23:30:00.000Z'</code>, and
+run <code>npm test</code>. Does it pass? Would it pass on a computer in New York?
+Why, or why not? Change it back.</p>
+</div>
+    
+  </main>
+</body>
+</html>

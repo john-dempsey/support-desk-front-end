@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A Route With a Parameter — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/foundations/formatting-dates/one-function-many-places.html">← One Function, Many Places</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/foundations/a-page-for-each-ticket/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/foundations/a-page-for-each-ticket/useparams.html">useParams() →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>A Route With a Parameter</h1>
+    <p class="lede">/tickets/:ticketId is one route that matches every ticket&#39;s URL, the same idea as /tickets/:id in Express.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The starter's checklist said every new page needs three things: the
+page, a route, and (if it belongs in the navigation) a link. Stage 1 adds
+two routes to <code>App.jsx</code>:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 1.24: the ticket routes (src/App.jsx, excerpt)</span>
+&lt;<span class="hljs-title class_">Route</span> path=<span class="hljs-string">&quot;/&quot;</span> element={<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">HomePage</span> /&gt;</span></span>} /&gt;
+<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">Route</span> <span class="hljs-attr">path</span>=<span class="hljs-string">&quot;/tickets&quot;</span> <span class="hljs-attr">element</span>=<span class="hljs-string">{</span>&lt;<span class="hljs-attr">TicketListPage</span> /&gt;</span>} /&gt;</span>
+{<span class="hljs-comment">/* &quot;:ticketId&quot; matches any value, like &quot;/tickets/:id&quot; in Express.
+    The page reads it with useParams(). */</span>}
+&lt;<span class="hljs-title class_">Route</span> path=<span class="hljs-string">&quot;/tickets/:ticketId&quot;</span> element={<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">TicketDetailPage</span> /&gt;</span></span>} /&gt;
+</code></pre>
+<p><code>/tickets</code> is an ordinary route, like the starter's <code>/</code>. The second one
+is new.</p>
+<h2>A route parameter</h2>
+<p>The colon in <code>:ticketId</code> makes that part of the path a <strong>parameter</strong>: a
+placeholder that matches any value. <code>/tickets/1</code>, <code>/tickets/2</code> and
+<code>/tickets/999</code> all match this one route, and all show
+<code>TicketDetailPage</code>.</p>
+<p>You've written this before:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Route</th>
+<th>The value is read with</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Express</td>
+<td><code>router.get('/:id', ...)</code></td>
+<td><code>req.params.id</code></td>
+</tr>
+<tr>
+<td>Laravel</td>
+<td><code>Route::get('/tickets/{id}', ...)</code></td>
+<td>the controller's <code>$id</code> parameter</td>
+</tr>
+<tr>
+<td>React Router</td>
+<td><code>&lt;Route path=&quot;/tickets/:ticketId&quot; ...&gt;</code></td>
+<td><code>useParams()</code> (next slide)</td>
+</tr>
+</tbody>
+</table>
+<p><code>ticketId</code> is a name you choose. The page will use the same name to read
+it, so it says what the value is: a ticket's ID.</p>
+<p>The ticket list already links to these URLs. Each subject is a
+<code>&lt;Link to={`/tickets/${ticket.id}`}&gt;</code> (Figure 1.8), so clicking ticket 2
+goes to <code>/tickets/2</code>.</p>
+<h2>The navigation link</h2>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 1.25: the Tickets link (src/components/NavBar.jsx, excerpt)</span>
+&lt;li&gt;
+  {<span class="hljs-comment">/* No `end` here, so &quot;Tickets&quot; stays active on a ticket&#x27;s own
+      page (/tickets/2) as well as on /tickets. */</span>}
+  &lt;<span class="hljs-title class_">NavLink</span> to=<span class="hljs-string">&quot;/tickets&quot;</span>&gt;<span class="hljs-title class_">Tickets</span>&lt;/<span class="hljs-title class_">NavLink</span>&gt;
+&lt;/li&gt;
+</code></pre>
+<p>The starter showed that <code>NavLink</code> marks the link for the current page as
+active, and that <code>end</code> means &quot;only on exactly this URL&quot;. Without <code>end</code>,
+a <code>NavLink</code> is also active on every URL <strong>under</strong> it. That's what you
+want here: when you're looking at ticket 2, you're still in the Tickets
+part of the app, and the navigation should say so.</p>
+<h2>Try it</h2>
+<p>Open <code>http://localhost:5173/tickets/2</code> and look at the navigation: which
+link is active? Now add <code>end</code> to the Tickets <code>NavLink</code>, save, and look
+again. Which is better for the user? Take <code>end</code> out again.</p>
+</div>
+    
+  </main>
+</body>
+</html>

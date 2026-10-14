@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Giving useParams() a Route — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/foundations/testing-stage-1/renderwithproviders.html">← renderWithProviders</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/foundations/testing-stage-1/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/foundations/testing-stage-1/testing-a-list.html">Testing a List →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Giving useParams() a Route</h1>
+    <p class="lede">useParams() only knows a parameter when a &lt;Route&gt; with that pattern matched, so the page test passes both the URL and the pattern.</p>
+
+    
+
+    
+      <div class="slide-body"><p><code>TicketDetailPage</code> reads <code>ticketId</code> with <code>useParams()</code>. In the app,
+<code>App.jsx</code>'s <code>&lt;Route path=&quot;/tickets/:ticketId&quot;&gt;</code> is what tells React
+Router there <strong>is</strong> a parameter called <code>ticketId</code>, and which part of the
+URL it is. A test that renders the page on its own has no <code>&lt;Route&gt;</code>, so
+<code>useParams()</code> returns an empty object, <code>ticketId</code> is <code>undefined</code>, and
+the page always says &quot;Ticket not found&quot;.</p>
+<p>So the page's tests pass two options:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 1.34: a page that reads the URL</span>
+<span class="hljs-comment">// (src/pages/TicketDetailPage.test.jsx, excerpt)</span>
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">DETAIL_PATH</span> = <span class="hljs-string">&#x27;/tickets/:ticketId&#x27;</span>;
+
+<span class="hljs-title function_">it</span>(<span class="hljs-string">&#x27;shows the ticket whose ID is in the URL&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-title function_">renderWithProviders</span>(<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">TicketDetailPage</span> /&gt;</span></span>, {
+    <span class="hljs-attr">route</span>: <span class="hljs-string">&#x27;/tickets/2&#x27;</span>,
+    <span class="hljs-attr">path</span>: <span class="hljs-variable constant_">DETAIL_PATH</span>,
+  });
+
+  <span class="hljs-title function_">expect</span>(
+    screen.<span class="hljs-title function_">getByRole</span>(<span class="hljs-string">&#x27;heading&#x27;</span>, { <span class="hljs-attr">level</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Invoice discrepancy&#x27;</span> }),
+  ).<span class="hljs-title function_">toBeInTheDocument</span>();
+  <span class="hljs-title function_">expect</span>(screen.<span class="hljs-title function_">getByText</span>(<span class="hljs-string">&#x27;Charged twice for March&#x27;</span>)).<span class="hljs-title function_">toBeInTheDocument</span>();
+</code></pre>
+<p>(In the file, this test sits inside <code>describe('TicketDetailPage', ...)</code>,
+and the <code>renderWithProviders</code> call is one line. Both are changed here to
+fit.)</p>
+<ul>
+<li><strong><code>route</code></strong> is the URL to start at, like typing it in the address bar.</li>
+<li><strong><code>path</code></strong> is the pattern, the same as in <code>App.jsx</code>. With it, the
+helper wraps the page in a <code>&lt;Routes&gt;</code> with one <code>&lt;Route&gt;</code>
+(Figure 1.33), so React Router matches <code>/tickets/2</code> against
+<code>/tickets/:ticketId</code> and <code>useParams()</code> gives <code>{ ticketId: '2' }</code>.</li>
+</ul>
+<p><code>DETAIL_PATH</code> is a constant so that all four tests use the same pattern.</p>
+<h2>The other tests</h2>
+<p>The file's other three tests check the cases from topic 06:</p>
+<ul>
+<li><code>/tickets/999</code> shows <strong>Ticket not found</strong></li>
+<li><code>/tickets/abc</code> shows <strong>Ticket not found</strong> (<code>Number('abc')</code> is <code>NaN</code>)</li>
+<li>the <strong>Back to all tickets</strong> link points to <code>/tickets</code></li>
+</ul>
+<p>This page still uses <code>sampleTickets</code>, so these tests rely on ticket 2
+being &quot;Invoice discrepancy&quot;. When Stage 2 replaces the sample data with
+the API, these tests will have to change too.</p>
+<h2>Try it</h2>
+<p>In the first test, delete the <code>path: DETAIL_PATH,</code> line and run the
+tests. Which heading does the page show now, and why? Put it back.</p>
+</div>
+    
+  </main>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Arrow Functions and JSX — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/foundations/pages-own-the-data/same-component-different-data.html">← Same Component, Different Data</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/foundations/lists-and-keys/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/foundations/lists-and-keys/from-an-array-to-rows.html">From an Array to Rows →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Arrow Functions and JSX</h1>
+    <p class="lede">A short reminder of arrow functions from the back-end, plus the one new shorthand JSX needs: parentheses around a multi-line result.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The next slide passes an arrow function to <code>.map()</code>. You met arrow
+functions in the back-end's Lesson 1, including the <strong>implicit return</strong>:
+with no <code>{ }</code>, the expression after <code>=&gt;</code> is returned automatically.</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// These two do the same thing:</span>
+<span class="hljs-keyword">const</span> <span class="hljs-title function_">double</span> = (<span class="hljs-params">number</span>) =&gt; { <span class="hljs-keyword">return</span> number * <span class="hljs-number">2</span>; };
+<span class="hljs-keyword">const</span> <span class="hljs-title function_">doubleAgain</span> = (<span class="hljs-params">number</span>) =&gt; number * <span class="hljs-number">2</span>;
+</code></pre>
+<p>You also passed an arrow function <strong>to another function</strong>, in the
+in-memory <code>ticket.service.js</code>:</p>
+<pre><code class="hljs language-js">tickets.<span class="hljs-title function_">find</span>(<span class="hljs-function">(<span class="hljs-params">ticket</span>) =&gt;</span> ticket.<span class="hljs-property">id</span> === id);
+</code></pre>
+<p><code>find()</code> calls the arrow function once for each ticket, and stops at the
+first one where it returns <code>true</code>. You write what to do with <strong>one</strong>
+ticket; <code>find()</code> does the looping.</p>
+<h2>Returning JSX</h2>
+<p>An arrow function can return JSX, because JSX is an expression:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-keyword">const</span> <span class="hljs-title function_">toListItem</span> = (<span class="hljs-params">name</span>) =&gt; <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">li</span>&gt;</span>{name}<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span></span>;
+</code></pre>
+<p>When the JSX is more than one line, wrap it in <strong>parentheses</strong>:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-keyword">const</span> <span class="hljs-title function_">toRow</span> = (<span class="hljs-params">ticket</span>) =&gt; (
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">tr</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">td</span>&gt;</span>{ticket.subject}<span class="hljs-tag">&lt;/<span class="hljs-name">td</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">tr</span>&gt;</span></span>
+);
+</code></pre>
+<p>The parentheses only group the lines, the same as the <code>return ( ... )</code>
+in every component you've seen. It's still an implicit return.</p>
+<h2>The trap: braces instead of parentheses</h2>
+<pre><code class="hljs language-jsx"><span class="hljs-keyword">const</span> <span class="hljs-title function_">toRow</span> = (<span class="hljs-params">ticket</span>) =&gt; {
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">tr</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">td</span>&gt;</span>{ticket.subject}<span class="hljs-tag">&lt;/<span class="hljs-name">td</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">tr</span>&gt;</span></span>
+};
+</code></pre>
+<p>With <strong>braces</strong>, the arrow function has a body, so nothing is returned
+unless you write <code>return</code>. This version returns <code>undefined</code>, React shows
+nothing for <code>undefined</code>, and there's no error message to tell you why.
+If a list comes out empty and you can't see why, check this first.</p>
+</div>
+    
+  </main>
+</body>
+</html>

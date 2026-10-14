@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>From an Array to Rows — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/foundations/lists-and-keys/arrow-functions-and-jsx.html">← Arrow Functions and JSX</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/foundations/lists-and-keys/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/foundations/lists-and-keys/keys.html">Keys →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>From an Array to Rows</h1>
+    <p class="lede">.map() turns an array of tickets into an array of table rows, and React shows an array of JSX by showing each item in turn.</p>
+
+    
+
+    
+      <div class="slide-body"><p><code>TicketList</code> has one ticket array and needs one table row per ticket.
+This is how it gets them (the comment and four of the cells are left
+out here):</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 1.10: one row per ticket (src/components/TicketList.jsx, excerpt)</span>
+&lt;tbody&gt;
+  {tickets.<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">ticket</span>) =&gt;</span> (
+    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">tr</span> <span class="hljs-attr">key</span>=<span class="hljs-string">{ticket.id}</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">td</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">Link</span> <span class="hljs-attr">to</span>=<span class="hljs-string">{</span>`/<span class="hljs-attr">tickets</span>/${<span class="hljs-attr">ticket.id</span>}`}&gt;</span>{ticket.subject}<span class="hljs-tag">&lt;/<span class="hljs-name">Link</span>&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">td</span>&gt;</span>
+      {/* ... four more cells ... */}
+    <span class="hljs-tag">&lt;/<span class="hljs-name">tr</span>&gt;</span></span>
+  ))}
+&lt;/tbody&gt;
+</code></pre>
+<h2>What <code>.map()</code> does</h2>
+<p><code>.map()</code> is an array method, like <code>find()</code>. It calls your function once
+for each item, and collects whatever the function returns into a <strong>new
+array</strong>, the same length as the old one:</p>
+<pre><code class="hljs language-js">[<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>].<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">number</span>) =&gt;</span> number * <span class="hljs-number">2</span>);   <span class="hljs-comment">// gives [2, 4, 6]</span>
+</code></pre>
+<p>The original array isn't changed. Here, the function turns <strong>one ticket</strong>
+into <strong>one <code>&lt;tr&gt;</code></strong>, so <code>tickets.map(...)</code> gives an array of four <code>&lt;tr&gt;</code>
+elements, one for each sample ticket.</p>
+<h2>React shows arrays</h2>
+<p>When the value inside <code>{ }</code> is an array, React shows every item in it,
+in order. So the array of <code>&lt;tr&gt;</code>s becomes the rows of the table.</p>
+<h2>Why not a <code>for</code> loop?</h2>
+<p>Only an <strong>expression</strong> can go inside <code>{ }</code> in JSX, and a <code>for</code> loop is a
+statement (the starter explained the difference). <code>.map()</code> is a
+function call, so it's an expression, and it gives back a value that
+React can show.</p>
+<h2>Compared with Blade</h2>
+<p>It's the same job as <code>@foreach</code>:</p>
+<pre><code class="hljs language-php">@<span class="hljs-keyword">foreach</span> (<span class="hljs-variable">$tickets</span> <span class="hljs-keyword">as</span> <span class="hljs-variable">$ticket</span>)
+    &lt;tr&gt;&lt;td&gt;{{ <span class="hljs-variable">$ticket</span>-&gt;subject }}&lt;/td&gt;&lt;/tr&gt;
+@<span class="hljs-keyword">endforeach</span>
+</code></pre>
+<p>Blade repeats a piece of the template for each ticket. React builds an
+array of rows and shows the array.</p>
+<h2>Try it</h2>
+<p>Add an <strong>ID</strong> column to the table: a <code>&lt;th scope=&quot;col&quot;&gt;ID&lt;/th&gt;</code> at the
+start of the heading row, and a <code>&lt;td&gt;{ticket.id}&lt;/td&gt;</code> at the start of
+each row. How many places did you have to change to add a cell to
+<strong>every</strong> row? Run <code>npm test</code>: do the tests still pass? Then take the
+column out again.</p>
+</div>
+    
+  </main>
+</body>
+</html>

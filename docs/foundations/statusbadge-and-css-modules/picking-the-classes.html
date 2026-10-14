@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Picking the Classes — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/foundations/statusbadge-and-css-modules/css-modules.html">← CSS Modules</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/foundations/statusbadge-and-css-modules/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/foundations/statusbadge-and-css-modules/not-colour-alone.html">Not Colour Alone →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Picking the Classes</h1>
+    <p class="lede">The badge looks up its colour class by the status value, the same way it looks up its label, and combines it with the shared badge class.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Here's the rest of the component. The <code>return</code> line is split over three
+lines to fit here; in the file it's one line:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 1.19: the badge (src/components/StatusBadge.jsx, excerpt)</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">StatusBadge</span>(<span class="hljs-params">{ status }</span>) {
+  <span class="hljs-comment">// If the API ever sends a status this file doesn&#x27;t know about, show it</span>
+  <span class="hljs-comment">// as it is, in grey, rather than showing nothing.</span>
+  <span class="hljs-keyword">const</span> label = <span class="hljs-variable constant_">STATUS_LABELS</span>[status] || status;
+  <span class="hljs-keyword">const</span> colourClass = styles[status] || styles.<span class="hljs-property">unknown</span>;
+
+  <span class="hljs-keyword">return</span> (
+    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">className</span>=<span class="hljs-string">{</span>`${<span class="hljs-attr">styles.badge</span>} ${<span class="hljs-attr">colourClass</span>}`}&gt;</span>{label}<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span></span>
+  );
+}
+</code></pre>
+<h2>The colour class</h2>
+<p><code>styles</code> is an object, so it's looked up the same way as
+<code>STATUS_LABELS</code>. That's why the CSS file names its classes <strong>exactly
+like the API's status values</strong>: <code>.open</code>, <code>.in_progress</code>, <code>.resolved</code>,
+<code>.closed</code>. For a ticket that's <code>in_progress</code>, <code>styles[status]</code> is
+<code>styles.in_progress</code>, the class with the yellow colours. An underscore is
+allowed in a CSS class name, so the API's value works as it is.</p>
+<p>For a status the file doesn't know, <code>styles[status]</code> is <code>undefined</code>, and
+<code>||</code> falls back to <code>styles.unknown</code>. In the CSS, <code>.unknown</code> shares its
+grey rule with <code>.closed</code>:</p>
+<pre><code class="hljs language-css"><span class="hljs-comment">/* Figure 1.20: the grey badge (src/components/StatusBadge.module.css,
+   excerpt) */</span>
+<span class="hljs-selector-class">.closed</span>,
+<span class="hljs-selector-class">.unknown</span> {
+  <span class="hljs-attribute">color</span>: <span class="hljs-number">#59636e</span>;
+  <span class="hljs-attribute">background-color</span>: <span class="hljs-number">#f6f8fa</span>;
+}
+</code></pre>
+<h2>Two classes on one element</h2>
+<p>In HTML, an element can have several classes, separated by spaces:
+<code>class=&quot;badge open&quot;</code>. The badge needs two: <code>badge</code> for the shape, and
+one colour class. The template literal builds that string from the two
+generated names:</p>
+<pre><code class="hljs language-js"><span class="hljs-string">`<span class="hljs-subst">${styles.badge}</span> <span class="hljs-subst">${colourClass}</span>`</span>   <span class="hljs-comment">// &#x27;_badge_85lrl_6 _open_85lrl_18&#x27;</span>
+</code></pre>
+<p>A template literal (a string in backticks, with <code>${ }</code> around each
+value) is the same thing you used to build strings in the back-end. <code>className</code> (not <code>class</code>) is the JSX name for
+the attribute, as the starter explained.</p>
+<h2>Try it</h2>
+<p>Make <strong>resolved</strong> tickets purple: in <code>StatusBadge.module.css</code>, change
+<code>.resolved</code>'s <code>color</code> to <code>#6639ba</code> and its <code>background-color</code> to
+<code>#fbefff</code>. Which file did you change, and which files didn't need to
+know? Then change the colours back.</p>
+</div>
+    
+  </main>
+</body>
+</html>
