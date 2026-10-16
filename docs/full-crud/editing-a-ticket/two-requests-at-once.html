@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Two Requests at Once — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/editing-a-ticket/the-edit-page.html">← The Edit Page</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/editing-a-ticket/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/editing-a-ticket/starting-with-the-tickets-values.html">Starting With the Ticket&#39;s Values →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Two Requests at Once</h1>
+    <p class="lede">The edit page needs the ticket and the agents. Promise.all() sends both requests together and waits for both, so the page waits only as long as the slower one.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Before it can show the form, the edit page needs two things from the
+API: the ticket, and the list of agents. Neither depends on the other.
+So it asks for both <strong>at the same time</strong>:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 3.23: loading two things at once</span>
+<span class="hljs-comment">// (src/pages/EditTicketPage.jsx, excerpt)</span>
+<span class="hljs-title function_">useEffect</span>(<span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-keyword">let</span> ignore = <span class="hljs-literal">false</span>;
+
+  <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">loadTicketAndAgents</span>(<span class="hljs-params"></span>) {
+    <span class="hljs-keyword">try</span> {
+      <span class="hljs-keyword">const</span> [ticketData, agentsData] = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">all</span>([
+        <span class="hljs-title function_">getTicket</span>(ticketId),
+        <span class="hljs-title function_">getAgents</span>(),
+      ]);
+      <span class="hljs-keyword">if</span> (!ignore) {
+        <span class="hljs-title function_">setTicket</span>(ticketData);
+        <span class="hljs-title function_">setAgents</span>(agentsData);
+      }
+    } <span class="hljs-keyword">catch</span> (error) {
+      <span class="hljs-comment">// ... setLoadErrorMessage, as in Stage 2</span>
+    } <span class="hljs-keyword">finally</span> {
+      <span class="hljs-comment">// ... setIsLoading(false)</span>
+    }
+  }
+  <span class="hljs-comment">// ...</span>
+}, [ticketId]);
+</code></pre>
+<p>Everything apart from the <code>Promise.all()</code> line is Stage 2's pattern:
+the <code>ignore</code> flag, <code>try</code>/<code>catch</code>/<code>finally</code>, and <code>ticketId</code> in the
+dependency array.</p>
+<h2><code>Promise.all()</code></h2>
+<p><code>getTicket(ticketId)</code> and <code>getAgents()</code> each return a promise, as soon
+as they've <strong>sent</strong> their request. Neither is awaited on its own.
+Instead, both promises go into an array, and <code>Promise.all()</code> makes one
+promise from them that:</p>
+<ul>
+<li><strong>succeeds</strong> when <strong>both</strong> have succeeded, with an array of their
+results, <strong>in the same order</strong> as the promises went in</li>
+<li><strong>fails</strong> as soon as <strong>either</strong> fails, with that one's error</li>
+</ul>
+<p><code>const [ticketData, agentsData] = ...</code> takes the array apart: the first
+result is the ticket, the second is the agents. The back-end does the
+same in <code>ticket.service.js</code>, where <code>getAllTickets</code> gets a page of
+tickets and their count with
+<code>const [tickets, total] = await Promise.all([...])</code>.</p>
+<h2>Why not one after the other?</h2>
+<p>This would work too:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-keyword">const</span> ticketData = <span class="hljs-keyword">await</span> <span class="hljs-title function_">getTicket</span>(ticketId);
+<span class="hljs-keyword">const</span> agentsData = <span class="hljs-keyword">await</span> <span class="hljs-title function_">getAgents</span>();
+</code></pre>
+<p>But the second request wouldn't <strong>start</strong> until the first had finished:</p>
+<p><img src="/support-desk-front-end/assets/images/two-requests-at-once.svg" alt="Diagram: two timelines. One after the other, with two awaits, one per line: getTicket() runs, and getAgents() only starts when it has finished, so the form shows after both times added together. With Promise.all(), one await for both: getTicket() and getAgents() start together and run side by side, so the form shows as soon as the slower one finishes. The difference is marked as time saved."></p>
+<p>With <code>Promise.all()</code>, the page waits only as long as the <strong>slower</strong> of
+the two. The two requests are independent, so there's no reason to
+wait for one before sending the other.</p>
+<h2>If one fails</h2>
+<p>If either request fails, <code>Promise.all()</code> fails, and the <code>catch</code> shows
+the error. That's right here: without the ticket there's nothing to
+edit, and without the agents the form would be missing a field.</p>
+<h2>Try it</h2>
+<p>With <strong>Casey's</strong> token, open the edit page for one of Casey's tickets.
+What does it say? Which of the two requests failed, and why? (Look in
+the Network tab.) Did the other one succeed?</p>
+</div>
+    
+  </main>
+</body>
+</html>

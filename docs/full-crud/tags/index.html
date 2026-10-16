@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tags: CRUD on One Page — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Tags: CRUD on One Page</h1>
+    <p class="lede">List, add, rename and delete tags, all on one page. A recap of the lesson so far, plus renaming in place, asking again for a sorted list, and rewording an unhelpful error.</p>
+
+    
+      <ul class="listing">
+        
+          <li>
+            <a href="/support-desk-front-end/full-crud/tags/a-whole-resource-on-one-page.html">A Whole Resource on One Page</a>
+            <p>Tags have only a name, so all four CRUD operations fit on one page. It&#39;s the pattern to copy for a simple resource in your own API.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/full-crud/tags/one-form-twice.html">One Form, Used Twice</a>
+            <p>TagForm is a one-field form. The page uses it to add a tag and to rename one, which is why each use needs its own input id, and only one has a Cancel button.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/full-crud/tags/which-row-is-being-renamed.html">Which Row Is Being Renamed?</a>
+            <p>One piece of state, editingTagId, holds the id of the tag being renamed. Each row compares its own id with it, and shows either its name or a TagForm.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/full-crud/tags/asking-again-for-a-sorted-list.html">Asking Again for a Sorted List</a>
+            <p>The API sorts tags by name, so a new or renamed tag could belong anywhere in the list. The page asks the API for the list again, instead of working out where.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/full-crud/tags/deleting-a-tag.html">Deleting a Tag</a>
+            <p>Deleting a tag doesn&#39;t change the order of the others, so the page just leaves it out of its list. A tag that&#39;s on a ticket can&#39;t be deleted.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/full-crud/tags/in-the-users-words.html">In the User&#39;s Words</a>
+            <p>For a duplicate name, the API&#39;s message mentions a database index. The page replaces it with one a user understands, because the page decides what a status means.</p>
+          </li>
+        
+      </ul>
+    
+
+    
+  </main>
+</body>
+</html>

@@ -2,15 +2,9 @@
 // as text too, never just a colour, so it still makes sense to someone who
 // can't tell the colours apart or is using a screen reader.
 import styles from './StatusBadge.module.css';
-
-// The API's status values are written for code ("in_progress"). These are
-// the words a person should see instead.
-const STATUS_LABELS = {
-  open: 'Open',
-  in_progress: 'In progress',
-  resolved: 'Resolved',
-  closed: 'Closed',
-};
+// The words to show for each status. They were defined in this file until
+// Stage 3, when the status dropdowns needed them too.
+import { STATUS_LABELS } from '../utils/ticketStatuses.js';
 
 function StatusBadge({ status }) {
   // If the API ever sends a status this file doesn't know about, show it

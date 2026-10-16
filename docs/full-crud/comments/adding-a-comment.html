@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Adding a Comment — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/comments/the-page-in-the-middle.html">← The Page in the Middle</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/comments/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/comments/a-new-array-not-a-changed-one.html">A New Array, Not a Changed One →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Adding a Comment</h1>
+    <p class="lede">The page adds the saved comment to its list, and tells the form whether it worked, so the form only empties its box when the comment was saved.</p>
+
+    
+
+    
+      <div class="slide-body"><p><code>CommentForm</code> works like <code>TicketForm</code>, with one difference. After a new
+ticket is saved, the page moves on, and the form disappears. After a
+comment is saved, the user stays on the same page, and the form stays
+too. Its box should be <strong>emptied</strong>, ready for the next comment. But only
+if the comment was saved: if it failed, the user's text mustn't be lost.</p>
+<p>So the form needs an answer from the page: did it work?</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 3.39: submitting a comment (src/components/CommentForm.jsx,</span>
+<span class="hljs-comment">// excerpt)</span>
+<span class="hljs-keyword">const</span> [commentText, setCommentText] = <span class="hljs-title function_">useState</span>(<span class="hljs-string">&#x27;&#x27;</span>);
+<span class="hljs-keyword">const</span> [isSubmitting, setIsSubmitting] = <span class="hljs-title function_">useState</span>(<span class="hljs-literal">false</span>);
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">handleSubmit</span>(<span class="hljs-params">event</span>) {
+  event.<span class="hljs-title function_">preventDefault</span>();
+  <span class="hljs-title function_">setIsSubmitting</span>(<span class="hljs-literal">true</span>);
+  <span class="hljs-keyword">const</span> isSaved = <span class="hljs-keyword">await</span> <span class="hljs-title function_">onSubmit</span>(commentText);
+  <span class="hljs-title function_">setIsSubmitting</span>(<span class="hljs-literal">false</span>);
+
+  <span class="hljs-keyword">if</span> (isSaved) {
+    <span class="hljs-title function_">setCommentText</span>(<span class="hljs-string">&#x27;&#x27;</span>);
+  }
+}
+</code></pre>
+<p><code>onSubmit</code> is the page's <code>handleAddComment</code>, and it <strong>returns</strong> <code>true</code>
+or <code>false</code>:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 3.40: adding the comment (src/pages/TicketDetailPage.jsx,</span>
+<span class="hljs-comment">// excerpt)</span>
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">handleAddComment</span>(<span class="hljs-params">commentText</span>) {
+  <span class="hljs-title function_">setCommentError</span>(<span class="hljs-literal">null</span>);
+  <span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">const</span> newComment = <span class="hljs-keyword">await</span> <span class="hljs-title function_">createComment</span>(ticket.<span class="hljs-property">id</span>, commentText);
+    <span class="hljs-title function_">setComments</span>([...comments, newComment]);
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+  } <span class="hljs-keyword">catch</span> (error) {
+    <span class="hljs-title function_">setCommentError</span>(error);
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+  }
+}
+</code></pre>
+<p>(The comments are left out.)</p>
+<ul>
+<li><strong>Saved:</strong> <code>createComment()</code> returns the comment as the API saved it,
+with its <code>id</code>, <code>author</code> and <code>createdAt</code>. The page adds it to the end
+of its list (the next slide explains <code>[...comments, newComment]</code>), and
+returns <code>true</code>. The form empties its box.</li>
+<li><strong>Failed:</strong> the page keeps the error, and returns <code>false</code>. The form
+keeps its text, so the user can fix it and try again.</li>
+</ul>
+<h2>Errors in the form</h2>
+<p>The page passes <code>commentError</code> to the form as its <code>error</code> prop, exactly
+as <code>NewTicketPage</code> did (topic 04). <code>CommentForm</code> shows the message at
+the top, and uses <code>getFieldError(error, 'body')</code> for the textarea:
+<code>'body'</code>, because that's the API's name for the field.</p>
+<h2>Try it</h2>
+<p>With Ada's token, add a comment that is only spaces. What does the form
+say, and where? Is your text still there? Now add a real comment. In
+the Network tab, with <strong>Fetch/XHR</strong> selected, how many requests did
+adding it send? Why didn't the page load the comments again?</p>
+</div>
+    
+  </main>
+</body>
+</html>

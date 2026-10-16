@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Page in the Middle — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/comments/the-comment-list.html">← The Comment List</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/comments/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/comments/adding-a-comment.html">Adding a Comment →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>The Page in the Middle</h1>
+    <p class="lede">The comment form and the comment list are siblings. They can&#39;t talk to each other, so the comments live in the page, their closest shared parent.</p>
+
+    
+
+    
+      <div class="slide-body"><p>At the bottom of the ticket's page, the list and the form sit side by
+side:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 3.38: comments on the page</span>
+<span class="hljs-comment">// (src/pages/TicketDetailPage.jsx, excerpt)</span>
+&lt;h2&gt;<span class="hljs-title class_">Comments</span>&lt;/h2&gt;
+<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">CommentList</span> <span class="hljs-attr">comments</span>=<span class="hljs-string">{comments}</span> <span class="hljs-attr">onDelete</span>=<span class="hljs-string">{handleDeleteComment}</span> /&gt;</span></span>
+<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">CommentForm</span> <span class="hljs-attr">onSubmit</span>=<span class="hljs-string">{handleAddComment}</span> <span class="hljs-attr">error</span>=<span class="hljs-string">{commentError}</span> /&gt;</span></span>
+</code></pre>
+<p>When the user adds a comment in the <strong>form</strong>, it has to appear in the
+<strong>list</strong>. But a component can only pass things down to its own children,
+and call functions its parent gave it (topic 03, slide 03). <code>CommentForm</code>
+and <code>CommentList</code> are <strong>siblings</strong>: neither is the other's parent. They
+have no way to reach each other.</p>
+<p>So the comments live in the <strong>page</strong>, the closest component that
+contains both:</p>
+<p><img src="/support-desk-front-end/assets/images/ticket-page-and-comments.svg" alt="Diagram: TicketDetailPage, the page, owns the comments. It holds the state ticket, comments, commentError and more, and its handleAddComment and handleDeleteComment call comments.api.js, then setComments. It has two children side by side. CommentList gets the props comments and onDelete; it shows each comment and a Delete button for each, and calls onDelete(comment). CommentForm gets the props onSubmit and error; it owns the typing, with the state commentText and isSubmitting, and calls onSubmit(commentText), which returns true or false. The list and the form never talk to each other: a new comment reaches the list through the page."></p>
+<p>Follow a new comment round:</p>
+<ol>
+<li><code>CommentForm</code> calls <code>onSubmit(commentText)</code>, which is the page's
+<code>handleAddComment</code>.</li>
+<li>The page sends it to the API, and adds the saved comment to its
+<code>comments</code> state.</li>
+<li>The page re-renders, and passes the longer <code>comments</code> array down to
+<code>CommentList</code>.</li>
+<li><code>CommentList</code> re-renders with one more comment.</li>
+</ol>
+<p>The form never knew the list existed.</p>
+<h2>Where should state live?</h2>
+<p>This is a rule React developers use all the time: <strong>put state in the
+closest component that contains everything that uses it.</strong> It's often
+called <strong>lifting state up</strong>.</p>
+<ul>
+<li><code>comments</code> is used by the list (to show) and changed because of the
+form (to add), so it lives in the page, above both.</li>
+<li><code>commentText</code> is used only by the form, so it lives in the form. The
+page doesn't need to know what's being typed until it's sent.</li>
+</ul>
+<h2>Try it</h2>
+<p>Imagine the page should show &quot;3 comments&quot; next to the <strong>Comments</strong>
+heading. Where would that number come from? Would you need any new
+state? Add it, and add a comment to check it updates.</p>
+</div>
+    
+  </main>
+</body>
+</html>

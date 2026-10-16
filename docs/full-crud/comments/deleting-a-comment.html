@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Deleting a Comment — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/comments/a-new-array-not-a-changed-one.html">← A New Array, Not a Changed One</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/comments/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/comments/update-or-ask-again.html">Update, or Ask Again? →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Deleting a Comment</h1>
+    <p class="lede">Confirm, send DELETE, and remove the comment from the list. Only a comment&#39;s author, or an admin, may delete it, and the API says so if you try.</p>
+
+    
+
+    
+      <div class="slide-body"><p>When a comment's <strong>Delete</strong> button is clicked, <code>CommentList</code> calls
+<code>onDelete(comment)</code> (slide 03). That's the page's
+<code>handleDeleteComment</code>:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 3.41: deleting a comment (src/pages/TicketDetailPage.jsx,</span>
+<span class="hljs-comment">// excerpt)</span>
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">handleDeleteComment</span>(<span class="hljs-params">commentToDelete</span>) {
+  <span class="hljs-keyword">const</span> isConfirmed = <span class="hljs-variable language_">window</span>.<span class="hljs-title function_">confirm</span>(
+    <span class="hljs-string">&quot;Delete this comment? This can&#x27;t be undone.&quot;</span>,
+  );
+  <span class="hljs-keyword">if</span> (!isConfirmed) {
+    <span class="hljs-keyword">return</span>;
+  }
+
+  <span class="hljs-title function_">setCommentError</span>(<span class="hljs-literal">null</span>);
+  <span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">await</span> <span class="hljs-title function_">deleteComment</span>(ticket.<span class="hljs-property">id</span>, commentToDelete.<span class="hljs-property">id</span>);
+    <span class="hljs-title function_">setComments</span>(
+      comments.<span class="hljs-title function_">filter</span>(<span class="hljs-function">(<span class="hljs-params">comment</span>) =&gt;</span> comment.<span class="hljs-property">id</span> !== commentToDelete.<span class="hljs-property">id</span>),
+    );
+  } <span class="hljs-keyword">catch</span> (error) {
+    <span class="hljs-title function_">setCommentError</span>(error);
+  }
+}
+</code></pre>
+<p>(The comments are left out, and the long lines are split here to fit.
+The file writes the message with single quotes and <code>\'</code>.)</p>
+<p>It's <code>handleDeleteTicket</code> (topic 06) again, with two differences:</p>
+<ul>
+<li><strong>It stays on the page.</strong> The ticket is still there, so instead of
+navigating away, it removes the comment from the list with <code>filter()</code>
+(the previous slide). The <code>DELETE</code> sent back a <code>204</code> with no body, so
+there's nothing else to use.</li>
+<li><strong>Its errors go to <code>commentError</code></strong>, which the form shows, just above
+the comment box. That keeps a comment's error with the comments,
+rather than up by the ticket's buttons.</li>
+</ul>
+<h2>Only your own comments</h2>
+<p>The API has a rule for comments (Lesson 4): only the comment's <strong>author</strong>
+may delete it, or an <strong>admin</strong>. Anyone else gets:</p>
+<blockquote>
+<p>You can only modify your own comments</p>
+</blockquote>
+<p>Ada is an admin, so with her token, every Delete button works. Stage 4
+will hide the Delete button on other people's comments. As with every
+control in this stage, hiding it will only be for the user's sake: the
+API's check is what protects the comments.</p>
+<h2>Try it</h2>
+<p>Switch to Casey's token and open ticket 1, which is Casey's. Add a
+comment as Casey, and delete it. Then try to delete Alex's comment.
+What does the page say, and where? Switch back to Ada's token.</p>
+</div>
+    
+  </main>
+</body>
+</html>

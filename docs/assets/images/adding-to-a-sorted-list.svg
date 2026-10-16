@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 300" width="760" height="300" role="img" aria-labelledby="title desc" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <title id="title">Adding a tag to a sorted list</title>
+  <desc id="desc">Before: the tags list shows billing, then bug, sorted by name. The user adds a tag called api. Two ways to show it. Wrong: add the saved tag to the end of the list the page already has, with [...tags, newTag]; the list shows billing, bug, api, out of order until the page is reloaded. Right, as TagsPage does: ask the API again, with reloadTags(), which calls getTags(); the API sorts by name, so the list shows api, billing, bug.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#1a1a1a"/>
+    </marker>
+  </defs>
+  <rect width="760" height="300" fill="#ffffff"/>
+  <text x="20" y="34" font-size="15" font-weight="700" fill="#1a1a1a">Before</text>
+  <text x="20" y="54" font-size="13" fill="#59636e">sorted by name</text>
+  <rect x="160" y="26" width="83" height="32" rx="16" fill="#ddf4ff" stroke="#0550ae" stroke-width="1.5"/>
+  <text x="201.5" y="47" text-anchor="middle" font-size="14" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">billing</text>
+  <rect x="253" y="26" width="47" height="32" rx="16" fill="#ddf4ff" stroke="#0550ae" stroke-width="1.5"/>
+  <text x="276.5" y="47" text-anchor="middle" font-size="14" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">bug</text>
+  <text x="360" y="47" font-size="14" fill="#1a1a1a">The user adds <tspan font-weight="700">api</tspan></text>
+  <line x1="20" y1="84" x2="740" y2="84" stroke="#d1d9e0" stroke-width="1"/>
+  <text x="20" y="124" font-size="15" font-weight="700" fill="#cf222e">✗ Add it to the end</text>
+  <text x="20" y="144" font-size="13" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">setTags([...tags, newTag])</text>
+  <rect x="300" y="116" width="83" height="32" rx="16" fill="#ddf4ff" stroke="#0550ae" stroke-width="1.5"/>
+  <text x="341.5" y="137" text-anchor="middle" font-size="14" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">billing</text>
+  <rect x="393" y="116" width="47" height="32" rx="16" fill="#ddf4ff" stroke="#0550ae" stroke-width="1.5"/>
+  <text x="416.5" y="137" text-anchor="middle" font-size="14" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">bug</text>
+  <rect x="450" y="116" width="47" height="32" rx="16" fill="#fff8c5" stroke="#7d4e00" stroke-width="1.5"/>
+  <text x="473.5" y="137" text-anchor="middle" font-size="14" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">api</text>
+  <text x="560" y="137" font-size="13" fill="#cf222e">out of order, until a reload</text>
+  <text x="20" y="214" font-size="15" font-weight="700" fill="#116329">✓ Ask the API again</text>
+  <text x="20" y="234" font-size="13" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">await reloadTags()</text>
+  <rect x="300" y="206" width="47" height="32" rx="16" fill="#fff8c5" stroke="#7d4e00" stroke-width="1.5"/>
+  <text x="323.5" y="227" text-anchor="middle" font-size="14" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">api</text>
+  <rect x="357" y="206" width="83" height="32" rx="16" fill="#ddf4ff" stroke="#0550ae" stroke-width="1.5"/>
+  <text x="398.5" y="227" text-anchor="middle" font-size="14" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">billing</text>
+  <rect x="450" y="206" width="47" height="32" rx="16" fill="#ddf4ff" stroke="#0550ae" stroke-width="1.5"/>
+  <text x="473.5" y="227" text-anchor="middle" font-size="14" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">bug</text>
+  <text x="560" y="227" font-size="13" fill="#116329">the API sorted it</text>
+  <text x="20" y="284" font-size="13" fill="#59636e">TagsPage does the second: reloadTags() calls getTags() and setTags() after every add or rename.</text>
+</svg>

@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>One Answer, Then Another — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/testing-stage-3/errors-and-waiting.html">← Errors, and Waiting</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/testing-stage-3/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/testing-stage-3/testing-through-the-url.html">Testing Through the URL →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>One Answer, Then Another</h1>
+    <p class="lede">When a page calls the same API function twice, mockResolvedValueOnce() gives each call its own answer. beforeEach() gives every test a sensible default.</p>
+
+    
+
+    
+      <div class="slide-body"><h2>Two calls, two answers</h2>
+<p>After adding a tag, <code>TagsPage</code> calls <code>getTags()</code> a second time (topic
+08, slide 04). The first answer should be the list <strong>before</strong>, and the
+second the list <strong>with the new tag</strong>:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 3.63: an answer per call (src/pages/TagsPage.test.jsx,</span>
+<span class="hljs-comment">// excerpt)</span>
+getTags.<span class="hljs-title function_">mockResolvedValueOnce</span>(testTags);
+getTags.<span class="hljs-title function_">mockResolvedValueOnce</span>([
+  ...testTags,
+  { <span class="hljs-attr">id</span>: <span class="hljs-number">3</span>, <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;urgent&#x27;</span> },
+]);
+createTag.<span class="hljs-title function_">mockResolvedValue</span>({ <span class="hljs-attr">id</span>: <span class="hljs-number">3</span>, <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;urgent&#x27;</span> });
+<span class="hljs-keyword">await</span> <span class="hljs-title function_">renderTagsPage</span>();
+
+<span class="hljs-keyword">await</span> userEvent.<span class="hljs-title function_">type</span>(screen.<span class="hljs-title function_">getByLabelText</span>(<span class="hljs-string">&#x27;New tag name&#x27;</span>), <span class="hljs-string">&#x27;urgent&#x27;</span>);
+<span class="hljs-keyword">await</span> userEvent.<span class="hljs-title function_">click</span>(screen.<span class="hljs-title function_">getByRole</span>(<span class="hljs-string">&#x27;button&#x27;</span>, { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Add tag&#x27;</span> }));
+
+<span class="hljs-title function_">expect</span>(createTag).<span class="hljs-title function_">toHaveBeenCalledWith</span>(<span class="hljs-string">&#x27;urgent&#x27;</span>);
+<span class="hljs-title function_">expect</span>(<span class="hljs-keyword">await</span> screen.<span class="hljs-title function_">findByText</span>(<span class="hljs-string">&#x27;urgent&#x27;</span>)).<span class="hljs-title function_">toBeInTheDocument</span>();
+<span class="hljs-title function_">expect</span>(screen.<span class="hljs-title function_">getByLabelText</span>(<span class="hljs-string">&#x27;New tag name&#x27;</span>)).<span class="hljs-title function_">toHaveValue</span>(<span class="hljs-string">&#x27;&#x27;</span>);
+</code></pre>
+<p>(The comment is left out, and the second <code>mockResolvedValueOnce</code> is one
+line in the file, split here to fit.)</p>
+<p><code>mockResolvedValueOnce</code> answers <strong>one</strong> call, then it's used up. Two of
+them line up two answers, in order. If the page didn't ask again,
+&quot;urgent&quot; would never appear, and the test would fail: so this test
+proves the page reloads after adding.</p>
+<p>The last line checks the other half of topic 08: the input is empty,
+because <code>onSubmit</code> returned <code>true</code>.</p>
+<h2>A default for every test</h2>
+<p>On the ticket's page, every test needs <code>getComments()</code> to answer
+something, but most don't care what. So the file sets a default:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 3.64: a default answer</span>
+<span class="hljs-comment">// (src/pages/TicketDetailPage.test.jsx, excerpt)</span>
+<span class="hljs-title function_">beforeEach</span>(<span class="hljs-function">() =&gt;</span> {
+  getComments.<span class="hljs-title function_">mockResolvedValue</span>([]);
+});
+</code></pre>
+<p><strong><code>beforeEach</code></strong> runs before every test in the <code>describe</code> block. The
+tests about comments set their own answer afterwards, which replaces
+this one for that test. <code>mockReset</code> (Stage 0, topic 08) wipes it after
+each test, and <code>beforeEach</code> sets it again for the next.</p>
+<h2>Try it</h2>
+<p>Remove <code>beforeEach</code> from <code>TicketDetailPage.test.jsx</code> and run the
+tests. Which tests fail, and why? (What does a <code>vi.mock()</code> fake return
+when nobody has said?) Put it back.</p>
+</div>
+    
+  </main>
+</body>
+</html>

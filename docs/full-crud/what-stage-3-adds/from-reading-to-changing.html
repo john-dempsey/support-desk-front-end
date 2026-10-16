@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>From Reading to Changing — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/fetching-from-the-api/making-it-yours/try-it-yourself.html">← Try It Yourself</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/what-stage-3-adds/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/what-stage-3-adds/three-new-routes.html">Three New Routes →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>From Reading to Changing</h1>
+    <p class="lede">Stage 2 could only read tickets. Stage 3 creates, edits and deletes them, and adds comments, tags, and a way to find tickets in a long list.</p>
+
+    
+
+    
+      <div class="slide-body"><p>At the end of Stage 2, the app could <strong>read</strong>: a list of tickets, and one
+ticket at a time. Every request it sent was a <code>GET</code>.</p>
+<p>The back-end could do more than that from Lesson 3, &quot;Full CRUD REST
+API&quot;: it can create, update and delete tickets, comments and tags.
+Stage 3 is the front-end's Lesson 3. It gives each of those a page, a
+form or a button, so the front-end can do everything CRUD stands for:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Stage 2</th>
+<th>Stage 3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>C</strong>reate</td>
+<td></td>
+<td>a ticket, a comment, a tag</td>
+</tr>
+<tr>
+<td><strong>R</strong>ead</td>
+<td>the list, one ticket</td>
+<td>the same, plus comments, tags and agents</td>
+</tr>
+<tr>
+<td><strong>U</strong>pdate</td>
+<td></td>
+<td>a ticket (including its status and agent), a tag's name</td>
+</tr>
+<tr>
+<td><strong>D</strong>elete</td>
+<td></td>
+<td>a ticket, a comment, a tag</td>
+</tr>
+</tbody>
+</table>
+<h2>The pages, and how they connect</h2>
+<p><img src="/support-desk-front-end/assets/images/stage-3-page-map.svg" alt="Diagram: five pages as boxes. Tickets, at /tickets, sends GET /tickets with the filter, sort and page (topic 09). A New ticket link goes to New ticket, at /tickets/new, which sends POST /tickets (topics 03 and 04); once saved, it goes to the new ticket's page. Clicking a subject in the list goes to A ticket, at /tickets/:ticketId, which gets the ticket and its comments, deletes the ticket (topic 06), and adds and deletes comments (topic 07); once deleted, it goes back to the list. An Edit ticket link goes to Edit ticket, at /tickets/:ticketId/edit, which gets the ticket and the agents and sends PATCH /tickets/:id (topic 05); once saved, it goes back to the ticket's page. Solid arrows are links; dashed arrows are navigate() after a change. Tags, at /tags, is reached from the navigation bar and sends GET, POST, PATCH and DELETE requests to /tags (topic 08)."></p>
+<p>Two kinds of arrow:</p>
+<ul>
+<li>a <strong>solid</strong> arrow is a link the user clicks, like every link so far</li>
+<li>a <strong>dashed</strong> arrow is new: after a change is saved, the page moves the
+user on by itself. After creating a ticket you see it; after deleting
+one, you're back at the list. Topic 03 shows how.</li>
+</ul>
+<h2>What this lesson covers</h2>
+<table>
+<thead>
+<tr>
+<th>Topic</th>
+<th>Idea</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>02</td>
+<td>Sending data with <code>POST</code>, <code>PATCH</code> and <code>DELETE</code></td>
+</tr>
+<tr>
+<td>03</td>
+<td>Creating a ticket: a form, and the page that sends it</td>
+</tr>
+<tr>
+<td>04</td>
+<td>When the API says no: showing its validation errors</td>
+</tr>
+<tr>
+<td>05</td>
+<td>Editing a ticket, its status and its agent</td>
+</tr>
+<tr>
+<td>06</td>
+<td>Deleting a ticket</td>
+</tr>
+<tr>
+<td>07</td>
+<td>Adding and deleting comments</td>
+</tr>
+<tr>
+<td>08</td>
+<td>Tags: a whole CRUD resource on one page</td>
+</tr>
+<tr>
+<td>09</td>
+<td>Filtering, sorting and paging the ticket list</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Testing forms and buttons</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Tracing a click, and doing the same for your own case study</td>
+</tr>
+</tbody>
+</table>
+<p>Topics 03 to 08 each add one feature, and each one builds on the topics
+before it. Topic 09 goes back to the list page.</p>
+<h2>Try it</h2>
+<p>With the API running and <code>npm run dev</code> started, open each URL in the
+diagram, using ticket 2 for <code>:ticketId</code>. Then click <strong>Tags</strong> in the
+navigation bar. Don't change anything yet: just find each page, and
+match it to its box.</p>
+<p>If every page says <strong>Invalid or expired token</strong>, your token from
+Stage 2 has run out: tokens last one day. Log in again in your REST
+client, and paste the new token into <code>.env</code> (Stage 2, topic 02, &quot;A
+Token Is Not a Setting&quot;). You'll need to do this each day you work on
+the app, until Stage 4 adds a login page.</p>
+</div>
+    
+  </main>
+</body>
+</html>

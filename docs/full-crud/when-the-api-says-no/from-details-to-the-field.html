@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>From details to the Field — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/when-the-api-says-no/keeping-the-whole-error.html">← Keeping the Whole Error</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/when-the-api-says-no/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/when-the-api-says-no/showing-it-under-the-field.html">Showing It Under the Field →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>From details to the Field</h1>
+    <p class="lede">getFieldError() looks through the error&#39;s details for one field&#39;s message. The form asks once for each of its fields.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Here's the whole path a validation message takes, from the back-end to
+the screen:</p>
+<p><img src="/support-desk-front-end/assets/images/details-to-the-field.svg" alt="Diagram: five steps. 1, validate.js in the back-end: the API answers 400, with a details list holding field 'subject' and message 'subject is required'. 2, client.js: apiRequest() throws an error with status 400, message 'Validation failed', and the details. 3, NewTicketPage.jsx: the page's catch keeps the whole error with setSaveError(error). 4, TicketForm.jsx: the form gets it as its error prop, and getFieldError(error, 'subject') gives 'subject is required'. 5, FieldError.jsx: FieldError shows it under Subject, and the input gets aria-invalid and aria-describedby, for screen readers."></p>
+<p>Steps 1 to 3 are already familiar. Step 4 is a small new function in
+<code>src/utils/</code>:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 3.17: one field&#x27;s message (src/utils/getFieldError.js)</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">getFieldError</span>(<span class="hljs-params">error, fieldName</span>) {
+  <span class="hljs-keyword">if</span> (!error || !error.<span class="hljs-property">details</span>) {
+    <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;&#x27;</span>;
+  }
+
+  <span class="hljs-keyword">const</span> problem = error.<span class="hljs-property">details</span>.<span class="hljs-title function_">find</span>(
+    <span class="hljs-function">(<span class="hljs-params">detail</span>) =&gt;</span> detail.<span class="hljs-property">field</span> === fieldName,
+  );
+  <span class="hljs-keyword">if</span> (!problem) {
+    <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;&#x27;</span>;
+  }
+
+  <span class="hljs-keyword">return</span> problem.<span class="hljs-property">message</span>;
+}
+</code></pre>
+<p>(The comment at the top is left out, and the <code>find()</code> line is split
+here to fit.)</p>
+<ul>
+<li><strong>No error, or no <code>details</code></strong> (a <code>403</code>, say): there's nothing to find,
+so it returns <code>''</code>.</li>
+<li><strong><code>find()</code></strong> goes through the list and returns the first item whose
+<code>field</code> matches, or <code>undefined</code> if none does. It's the same <code>find()</code>
+Stage 1 used to look up a ticket by its <code>id</code>.</li>
+<li><strong>Found it</strong>: return its <code>message</code>.</li>
+</ul>
+<p>It always returns a string, so the form can use the answer without
+checking for <code>null</code> or <code>undefined</code> first.</p>
+<h2>The form asks for each field</h2>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 3.18: asking for each field (src/components/TicketForm.jsx,</span>
+<span class="hljs-comment">// excerpt)</span>
+<span class="hljs-keyword">const</span> subjectError = <span class="hljs-title function_">getFieldError</span>(error, <span class="hljs-string">&#x27;subject&#x27;</span>);
+<span class="hljs-keyword">const</span> descriptionError = <span class="hljs-title function_">getFieldError</span>(error, <span class="hljs-string">&#x27;description&#x27;</span>);
+</code></pre>
+<p>These run on every render. Most of the time <code>error</code> is <code>null</code>, and both
+are <code>''</code>. After a <code>400</code>, each holds its field's message, or <code>''</code> if that
+field was fine.</p>
+<p>The field names are the <strong>API's</strong> names (<code>'subject'</code>, <code>'description'</code>),
+because they come from the back-end's <code>details</code>. That's one more reason
+the front-end uses the same names as the API everywhere.</p>
+<h2>Why a separate function?</h2>
+<p>Three forms in this stage need it (tickets, comments and tags). Written
+once in <code>utils/</code>, it's tested once, and every form uses it the same way.
+It works for any API that uses this error shape, so it'll work
+unchanged in your own front-end.</p>
+<h2>Try it</h2>
+<p>With Casey's token, send <code>POST /tickets</code> in your REST client with the
+body <code>{ &quot;subject&quot;: &quot;&quot;, &quot;description&quot;: &quot; &quot; }</code>. How many items are in
+<code>details</code>? Then type a subject of only spaces <strong>and</strong> a description of
+only spaces in the form. Does each message appear under the right
+field?</p>
+</div>
+    
+  </main>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Update, or Ask Again? — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/comments/deleting-a-comment.html">← Deleting a Comment</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/comments/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/tags/a-whole-resource-on-one-page.html">A Whole Resource on One Page →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Update, or Ask Again?</h1>
+    <p class="lede">After a change, a page can update the state it has from the response, or ask the API again. The edit page asks again; the comments update. Here&#39;s how to choose.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Every change in this lesson ends with the page showing the result. There
+have been two ways of doing that:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Ask the API again</th>
+<th>Update the state you have</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Where</strong></td>
+<td>creating, editing and deleting a ticket</td>
+<td>adding and deleting a comment</td>
+</tr>
+<tr>
+<td><strong>How</strong></td>
+<td><code>navigate()</code> to a page that loads fresh</td>
+<td><code>setComments(...)</code> with a new array</td>
+</tr>
+<tr>
+<td><strong>Requests</strong></td>
+<td>one more <code>GET</code></td>
+<td>none</td>
+</tr>
+<tr>
+<td><strong>Shows</strong></td>
+<td>exactly what the database has</td>
+<td>what the page <strong>worked out</strong> the database has</td>
+</tr>
+</tbody>
+</table>
+<h2>When updating is safe</h2>
+<p>The comments can be updated in place because the page knows <strong>exactly</strong>
+what changed, and <strong>where</strong>:</p>
+<ul>
+<li><strong>adding:</strong> the API sends back the whole saved comment, author
+included, and comments are sorted oldest first, so a new one always
+goes <strong>at the end</strong></li>
+<li><strong>deleting:</strong> a <code>204</code> means it's gone, so the list is the old one
+without it</li>
+</ul>
+<p>So the result is the same as asking again, without the wait or the
+extra request. That matters on a page the user stays on, adding comment
+after comment.</p>
+<h2>When to ask again</h2>
+<p>Asking again is simpler and always right. Choose it when the page
+can't easily work out the result itself:</p>
+<ul>
+<li>the API decides something the page can't predict, such as the order
+of a sorted list (you'll meet one later in this lesson)</li>
+<li>the change affects things the response doesn't include</li>
+<li>the page is leaving anyway, as after saving a ticket: the next page
+loads fresh at no extra cost</li>
+</ul>
+<h2>Neither shows other people's changes</h2>
+<p>If Alex adds a comment while you're looking at the ticket, you won't
+see it either way, until you reload the page. Showing other people's
+changes as they happen is what Stage 5's notifications are for.</p>
+<h2>Try it</h2>
+<p>Picture a <strong>Close ticket</strong> button on the ticket's page, which sends
+<code>PATCH /tickets/:id</code> with <code>{ &quot;status&quot;: &quot;closed&quot; }</code>, and stays on the
+page. Which way would you show the result? What does <code>updateTicket()</code>
+return that would help? Which piece of state would you change?</p>
+</div>
+    
+  </main>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Which Row Is Being Renamed? — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/tags/one-form-twice.html">← One Form, Used Twice</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/tags/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/tags/asking-again-for-a-sorted-list.html">Asking Again for a Sorted List →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Which Row Is Being Renamed?</h1>
+    <p class="lede">One piece of state, editingTagId, holds the id of the tag being renamed. Each row compares its own id with it, and shows either its name or a TagForm.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Clicking <strong>Rename</strong> turns that one row into a small form, with the
+tag's name ready to change. Clicking <strong>Cancel</strong>, or saving, turns it
+back. The page needs to remember <strong>which</strong> row, if any, is being
+renamed. One piece of state does it:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 3.45: which tag, if any (src/pages/TagsPage.jsx, excerpt)</span>
+<span class="hljs-keyword">const</span> [editingTagId, setEditingTagId] = <span class="hljs-title function_">useState</span>(<span class="hljs-literal">null</span>);
+<span class="hljs-comment">// ...</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">startRenaming</span>(<span class="hljs-params">tagId</span>) {
+  <span class="hljs-title function_">setRenameError</span>(<span class="hljs-literal">null</span>);
+  <span class="hljs-title function_">setEditingTagId</span>(tagId);
+}
+</code></pre>
+<p><code>null</code> means no tag is being renamed. Otherwise, it's the <code>id</code> of the
+one that is. Each row then asks: <strong>is it me?</strong></p>
+<p><img src="/support-desk-front-end/assets/images/which-tag-is-being-renamed.svg" alt="Diagram: on the left, the TagsPage state, editingTagId: 1. On the right, two rows. Billing's id is 2: 2 === 1? No, so the row shows its name, billing, with Rename and Delete buttons. Bug's id is 1: 1 === 1? Yes, so the row shows a TagForm instead, labelled New name for &quot;bug&quot;, with an input holding bug, and Save and Cancel buttons. Rename sets editingTagId to that tag's id. Cancel, or a successful save, sets it back to null."></p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 3.46: each row (src/pages/TagsPage.jsx, excerpt)</span>
+{tags.<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">tag</span>) =&gt;</span> (
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">li</span> <span class="hljs-attr">key</span>=<span class="hljs-string">{tag.id}</span>&gt;</span>
+    {tag.id === editingTagId ? (
+      <span class="hljs-tag">&lt;<span class="hljs-name">TagForm</span> <span class="hljs-attr">...</span> /&gt;</span>
+    ) : (
+      <span class="hljs-tag">&lt;&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">className</span>=<span class="hljs-string">&quot;tag-name&quot;</span>&gt;</span>{tag.name}<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">...</span> <span class="hljs-attr">onClick</span>=<span class="hljs-string">{()</span> =&gt;</span> startRenaming(tag.id)}&gt;
+          Rename
+        <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">...</span> <span class="hljs-attr">onClick</span>=<span class="hljs-string">{()</span> =&gt;</span> handleDeleteTag(tag)}&gt;
+          Delete
+        <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+      <span class="hljs-tag">&lt;/&gt;</span></span>
+    )}
+  &lt;/li&gt;
+))}
+</code></pre>
+<p>(<code>...</code> marks the props left out. Figure 3.44 shows the <code>TagForm</code>'s.)</p>
+<h2><code>? :</code> with JSX</h2>
+<p><code>condition ? (this) : (that)</code> is the same ternary you used for
+&quot;Unassigned&quot; in Stage 1, with a piece of JSX on each side instead of a
+string. <code>&amp;&amp;</code> shows something or nothing; <code>? :</code> shows <strong>one thing or the
+other</strong>.</p>
+<h2>Why an id, not true or false?</h2>
+<p>A <code>true</code>/<code>false</code> like <code>isRenaming</code> couldn't say <strong>which</strong> tag. A <code>true</code>
+or <code>false</code> per tag could, but then two rows could be in rename mode at
+once, and the page would need a way to keep them all. One id says both
+things at once: whether anything is being renamed, and what.</p>
+<p><code>startRenaming</code> also clears <code>renameError</code>, so an error from renaming
+one tag doesn't appear when you start renaming another.</p>
+<h2>Try it</h2>
+<p>Click <strong>Rename</strong> on one tag, and then, without cancelling, click
+<strong>Rename</strong> on another. What happens to the first? Why? Which single
+line made it happen?</p>
+</div>
+    
+  </main>
+</body>
+</html>

@@ -6,6 +6,9 @@ import NavBar from './components/NavBar.jsx';
 import HomePage from './pages/HomePage.jsx';
 import TicketListPage from './pages/TicketListPage.jsx';
 import TicketDetailPage from './pages/TicketDetailPage.jsx';
+import NewTicketPage from './pages/NewTicketPage.jsx';
+import EditTicketPage from './pages/EditTicketPage.jsx';
+import TagsPage from './pages/TagsPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 
 function App() {
@@ -19,6 +22,12 @@ function App() {
           {/* ":ticketId" matches any value, like "/tickets/:id" in Express.
               The page reads it with useParams(). */}
           <Route path="/tickets/:ticketId" element={<TicketDetailPage />} />
+          {/* "/tickets/new" also fits "/tickets/:ticketId", but a fixed
+              word is more specific than ":ticketId", so React Router picks
+              NewTicketPage. */}
+          <Route path="/tickets/new" element={<NewTicketPage />} />
+          <Route path="/tickets/:ticketId/edit" element={<EditTicketPage />} />
+          <Route path="/tags" element={<TagsPage />} />
 
           {/* "*" matches any URL that no other route matches. React Router
               always picks the most specific match, so order doesn't

@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Delete, Then Go Back — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/deleting-a-ticket/asking-first.html">← Asking First</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/deleting-a-ticket/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/comments/comments-on-the-ticket-page.html">Comments on the Ticket&#39;s Page →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Delete, Then Go Back</h1>
+    <p class="lede">If the user clicks OK, the page sends DELETE, then goes back to the list. If the API refuses, its message appears under the buttons.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Here's the whole of what happens after the user clicks <strong>Delete
+ticket</strong>:</p>
+<p><img src="/support-desk-front-end/assets/images/deleting-a-ticket.svg" alt="Diagram: a flowchart. 1, the user clicks Delete ticket. 2, window.confirm() asks &quot;Delete the ticket ...?&quot;. Cancel leads to nothing. OK leads to 3, deleteTicket(ticket.id), which sends DELETE /tickets/:id. On 204 No Content, navigate('/tickets'): the list loads, without the ticket, going from TicketDetailPage.jsx to TicketListPage.jsx. On 409, 403 or 404, the catch calls setDeleteErrorMessage(...), and the message shows under the buttons, in TicketDetailPage.jsx."></p>
+<p>And the rest of the function, after the confirmation:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 3.33: deleting (src/pages/TicketDetailPage.jsx, excerpt)</span>
+  <span class="hljs-title function_">setDeleteErrorMessage</span>(<span class="hljs-string">&#x27;&#x27;</span>);
+  <span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">await</span> <span class="hljs-title function_">deleteTicket</span>(ticket.<span class="hljs-property">id</span>);
+    <span class="hljs-title function_">navigate</span>(<span class="hljs-string">&#x27;/tickets&#x27;</span>);
+  } <span class="hljs-keyword">catch</span> (error) {
+    <span class="hljs-title function_">setDeleteErrorMessage</span>(error.<span class="hljs-property">message</span>);
+  }
+}
+</code></pre>
+<p>(The comments are left out.)</p>
+<p>It's the same shape as <code>handleCreate</code> and <code>handleSave</code>: clear the old
+error, try the request, then either move on or keep the error.</p>
+<ul>
+<li><strong>It worked</strong> (<code>204</code>): <code>deleteTicket()</code> returns nothing (topic 02),
+and there's nothing on this page left to show. <code>navigate('/tickets')</code>
+goes to the list, which loads fresh from the API, so the ticket isn't
+in it.</li>
+<li><strong>It failed</strong>: the message goes into <code>deleteErrorMessage</code>, and
+<code>ErrorMessage</code> shows it under the buttons (Figure 3.31). The ticket is
+still there, so the page stays.</li>
+</ul>
+<h2>Just the message, this time</h2>
+<p><code>handleCreate</code> kept the <strong>whole</strong> error, because a form needs its
+<code>details</code> (topic 04). Deleting has no form and no fields, so there are
+no details to show. A string is all the page needs, as in Stage 2.</p>
+<h2>What can go wrong</h2>
+<table>
+<thead>
+<tr>
+<th>Status</th>
+<th>When</th>
+<th>Message</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>409</code></td>
+<td>the ticket still has comments (ticket 1 has one)</td>
+<td>This record cannot be deleted or changed because other records still depend on it</td>
+</tr>
+<tr>
+<td><code>403</code></td>
+<td>the token isn't an agent's or admin's</td>
+<td>You do not have permission to perform this action</td>
+</tr>
+<tr>
+<td><code>404</code></td>
+<td>someone else deleted it first</td>
+<td>Ticket 5 not found</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>409</code> message is the API's own, and it's not very friendly. The
+page could check <code>error.status</code> and say &quot;Delete this ticket's comments
+first&quot; for a <code>409</code> instead. You'll see a page reword an API message
+like that later in this lesson.</p>
+<h2>Clearing it for the next ticket</h2>
+<p><code>deleteErrorMessage</code> is reset in the page's effect cleanup, with the
+rest of the page's state (Stage 2, topic 05). So a &quot;cannot be deleted&quot;
+message about ticket 1 doesn't follow the user to ticket 2.</p>
+<h2>Try it</h2>
+<p>With Ada's token:</p>
+<ol>
+<li>Try to delete ticket 1. What does the page say? Why?</li>
+<li>Open one of the tickets you created as Casey in <strong>two</strong> tabs. Delete
+it in the first tab. In the second, click <strong>Delete ticket</strong> and OK.
+What happens, and why is it a <code>404</code> and not a <code>204</code>?</li>
+</ol>
+</div>
+    
+  </main>
+</body>
+</html>

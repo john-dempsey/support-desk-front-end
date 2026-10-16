@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saving, and Going Back — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/editing-a-ticket/one-list-of-statuses.html">← One List of Statuses</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/editing-a-ticket/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/deleting-a-ticket/a-link-and-a-button.html">A Link and a Button →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Saving, and Going Back</h1>
+    <p class="lede">handleSave sends PATCH, then returns to the ticket&#39;s page, which loads the ticket fresh. There&#39;s no state to update by hand.</p>
+
+    
+
+    
+      <div class="slide-body"><p>When the user clicks <strong>Save changes</strong>, <code>TicketForm</code> calls <code>onSubmit</code>
+with the values, exactly as before. On this page, that's <code>handleSave</code>:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 3.30: saving the changes (src/pages/EditTicketPage.jsx,</span>
+<span class="hljs-comment">// excerpt)</span>
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">handleSave</span>(<span class="hljs-params">changes</span>) {
+  <span class="hljs-title function_">setSaveError</span>(<span class="hljs-literal">null</span>);
+  <span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">await</span> <span class="hljs-title function_">updateTicket</span>(ticketId, changes);
+    <span class="hljs-title function_">navigate</span>(<span class="hljs-string">`/tickets/<span class="hljs-subst">${ticketId}</span>`</span>);
+  } <span class="hljs-keyword">catch</span> (error) {
+    <span class="hljs-title function_">setSaveError</span>(error);
+  }
+}
+</code></pre>
+<p>(The comment is left out.)</p>
+<p>Put it next to <code>handleCreate</code> (Figure 3.12). Only two things differ:
+<code>updateTicket()</code> instead of <code>createTicket()</code>, and where it goes after
+saving. It uses <code>ticketId</code> from the URL, because the ticket already
+exists.</p>
+<h2>What about the saved ticket?</h2>
+<p><code>updateTicket()</code> returns the ticket as it is after the change (topic 02).
+<code>handleSave</code> doesn't even keep it. Why not?</p>
+<p>Because the page it goes to, <code>TicketDetailPage</code>, <strong>loads the ticket from
+the API</strong> every time it appears (Stage 2). So it shows exactly what was
+saved, including things the front-end didn't send, like the new
+<code>updatedAt</code> time. There's no copy of the ticket on this page to keep up
+to date by hand.</p>
+<p>This is one of two ways to show the result of a change:</p>
+<ul>
+<li><strong>ask the API again</strong>, as here: the simplest, and always right</li>
+<li><strong>update the state you already have</strong> from the response, which saves a
+request</li>
+</ul>
+<p>Topic 07 uses the second way for comments, and explains when it's
+worth it.</p>
+<h2>The back-end reacts</h2>
+<p>A <code>PATCH</code> does more than change a row. In back-end Lesson 5,
+<code>ticket.service.js</code> fires <strong>domain events</strong> when a ticket's status
+changes or it's assigned to an agent, and a listener sends an email for
+each. Mailpit catches them, at <a href="http://localhost:8025">http://localhost:8025</a>:</p>
+<table>
+<thead>
+<tr>
+<th>Change</th>
+<th>Who's emailed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>the status</td>
+<td>the ticket's customer</td>
+</tr>
+<tr>
+<td>the assigned agent</td>
+<td>the agent</td>
+</tr>
+</tbody>
+</table>
+<p>The service compares the ticket before and after, so saving without
+changing the status or the agent sends no email.</p>
+<p>(If your own API doesn't have Lesson 5's events, nothing is emailed,
+and everything else works the same.)</p>
+<h2>Try it</h2>
+<p>Open Mailpit in another tab. Change ticket 2's status and save. Who got
+an email? Now open the edit page again and save without changing
+anything. Did anyone get one this time? Assign ticket 2 to Alex: who
+was emailed now?</p>
+</div>
+    
+  </main>
+</body>
+</html>

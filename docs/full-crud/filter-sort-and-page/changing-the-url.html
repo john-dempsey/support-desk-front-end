@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Changing the URL — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/filter-sort-and-page/from-the-url-to-the-api.html">← From the URL to the API</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/filter-sort-and-page/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/filter-sort-and-page/pages-of-tickets.html">Pages of Tickets →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Changing the URL</h1>
+    <p class="lede">Choosing a filter or a page makes a new copy of the query, changes it, and hands it to setSearchParams(). The URL changes, and the effect does the rest.</p>
+
+    
+
+    
+      <div class="slide-body"><p>When the user chooses a status, the page doesn't load anything itself.
+It only changes the URL:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 3.55: changing the query (src/pages/TicketListPage.jsx,</span>
+<span class="hljs-comment">// excerpt)</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">handleFilterChange</span>(<span class="hljs-params">name, value</span>) {
+  <span class="hljs-keyword">const</span> newSearchParams = <span class="hljs-keyword">new</span> <span class="hljs-title class_">URLSearchParams</span>(searchParams);
+  <span class="hljs-keyword">if</span> (value) {
+    newSearchParams.<span class="hljs-title function_">set</span>(name, value);
+  } <span class="hljs-keyword">else</span> {
+    newSearchParams.<span class="hljs-title function_">delete</span>(name);
+  }
+  newSearchParams.<span class="hljs-title function_">delete</span>(<span class="hljs-string">&#x27;page&#x27;</span>);
+  <span class="hljs-title function_">setSearchParams</span>(newSearchParams);
+}
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">handlePageChange</span>(<span class="hljs-params">newPage</span>) {
+  <span class="hljs-keyword">const</span> newSearchParams = <span class="hljs-keyword">new</span> <span class="hljs-title class_">URLSearchParams</span>(searchParams);
+  newSearchParams.<span class="hljs-title function_">set</span>(<span class="hljs-string">&#x27;page&#x27;</span>, newPage);
+  <span class="hljs-title function_">setSearchParams</span>(newSearchParams);
+}
+</code></pre>
+<p>(The comments are left out.)</p>
+<p>Then the loop from the previous slide takes over: the URL changes,
+<code>queryString</code> changes, and the effect loads the matching tickets.</p>
+<h2>A copy, not the original</h2>
+<p><code>new URLSearchParams(searchParams)</code> makes a <strong>copy</strong> of the current
+query. The page changes the copy, and hands it to <code>setSearchParams()</code>.
+It's the rule from topic 07: never change what React gave you; make a
+new one.</p>
+<h2><code>set()</code> and <code>delete()</code></h2>
+<ul>
+<li><strong><code>set(name, value)</code></strong> adds the parameter, or replaces it if it's
+there already: <code>status=open</code> becomes <code>status=closed</code>.</li>
+<li><strong><code>delete(name)</code></strong> takes it out. Choosing <strong>All statuses</strong> sends <code>''</code>,
+so <code>status</code> is removed, and the API uses its default: every status.</li>
+</ul>
+<h2>Back to page 1</h2>
+<p><code>delete('page')</code> runs for <strong>every</strong> filter or sort change. Say you're on
+page 3 of every ticket, and choose <strong>Open</strong>: there might only be one
+page of open tickets, so &quot;page 3&quot; would be empty. Starting again from
+page 1 makes sense to a user, too.</p>
+<p><code>handlePageChange</code> changes only <code>page</code>, and keeps everything else, so
+the filter and order stay as they are while you move through the pages.</p>
+<h2>The Back button</h2>
+<p>By default, <code>setSearchParams()</code> adds a new entry to the browser's
+history, just like clicking a link. So every choice can be undone with
+<strong>Back</strong>, one at a time.</p>
+<h2>Try it</h2>
+<p>Choose <strong>Open</strong>, then sort by <strong>Subject</strong>, then <strong>Ascending</strong>. Watch the
+address bar after each one. Now press <strong>Back</strong> three times. What
+happens at each step, and why didn't the page need any code for it?</p>
+</div>
+    
+  </main>
+</body>
+</html>

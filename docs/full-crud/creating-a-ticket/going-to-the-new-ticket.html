@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Going to the New Ticket — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/creating-a-ticket/handling-the-submit.html">← Handling the Submit</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/creating-a-ticket/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/creating-a-ticket/following-a-new-ticket.html">Following a New Ticket →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Going to the New Ticket</h1>
+    <p class="lede">handleCreate sends the ticket, then uses navigate() to go to its page, the front-end&#39;s version of a redirect. If it fails, it keeps the error.</p>
+
+    
+
+    
+      <div class="slide-body"><p>This is the function the form calls:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 3.12: sending the new ticket (src/pages/NewTicketPage.jsx,</span>
+<span class="hljs-comment">// excerpt)</span>
+<span class="hljs-keyword">const</span> navigate = <span class="hljs-title function_">useNavigate</span>();
+<span class="hljs-keyword">const</span> [saveError, setSaveError] = <span class="hljs-title function_">useState</span>(<span class="hljs-literal">null</span>);
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">handleCreate</span>(<span class="hljs-params">newTicket</span>) {
+  <span class="hljs-title function_">setSaveError</span>(<span class="hljs-literal">null</span>);
+  <span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">const</span> savedTicket = <span class="hljs-keyword">await</span> <span class="hljs-title function_">createTicket</span>(newTicket);
+    <span class="hljs-title function_">navigate</span>(<span class="hljs-string">`/tickets/<span class="hljs-subst">${savedTicket.id}</span>`</span>);
+  } <span class="hljs-keyword">catch</span> (error) {
+    <span class="hljs-title function_">setSaveError</span>(error);
+  }
+}
+</code></pre>
+<p>(The comments are left out.)</p>
+<p>Step by step:</p>
+<ol>
+<li><strong><code>setSaveError(null)</code></strong> clears the error from any earlier attempt,
+so an old message doesn't stay on screen.</li>
+<li><strong><code>createTicket(newTicket)</code></strong> sends <code>POST /tickets</code> (topic 02) and
+waits for the saved ticket.</li>
+<li>If that worked, <strong><code>navigate(...)</code></strong> goes to the new ticket's page.</li>
+<li>If it threw, <strong><code>setSaveError(error)</code></strong> keeps the error, the page
+re-renders, and the form gets it as its <code>error</code> prop. Topic 04 shows
+what the form does with it.</li>
+</ol>
+<p>The <code>try</code>/<code>catch</code> is the same shape as the pages' <code>useEffect</code>s in
+Stage 2, without the <code>ignore</code> flag. That flag guarded against a
+response arriving after the user had moved on; here, the user is the
+one waiting for the answer.</p>
+<h2><code>useNavigate()</code></h2>
+<p>So far, only the user has changed the URL, by clicking a <code>&lt;Link&gt;</code>.
+<strong><code>useNavigate()</code></strong>, from React Router, gives the page a function that
+changes it from code:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-title function_">navigate</span>(<span class="hljs-string">&#x27;/tickets/5&#x27;</span>);
+</code></pre>
+<p>It's the same as clicking a link to <code>/tickets/5</code>: no reload, and React
+Router shows <code>TicketDetailPage</code>, which loads ticket 5 from the API.</p>
+<p>It's the front-end's version of what a Laravel controller does after
+saving: <code>return redirect()-&gt;route('tickets.show', $ticket)</code>. The one
+thing it needs is the new ticket's <code>id</code>, which the API sent back
+(topic 02).</p>
+<h2>Why the page, not the form?</h2>
+<p>Where to go after saving is the page's decision. After <strong>creating</strong>, it
+makes sense to see the new ticket. Another page using the same form
+might go somewhere else, or nowhere. So <code>navigate()</code> is in
+<code>NewTicketPage</code>, and <code>TicketForm</code> doesn't know it happens.</p>
+<h2>Try it</h2>
+<p>Create a ticket (slide 07 shows how), and then press the browser's
+<strong>Back</strong> button. Where do you end up? What's in the form? Why? Now
+change the <code>navigate()</code> line to go to <code>/tickets</code> instead, and create
+another. Which do you prefer? Put it back.</p>
+</div>
+    
+  </main>
+</body>
+</html>

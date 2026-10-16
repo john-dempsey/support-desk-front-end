@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Choices in the URL — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/tags/in-the-users-words.html">← In the User&#39;s Words</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/filter-sort-and-page/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/filter-sort-and-page/reading-the-url.html">Reading the URL →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Choices in the URL</h1>
+    <p class="lede">The list&#39;s filter, sort order and page number are kept in the URL, not in useState, so a refresh, the Back button and a shared link all keep them.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The Tickets page now has three dropdowns above the list, <strong>Status</strong>,
+<strong>Sort by</strong> and <strong>Order</strong>, and <strong>Previous</strong> and <strong>Next</strong> buttons below
+it when there's more than one page.</p>
+<p>The API has done the hard part since Lesson 3: <code>GET /tickets</code> already
+takes <code>status</code>, <code>sortBy</code>, <code>order</code>, <code>page</code> and <code>pageSize</code> as query
+parameters. The front-end only has to send the user's choices.</p>
+<h2>Where to keep the choices?</h2>
+<p>Each choice could be a piece of state:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-keyword">const</span> [status, setStatus] = <span class="hljs-title function_">useState</span>(<span class="hljs-string">&#x27;&#x27;</span>);
+</code></pre>
+<p>That would work, until the user:</p>
+<ul>
+<li><strong>refreshes</strong> the page: state starts again from scratch, so the
+filter is gone</li>
+<li>clicks a ticket and presses <strong>Back</strong>: the list page appears again,
+with new state, so the filter is gone</li>
+<li><strong>copies the link</strong> to send to a colleague: the link is just
+<code>/tickets</code>, so the filter is gone</li>
+</ul>
+<p>So the choices go in the <strong>URL</strong> instead, as a <strong>query string</strong>:</p>
+<pre><code class="hljs">/tickets?status=open&amp;sortBy=subject&amp;order=asc&amp;page=2
+</code></pre>
+<p>The URL survives all three. It's also how Laravel's pagination worked:
+<code>$tickets-&gt;links()</code> made links like <code>?page=2</code>, and a <code>GET</code> search form
+put its fields in the query string.</p>
+<h2>The API's names</h2>
+<p>The URL uses <strong>exactly</strong> the API's names for its parameters. That's the
+trick that keeps this simple: the page can pass its own query string
+straight to the API, without translating anything (slide 03).</p>
+<h2>Try it</h2>
+<p>Before reading the code, type these into the address bar, one at a
+time, with Ada's token. Which dropdowns change? What does the list
+show?</p>
+<ol>
+<li><code>/tickets?status=open</code></li>
+<li><code>/tickets?sortBy=subject&amp;order=asc</code></li>
+<li><code>/tickets?pageSize=2</code></li>
+<li><code>/tickets?status=done</code></li>
+</ol>
+</div>
+    
+  </main>
+</body>
+</html>

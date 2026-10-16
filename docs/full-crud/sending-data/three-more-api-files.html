@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Three More API Files — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/sending-data/delete-and-the-empty-answer.html">← DELETE, and the Empty Answer</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/sending-data/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/creating-a-ticket/the-page-and-the-form.html">The Page and the Form →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Three More API Files</h1>
+    <p class="lede">Comments, tags and agents each get their own file in src/api/, with the same shape as tickets.api.js. Each one is shown in the topic that uses it.</p>
+
+    
+
+    
+      <div class="slide-body"><p><code>tickets.api.js</code> is no longer the only API module. Stage 3 adds three
+more, one per resource, just as the back-end has one service per
+resource:</p>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Functions</th>
+<th>Back-end routes</th>
+<th>Shown in</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>users.api.js</code></td>
+<td><code>getAgents()</code></td>
+<td><code>GET /users?role=agent</code></td>
+<td>topic 05</td>
+</tr>
+<tr>
+<td><code>comments.api.js</code></td>
+<td><code>getComments()</code>, <code>createComment()</code>, <code>deleteComment()</code></td>
+<td><code>/tickets/:ticketId/comments</code></td>
+<td>topic 07</td>
+</tr>
+<tr>
+<td><code>tags.api.js</code></td>
+<td><code>getTags()</code>, <code>createTag()</code>, <code>updateTag()</code>, <code>deleteTag()</code></td>
+<td><code>/tags</code></td>
+<td>topic 08</td>
+</tr>
+</tbody>
+</table>
+<p>Each function has the same three steps as Figures 3.3 to 3.5. Here's
+the shortest one, which fills the &quot;Assigned to&quot; dropdown on the edit
+page:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 3.6: the list of agents (src/api/users.api.js, excerpt)</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">getAgents</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> responseBody = <span class="hljs-keyword">await</span> <span class="hljs-title function_">apiRequest</span>(<span class="hljs-string">&#x27;/users?role=agent&#x27;</span>);
+  <span class="hljs-keyword">return</span> responseBody.<span class="hljs-property">data</span>;
+}
+</code></pre>
+<p>The query string is part of the path. The page that calls <code>getAgents()</code>
+doesn't need to know the API filters users by role. It just asks for
+agents.</p>
+<h2>Why <code>/users</code> exists</h2>
+<p>The back-end got <code>GET /users</code> in Lesson 7, &quot;Preparing the API for a
+Client&quot;. Without it, the edit page would have no way to find out which
+agents there are, so an admin could never choose who to assign a ticket
+to. The front-end needed it, so the back-end added it: the two halves
+are designed together.</p>
+<h2>Why one file per resource</h2>
+<p>The pages read better for it:</p>
+<pre><code class="hljs language-js"><span class="hljs-keyword">import</span> { getComments, createComment } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;../api/comments.api.js&#x27;</span>;
+</code></pre>
+<p>says exactly where comments come from. And each file is small enough to
+read in one go. One long <code>api.js</code> with every function would work, but
+it would be the front-end's version of a single back-end file holding
+every route.</p>
+<h2>Try it</h2>
+<p>Before you look at it, write <code>comments.api.js</code>'s <code>getComments(ticketId)</code>
+yourself from the table above. (Stage 2's first slide on
+<code>tickets.api.js</code> asked you to try this, as <code>getTicketComments()</code>.) Then
+compare it with the real file.
+What does <code>createComment(ticketId, commentText)</code> have to send as its
+body? Check the back-end's <code>createCommentSchema</code>.</p>
+</div>
+    
+  </main>
+</body>
+</html>

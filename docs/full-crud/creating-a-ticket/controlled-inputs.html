@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Controlled Inputs — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/creating-a-ticket/the-page-and-the-form.html">← The Page and the Form</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/creating-a-ticket/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/creating-a-ticket/a-function-as-a-prop.html">A Function as a Prop →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Controlled Inputs</h1>
+    <p class="lede">Each input shows a piece of state, and typing updates the state. React, not the input, holds the value.</p>
+
+    
+
+    
+      <div class="slide-body"><p>In a Blade form, the browser keeps what you type <strong>inside the input</strong>.
+Nothing reads it until the form is posted, and then Laravel finds it in
+<code>$request-&gt;input('subject')</code>.</p>
+<p>A React form usually works the other way round. Each input's value
+lives in <strong>state</strong>, and the input just shows it:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 3.8: the subject input (src/components/TicketForm.jsx, excerpt)</span>
+<span class="hljs-keyword">const</span> [subject, setSubject] = <span class="hljs-title function_">useState</span>(initialValues.<span class="hljs-property">subject</span>);
+<span class="hljs-comment">// ...</span>
+<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">input</span>
+  <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;ticket-subject&quot;</span>
+  <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;text&quot;</span>
+  <span class="hljs-attr">required</span>
+  <span class="hljs-attr">maxLength</span>=<span class="hljs-string">{200}</span>
+  <span class="hljs-attr">value</span>=<span class="hljs-string">{subject}</span>
+  <span class="hljs-attr">onChange</span>=<span class="hljs-string">{(event)</span> =&gt;</span> setSubject(event.target.value)}
+/&gt;</span>
+</code></pre>
+<p>(Two more lines in the <code>&lt;input&gt;</code>, starting with <code>aria-</code>, are left out
+here. Topic 04 explains them.)</p>
+<p>This is called a <strong>controlled input</strong>: React controls what it shows.</p>
+<h2>One keypress</h2>
+<p>Two props make it work:</p>
+<ul>
+<li><strong><code>value={subject}</code></strong> says &quot;show whatever is in <code>subject</code>&quot;. Not what
+was typed: what's in <strong>state</strong>.</li>
+<li><strong><code>onChange</code></strong> runs on every keypress. <code>event.target</code> is the input,
+and <code>event.target.value</code> is what it <em>would</em> now show, with the new
+character. <code>setSubject()</code> saves that into state.</li>
+</ul>
+<p>So typing a &quot;P&quot; goes round a small loop:</p>
+<ol>
+<li>The user presses <strong>P</strong>. <code>onChange</code> runs.</li>
+<li><code>setSubject('P')</code> changes the state.</li>
+<li>React re-renders <code>TicketForm</code>, and <code>value={subject}</code> now shows &quot;P&quot;.</li>
+</ol>
+<p>It all happens in a few milliseconds, so it looks the same as a normal
+input. The difference is that <strong>the current value is always in a
+variable</strong>, ready to send, check or show somewhere else.</p>
+<p><code>initialValues.subject</code> is the value the state starts with. For a new
+ticket, it's <code>''</code>, an empty string. Topic 05 starts it with an existing
+ticket's subject instead.</p>
+<h2>One state per input</h2>
+<p>The description <code>&lt;textarea&gt;</code> works the same way, with its own
+<code>description</code> state and <code>setDescription()</code>. In JSX, a <code>&lt;textarea&gt;</code> takes
+<code>value</code> like an <code>&lt;input&gt;</code>, not text between its tags as in HTML.</p>
+<h2>Try it</h2>
+<p>Delete <code>onChange={...}</code> from the subject input, save, and try typing
+into <strong>Subject</strong> on the new ticket page. What happens? Why? Look in the
+browser's console: what does React warn you about? Put the line back.</p>
+</div>
+    
+  </main>
+</body>
+</html>

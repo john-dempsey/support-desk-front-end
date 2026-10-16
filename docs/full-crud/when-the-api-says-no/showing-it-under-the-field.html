@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Showing It Under the Field — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/when-the-api-says-no/from-details-to-the-field.html">← From details to the Field</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/when-the-api-says-no/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/editing-a-ticket/the-edit-page.html">The Edit Page →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Showing It Under the Field</h1>
+    <p class="lede">FieldError shows the message, and two aria attributes link it to its input, so a screen reader reads it out and the input is marked as having a problem.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The message is shown by a small new component:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 3.19: one field&#x27;s error (src/components/FieldError.jsx)</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">FieldError</span>(<span class="hljs-params">{ id, message }</span>) {
+  <span class="hljs-keyword">if</span> (!message) {
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;
+  }
+
+  <span class="hljs-keyword">return</span> (
+    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">p</span> <span class="hljs-attr">id</span>=<span class="hljs-string">{id}</span> <span class="hljs-attr">className</span>=<span class="hljs-string">&quot;field-error&quot;</span>&gt;</span>
+      {message}
+    <span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span></span>
+  );
+}
+</code></pre>
+<p>(The comment at the top is left out.)</p>
+<p>When <code>message</code> is <code>''</code>, it returns <code>null</code>, which React shows as
+nothing. Otherwise, a paragraph with the message, and an <strong><code>id</code></strong>.</p>
+<h2>Linking it to the input</h2>
+<p>Seeing a message under a box is enough for most users. A screen reader
+user moving through the form needs to <strong>hear</strong> it, at the moment they
+reach the input. Two attributes do that:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 3.20: the subject input, in full (src/components/TicketForm.jsx,</span>
+<span class="hljs-comment">// excerpt)</span>
+&lt;input
+  id=<span class="hljs-string">&quot;ticket-subject&quot;</span>
+  type=<span class="hljs-string">&quot;text&quot;</span>
+  required
+  maxLength={<span class="hljs-number">200</span>}
+  value={subject}
+  onChange={<span class="hljs-function">(<span class="hljs-params">event</span>) =&gt;</span> <span class="hljs-title function_">setSubject</span>(event.<span class="hljs-property">target</span>.<span class="hljs-property">value</span>)}
+  aria-invalid={<span class="hljs-title class_">Boolean</span>(subjectError)}
+  aria-describedby={
+    subjectError ? <span class="hljs-string">&#x27;ticket-subject-error&#x27;</span> : <span class="hljs-literal">undefined</span>
+  }
+/&gt;
+<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">FieldError</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;ticket-subject-error&quot;</span> <span class="hljs-attr">message</span>=<span class="hljs-string">{subjectError}</span> /&gt;</span></span>
+</code></pre>
+<p>(The <code>aria-describedby</code> line is one line in the file. It's split here
+to fit.)</p>
+<ul>
+<li><strong><code>aria-invalid</code></strong> tells assistive technology the value has a problem.
+<code>Boolean('')</code> is <code>false</code> and <code>Boolean('subject is required')</code> is
+<code>true</code>, so it's <code>&quot;true&quot;</code> only when there's a message.</li>
+<li><strong><code>aria-describedby</code></strong> names the <code>id</code> of the element that describes the
+input. When the user reaches <strong>Subject</strong>, a screen reader reads its
+label, then the message, something like &quot;Subject, invalid entry,
+subject is required&quot; (each screen reader words it a little
+differently). When there's no message, the value is <code>undefined</code>, and
+React leaves the attribute out altogether, so it never points at an
+element that isn't there.</li>
+</ul>
+<p>The <code>id</code> on <code>FieldError</code> and the value of <code>aria-describedby</code> must match
+exactly. The description textarea does the same, with
+<code>ticket-description-error</code>.</p>
+<h2>Not by colour alone</h2>
+<pre><code class="hljs language-css"><span class="hljs-comment">/* Figure 3.21: a field with a problem (src/index.css, excerpt) */</span>
+<span class="hljs-selector-attr">[aria-invalid=<span class="hljs-string">&#x27;true&#x27;</span>]</span> {
+  <span class="hljs-attribute">border</span>: <span class="hljs-number">2px</span> solid <span class="hljs-built_in">var</span>(--colour-error-text);
+}
+</code></pre>
+<p>The CSS uses the same <code>aria-invalid</code> attribute to give the input a
+thicker, red border. The border isn't the only sign, though: the
+message is there in words. Someone who can't tell red from grey still
+knows what's wrong (Stage 0, topic 07).</p>
+<h2>Try it</h2>
+<p>Make the API reject the subject (three spaces, with Casey's token).
+Then, in the browser's developer tools, select the <strong>Subject</strong> input
+and open the <strong>Accessibility</strong> pane (in Chrome, next to <strong>Styles</strong>).
+What do <strong>Name</strong>, <strong>Description</strong> and <strong>Invalid user input</strong> say?
+Correct the subject and submit again. What happens to them?</p>
+</div>
+    
+  </main>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Asking First — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/deleting-a-ticket/a-link-and-a-button.html">← A Link and a Button</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/deleting-a-ticket/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/deleting-a-ticket/delete-then-go-back.html">Delete, Then Go Back →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Asking First</h1>
+    <p class="lede">Deleting can&#39;t be undone, so handleDeleteTicket asks with window.confirm() first. If the user clicks Cancel, nothing happens.</p>
+
+    
+
+    
+      <div class="slide-body"><p>A deleted ticket is gone: there's no bin to get it back from. One
+mis-click shouldn't be enough to lose it, so the first thing
+<code>handleDeleteTicket</code> does is ask:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 3.32: asking first (src/pages/TicketDetailPage.jsx, excerpt)</span>
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">handleDeleteTicket</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> isConfirmed = <span class="hljs-variable language_">window</span>.<span class="hljs-title function_">confirm</span>(
+    <span class="hljs-string">`Delete the ticket &quot;<span class="hljs-subst">${ticket.subject}</span>&quot;? This can&#x27;t be undone.`</span>,
+  );
+  <span class="hljs-keyword">if</span> (!isConfirmed) {
+    <span class="hljs-keyword">return</span>;
+  }
+
+  <span class="hljs-comment">// ... the next slide</span>
+}
+</code></pre>
+<p>(The comment is left out, and <code>window.confirm(...)</code> is one line in the
+file, split here to fit.)</p>
+<h2><code>window.confirm()</code></h2>
+<p><code>window.confirm()</code> is built into every browser. It shows a small box
+with a message and two buttons, <strong>OK</strong> and <strong>Cancel</strong>, and returns
+<code>true</code> for OK and <code>false</code> for Cancel.</p>
+<p>Until the user answers, the page is <strong>frozen</strong>: no other code runs, and
+nothing else on the page can be clicked. That's why it can return the
+answer straight away, without a promise or <code>await</code>.</p>
+<p>The message names the ticket, so the user can check it's the one they
+meant: &quot;Delete the ticket &quot;Invoice discrepancy&quot;? This can't be undone.&quot;</p>
+<h2>Return early</h2>
+<p>If the user clicks Cancel, <code>isConfirmed</code> is <code>false</code>, and <code>return</code> ends
+the function there. No request is sent and no state changes. This
+<strong>early return</strong> keeps the rest of the function about the real work,
+not wrapped inside an <code>if</code>.</p>
+<h2>Good enough, for now</h2>
+<p><code>window.confirm()</code> is quick to write, and browsers make it work with the
+keyboard and screen readers. But you can't style it, its title shows
+the page's address, and it looks different in every browser. Most apps
+build their own dialog instead, which is more work to make accessible.
+For this stage, the built-in one is the right choice, and building your
+own is a good challenge for later.</p>
+<h2>Try it</h2>
+<p>Change the message so it also includes the ticket's id. Then, in the
+browser's console, type <code>window.confirm('Sure?')</code> and press Enter.
+Click each button in turn. What does the console show each time?</p>
+</div>
+    
+  </main>
+</body>
+</html>

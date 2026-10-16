@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Deleting a Tag — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/tags/asking-again-for-a-sorted-list.html">← Asking Again for a Sorted List</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/tags/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/tags/in-the-users-words.html">In the User&#39;s Words →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Deleting a Tag</h1>
+    <p class="lede">Deleting a tag doesn&#39;t change the order of the others, so the page just leaves it out of its list. A tag that&#39;s on a ticket can&#39;t be deleted.</p>
+
+    
+
+    
+      <div class="slide-body"><pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 3.49: deleting a tag (src/pages/TagsPage.jsx, excerpt)</span>
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">handleDeleteTag</span>(<span class="hljs-params">tagToDelete</span>) {
+  <span class="hljs-keyword">const</span> isConfirmed = <span class="hljs-variable language_">window</span>.<span class="hljs-title function_">confirm</span>(
+    <span class="hljs-string">`Delete the tag &quot;<span class="hljs-subst">${tagToDelete.name}</span>&quot;?`</span>,
+  );
+  <span class="hljs-keyword">if</span> (!isConfirmed) {
+    <span class="hljs-keyword">return</span>;
+  }
+
+  <span class="hljs-title function_">setDeleteErrorMessage</span>(<span class="hljs-string">&#x27;&#x27;</span>);
+  <span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">await</span> <span class="hljs-title function_">deleteTag</span>(tagToDelete.<span class="hljs-property">id</span>);
+    <span class="hljs-title function_">setTags</span>(tags.<span class="hljs-title function_">filter</span>(<span class="hljs-function">(<span class="hljs-params">tag</span>) =&gt;</span> tag.<span class="hljs-property">id</span> !== tagToDelete.<span class="hljs-property">id</span>));
+  } <span class="hljs-keyword">catch</span> (error) {
+    <span class="hljs-title function_">setDeleteErrorMessage</span>(error.<span class="hljs-property">message</span>);
+  }
+}
+</code></pre>
+<p>(The comment is left out, and <code>window.confirm(...)</code> is one line in the
+file, split here to fit.)</p>
+<p>It's <code>handleDeleteComment</code> (topic 07) with tags instead of comments:
+confirm, send <code>DELETE</code>, then <code>filter()</code> the tag out of the list.</p>
+<h2>Why not ask again this time?</h2>
+<p>Adding and renaming ask the API again, because they can change the
+order. Deleting can't: take one tag out of a sorted list, and the rest
+are still sorted. So the page knows exactly what the new list is, and
+<code>filter()</code> is enough. The right choice depends on the change, not on
+the page.</p>
+<h2>Tags on tickets</h2>
+<p>Try to delete <strong>bug</strong> or <strong>billing</strong>, the two seeded tags. The API
+answers <code>409</code>:</p>
+<blockquote>
+<p>This record cannot be deleted or changed because other records still
+depend on it</p>
+</blockquote>
+<p>The seed puts each of them on a ticket. In the database, a <code>TicketTag</code>
+row links a ticket to a tag, so the tag can't be deleted while that
+link exists: the same foreign key rule as a ticket with comments
+(topic 06).</p>
+<p>There's no API request to take a tag off a ticket (or to put one on),
+so from the front-end, those two tags can't be deleted. Tags you add
+yourself can.</p>
+<h2>Try it</h2>
+<p>Add a tag, then delete it. Then try to delete <strong>bug</strong>. Where does the
+message appear? Why does the page show the API's message here, rather
+than rewording it the way the next slide does for adding and renaming?</p>
+</div>
+    
+  </main>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Following a New Ticket — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/creating-a-ticket/going-to-the-new-ticket.html">← Going to the New Ticket</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/creating-a-ticket/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/creating-a-ticket/creating-one-as-casey.html">Creating One as Casey →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Following a New Ticket</h1>
+    <p class="lede">Every step from typing in the form to seeing the new ticket, through each file, across to the API and back, including the way back when the API says no.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Stage 2 traced a request that <strong>reads</strong> a ticket (Stage 2, topic 06).
+Here's one that <strong>creates</strong> a ticket. The bottom half has the same
+shape: the API answers, and there are two ways back.</p>
+<p><img src="/support-desk-front-end/assets/images/tracing-a-new-ticket.svg" alt="Diagram: six steps, then two columns. 1, TicketForm.jsx: each key calls setSubject, and the form re-renders. 2, TicketForm.jsx: clicking Create ticket runs handleSubmit, and the button says Saving. 3, NewTicketPage.jsx: onSubmit(values) runs handleCreate(values). 4, tickets.api.js: createTicket(values) calls apiRequest('/tickets', ...). 5, client.js: fetch sends POST /tickets, with the values as JSON and the token. 6, the back-end: authenticate, authorize('customer'), validate, save. For 201 Created: apiRequest returns the body and createTicket returns the ticket; the page calls navigate() to the new ticket, e.g. /tickets/5; the ticket's page appears and loads the new ticket. For 403 or 400: apiRequest throws the error, which passes through createTicket; the page's catch calls setSaveError(error), then the form calls setIsSubmitting(false); the form shows the error, and what was typed is still there."></p>
+<h2>What's new compared with reading</h2>
+<ul>
+<li><strong>It starts with the user, not the page.</strong> In Stage 2, <code>useEffect</code>
+sent the request as soon as the page appeared. Here, nothing is sent
+until the user clicks.</li>
+<li><strong>Two components take part.</strong> Steps 1 and 2 are in the form, step 3
+is in the page, and the call from one to the other is the <code>onSubmit</code>
+prop (slide 03).</li>
+<li><strong>The request carries data.</strong> Step 5 sends a body, and step 6
+validates it.</li>
+<li><strong>Success means going somewhere else.</strong> The page doesn't show the
+ticket itself; it navigates, and the ticket's page loads it, exactly
+as in Stage 2.</li>
+</ul>
+<h2>In the back-end</h2>
+<p>Step 6 runs the middleware in <code>ticket.routes.js</code> in order:
+<code>authenticate</code>, then <code>authorize('customer')</code>, then
+<code>validate({ body: createTicketSchema })</code>, then the controller. The
+<strong>order</strong> decides which error you see first: with Ada's token,
+<code>authorize</code> rejects the request (<code>403</code>) before <code>validate</code> ever looks at
+the body. Topic 04 comes back to this.</p>
+<h2>Be ready to trace it</h2>
+<p>In the viva, you may be asked to trace a click like this one through
+your own code, without notes. Practise on this one: point at each line
+of code that runs, in order, and say which file it's in.</p>
+<h2>Try it</h2>
+<p>Put a <code>console.log</code> at the start of <code>handleSubmit</code> in <code>TicketForm</code>, at
+the start of <code>handleCreate</code> in <code>NewTicketPage</code>, and at the start of
+<code>createTicket</code> in <code>tickets.api.js</code>. Create a ticket and read the console.
+Is the order what the diagram says? Remove the <code>console.log</code>s.</p>
+</div>
+    
+  </main>
+</body>
+</html>

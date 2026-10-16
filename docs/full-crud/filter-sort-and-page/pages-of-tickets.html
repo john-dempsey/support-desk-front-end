@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pages of Tickets — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/filter-sort-and-page/changing-the-url.html">← Changing the URL</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/filter-sort-and-page/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/filter-sort-and-page/answers-out-of-order.html">Answers Out of Order →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Pages of Tickets</h1>
+    <p class="lede">Pagination shows Previous and Next, and which page this is, from the API&#39;s meta. With only 4 seeded tickets, ?pageSize=2 is the way to see it.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The API sends at most <code>pageSize</code> tickets at a time (10, unless asked),
+and <code>meta</code> says where this page is in the whole list:</p>
+<pre><code class="hljs language-json"><span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;page&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;pageSize&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;total&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">4</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;totalPages&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">2</span> <span class="hljs-punctuation">}</span>
+</code></pre>
+<p><code>Pagination</code> uses two of those:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 3.56: Previous and Next (src/components/Pagination.jsx,</span>
+<span class="hljs-comment">// excerpt)</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">Pagination</span>(<span class="hljs-params">{ page, totalPages, onPageChange }</span>) {
+  <span class="hljs-keyword">if</span> (totalPages &lt;= <span class="hljs-number">1</span>) {
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;
+  }
+
+  <span class="hljs-keyword">return</span> (
+    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">nav</span> <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Pagination&quot;</span> <span class="hljs-attr">className</span>=<span class="hljs-string">&quot;pagination&quot;</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">button</span>
+        <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;button&quot;</span>
+        <span class="hljs-attr">onClick</span>=<span class="hljs-string">{()</span> =&gt;</span> onPageChange(page - 1)}
+        disabled={page &lt;= 1}
+      &gt;
+        Previous
+      <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>
+        Page {page} of {totalPages}
+      <span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">button</span>
+        <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;button&quot;</span>
+        <span class="hljs-attr">onClick</span>=<span class="hljs-string">{()</span> =&gt;</span> onPageChange(page + 1)}
+        disabled={page &gt;= totalPages}
+      &gt;
+        Next
+      <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">nav</span>&gt;</span></span>
+  );
+}
+</code></pre>
+<p>(The comment is left out, and each <code>&lt;button&gt;</code> is on one line in the
+file, split here to fit.)</p>
+<ul>
+<li><strong>One page, or none:</strong> nothing to move between, so it shows nothing.</li>
+<li><strong>First page:</strong> Previous is disabled. <strong>Last page:</strong> Next is.</li>
+<li>Each button calls <code>onPageChange</code> with the page it leads to. On the
+ticket list, that's <code>handlePageChange</code> (slide 04).</li>
+</ul>
+<p>It's a <code>&lt;nav&gt;</code> with its own <code>aria-label</code>, because it's a way of moving
+around, and a screen reader lists it next to the main navigation as
+&quot;Pagination&quot;.</p>
+<p><code>Pagination</code> doesn't know it's showing tickets. It works for any list
+that has a <code>page</code> and a <code>totalPages</code>: copy it as it is for your own API.</p>
+<h2>Seeing it with 4 tickets</h2>
+<p>The seed has 4 tickets, and a page holds 10, so on plain <code>/tickets</code>
+there's only one page, and <code>Pagination</code> shows nothing. To see it, ask
+for smaller pages:</p>
+<pre><code class="hljs">/tickets?pageSize=2
+</code></pre>
+<p>There's no dropdown for <code>pageSize</code>, but the page passes the whole query
+string to the API (slide 03), so it works anyway. And because
+<code>handlePageChange</code> keeps everything else in the query, it stays at 2
+per page as you click Next.</p>
+<h2>Try it</h2>
+<ol>
+<li>Open <code>/tickets?pageSize=2</code> and click <strong>Next</strong>. Then choose a
+different <strong>Order</strong>. Which page are you on now, and why?</li>
+<li>Open <code>/tickets?pageSize=2&amp;page=3</code>. What does the list say? What does
+<code>Pagination</code> show? Is that sensible? How would you fix it?</li>
+</ol>
+</div>
+    
+  </main>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Handling the Submit — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/creating-a-ticket/a-function-as-a-prop.html">← A Function as a Prop</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/creating-a-ticket/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/creating-a-ticket/going-to-the-new-ticket.html">Going to the New Ticket →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Handling the Submit</h1>
+    <p class="lede">handleSubmit stops the browser&#39;s own form handling, gathers the values from state, and disables the button until the page has finished.</p>
+
+    
+
+    
+      <div class="slide-body"><p>When the user clicks <strong>Create ticket</strong> (or presses Enter in the
+subject), the browser fires the form's <code>submit</code> event, and React runs
+<code>handleSubmit</code>:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 3.10: submitting the form (src/components/TicketForm.jsx,</span>
+<span class="hljs-comment">// excerpt)</span>
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">handleSubmit</span>(<span class="hljs-params">event</span>) {
+  event.<span class="hljs-title function_">preventDefault</span>();
+
+  <span class="hljs-keyword">let</span> values = { subject, description };
+  <span class="hljs-keyword">if</span> (agents) {
+    <span class="hljs-comment">// ... the edit page&#x27;s extra fields: topic 05</span>
+  }
+
+  <span class="hljs-title function_">setIsSubmitting</span>(<span class="hljs-literal">true</span>);
+  <span class="hljs-keyword">await</span> <span class="hljs-title function_">onSubmit</span>(values);
+  <span class="hljs-title function_">setIsSubmitting</span>(<span class="hljs-literal">false</span>);
+}
+
+<span class="hljs-comment">// ...</span>
+&lt;form className=<span class="hljs-string">&quot;form&quot;</span> onSubmit={handleSubmit}&gt;
+</code></pre>
+<p>(The comments are left out.)</p>
+<h2><code>preventDefault()</code>: no reload</h2>
+<p>Left to itself, a browser <strong>sends</strong> a form: it posts the inputs to the
+form's <code>action</code> URL and loads whatever page comes back. That's how
+every Blade form you've written worked, and Laravel answered with a
+<code>redirect()</code>.</p>
+<p>Here, that would reload the whole app and throw away its state.
+<code>event.preventDefault()</code> tells the browser <strong>not</strong> to do its default
+thing. From then on, it's up to the code: the values are already in
+state, and the page will send them with <code>fetch()</code>.</p>
+<h2>The values come from state</h2>
+<p><code>{ subject, description }</code> builds the object to send, straight from the
+two pieces of state. Nothing is read from the inputs, because the
+inputs only ever show what's in state (slide 02).</p>
+<p>(<code>{ subject, description }</code> is short for
+<code>{ subject: subject, description: description }</code>.)</p>
+<h2><code>isSubmitting</code>: one click, one ticket</h2>
+<p>A request takes time. If the user clicks <strong>Create ticket</strong> twice while
+it's on its way, two tickets would be created. So the form waits, and
+shows that it's waiting:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 3.11: the button (src/components/TicketForm.jsx, excerpt)</span>
+&lt;button type=<span class="hljs-string">&quot;submit&quot;</span> disabled={isSubmitting}&gt;
+  {isSubmitting ? <span class="hljs-string">&#x27;Saving…&#x27;</span> : submitLabel}
+&lt;/button&gt;
+</code></pre>
+<ol>
+<li><code>setIsSubmitting(true)</code>: the button is <strong>disabled</strong> (it can't be
+clicked) and says <strong>Saving…</strong>.</li>
+<li><code>await onSubmit(values)</code> waits until the page's <code>handleCreate</code> has
+finished, whether it worked or not.</li>
+<li><code>setIsSubmitting(false)</code>: the button is back.</li>
+</ol>
+<p>If the ticket was created, the page has already moved on to the new
+ticket by step 3, and <code>TicketForm</code> is no longer on screen. React simply
+ignores state changes for a component that has gone, so step 3 does no
+harm.</p>
+<h2>Try it</h2>
+<p>In the Network tab, set <strong>No throttling</strong> to <strong>Slow 4G</strong>. Create a
+ticket (with Casey's token, slide 07), and watch the button while the
+request is on its way. Then try to click it again. Set throttling back
+to <strong>No throttling</strong> when you're done.</p>
+</div>
+    
+  </main>
+</body>
+</html>

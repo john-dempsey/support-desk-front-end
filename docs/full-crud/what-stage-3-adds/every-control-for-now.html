@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Every Control, for Now — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/what-stage-3-adds/what-changes-and-what-doesnt.html">← What Changes, and What Doesn&#39;t</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/what-stage-3-adds/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/sending-data/post-with-a-body.html">POST, with a Body →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Every Control, for Now</h1>
+    <p class="lede">Stage 3 shows every button and form to everyone. Ada&#39;s admin token is allowed to use all but one of them, and the API says no to that one.</p>
+
+    
+
+    
+      <div class="slide-body"><p>In the back-end, Lesson 4 decided who may do what, with
+<code>authorize(...)</code> on each route. Lesson 7's <code>GET /users</code> follows the same
+rule:</p>
+<table>
+<thead>
+<tr>
+<th>Request</th>
+<th>Who the API allows</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST /tickets</code></td>
+<td>customers only</td>
+</tr>
+<tr>
+<td><code>PATCH /tickets/:id</code>, <code>DELETE /tickets/:id</code></td>
+<td>agents and admins</td>
+</tr>
+<tr>
+<td><code>POST</code>, <code>PATCH</code>, <code>DELETE</code> on <code>/tags</code></td>
+<td>agents and admins</td>
+</tr>
+<tr>
+<td><code>GET /users?role=agent</code></td>
+<td>agents and admins</td>
+</tr>
+<tr>
+<td>comments</td>
+<td>anyone who can see the ticket. Only the author (or an admin) may delete one</td>
+</tr>
+</tbody>
+</table>
+<p>The front-end has no login yet, so it doesn't know who's using it. Every
+request carries the stand-in token from <code>.env</code>, which is Ada's, and Ada
+is an <strong>admin</strong>.</p>
+<p>So Stage 3 shows <strong>every</strong> control to everyone: the New ticket link,
+Edit, Delete, the status and agent dropdowns, and the Tags page. There
+are no role checks anywhere in this stage's code.</p>
+<h2>The one thing Ada can't do</h2>
+<p>Look down the table: an admin may do everything except <strong>create a
+ticket</strong>, which is for customers. With Ada's token, the New ticket form
+gets a <code>403</code>, and shows the API's message:</p>
+<blockquote>
+<p>You do not have permission to perform this action</p>
+</blockquote>
+<p>That's not a bug in the front-end. It's the API protecting itself, as
+Lesson 4 designed it to. Topic 03 shows how to switch to a customer's
+token to create a ticket.</p>
+<h2>Hiding is not protecting</h2>
+<p>Stage 4 adds a login, and then hides each control from the roles that
+can't use it: no New ticket link for an agent, no Edit or Delete for a
+customer. That makes the app <strong>easier to use</strong>, because nobody is shown
+a button that can only fail.</p>
+<p>It doesn't make anything <strong>safer</strong>. Anyone can send a request with a
+REST client, and skip the front-end entirely. The API checks every
+request itself, so it stays the only real guard. A front-end that relies
+on hiding buttons for security has no security.</p>
+<h2>If your API has no authentication</h2>
+<p>Everything in this stage still works. With <code>VITE_DEV_TOKEN</code> empty, no
+token is sent, your API allows every request, and there's no <code>403</code> to
+see. Nothing in Stage 3 depends on a login, a role or a token.</p>
+<h2>Try it</h2>
+<p>In your REST client, log in as <code>casey@example.com</code> and send
+<code>PATCH /tickets/1</code> with Casey's token and the body
+<code>{ &quot;status&quot;: &quot;resolved&quot; }</code>. What status comes back, and which line of
+the back-end's <code>ticket.routes.js</code> sent it? (The API allows only 10
+logins every 15 minutes. If you get a <code>429</code>, wait a few minutes.)</p>
+</div>
+    
+  </main>
+</body>
+</html>

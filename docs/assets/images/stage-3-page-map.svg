@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 512" width="760" height="512" role="img" aria-labelledby="title desc" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <title id="title">The Stage 3 pages, and the requests each one sends</title>
+  <desc id="desc">Five pages. Tickets, at /tickets, sends GET /tickets with the filter, sort and page. Its New ticket link goes to New ticket, at /tickets/new, which sends POST /tickets and, once saved, goes to the new ticket's page. Clicking a subject in the list goes to a ticket's page, at /tickets/:ticketId, which gets the ticket and its comments, adds and deletes comments, and deletes the ticket; after deleting, it goes back to the list. Its Edit ticket link goes to Edit ticket, at /tickets/:ticketId/edit, which gets the ticket and the agents and sends PATCH /tickets/:id; once saved, it goes back to the ticket's page. Tags, at /tags, is reached from the navigation bar and sends GET, POST, PATCH and DELETE requests to /tags.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#1a1a1a"/>
+    </marker>
+  </defs>
+  <rect width="760" height="512" fill="#ffffff"/>
+  <rect x="20" y="20" width="300" height="120" rx="8" fill="#dafbe1" stroke="#116329" stroke-width="2"/>
+  <text x="36" y="48" font-size="16" font-weight="700" fill="#1a1a1a">Tickets</text>
+  <text x="36" y="68" font-size="13" fill="#59636e" font-family="ui-monospace, Consolas, monospace">/tickets</text>
+  <text x="36" y="94" font-size="13" fill="#1a1a1a"><tspan font-family="ui-monospace, Consolas, monospace">GET /tickets?status=…&amp;page=…</tspan></text>
+  <text x="36" y="114" font-size="13" fill="#59636e">filter, sort and page (topic 09)</text>
+  <rect x="440" y="20" width="300" height="120" rx="8" fill="#dafbe1" stroke="#116329" stroke-width="2"/>
+  <text x="456" y="48" font-size="16" font-weight="700" fill="#1a1a1a">New ticket</text>
+  <text x="456" y="68" font-size="13" fill="#59636e" font-family="ui-monospace, Consolas, monospace">/tickets/new</text>
+  <text x="456" y="94" font-size="13" fill="#1a1a1a"><tspan font-family="ui-monospace, Consolas, monospace">POST /tickets</tspan></text>
+  <text x="456" y="114" font-size="13" fill="#59636e">topics 03 and 04</text>
+  <line x1="322" y1="62" x2="436" y2="62" stroke="#1a1a1a" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="380" y="54" text-anchor="middle" font-size="13" fill="#1a1a1a">New ticket</text>
+  <rect x="20" y="220" width="300" height="140" rx="8" fill="#dafbe1" stroke="#116329" stroke-width="2"/>
+  <text x="36" y="248" font-size="16" font-weight="700" fill="#1a1a1a">A ticket</text>
+  <text x="36" y="268" font-size="13" fill="#59636e" font-family="ui-monospace, Consolas, monospace">/tickets/:ticketId</text>
+  <text x="36" y="294" font-size="13" fill="#1a1a1a"><tspan font-family="ui-monospace, Consolas, monospace">GET</tspan> the ticket and its comments</text>
+  <text x="36" y="314" font-size="13" fill="#1a1a1a"><tspan font-family="ui-monospace, Consolas, monospace">DELETE</tspan> the ticket (topic 06)</text>
+  <text x="36" y="334" font-size="13" fill="#1a1a1a"><tspan font-family="ui-monospace, Consolas, monospace">POST</tspan>, <tspan font-family="ui-monospace, Consolas, monospace">DELETE</tspan> a comment (topic 07)</text>
+  <rect x="440" y="220" width="300" height="140" rx="8" fill="#dafbe1" stroke="#116329" stroke-width="2"/>
+  <text x="456" y="248" font-size="16" font-weight="700" fill="#1a1a1a">Edit ticket</text>
+  <text x="456" y="268" font-size="13" fill="#59636e" font-family="ui-monospace, Consolas, monospace">/tickets/:ticketId/edit</text>
+  <text x="456" y="294" font-size="13" fill="#1a1a1a"><tspan font-family="ui-monospace, Consolas, monospace">GET</tspan> the ticket and the agents</text>
+  <text x="456" y="314" font-size="13" fill="#1a1a1a"><tspan font-family="ui-monospace, Consolas, monospace">PATCH /tickets/:id</tspan></text>
+  <text x="456" y="334" font-size="13" fill="#59636e">topic 05</text>
+  <line x1="220" y1="142" x2="220" y2="216" stroke="#1a1a1a" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="230" y="184" text-anchor="start" font-size="13" fill="#1a1a1a">click a subject</text>
+  <line x1="80" y1="218" x2="80" y2="144" stroke="#1a1a1a" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrow)"/>
+  <text x="90" y="184" text-anchor="start" font-size="13" fill="#1a1a1a">deleted</text>
+  <line x1="560" y1="142" x2="326" y2="226" stroke="#1a1a1a" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrow)"/>
+  <text x="470" y="196" text-anchor="start" font-size="13" fill="#1a1a1a">saved</text>
+  <line x1="322" y1="262" x2="436" y2="262" stroke="#1a1a1a" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="380" y="254" text-anchor="middle" font-size="13" fill="#1a1a1a">Edit ticket</text>
+  <line x1="438" y1="318" x2="324" y2="318" stroke="#1a1a1a" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrow)"/>
+  <text x="380" y="336" text-anchor="middle" font-size="13" fill="#1a1a1a">saved</text>
+  <line x1="330" y1="384" x2="370" y2="384" stroke="#1a1a1a" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="378" y="388" font-size="12" fill="#59636e">a link</text>
+  <line x1="450" y1="384" x2="490" y2="384" stroke="#1a1a1a" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrow)"/>
+  <text x="498" y="388" font-size="12" fill="#59636e">navigate() after a change</text>
+  <rect x="20" y="406" width="720" height="86" rx="8" fill="#dafbe1" stroke="#116329" stroke-width="2"/>
+  <text x="36" y="434" font-size="16" font-weight="700" fill="#1a1a1a">Tags</text>
+  <text x="36" y="454" font-size="13" fill="#59636e" font-family="ui-monospace, Consolas, monospace">/tags</text>
+  <text x="36" y="480" font-size="13" fill="#1a1a1a"><tspan font-family="ui-monospace, Consolas, monospace">GET</tspan>, <tspan font-family="ui-monospace, Consolas, monospace">POST</tspan>, <tspan font-family="ui-monospace, Consolas, monospace">PATCH</tspan>, <tspan font-family="ui-monospace, Consolas, monospace">DELETE /tags</tspan>: list, add, rename, delete, reached from the navigation bar (topic 08)</text>
+</svg>

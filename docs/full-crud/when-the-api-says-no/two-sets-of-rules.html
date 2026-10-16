@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Two Sets of Rules — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/creating-a-ticket/forms-and-buttons-in-css.html">← Forms and Buttons in CSS</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/when-the-api-says-no/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/when-the-api-says-no/keeping-the-whole-error.html">Keeping the Whole Error →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Two Sets of Rules</h1>
+    <p class="lede">The browser checks the form before it&#39;s sent, using the same rules as the back-end&#39;s Zod schema. But only the API&#39;s check counts.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The back-end's <code>createTicketSchema</code> (Lesson 3) has the rules for a new
+ticket. The form's inputs repeat the simple ones as HTML attributes:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>The API's rule (Zod)</th>
+<th>The browser's rule (HTML)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>subject</code></td>
+<td><code>.trim().min(1)</code>: not empty, ignoring spaces</td>
+<td><code>required</code></td>
+</tr>
+<tr>
+<td><code>subject</code></td>
+<td><code>.max(200)</code></td>
+<td><code>maxLength={200}</code></td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td><code>.trim().min(1)</code></td>
+<td><code>required</code></td>
+</tr>
+</tbody>
+</table>
+<h2>The browser checks first</h2>
+<p>With <code>required</code>, the browser won't send the form while the field is
+empty. It shows its own message next to the input (the wording depends
+on the browser and its language), and <code>handleSubmit</code> never runs. <code>maxLength</code> stops the user
+typing a 201st character at all.</p>
+<p>So the most common mistakes are caught <strong>instantly</strong>, without a request
+to the API. That's the reason to repeat the rules: it's quicker and
+friendlier for the user.</p>
+<h2>The API has the final say</h2>
+<p>The browser's checks are a convenience, not protection:</p>
+<ul>
+<li><strong>They're not the same rules.</strong> <code>required</code> is happy with three spaces.
+Zod trims them off first, finds nothing left, and says no.</li>
+<li><strong>They can be skipped.</strong> Anyone can send a request with a REST client,
+or remove <code>required</code> in the browser's developer tools. The API checks
+every request, wherever it came from.</li>
+<li><strong>Some rules can only be checked by the API.</strong> A tag name that's
+already taken (topic 08) needs the database to know.</li>
+</ul>
+<p>So the front-end must always be ready for the API to say no, and show
+<strong>its</strong> reasons. That's the rest of this topic.</p>
+<h2>You need Casey's token to see it</h2>
+<p>Remember the order of the middleware in <code>ticket.routes.js</code> (topic 03,
+slide 06): <code>authorize('customer')</code> runs <strong>before</strong> <code>validate</code>. With
+Ada's token, the request is turned away with a <code>403</code> before the body is
+looked at, so you'll never see a validation error. Use Casey's token
+for this topic (topic 03, slide 07).</p>
+<h2>Try it</h2>
+<p>With Casey's token, open <strong>New ticket</strong> and:</p>
+<ol>
+<li>click <strong>Create ticket</strong> with both fields empty. What does the browser
+say? Look in the Network tab: was a request sent?</li>
+<li>type three spaces as the subject, something real as the description,
+and click <strong>Create ticket</strong>. Was a request sent this time? What came
+back?</li>
+</ol>
+</div>
+    
+  </main>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 450" width="760" height="450" role="img" aria-labelledby="title desc" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <title id="title">NewTicketPage and TicketForm: who holds what</title>
+  <desc id="desc">Two components, one above the other. NewTicketPage, the parent, holds one piece of state, saveError, and has the function handleCreate, which calls createTicket in tickets.api.js and then either navigates or calls setSaveError. TicketForm, the child, holds subject, description and isSubmitting, and has handleSubmit. Props go down from the page to the form: submitLabel, onSubmit set to handleCreate, and error set to saveError. A call goes back up: the form's handleSubmit calls onSubmit with the values, which runs the page's handleCreate. The user types into, and clicks, the form.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#1a1a1a"/>
+    </marker>
+  </defs>
+  <rect width="760" height="450" fill="#ffffff"/>
+
+  <!-- the page -->
+  <rect x="20" y="20" width="470" height="124" rx="8" fill="#dafbe1" stroke="#116329" stroke-width="2"/>
+  <text x="36" y="48" font-size="16" font-weight="700" fill="#1a1a1a">NewTicketPage <tspan font-weight="400" font-size="13" fill="#59636e">the page: owns the request</tspan></text>
+  <text x="36" y="78" font-size="14" fill="#1a1a1a">state: <tspan font-family="ui-monospace, Consolas, monospace">saveError</tspan></text>
+  <text x="36" y="104" font-size="14" fill="#1a1a1a"><tspan font-family="ui-monospace, Consolas, monospace">handleCreate(newTicket)</tspan>: calls <tspan font-family="ui-monospace, Consolas, monospace">createTicket()</tspan>,</text>
+  <text x="36" y="124" font-size="14" fill="#1a1a1a">then <tspan font-family="ui-monospace, Consolas, monospace">navigate()</tspan> or <tspan font-family="ui-monospace, Consolas, monospace">setSaveError(error)</tspan></text>
+
+  <!-- the API module -->
+  <rect x="560" y="44" width="180" height="76" rx="8" fill="#fff8c5" stroke="#7d4e00" stroke-width="2"/>
+  <text x="576" y="72" font-size="14" font-weight="700" fill="#1a1a1a">tickets.api.js</text>
+  <text x="576" y="98" font-size="13" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">POST /tickets</text>
+  <line x1="492" y1="82" x2="556" y2="82" stroke="#1a1a1a" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- props down -->
+  <line x1="110" y1="146" x2="110" y2="276" stroke="#1a1a1a" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="122" y="180" font-size="13" font-weight="700" fill="#0550ae">props, down</text>
+  <text x="122" y="200" font-size="13" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">submitLabel="Create ticket"</text>
+  <text x="122" y="220" font-size="13" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">onSubmit={handleCreate}</text>
+  <text x="122" y="240" font-size="13" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">error={saveError}</text>
+
+  <!-- call up -->
+  <line x1="400" y1="276" x2="400" y2="146" stroke="#1a1a1a" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrow)"/>
+  <text x="412" y="200" font-size="13" font-weight="700" fill="#7d4e00">a call, up</text>
+  <text x="412" y="220" font-size="13" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">onSubmit(values)</text>
+  <text x="412" y="240" font-size="13" fill="#1a1a1a">runs the page's <tspan font-family="ui-monospace, Consolas, monospace">handleCreate</tspan></text>
+
+  <!-- the form -->
+  <rect x="20" y="280" width="470" height="110" rx="8" fill="#dafbe1" stroke="#116329" stroke-width="2"/>
+  <text x="36" y="308" font-size="16" font-weight="700" fill="#1a1a1a">TicketForm <tspan font-weight="400" font-size="13" fill="#59636e">the component: owns the typing</tspan></text>
+  <text x="36" y="338" font-size="14" fill="#1a1a1a">state: <tspan font-family="ui-monospace, Consolas, monospace">subject</tspan>, <tspan font-family="ui-monospace, Consolas, monospace">description</tspan>, <tspan font-family="ui-monospace, Consolas, monospace">isSubmitting</tspan></text>
+  <text x="36" y="364" font-size="14" fill="#1a1a1a"><tspan font-family="ui-monospace, Consolas, monospace">handleSubmit(event)</tspan>: stops the reload, then</text>
+  <text x="36" y="382" font-size="14" fill="#1a1a1a">calls <tspan font-family="ui-monospace, Consolas, monospace">onSubmit({ subject, description })</tspan></text>
+
+  <!-- the user -->
+  <rect x="560" y="300" width="180" height="70" rx="8" fill="#ddf4ff" stroke="#0550ae" stroke-width="2"/>
+  <text x="576" y="328" font-size="14" font-weight="700" fill="#1a1a1a">the user</text>
+  <text x="576" y="352" font-size="13" fill="#1a1a1a">types, then clicks</text>
+  <line x1="556" y1="335" x2="494" y2="335" stroke="#1a1a1a" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- footer -->
+  <text x="20" y="428" font-size="13" fill="#59636e">Data goes down as props. The form can't change the page's state itself: it calls a function the page gave it.</text>
+</svg>

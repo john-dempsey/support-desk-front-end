@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Status and Agent Dropdowns — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/editing-a-ticket/starting-with-the-tickets-values.html">← Starting With the Ticket&#39;s Values</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/editing-a-ticket/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/editing-a-ticket/strings-and-numbers.html">Strings and Numbers →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>The Status and Agent Dropdowns</h1>
+    <p class="lede">When TicketForm is given agents, it shows two more fields: a status dropdown built from a list, and an agent dropdown built from the API&#39;s agents.</p>
+
+    
+
+    
+      <div class="slide-body"><p>A new ticket is always <strong>open</strong> and <strong>unassigned</strong>: the back-end sets
+both, and a customer can't choose. So the new ticket page doesn't show
+those fields. The edit page does, because changing them is what agents
+and admins edit tickets for.</p>
+<p><code>TicketForm</code> decides with its <code>agents</code> prop. The new ticket page doesn't
+pass it, so it's <code>undefined</code>; the edit page passes the list:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 3.25: two extra fields (src/components/TicketForm.jsx, excerpt)</span>
+{agents &amp;&amp; (
+  <span class="language-xml"><span class="hljs-tag">&lt;&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">className</span>=<span class="hljs-string">&quot;form-field&quot;</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">label</span> <span class="hljs-attr">htmlFor</span>=<span class="hljs-string">&quot;ticket-status&quot;</span>&gt;</span>Status<span class="hljs-tag">&lt;/<span class="hljs-name">label</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">select</span>
+        <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;ticket-status&quot;</span>
+        <span class="hljs-attr">value</span>=<span class="hljs-string">{status}</span>
+        <span class="hljs-attr">onChange</span>=<span class="hljs-string">{(event)</span> =&gt;</span> setStatus(event.target.value)}
+      &gt;
+        {TICKET_STATUSES.map((statusValue) =&gt; (
+          <span class="hljs-tag">&lt;<span class="hljs-name">option</span> <span class="hljs-attr">key</span>=<span class="hljs-string">{statusValue}</span> <span class="hljs-attr">value</span>=<span class="hljs-string">{statusValue}</span>&gt;</span>
+            {STATUS_LABELS[statusValue]}
+          <span class="hljs-tag">&lt;/<span class="hljs-name">option</span>&gt;</span>
+        ))}
+      <span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+
+    {/* ... the &quot;Assigned to&quot; field, below */}
+  <span class="hljs-tag">&lt;/&gt;</span></span>
+)}
+</code></pre>
+<p><code>agents &amp;&amp; (...)</code> is the same <code>&amp;&amp;</code> you've used for loading and error
+messages: if <code>agents</code> is <code>undefined</code>, nothing is shown. The <code>&lt;&gt;...&lt;/&gt;</code>
+fragment groups the two fields so <code>&amp;&amp;</code> can show both or neither.</p>
+<h2>A controlled <code>&lt;select&gt;</code></h2>
+<p>A <code>&lt;select&gt;</code> is controlled exactly like an <code>&lt;input&gt;</code> (topic 03, slide
+02): <code>value={status}</code> chooses which option shows as selected, and
+<code>onChange</code> saves the user's choice. <code>event.target.value</code> is the chosen
+option's <code>value</code>, so <code>'in_progress'</code>, not the words &quot;In progress&quot;.</p>
+<p>The options are built by <code>map()</code>, one per status, from two lists in
+<code>src/utils/ticketStatuses.js</code> (slide 06): <code>TICKET_STATUSES</code> for the
+values, and <code>STATUS_LABELS</code> for the words. Each <code>&lt;option&gt;</code> needs a
+<code>key</code>, like any list in React.</p>
+<h2>The agent dropdown</h2>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 3.26: choosing an agent (src/components/TicketForm.jsx,</span>
+<span class="hljs-comment">// excerpt)</span>
+&lt;select
+  id=<span class="hljs-string">&quot;ticket-agent&quot;</span>
+  value={assignedAgentId}
+  onChange={<span class="hljs-function">(<span class="hljs-params">event</span>) =&gt;</span> <span class="hljs-title function_">setAssignedAgentId</span>(event.<span class="hljs-property">target</span>.<span class="hljs-property">value</span>)}
+&gt;
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">option</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;&quot;</span>&gt;</span>Unassigned<span class="hljs-tag">&lt;/<span class="hljs-name">option</span>&gt;</span></span>
+  {agents.<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">agent</span>) =&gt;</span> (
+    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">option</span> <span class="hljs-attr">key</span>=<span class="hljs-string">{agent.id}</span> <span class="hljs-attr">value</span>=<span class="hljs-string">{agent.id}</span>&gt;</span>
+      {agent.name}
+    <span class="hljs-tag">&lt;/<span class="hljs-name">option</span>&gt;</span></span>
+  ))}
+&lt;/select&gt;
+</code></pre>
+<p>(Its <code>&lt;label&gt;</code> and the <code>&lt;div&gt;</code> around it are left out. They're the same
+shape as the status field's.)</p>
+<ul>
+<li>One option is always there: <strong>Unassigned</strong>, with the value <code>''</code>.</li>
+<li>One option per agent from <code>GET /users?role=agent</code>, with the agent's
+<strong><code>id</code></strong> as the value and their <strong>name</strong> as the words. The user
+chooses a name; the code gets an id.</li>
+</ul>
+<h2>Try it</h2>
+<p>In the seeded data there's only one agent, Alex. In your REST client,
+send <code>POST /auth/register</code> (it needs no token) with a new name, email
+and password. What role does the new user get? Is there any request in
+the API that could make them an agent? What does that tell you about
+where agents come from? (Registering counts towards the 10 logins every
+15 minutes.)</p>
+</div>
+    
+  </main>
+</body>
+</html>

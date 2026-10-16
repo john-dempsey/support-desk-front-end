@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A Whole Resource on One Page — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/comments/update-or-ask-again.html">← Update, or Ask Again?</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/tags/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/tags/one-form-twice.html">One Form, Used Twice →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>A Whole Resource on One Page</h1>
+    <p class="lede">Tags have only a name, so all four CRUD operations fit on one page. It&#39;s the pattern to copy for a simple resource in your own API.</p>
+
+    
+
+    
+      <div class="slide-body"><p>A tag is a label, such as <strong>bug</strong> or <strong>billing</strong>. It has an <code>id</code> and a
+<code>name</code>, and nothing else. With so little to show, there's no need for a
+page per tag, or a separate page to create one. <code>/tags</code> does
+everything:</p>
+<table>
+<thead>
+<tr>
+<th>On the page</th>
+<th>Request</th>
+<th>Topic</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>the list, sorted by name</td>
+<td><code>GET /tags</code></td>
+<td>this slide</td>
+</tr>
+<tr>
+<td>an <strong>Add a tag</strong> form at the top</td>
+<td><code>POST /tags</code></td>
+<td>slides 02 and 04</td>
+</tr>
+<tr>
+<td>a <strong>Rename</strong> button on each tag</td>
+<td><code>PATCH /tags/:id</code></td>
+<td>slides 03 and 04</td>
+</tr>
+<tr>
+<td>a <strong>Delete</strong> button on each tag</td>
+<td><code>DELETE /tags/:id</code></td>
+<td>slide 05</td>
+</tr>
+</tbody>
+</table>
+<h2>The requests</h2>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 3.42: the tag requests (src/api/tags.api.js, excerpt)</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">getTags</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> responseBody = <span class="hljs-keyword">await</span> <span class="hljs-title function_">apiRequest</span>(<span class="hljs-string">&#x27;/tags&#x27;</span>);
+  <span class="hljs-keyword">return</span> responseBody.<span class="hljs-property">data</span>;
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">createTag</span>(<span class="hljs-params">name</span>) {
+  <span class="hljs-keyword">const</span> responseBody = <span class="hljs-keyword">await</span> <span class="hljs-title function_">apiRequest</span>(<span class="hljs-string">&#x27;/tags&#x27;</span>, {
+    <span class="hljs-attr">method</span>: <span class="hljs-string">&#x27;POST&#x27;</span>,
+    <span class="hljs-attr">body</span>: { name },
+  });
+  <span class="hljs-keyword">return</span> responseBody.<span class="hljs-property">data</span>;
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">updateTag</span>(<span class="hljs-params">tagId, name</span>) {
+  <span class="hljs-keyword">const</span> responseBody = <span class="hljs-keyword">await</span> <span class="hljs-title function_">apiRequest</span>(<span class="hljs-string">`/tags/<span class="hljs-subst">${tagId}</span>`</span>, {
+    <span class="hljs-attr">method</span>: <span class="hljs-string">&#x27;PATCH&#x27;</span>,
+    <span class="hljs-attr">body</span>: { name },
+  });
+  <span class="hljs-keyword">return</span> responseBody.<span class="hljs-property">data</span>;
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">deleteTag</span>(<span class="hljs-params">tagId</span>) {
+  <span class="hljs-keyword">await</span> <span class="hljs-title function_">apiRequest</span>(<span class="hljs-string">`/tags/<span class="hljs-subst">${tagId}</span>`</span>, { <span class="hljs-attr">method</span>: <span class="hljs-string">&#x27;DELETE&#x27;</span> });
+}
+</code></pre>
+<p>(The comments are left out, and the <code>POST</code> and <code>PATCH</code> calls are each
+one line in the file, split here to fit.)</p>
+<p>Nothing here is new. These are the four shapes from topic 02, for a
+different resource. <code>{ name }</code> is short for <code>{ name: name }</code>.</p>
+<h2>Loading the list</h2>
+<p><code>TagsPage</code> loads its tags exactly as Stage 2's list page loaded tickets:
+<code>tags</code> starts as <code>null</code>, a <code>useEffect</code> with an empty dependency array
+calls <code>getTags()</code> once, and the page shows loading, error, empty (&quot;There
+are no tags yet.&quot;) or the list.</p>
+<h2>A model for your own API</h2>
+<p>Most case-study APIs have a simple resource like this: a category, a
+location, a type of something. This page is the pattern to copy for
+one. Everything else in this topic is about the few things that are
+new: renaming in place, keeping a sorted list in order, and a better
+error message.</p>
+<h2>Try it</h2>
+<p>Look at the back-end's <code>tag.routes.js</code>. Which of the four requests can
+a customer make? With Casey's token, what would this page show, and
+which buttons would fail? (Stage 4 will hide this page from customers.)</p>
+</div>
+    
+  </main>
+</body>
+</html>

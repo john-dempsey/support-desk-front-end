@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Strings and Numbers — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/editing-a-ticket/status-and-agent-dropdowns.html">← The Status and Agent Dropdowns</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/editing-a-ticket/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/editing-a-ticket/one-list-of-statuses.html">One List of Statuses →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Strings and Numbers</h1>
+    <p class="lede">A dropdown&#39;s value is always a string. The agent&#39;s id goes from a number to a string for the form, and back to a number (or null) for the API.</p>
+
+    
+
+    
+      <div class="slide-body"><p>HTML has no numbers. Whatever you put in an <code>&lt;option&gt;</code>'s <code>value</code>, the
+browser keeps it as <strong>text</strong>, and <code>event.target.value</code> is always a
+string. So an agent's <code>id</code> has to change type twice on its way through
+the edit page:</p>
+<p><img src="/support-desk-front-end/assets/images/agent-id-round-trip.svg" alt="Diagram: an agent's id, there and back, in two rows and four steps: from the API, in state, the dropdown, and sent with PATCH. Assigned: the API sends assignedAgent with id 3; String() makes it '3' in state, in EditTicketPage.jsx; the dropdown shows Alex Agent, and the user can change it here; Number() makes it 3 again, sent as assignedAgentId: 3, in TicketForm.jsx. Unassigned: the API sends assignedAgent: null; it becomes '' in state; the dropdown shows Unassigned; it's sent as assignedAgentId: null. The id 3 is an example."></p>
+<p><strong>On the way in</strong>, <code>EditTicketPage</code> turns the agent's id into a string
+with <code>String()</code>, or uses <code>''</code> for no agent (Figure 3.24). Then
+<code>value={assignedAgentId}</code> matches one of the options exactly.</p>
+<p><strong>On the way out</strong>, <code>TicketForm</code> turns it back, in <code>handleSubmit</code>:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 3.27: back to what the API expects</span>
+<span class="hljs-comment">// (src/components/TicketForm.jsx, excerpt)</span>
+<span class="hljs-keyword">let</span> values = { subject, description };
+<span class="hljs-keyword">if</span> (agents) {
+  <span class="hljs-keyword">let</span> agentIdToSend = <span class="hljs-literal">null</span>;
+  <span class="hljs-keyword">if</span> (assignedAgentId !== <span class="hljs-string">&#x27;&#x27;</span>) {
+    agentIdToSend = <span class="hljs-title class_">Number</span>(assignedAgentId);
+  }
+  values = {
+    subject,
+    description,
+    status,
+    <span class="hljs-attr">assignedAgentId</span>: agentIdToSend,
+  };
+}
+</code></pre>
+<p>(The comments are left out, and <code>values = {...}</code> is one line in the
+file, split here to fit.)</p>
+<ul>
+<li><strong><code>''</code> (Unassigned) becomes <code>null</code></strong>, which is how the API says &quot;no
+agent&quot; (topic 02, slide 02).</li>
+<li><strong>Anything else becomes a number</strong>, with <code>Number('3')</code>, which is <code>3</code>.</li>
+</ul>
+<p>The new ticket page has no <code>agents</code>, so it skips all of this and sends
+only <code>{ subject, description }</code>.</p>
+<h2>Does the API care?</h2>
+<p>Try sending the strings as they are, with your REST client and Ada's
+token:</p>
+<table>
+<thead>
+<tr>
+<th>Body of <code>PATCH /tickets/2</code></th>
+<th>The API's answer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>{ &quot;assignedAgentId&quot;: &quot;&quot; }</code></td>
+<td><code>400</code>: Number must be greater than 0</td>
+</tr>
+<tr>
+<td><code>{ &quot;assignedAgentId&quot;: &quot;abc&quot; }</code></td>
+<td><code>400</code>: Expected number, received nan</td>
+</tr>
+</tbody>
+</table>
+<p>The back-end's schema uses <code>z.coerce.number()</code> (Lesson 3), so it turns
+a string into a number before it checks it. <code>''</code> becomes <code>0</code>, which
+isn't a valid id. That's the real reason the form must send <code>null</code> for
+&quot;Unassigned&quot;.</p>
+<p>It would turn <code>'3'</code> into <code>3</code> without complaint. The form converts it
+anyway: sending the type the API documents means the front-end works
+with any API, not only one that's forgiving.</p>
+<h2>Try it</h2>
+<p><code>Number()</code> is lenient in other ways too. In the browser's console, try
+<code>Number('')</code>, <code>Number(' 3 ')</code>, <code>Number('3abc')</code> and <code>Number(null)</code>.
+Which ones surprise you? Could any of them reach <code>Number()</code> from this
+dropdown? Why not?</p>
+</div>
+    
+  </main>
+</body>
+</html>

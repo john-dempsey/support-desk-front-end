@@ -6,13 +6,21 @@
 // come from.
 import { apiRequest } from './client.js';
 
-// GET /tickets: returns the array of tickets.
-// The API sends them 10 at a time, newest first, with a `meta` object
-// ({ page, pageSize, total, totalPages }) alongside. Only the tickets are
-// returned for now; Stage 3 uses `meta` for filtering and pagination.
-export async function getTickets() {
-  const responseBody = await apiRequest('/tickets');
-  return responseBody.data;
+// GET /tickets: returns { tickets, meta }.
+// `queryString` is the part of the page's URL after the "?", e.g.
+// "status=open&page=2". It's passed to the API unchanged, because the page
+// uses the same names in its URL as the API's query parameters (status,
+// sortBy, order, page, pageSize). The API sends 10 tickets at a time, and
+// `meta` ({ page, pageSize, total, totalPages }) says how many pages there
+// are in all.
+export async function getTickets(queryString = '') {
+  let path = '/tickets';
+  if (queryString) {
+    path = `/tickets?${queryString}`;
+  }
+
+  const responseBody = await apiRequest(path);
+  return { tickets: responseBody.data, meta: responseBody.meta };
 }
 
 // GET /tickets/:id: returns one ticket. If the ticket doesn't exist, the
@@ -21,4 +29,27 @@ export async function getTickets() {
 export async function getTicket(ticketId) {
   const responseBody = await apiRequest(`/tickets/${ticketId}`);
   return responseBody.data;
+}
+
+// POST /tickets: `newTicket` is { subject, description }. Returns the saved
+// ticket, including the id the database gave it.
+export async function createTicket(newTicket) {
+  const responseBody = await apiRequest('/tickets', { method: 'POST', body: newTicket });
+  return responseBody.data;
+}
+
+// PATCH /tickets/:id: `changes` holds only the fields to change, e.g.
+// { status: 'resolved' }. Returns the ticket as it is now.
+export async function updateTicket(ticketId, changes) {
+  const responseBody = await apiRequest(`/tickets/${ticketId}`, {
+    method: 'PATCH',
+    body: changes,
+  });
+  return responseBody.data;
+}
+
+// DELETE /tickets/:id: the API answers 204 No Content, so there's nothing
+// to return. A 409 means the ticket still has comments.
+export async function deleteTicket(ticketId) {
+  await apiRequest(`/tickets/${ticketId}`, { method: 'DELETE' });
 }

@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" width="760" height="440" role="img" aria-labelledby="title desc" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <title id="title">The ticket page, its comment list and its comment form</title>
+  <desc id="desc">TicketDetailPage, the parent, holds the state ticket, comments and commentError, and has the functions handleAddComment and handleDeleteComment, which call comments.api.js. It has two children side by side. CommentList receives the props comments and onDelete; it shows each comment and a Delete button, and calls onDelete(comment) when one is clicked. CommentForm receives the props onSubmit and error; it holds its own state, commentText and isSubmitting, and calls onSubmit(commentText), which returns true or false. The list and the form never talk to each other: a new comment reaches the list through the page.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#1a1a1a"/>
+    </marker>
+  </defs>
+  <rect width="760" height="440" fill="#ffffff"/>
+  <rect x="20" y="20" width="720" height="112" rx="8" fill="#dafbe1" stroke="#116329" stroke-width="2"/>
+  <text x="36" y="48" font-size="16" font-weight="700" fill="#1a1a1a">TicketDetailPage <tspan font-weight="400" font-size="13" fill="#59636e">the page: owns the comments</tspan></text>
+  <text x="36" y="76" font-size="14" fill="#1a1a1a">state: <tspan font-family="ui-monospace, Consolas, monospace">ticket</tspan>, <tspan font-family="ui-monospace, Consolas, monospace">comments</tspan>, <tspan font-family="ui-monospace, Consolas, monospace">commentError</tspan>, ...</text>
+  <text x="36" y="98" font-size="14" fill="#1a1a1a"><tspan font-family="ui-monospace, Consolas, monospace">handleAddComment</tspan>, <tspan font-family="ui-monospace, Consolas, monospace">handleDeleteComment</tspan>: call <tspan font-family="ui-monospace, Consolas, monospace">comments.api.js</tspan>, then <tspan font-family="ui-monospace, Consolas, monospace">setComments(...)</tspan></text>
+  <line x1="90" y1="134" x2="90" y2="256" stroke="#1a1a1a" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="102" y="166" text-anchor="start" font-size="13" font-weight="700" fill="#0550ae">props</text>
+  <text x="102" y="184" text-anchor="start" font-size="13" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">comments</text>
+  <text x="102" y="202" text-anchor="start" font-size="13" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">onDelete</text>
+  <line x1="320" y1="256" x2="320" y2="134" stroke="#1a1a1a" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrow)"/>
+  <text x="308" y="196" text-anchor="end" font-size="13" font-weight="700" fill="#7d4e00">a call</text>
+  <text x="308" y="214" text-anchor="end" font-size="13" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">onDelete(comment)</text>
+  <line x1="440" y1="134" x2="440" y2="256" stroke="#1a1a1a" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="452" y="166" text-anchor="start" font-size="13" font-weight="700" fill="#0550ae">props</text>
+  <text x="452" y="184" text-anchor="start" font-size="13" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">onSubmit</text>
+  <text x="452" y="202" text-anchor="start" font-size="13" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">error</text>
+  <line x1="700" y1="256" x2="700" y2="134" stroke="#1a1a1a" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrow)"/>
+  <text x="688" y="196" text-anchor="end" font-size="13" font-weight="700" fill="#7d4e00">a call</text>
+  <text x="688" y="214" text-anchor="end" font-size="13" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">onSubmit(commentText)</text>
+  <text x="688" y="232" text-anchor="end" font-size="13" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">returns true or false</text>
+  <rect x="20" y="260" width="330" height="110" rx="8" fill="#dafbe1" stroke="#116329" stroke-width="2"/>
+  <text x="36" y="288" font-size="16" font-weight="700" fill="#1a1a1a">CommentList <tspan font-weight="400" font-size="13" fill="#59636e">shows</tspan></text>
+  <text x="36" y="316" font-size="14" fill="#1a1a1a">each comment, and a <tspan font-family="ui-monospace, Consolas, monospace">Delete</tspan></text>
+  <text x="36" y="338" font-size="14" fill="#1a1a1a">button for each</text>
+  <rect x="410" y="260" width="330" height="110" rx="8" fill="#dafbe1" stroke="#116329" stroke-width="2"/>
+  <text x="426" y="288" font-size="16" font-weight="700" fill="#1a1a1a">CommentForm <tspan font-weight="400" font-size="13" fill="#59636e">owns the typing</tspan></text>
+  <text x="426" y="316" font-size="14" fill="#1a1a1a">state: <tspan font-family="ui-monospace, Consolas, monospace">commentText</tspan>,</text>
+  <text x="426" y="338" font-size="14" fill="#1a1a1a"><tspan font-family="ui-monospace, Consolas, monospace">isSubmitting</tspan></text>
+  <text x="20" y="410" font-size="13" fill="#59636e">The list and the form never talk to each other. A new comment reaches the list through the page.</text>
+</svg>

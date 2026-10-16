@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 390" width="760" height="390" role="img" aria-labelledby="title desc" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <title id="title">What's real and what's fake in a page test</title>
+  <desc id="desc">Three columns. On the left, the test: it sets up the fakes, types and clicks with userEvent, then checks the screen and checks what the fakes were given. In the middle, the real code under test, inside a MemoryRouter: the page, such as NewTicketPage, and the components it renders, such as TicketForm, FieldError and ErrorMessage. On the right, three fakes the page talks to instead of the real thing: the API module, replaced with vi.mock, whose functions return whatever the test says; window.confirm, replaced with vi.spyOn, which answers OK or Cancel as the test says; and the next page, a stand-in Route showing a plain heading, so the test can see where navigate() went.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#1a1a1a"/>
+    </marker>
+  </defs>
+  <rect width="760" height="390" fill="#ffffff"/>
+  <text x="20" y="24" font-size="13" font-weight="700" fill="#59636e">THE TEST</text>
+  <text x="250" y="24" font-size="13" font-weight="700" fill="#116329">REAL: THE CODE UNDER TEST</text>
+  <text x="556" y="24" font-size="13" font-weight="700" fill="#59636e">FAKE: WHAT IT TALKS TO</text>
+  <rect x="20" y="110" width="190" height="150" rx="8" fill="#ddf4ff" stroke="#0550ae" stroke-width="2"/>
+  <text x="34" y="136" font-size="15" font-weight="700" fill="#1a1a1a">The test</text>
+  <text x="34" y="160" font-size="13" fill="#1a1a1a">1 sets up the fakes</text>
+  <text x="34" y="179" font-size="13" fill="#1a1a1a">2 types and clicks</text>
+  <text x="34" y="198" font-size="13" fill="#1a1a1a">   (<tspan font-family="ui-monospace, Consolas, monospace">userEvent</tspan>)</text>
+  <text x="34" y="217" font-size="13" fill="#1a1a1a">3 checks the screen</text>
+  <text x="34" y="236" font-size="13" fill="#1a1a1a">4 checks the fakes</text>
+  <rect x="250" y="40" width="260" height="320" rx="8" fill="#dafbe1" stroke="#116329" stroke-width="2"/>
+  <text x="264" y="66" font-size="15" font-weight="700" fill="#1a1a1a">The page</text>
+  <text x="264" y="90" font-size="13" fill="#1a1a1a">e.g. <tspan font-family="ui-monospace, Consolas, monospace">NewTicketPage</tspan>,</text>
+  <text x="264" y="109" font-size="13" fill="#1a1a1a">and every component it</text>
+  <text x="264" y="128" font-size="13" fill="#1a1a1a">renders: <tspan font-family="ui-monospace, Consolas, monospace">TicketForm</tspan>,</text>
+  <text x="264" y="147" font-size="13" fill="#1a1a1a"><tspan font-family="ui-monospace, Consolas, monospace">FieldError</tspan>, <tspan font-family="ui-monospace, Consolas, monospace">ErrorMessage</tspan></text>
+  <text x="264" y="166" font-size="13" fill="#1a1a1a"></text>
+  <text x="264" y="185" font-size="13" fill="#1a1a1a">all inside a <tspan font-family="ui-monospace, Consolas, monospace">MemoryRouter</tspan></text>
+  <text x="264" y="204" font-size="13" fill="#1a1a1a">(<tspan font-family="ui-monospace, Consolas, monospace">renderWithProviders</tspan>)</text>
+  <text x="264" y="258" font-size="13" fill="#1a1a1a">The test only does what a</text>
+  <text x="264" y="277" font-size="13" fill="#1a1a1a">user can: it never calls the</text>
+  <text x="264" y="296" font-size="13" fill="#1a1a1a">page's functions itself.</text>
+  <rect x="556" y="40" width="196" height="96" rx="8" fill="#f6f8fa" stroke="#59636e" stroke-width="2" stroke-dasharray="6 4"/>
+  <text x="570" y="66" font-size="15" font-weight="700" fill="#1a1a1a">The API module</text>
+  <text x="570" y="90" font-size="13" fill="#1a1a1a"><tspan font-family="ui-monospace, Consolas, monospace">vi.mock(...)</tspan>: returns</text>
+  <text x="570" y="109" font-size="13" fill="#1a1a1a">what the test says</text>
+  <rect x="556" y="152" width="196" height="96" rx="8" fill="#f6f8fa" stroke="#59636e" stroke-width="2" stroke-dasharray="6 4"/>
+  <text x="570" y="178" font-size="15" font-weight="700" fill="#1a1a1a">window.confirm</text>
+  <text x="570" y="202" font-size="13" fill="#1a1a1a"><tspan font-family="ui-monospace, Consolas, monospace">vi.spyOn(...)</tspan>: answers</text>
+  <text x="570" y="221" font-size="13" fill="#1a1a1a">OK or Cancel</text>
+  <rect x="556" y="264" width="196" height="96" rx="8" fill="#f6f8fa" stroke="#59636e" stroke-width="2" stroke-dasharray="6 4"/>
+  <text x="570" y="290" font-size="15" font-weight="700" fill="#1a1a1a">The next page</text>
+  <text x="570" y="314" font-size="13" fill="#1a1a1a">a stand-in <tspan font-family="ui-monospace, Consolas, monospace">&lt;Route&gt;</tspan></text>
+  <text x="570" y="333" font-size="13" fill="#1a1a1a">with a plain <tspan font-family="ui-monospace, Consolas, monospace">&lt;h1&gt;</tspan></text>
+  <line x1="212" y1="185" x2="246" y2="185" stroke="#1a1a1a" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="512" y1="88" x2="552" y2="88" stroke="#1a1a1a" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="512" y1="200" x2="552" y2="200" stroke="#1a1a1a" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="512" y1="312" x2="552" y2="312" stroke="#1a1a1a" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="534" y="80" text-anchor="middle" font-size="11" fill="#59636e">calls</text>
+  <text x="534" y="192" text-anchor="middle" font-size="11" fill="#59636e">asks</text>
+  <text x="534" y="304" text-anchor="middle" font-size="11" fill="#59636e">goes to</text>
+</svg>

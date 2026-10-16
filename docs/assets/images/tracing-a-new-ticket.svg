@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 660" width="760" height="660" role="img" aria-labelledby="title desc" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <title id="title">Tracing a new ticket</title>
+  <desc id="desc">Six steps from typing in the form to the API's answer, then two ways back. 1, TicketForm.jsx: each key the user types calls setSubject or setDescription, and the form re-renders. 2, TicketForm.jsx: clicking Create ticket runs handleSubmit, which calls event.preventDefault() and setIsSubmitting(true), so the button says Saving. 3, NewTicketPage.jsx: the form calls onSubmit(values), which runs the page's handleCreate. 4, tickets.api.js: createTicket(values) calls apiRequest('/tickets') with method POST and the values as the body. 5, client.js: fetch sends POST /tickets, with the values as JSON and the token. 6, the back-end: authenticate, authorize('customer'), validate, save. If the answer is 201 Created: apiRequest returns the body and createTicket returns the new ticket; the page calls navigate to /tickets/ and the new id; the ticket's page appears and loads the new ticket. If the answer is 403 or 400: apiRequest throws, and the error passes through createTicket; the page's catch calls setSaveError(error), and the form then calls setIsSubmitting(false); React re-renders the form with the error showing and what was typed still there.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#1a1a1a"/>
+    </marker>
+  </defs>
+  <rect width="760" height="660" fill="#ffffff"/>
+
+  <text x="20" y="76" font-size="13" font-weight="700" fill="#116329">COMPONENT</text>
+  <text x="20" y="163" font-size="13" font-weight="700" fill="#116329">PAGE</text>
+  <text x="20" y="221" font-size="13" font-weight="700" fill="#7d4e00">API MODULE</text>
+  <text x="20" y="279" font-size="13" font-weight="700" fill="#7d4e00">HTTP</text>
+  <text x="20" y="337" font-size="13" font-weight="700" fill="#59636e">THE API</text>
+  <text x="20" y="443" font-size="13" font-weight="700" fill="#7d4e00">BACK UP</text>
+  <text x="20" y="527" font-size="13" font-weight="700" fill="#116329">STATE</text>
+  <text x="20" y="611" font-size="13" font-weight="700" fill="#116329">RESULT</text>
+  <g font-size="15" fill="#1a1a1a">
+    <rect x="130" y="20" width="610" height="44" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+    <text x="144" y="47"><tspan font-weight="700">1</tspan>  Each key calls <tspan font-family="ui-monospace, Consolas, monospace">setSubject(…)</tspan>, and the form re-renders</text>
+    <text x="726" y="47" text-anchor="end" font-size="13" fill="#59636e">TicketForm.jsx</text>
+    <rect x="130" y="78" width="610" height="44" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+    <text x="144" y="105"><tspan font-weight="700">2</tspan>  Click Create ticket: <tspan font-family="ui-monospace, Consolas, monospace">handleSubmit</tspan> runs, "Saving…"</text>
+    <text x="726" y="105" text-anchor="end" font-size="13" fill="#59636e">TicketForm.jsx</text>
+    <rect x="130" y="136" width="610" height="44" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+    <text x="144" y="163"><tspan font-weight="700">3</tspan>  <tspan font-family="ui-monospace, Consolas, monospace">onSubmit(values)</tspan> runs <tspan font-family="ui-monospace, Consolas, monospace">handleCreate(values)</tspan></text>
+    <text x="726" y="163" text-anchor="end" font-size="13" fill="#59636e">NewTicketPage.jsx</text>
+    <rect x="130" y="194" width="610" height="44" rx="6" fill="#fff8c5" stroke="#7d4e00" stroke-width="1.5"/>
+    <text x="144" y="221"><tspan font-weight="700">4</tspan>  <tspan font-family="ui-monospace, Consolas, monospace">createTicket(values)</tspan> calls <tspan font-family="ui-monospace, Consolas, monospace">apiRequest('/tickets', …)</tspan></text>
+    <text x="726" y="221" text-anchor="end" font-size="13" fill="#59636e">tickets.api.js</text>
+    <rect x="130" y="252" width="610" height="44" rx="6" fill="#fff8c5" stroke="#7d4e00" stroke-width="1.5"/>
+    <text x="144" y="279"><tspan font-weight="700">5</tspan>  <tspan font-family="ui-monospace, Consolas, monospace">fetch()</tspan> sends <tspan font-family="ui-monospace, Consolas, monospace">POST /tickets</tspan>: the values as JSON + token</text>
+    <text x="726" y="279" text-anchor="end" font-size="13" fill="#59636e">client.js</text>
+    <rect x="130" y="310" width="610" height="44" rx="6" fill="#f6f8fa" stroke="#59636e" stroke-width="1.5"/>
+    <text x="144" y="337"><tspan font-weight="700">6</tspan>  authenticate → authorize('customer') → validate → save</text>
+    <text x="726" y="337" text-anchor="end" font-size="13" fill="#59636e">the back-end</text>
+  </g>
+  <g stroke="#1a1a1a" stroke-width="2" marker-end="url(#arrow)">
+    <line x1="435" y1="64" x2="435" y2="76"/>
+    <line x1="435" y1="122" x2="435" y2="134"/>
+    <line x1="435" y1="180" x2="435" y2="192"/>
+    <line x1="435" y1="238" x2="435" y2="250"/>
+    <line x1="435" y1="296" x2="435" y2="308"/>
+    <line x1="400" y1="354" x2="290" y2="402"/>
+    <line x1="470" y1="354" x2="580" y2="402"/>
+  </g>
+  <text x="290" y="380" text-anchor="end" font-size="14" font-weight="700" fill="#116329">201 Created</text>
+  <text x="580" y="380" font-size="14" font-weight="700" fill="#cf222e">403 or 400</text>
+  <g font-size="14" fill="#1a1a1a">
+    <rect x="130" y="406" width="295" height="66" rx="6" fill="#fff8c5" stroke="#7d4e00" stroke-width="1.5"/>
+    <text x="144" y="428"><tspan font-family="ui-monospace, Consolas, monospace">apiRequest()</tspan> returns the body;</text>
+    <text x="144" y="446"><tspan font-family="ui-monospace, Consolas, monospace">createTicket()</tspan> returns the ticket</text>
+    <text x="144" y="464" font-size="12" fill="#59636e">client.js → tickets.api.js</text>
+    <rect x="445" y="406" width="295" height="66" rx="6" fill="#fff8c5" stroke="#7d4e00" stroke-width="1.5"/>
+    <text x="459" y="428"><tspan font-family="ui-monospace, Consolas, monospace">apiRequest()</tspan> throws the error;</text>
+    <text x="459" y="446">it passes through <tspan font-family="ui-monospace, Consolas, monospace">createTicket()</tspan></text>
+    <text x="459" y="464" font-size="12" fill="#59636e">client.js → tickets.api.js</text>
+    <rect x="130" y="490" width="295" height="66" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+    <text x="144" y="512"><tspan font-family="ui-monospace, Consolas, monospace">navigate()</tspan> to the new ticket,</text>
+    <text x="144" y="530">e.g. <tspan font-family="ui-monospace, Consolas, monospace">/tickets/5</tspan></text>
+    <text x="144" y="548" font-size="12" fill="#59636e">NewTicketPage.jsx</text>
+    <rect x="445" y="490" width="295" height="66" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+    <text x="459" y="512">catch: <tspan font-family="ui-monospace, Consolas, monospace">setSaveError(error)</tspan>;</text>
+    <text x="459" y="530">then <tspan font-family="ui-monospace, Consolas, monospace">setIsSubmitting(false)</tspan></text>
+    <text x="459" y="548" font-size="12" fill="#59636e">NewTicketPage → TicketForm</text>
+    <rect x="130" y="574" width="295" height="66" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+    <text x="144" y="596">The ticket's page appears,</text>
+    <text x="144" y="614">and loads the new ticket</text>
+    <text x="144" y="632" font-size="12" fill="#59636e">TicketDetailPage.jsx</text>
+    <rect x="445" y="574" width="295" height="66" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+    <text x="459" y="596">The form shows the error, and</text>
+    <text x="459" y="614">what was typed is still there</text>
+    <text x="459" y="632" font-size="12" fill="#59636e">TicketForm.jsx</text>
+  </g>
+  <g stroke="#1a1a1a" stroke-width="2" marker-end="url(#arrow)">
+    <line x1="277" y1="472" x2="277" y2="488"/>
+    <line x1="277" y1="556" x2="277" y2="572"/>
+    <line x1="592" y1="472" x2="592" y2="488"/>
+    <line x1="592" y1="556" x2="592" y2="572"/>
+  </g>
+</svg>

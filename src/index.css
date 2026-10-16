@@ -131,3 +131,165 @@ th {
 .details-list dd {
   margin: 0;
 }
+
+/* Keeps the line breaks someone typed into a description or comment. */
+.multiline-text {
+  white-space: pre-line;
+}
+
+/* ---- Buttons ---- */
+
+/* Every button, and links styled to look like one (e.g. "New ticket").
+   White on --colour-link is 7.6:1. */
+button,
+.button-link {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  font: inherit;
+  color: #ffffff;
+  text-decoration: none;
+  background-color: var(--colour-link);
+  border: 1px solid var(--colour-link);
+  border-radius: 0.375rem;
+  cursor: pointer;
+}
+
+.secondary-button {
+  color: var(--colour-link);
+  background-color: var(--colour-background);
+}
+
+/* For buttons that delete something. White on the error colour is 10:1. */
+.danger-button {
+  background-color: var(--colour-error-text);
+  border-color: var(--colour-error-text);
+}
+
+/* Shown while a request is on its way, so it can't be clicked twice. */
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+/* ---- Forms (TicketForm, CommentForm, TagForm, TicketFilters) ---- */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+  max-width: 40rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  width: 100%;
+}
+
+.form-field label {
+  font-weight: 600;
+}
+
+/* Input borders use the muted colour, not the lighter border colour, so
+   the edge of each box is easy to see (at least 3:1 against white). */
+input,
+textarea,
+select {
+  padding: 0.5rem;
+  font: inherit;
+  color: var(--colour-text);
+  background-color: var(--colour-background);
+  border: 1px solid var(--colour-muted);
+  border-radius: 0.375rem;
+}
+
+/* An input the API said has a problem: a thicker red border, as well as
+   the message under it, so it isn't shown by colour alone. */
+[aria-invalid='true'] {
+  border: 2px solid var(--colour-error-text);
+}
+
+.field-error {
+  margin: 0;
+  color: var(--colour-error-text);
+  font-weight: 600;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.filters .form-field {
+  width: auto;
+}
+
+/* ---- Pagination ---- */
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.pagination p {
+  margin: 0;
+}
+
+/* ---- Comments ---- */
+
+.comment-list {
+  padding: 0;
+  list-style: none;
+}
+
+.comment {
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--colour-border);
+  border-radius: 0.375rem;
+}
+
+.comment-meta {
+  margin-top: 0;
+  color: var(--colour-muted);
+}
+
+/* ---- Tags ---- */
+
+.tag-list {
+  padding: 0;
+  list-style: none;
+}
+
+.tag-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--colour-border);
+}
+
+.tag-name {
+  flex-grow: 1;
+  font-weight: 600;
+}
+
+.tag-form {
+  flex-grow: 1;
+  margin-bottom: 0;
+}

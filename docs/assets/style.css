@@ -166,3 +166,26 @@ body {
   height: auto;
   display: block;
 }
+
+/* Tables: a border round every cell and padding inside it, so columns
+   are clearly separate. display: block plus overflow-x lets a wide table
+   scroll sideways on a narrow screen instead of widening the page. */
+.slide-body table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  margin: 1rem 0;
+  border-collapse: collapse;
+}
+
+.slide-body th,
+.slide-body td {
+  padding: 0.4rem 0.75rem;
+  text-align: left;
+  vertical-align: top;
+  border: 1px solid var(--border);
+}
+
+.slide-body th {
+  background: var(--bg-code);
+}

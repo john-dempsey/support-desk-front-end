@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>POST, with a Body — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/what-stage-3-adds/every-control-for-now.html">← Every Control, for Now</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/sending-data/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/sending-data/patch-sends-what-changed.html">PATCH Sends What Changed →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>POST, with a Body</h1>
+    <p class="lede">createTicket() is getTicket() with two more things: a method, and a body for apiRequest() to send as JSON.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Every function in <code>tickets.api.js</code> so far has sent a <code>GET</code>. Here's the
+first that sends data:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 3.3: creating a ticket (src/api/tickets.api.js, excerpt)</span>
+<span class="hljs-comment">// POST /tickets: `newTicket` is { subject, description }. Returns the</span>
+<span class="hljs-comment">// saved ticket, including the id the database gave it.</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">createTicket</span>(<span class="hljs-params">newTicket</span>) {
+  <span class="hljs-keyword">const</span> responseBody = <span class="hljs-keyword">await</span> <span class="hljs-title function_">apiRequest</span>(<span class="hljs-string">&#x27;/tickets&#x27;</span>, {
+    <span class="hljs-attr">method</span>: <span class="hljs-string">&#x27;POST&#x27;</span>,
+    <span class="hljs-attr">body</span>: newTicket,
+  });
+  <span class="hljs-keyword">return</span> responseBody.<span class="hljs-property">data</span>;
+}
+</code></pre>
+<p>(The <code>apiRequest()</code> call is on one line in the file. It's split here to
+fit.)</p>
+<p>Put it next to <code>getTicket()</code> from Figure 2.5. The only difference is the
+second argument to <code>apiRequest()</code>, the <strong>options</strong> object:</p>
+<ul>
+<li><strong><code>method: 'POST'</code></strong>. Without it, <code>apiRequest()</code> sends a <code>GET</code>.</li>
+<li><strong><code>body: newTicket</code></strong>. A plain JavaScript object, such as
+<code>{ subject: 'Printer jammed', description: 'Paper stuck in tray 2' }</code>.</li>
+</ul>
+<p>That's all <code>createTicket()</code> has to do. Stage 0's <code>apiRequest()</code> already
+knows what to do with a body (Figure 0.14): turn it into JSON text with
+<code>JSON.stringify()</code>, and add the <code>Content-Type: application/json</code> header
+so the back-end's <code>express.json()</code> can read it into <code>req.body</code>.</p>
+<h2>What comes back</h2>
+<p>The back-end's <code>createTicket</code> controller answers <code>201 Created</code>, with the
+saved ticket in <code>data</code>:</p>
+<pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;data&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;subject&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Printer jammed&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;description&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Paper stuck in tray 2&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;status&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;open&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;customer&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> ...<span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Casey Customer&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;email&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;...&quot;</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;createdAt&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2026-10-15T09:30:00.000Z&quot;</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<p>(Shortened: some fields are left out. Your <code>id</code>s will be different.)</p>
+<p><code>201</code> is a 2xx status, so <code>response.ok</code> is <code>true</code>, and <code>apiRequest()</code>
+treats it like a <code>200</code>. <code>createTicket()</code> returns the ticket in <code>data</code>.</p>
+<p>The most useful part of it is the <strong><code>id</code></strong>. The browser didn't know it:
+the database chose it. With the <code>id</code>, the page can go straight to the
+new ticket's own page, <code>/tickets/5</code>. That's the dashed &quot;saved&quot; arrow
+from <code>New ticket</code> in the diagram in topic 01.</p>
+<h2>The front-end never sends <code>customerId</code></h2>
+<p><code>newTicket</code> has only <code>subject</code> and <code>description</code>. Who the ticket
+belongs to comes from the <strong>token</strong>, not the body: the back-end reads
+<code>req.user.id</code> (Lesson 4). The back-end's <code>createTicketSchema</code> doesn't
+even accept a <code>customerId</code>, so a customer can't create a ticket in
+someone else's name.</p>
+<h2>Try it</h2>
+<p>Which one word would you change in Figure 3.3 to send the same body
+with <code>PUT</code> instead? Would the Support Desk API accept it? (Look at
+<code>ticket.routes.js</code> in the back-end.)</p>
+</div>
+    
+  </main>
+</body>
+</html>

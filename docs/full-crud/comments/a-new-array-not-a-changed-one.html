@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A New Array, Not a Changed One — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/comments/adding-a-comment.html">← Adding a Comment</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/comments/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/comments/deleting-a-comment.html">Deleting a Comment →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>A New Array, Not a Changed One</h1>
+    <p class="lede">React only re-renders when it&#39;s given a different value. So adding to a list in state means making a new array with the spread syntax, never push().</p>
+
+    
+
+    
+      <div class="slide-body"><p>To add the new comment, the page writes:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-title function_">setComments</span>([...comments, newComment]);
+</code></pre>
+<p>Why not the obvious way?</p>
+<pre><code class="hljs language-jsx">comments.<span class="hljs-title function_">push</span>(newComment);
+<span class="hljs-title function_">setComments</span>(comments);
+</code></pre>
+<h2>React compares, then decides</h2>
+<p>When you call a state setter, React compares the new value with the
+one it already has. If they're the <strong>same</strong>, nothing has changed, so it
+doesn't re-render. That saves a lot of work.</p>
+<p>For an array, &quot;the same&quot; means <strong>the same array</strong>, not &quot;an array with
+the same items&quot;. <code>push()</code> adds to the array you already have. So
+<code>setComments(comments)</code> hands React the very array it's already
+holding. React sees no change, skips the re-render, and the new comment
+<strong>doesn't appear</strong>:</p>
+<p><img src="/support-desk-front-end/assets/images/a-new-array.svg" alt="Diagram: three ways to change the comments list. 1, correct: setComments([...comments, newComment]). The old array, holding #1 and #2, is untouched, and a new array holds #1, #2 and #3. React re-renders, and the list shows 3 comments. 2, wrong: comments.push(newComment); setComments(comments). There's one array: #3 is pushed into the old one, and there is no new array. React skips the re-render, and the screen still shows 2. 3, correct: setComments(comments.filter(...)). The old array, holding #1, #2 and #3, is untouched, and a new array holds #1 and #3, without #2. React re-renders, and the list shows 2 comments."></p>
+<p>The comment is in the array, but not on the screen, and it may appear
+later, when something else happens to re-render the page. It's a
+confusing bug, because the data looks right in the debugger.</p>
+<h2>The spread syntax</h2>
+<p><code>[...comments, newComment]</code> makes a <strong>new</strong> array:</p>
+<ul>
+<li><code>...comments</code> <strong>spreads</strong> the existing comments into it, one by one</li>
+<li><code>newComment</code> goes on the end</li>
+</ul>
+<p>The old array isn't touched. React gets a different array, so it
+re-renders. It's the same <code>...</code> the back-end uses to copy objects, such
+as <code>{ ...req.body, customerId: req.user.id }</code>.</p>
+<h2>Deleting: <code>filter()</code></h2>
+<p>Deleting needs a new array too. <code>filter()</code> always makes one: it keeps
+every item for which the function returns <code>true</code>.</p>
+<pre><code class="hljs language-jsx"><span class="hljs-title function_">setComments</span>(
+  comments.<span class="hljs-title function_">filter</span>(<span class="hljs-function">(<span class="hljs-params">comment</span>) =&gt;</span> comment.<span class="hljs-property">id</span> !== commentToDelete.<span class="hljs-property">id</span>),
+);
+</code></pre>
+<p>Every comment <strong>except</strong> the deleted one goes into the new array.</p>
+<h2>The rule</h2>
+<p><strong>Never change state directly. Make a new value, and pass that to the
+setter.</strong> It applies to objects as well as arrays, and to every piece
+of state in every component.</p>
+<h2>Try it</h2>
+<p>In <code>handleAddComment</code>, replace the <code>setComments(...)</code> line with the two
+<code>push()</code> lines above. Save, and add a comment. Does it appear? Type a
+character in the comment box: does it appear now? (The form's state
+changes, but does the page re-render?) Then delete a <strong>different</strong>
+comment, and click OK. What appears, and why then? Put the line back.</p>
+</div>
+    
+  </main>
+</body>
+</html>

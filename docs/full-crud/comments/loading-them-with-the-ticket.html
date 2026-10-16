@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Loading Them With the Ticket — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/comments/comments-on-the-ticket-page.html">← Comments on the Ticket&#39;s Page</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/comments/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/comments/the-comment-list.html">The Comment List →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Loading Them With the Ticket</h1>
+    <p class="lede">The ticket&#39;s page now asks for the ticket and its comments together, with Promise.all(), in the effect it already had.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The ticket's page already had a <code>useEffect</code> that loaded the ticket
+(Stage 2). Stage 3 adds the comments to the same effect, with the same
+<code>Promise.all()</code> as the edit page (topic 05):</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 3.35: the ticket and its comments</span>
+<span class="hljs-comment">// (src/pages/TicketDetailPage.jsx, excerpt)</span>
+<span class="hljs-keyword">const</span> [ticket, setTicket] = <span class="hljs-title function_">useState</span>(<span class="hljs-literal">null</span>);
+<span class="hljs-keyword">const</span> [comments, setComments] = <span class="hljs-title function_">useState</span>([]);
+<span class="hljs-comment">// ...</span>
+<span class="hljs-keyword">const</span> [ticketData, commentsData] = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">all</span>([
+  <span class="hljs-title function_">getTicket</span>(ticketId),
+  <span class="hljs-title function_">getComments</span>(ticketId),
+]);
+<span class="hljs-keyword">if</span> (!ignore) {
+  <span class="hljs-title function_">setTicket</span>(ticketData);
+  <span class="hljs-title function_">setComments</span>(commentsData);
+}
+</code></pre>
+<p>Nothing else in the effect changes. In particular, the &quot;not found&quot;
+handling still works: for a ticket that doesn't exist, <strong>both</strong> requests
+get a <code>404</code> (the back-end checks the ticket before it looks for its
+comments), <code>Promise.all()</code> fails, and the <code>catch</code> sets <code>isNotFound</code> as
+before.</p>
+<h2><code>[]</code>, not <code>null</code></h2>
+<p><code>comments</code> starts as <code>[]</code>, unlike <code>ticket</code>, which starts as <code>null</code>.
+Does that break the rule from Stage 2, that <code>null</code> means &quot;not loaded
+yet&quot;?</p>
+<p>No: the comments are never shown on their own. The page shows
+<code>&lt;Loading /&gt;</code> until <strong>both</strong> have loaded, so by the time <code>CommentList</code>
+appears, <code>comments</code> has always been set from the API. Starting with <code>[]</code>
+just means <code>comments</code> is always an array, so the code that uses it
+never has to check for <code>null</code>.</p>
+<h2>Clearing them for the next ticket</h2>
+<p>The effect's cleanup already reset the ticket's state when the URL
+changed to another ticket (Stage 2, topic 05). It now resets the
+comments and their error too:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 3.36: the cleanup (src/pages/TicketDetailPage.jsx, excerpt)</span>
+<span class="hljs-keyword">return</span> <span class="hljs-function">() =&gt;</span> {
+  ignore = <span class="hljs-literal">true</span>;
+  <span class="hljs-title function_">setTicket</span>(<span class="hljs-literal">null</span>);
+  <span class="hljs-title function_">setComments</span>([]);
+  <span class="hljs-comment">// ... the error messages and isLoading, as before</span>
+  <span class="hljs-title function_">setCommentError</span>(<span class="hljs-literal">null</span>);
+};
+</code></pre>
+<p>Without that, ticket 2's page could briefly show ticket 1's comments.</p>
+<h2>Try it</h2>
+<p>The comments could have been loaded in a <strong>second</strong> <code>useEffect</code>
+instead, with their own loading and error state. What would that let
+the page do that Figure 3.35 can't? (Hint: what happens to the whole
+page now if only the comments request fails?) What would it cost?</p>
+</div>
+    
+  </main>
+</body>
+</html>

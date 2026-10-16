@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Three New Routes — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/what-stage-3-adds/from-reading-to-changing.html">← From Reading to Changing</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/what-stage-3-adds/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/what-stage-3-adds/what-changes-and-what-doesnt.html">What Changes, and What Doesn&#39;t →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Three New Routes</h1>
+    <p class="lede">Each new page gets a line in App.jsx. One of them, /tickets/new, also fits the pattern /tickets/:ticketId, and React Router still picks the right page.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Every page in the app has a line in the route table, <code>App.jsx</code> (Stage 0,
+topic 04). Stage 3 adds three lines for the three ticket and tag pages:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 3.1: the route table (src/App.jsx, excerpt)</span>
+&lt;<span class="hljs-title class_">Routes</span>&gt;
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">Route</span> <span class="hljs-attr">path</span>=<span class="hljs-string">&quot;/&quot;</span> <span class="hljs-attr">element</span>=<span class="hljs-string">{</span>&lt;<span class="hljs-attr">HomePage</span> /&gt;</span>} /&gt;</span>
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">Route</span> <span class="hljs-attr">path</span>=<span class="hljs-string">&quot;/tickets&quot;</span> <span class="hljs-attr">element</span>=<span class="hljs-string">{</span>&lt;<span class="hljs-attr">TicketListPage</span> /&gt;</span>} /&gt;</span>
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">Route</span> <span class="hljs-attr">path</span>=<span class="hljs-string">&quot;/tickets/:ticketId&quot;</span> <span class="hljs-attr">element</span>=<span class="hljs-string">{</span>&lt;<span class="hljs-attr">TicketDetailPage</span> /&gt;</span>} /&gt;</span>
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">Route</span> <span class="hljs-attr">path</span>=<span class="hljs-string">&quot;/tickets/new&quot;</span> <span class="hljs-attr">element</span>=<span class="hljs-string">{</span>&lt;<span class="hljs-attr">NewTicketPage</span> /&gt;</span>} /&gt;</span>
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">Route</span>
+    <span class="hljs-attr">path</span>=<span class="hljs-string">&quot;/tickets/:ticketId/edit&quot;</span>
+    <span class="hljs-attr">element</span>=<span class="hljs-string">{</span>&lt;<span class="hljs-attr">EditTicketPage</span> /&gt;</span>}
+  /&gt;</span>
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">Route</span> <span class="hljs-attr">path</span>=<span class="hljs-string">&quot;/tags&quot;</span> <span class="hljs-attr">element</span>=<span class="hljs-string">{</span>&lt;<span class="hljs-attr">TagsPage</span> /&gt;</span>} /&gt;</span>
+
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">Route</span> <span class="hljs-attr">path</span>=<span class="hljs-string">&quot;*&quot;</span> <span class="hljs-attr">element</span>=<span class="hljs-string">{</span>&lt;<span class="hljs-attr">NotFoundPage</span> /&gt;</span>} /&gt;</span>
+&lt;/<span class="hljs-title class_">Routes</span>&gt;
+</code></pre>
+<p>(The comments are left out, and the <code>edit</code> route is split over several
+lines here to fit. It's one line in the file.)</p>
+<p>Each new page is imported at the top of the file, like the others.</p>
+<h2><code>/tickets/new</code> or ticket &quot;new&quot;?</h2>
+<p>Look at <code>/tickets/new</code>. It also fits the pattern <code>/tickets/:ticketId</code>,
+with <code>ticketId</code> as the text <code>'new'</code>. So which page shows?</p>
+<p>React Router compares the routes and picks the <strong>most specific</strong> one
+that fits (Stage 0, topic 04). A fixed word like <code>new</code> is more specific
+than <code>:ticketId</code>, which fits anything. So <code>/tickets/new</code> shows
+<code>NewTicketPage</code>, and <code>/tickets/2</code> still shows <code>TicketDetailPage</code>. The
+order of the lines makes no difference.</p>
+<p>Express is different. In the back-end, routes are tried <strong>in the order
+they're registered</strong>, and the first one that fits wins. If a back-end
+route file had <code>router.get('/:id', ...)</code> above <code>router.get('/new', ...)</code>,
+a request for <code>/new</code> would reach the first one, with <code>req.params.id</code> set
+to <code>'new'</code>. In React Router, that mistake can't happen.</p>
+<h2><code>:ticketId</code> in the middle</h2>
+<p><code>/tickets/:ticketId/edit</code> has its parameter in the <strong>middle</strong> of the
+path. That works the same way: on <code>/tickets/2/edit</code>, <code>useParams()</code> gives
+<code>{ ticketId: '2' }</code>. It's the same shape as the back-end's nested
+comment routes, <code>/tickets/:ticketId/comments</code>.</p>
+<h2>A link to Tags</h2>
+<p>The ticket pages link to each other (the diagram on the previous slide),
+but nothing links to <code>/tags</code>. So <code>NavBar.jsx</code> gets a third <code>NavLink</code>,
+exactly like the other two:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 3.2: the new link (src/components/NavBar.jsx, excerpt)</span>
+&lt;li&gt;
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">NavLink</span> <span class="hljs-attr">to</span>=<span class="hljs-string">&quot;/tags&quot;</span>&gt;</span>Tags<span class="hljs-tag">&lt;/<span class="hljs-name">NavLink</span>&gt;</span></span>
+&lt;/li&gt;
+</code></pre>
+<p>The new and edit pages don't need links in the navigation bar, because
+you reach them from the ticket pages.</p>
+<h2>Try it</h2>
+<p>Open <code>/tickets/new/edit</code>. Which route does that fit, and which page do
+you see? What does the page say, and why? (Hint: what would <code>useParams()</code>
+give?)</p>
+</div>
+    
+  </main>
+</body>
+</html>

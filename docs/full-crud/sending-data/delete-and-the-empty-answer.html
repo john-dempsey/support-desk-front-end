@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DELETE, and the Empty Answer — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/sending-data/patch-sends-what-changed.html">← PATCH Sends What Changed</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/sending-data/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/sending-data/three-more-api-files.html">Three More API Files →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>DELETE, and the Empty Answer</h1>
+    <p class="lede">A successful DELETE answers 204 No Content. deleteTicket() has nothing to return, but it can still fail.</p>
+
+    
+
+    
+      <div class="slide-body"><pre><code class="hljs language-js"><span class="hljs-comment">// Figure 3.5: deleting a ticket (src/api/tickets.api.js, excerpt)</span>
+<span class="hljs-comment">// DELETE /tickets/:id: the API answers 204 No Content, so there&#x27;s</span>
+<span class="hljs-comment">// nothing to return. A 409 means the ticket still has comments.</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">deleteTicket</span>(<span class="hljs-params">ticketId</span>) {
+  <span class="hljs-keyword">await</span> <span class="hljs-title function_">apiRequest</span>(<span class="hljs-string">`/tickets/<span class="hljs-subst">${ticketId}</span>`</span>, { <span class="hljs-attr">method</span>: <span class="hljs-string">&#x27;DELETE&#x27;</span> });
+}
+</code></pre>
+<p>A method, but no body: the URL already says everything.</p>
+<h2>Nothing to return</h2>
+<p>When the delete works, the back-end answers <strong><code>204 No Content</code></strong>, with
+no body at all. Stage 0's <code>apiRequest()</code> checks for that first and
+returns <code>null</code> (Figure 0.16), so it never tries to read JSON that isn't
+there.</p>
+<p>There's no <code>responseBody.data</code> to return, so <code>deleteTicket()</code> returns
+nothing. The function has no <code>return</code> line at all. A page that calls it
+only needs to know one thing: did it work?</p>
+<h2>It can still fail</h2>
+<p><code>await</code> still matters. It waits for the answer, and if the answer is an
+error, <code>apiRequest()</code> throws and <code>deleteTicket()</code> throws the same error,
+as <code>getTicket()</code> did with a <code>404</code> (Stage 2, topic 03).</p>
+<p>The one to expect here is <strong><code>409 Conflict</code></strong>. In the database, each
+comment points at its ticket, so the back-end won't delete a ticket
+that still has comments (Lesson 3 met this as a foreign key error). In
+the seeded data, ticket 1 has a comment:</p>
+<table>
+<thead>
+<tr>
+<th>Request</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DELETE /tickets/1</code></td>
+<td>409: &quot;This record cannot be deleted or changed because other records still depend on it&quot;</td>
+</tr>
+<tr>
+<td><code>DELETE /tickets/999</code></td>
+<td>404: &quot;Ticket 999 not found&quot;</td>
+</tr>
+</tbody>
+</table>
+<p>Topic 06 shows how the page shows these to the user.</p>
+<h2>Summary: three ways to send data</h2>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Sends</th>
+<th>Success</th>
+<th>Returns</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>createTicket(newTicket)</code></td>
+<td><code>POST /tickets</code> with a body</td>
+<td><code>201</code>, the new ticket</td>
+<td>the ticket, with its <code>id</code></td>
+</tr>
+<tr>
+<td><code>updateTicket(id, changes)</code></td>
+<td><code>PATCH /tickets/:id</code> with a body</td>
+<td><code>200</code>, the ticket now</td>
+<td>the ticket</td>
+</tr>
+<tr>
+<td><code>deleteTicket(id)</code></td>
+<td><code>DELETE /tickets/:id</code>, no body</td>
+<td><code>204</code>, no body</td>
+<td>nothing</td>
+</tr>
+</tbody>
+</table>
+<p>Every error, for all three, arrives the same way: thrown by
+<code>apiRequest()</code>, with <code>status</code>, <code>message</code> and, for a <code>400</code>, <code>details</code>.</p>
+<h2>Try it</h2>
+<p>Don't delete anything yet. In your REST client, send
+<code>DELETE /tickets/abc</code> with Ada's token. What status comes back, and
+why does it never reach the database?</p>
+</div>
+    
+  </main>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Keeping the Whole Error — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/when-the-api-says-no/two-sets-of-rules.html">← Two Sets of Rules</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/when-the-api-says-no/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/when-the-api-says-no/from-details-to-the-field.html">From details to the Field →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Keeping the Whole Error</h1>
+    <p class="lede">The page keeps the error object itself, not just its message, because a form needs the details too. The form shows the message at the top.</p>
+
+    
+
+    
+      <div class="slide-body"><p>In Stage 2, the pages kept only the error's <strong>message</strong>:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-title function_">setErrorMessage</span>(error.<span class="hljs-property">message</span>);
+</code></pre>
+<p>A message was all they showed. A form needs more. For a <code>400</code>, the
+useful part isn't the message (&quot;Validation failed&quot;), it's the
+<code>details</code>: which field, and what's wrong with it. So <code>NewTicketPage</code>
+keeps the <strong>whole error object</strong>:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 3.15: the error, kept whole (src/pages/NewTicketPage.jsx,</span>
+<span class="hljs-comment">// excerpt)</span>
+<span class="hljs-keyword">const</span> [saveError, setSaveError] = <span class="hljs-title function_">useState</span>(<span class="hljs-literal">null</span>);
+<span class="hljs-comment">// ...</span>
+} <span class="hljs-keyword">catch</span> (error) {
+  <span class="hljs-title function_">setSaveError</span>(error);
+}
+<span class="hljs-comment">// ...</span>
+&lt;<span class="hljs-title class_">TicketForm</span> ... error={saveError} /&gt;
+</code></pre>
+<p><code>null</code> means &quot;no error&quot;. After a failed attempt, <code>saveError</code> is the
+error <code>apiRequest()</code> threw, with its <code>message</code>, <code>status</code> and, for a
+<code>400</code>, <code>details</code> (Stage 0, topic 05). The page passes all of it down to
+the form, and the form picks out what it needs.</p>
+<h2>The message, at the top</h2>
+<p>The first thing in the form is:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 3.16: the form&#x27;s error message (src/components/TicketForm.jsx,</span>
+<span class="hljs-comment">// excerpt)</span>
+&lt;form className=<span class="hljs-string">&quot;form&quot;</span> onSubmit={handleSubmit}&gt;
+  {error &amp;&amp; <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">ErrorMessage</span> <span class="hljs-attr">message</span>=<span class="hljs-string">{error.message}</span> /&gt;</span></span>}
+</code></pre>
+<p>When there's an error, the same <code>ErrorMessage</code> as every other page shows
+its message, in a <code>role=&quot;alert&quot;</code> box that screen readers announce
+straight away (Stage 0, topic 07). When <code>error</code> is <code>null</code>, <code>&amp;&amp;</code> shows
+nothing.</p>
+<h2>What the user sees</h2>
+<p>Every error goes through the same two lines, so the form copes with
+anything the API (or the network) can say:</p>
+<table>
+<thead>
+<tr>
+<th>What happened</th>
+<th><code>status</code></th>
+<th>At the top of the form</th>
+<th>Under a field</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ada's token: not a customer</td>
+<td>403</td>
+<td>You do not have permission to perform this action</td>
+<td>nothing</td>
+</tr>
+<tr>
+<td>Three spaces as the subject</td>
+<td>400</td>
+<td>Validation failed</td>
+<td>subject is required</td>
+</tr>
+<tr>
+<td>The token has expired</td>
+<td>401</td>
+<td>Invalid or expired token</td>
+<td>nothing</td>
+</tr>
+<tr>
+<td>The API isn't running</td>
+<td>0</td>
+<td>Can't reach the API at ...</td>
+<td>nothing</td>
+</tr>
+</tbody>
+</table>
+<p>The last column is the next slide.</p>
+<p>In every case, the inputs keep what the user typed. The error only
+changes <code>saveError</code> in the page; <code>subject</code> and <code>description</code> are in the
+form's state, and nothing clears them.</p>
+<h2>Try it</h2>
+<p>With Casey's token, fill in the form, stop the API (<code>docker compose stop api</code> in the back-end folder), and click <strong>Create ticket</strong>. What
+does the form say? Is your text still there?</p>
+<p>Now start the API again (<code>docker compose start api</code>), change the
+subject to three spaces, and set the Network tab's throttling to
+<strong>Slow 4G</strong>. Click <strong>Create ticket</strong> and watch the &quot;Can't reach the
+API&quot; message. It disappears the moment you click, before the API has
+answered, and then &quot;Validation failed&quot; appears. Which line in
+<code>handleCreate</code> removed the old message, and which line put the new one
+there? Set throttling back to <strong>No throttling</strong>.</p>
+</div>
+    
+  </main>
+</body>
+</html>

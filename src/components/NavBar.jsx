@@ -23,6 +23,9 @@ function NavBar() {
                 page (/tickets/2) as well as on /tickets. */}
             <NavLink to="/tickets">Tickets</NavLink>
           </li>
+          <li>
+            <NavLink to="/tags">Tags</NavLink>
+          </li>
         </ul>
       </nav>
     </header>

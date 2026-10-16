@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Answering the Confirm Box — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/testing-stage-3/where-did-it-go.html">← Where Did It Go?</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/testing-stage-3/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/testing-stage-3/errors-and-waiting.html">Errors, and Waiting →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Answering the Confirm Box</h1>
+    <p class="lede">A test can&#39;t click OK in a browser&#39;s confirmation box. vi.spyOn() replaces window.confirm with a fake that answers for it.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Every delete starts with <code>window.confirm()</code> (topic 06). In a test,
+there's no box for anyone to click: jsdom, the pretend browser, doesn't
+show one, and complains that it isn't implemented. So the tests replace
+it:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 3.61: answering for the user</span>
+<span class="hljs-comment">// (src/pages/TicketDetailPage.test.jsx, excerpt)</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">answerConfirmWith</span>(<span class="hljs-params">answer</span>) {
+  vi.<span class="hljs-title function_">spyOn</span>(<span class="hljs-variable language_">window</span>, <span class="hljs-string">&#x27;confirm&#x27;</span>).<span class="hljs-title function_">mockReturnValue</span>(answer);
+}
+</code></pre>
+<p>(The comment above it is left out.)</p>
+<p><strong><code>vi.spyOn(object, 'name')</code></strong> replaces one function on an existing
+object with a fake, here <code>window.confirm</code>. <code>.mockReturnValue(true)</code>
+makes it answer OK; <code>false</code> makes it answer Cancel. It's like
+<code>vi.mock()</code>, but for one function on something that already exists,
+rather than a whole module of yours.</p>
+<h2>OK, and Cancel</h2>
+<pre><code class="hljs language-jsx"><span class="hljs-title function_">it</span>(<span class="hljs-string">&#x27;does nothing when the user cancels&#x27;</span>, <span class="hljs-title function_">async</span> () =&gt; {
+  <span class="hljs-title function_">answerConfirmWith</span>(<span class="hljs-literal">false</span>);
+  <span class="hljs-keyword">await</span> <span class="hljs-title function_">renderDeletableTicket</span>();
+
+  <span class="hljs-keyword">await</span> userEvent.<span class="hljs-title function_">click</span>(
+    screen.<span class="hljs-title function_">getByRole</span>(<span class="hljs-string">&#x27;button&#x27;</span>, { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Delete ticket&#x27;</span> }),
+  );
+
+  <span class="hljs-title function_">expect</span>(deleteTicket).<span class="hljs-property">not</span>.<span class="hljs-title function_">toHaveBeenCalled</span>();
+});
+</code></pre>
+<p>The Cancel test is as important as the OK test. It proves that the
+early <code>return</code> (topic 06, slide 02) works: no request is sent at all.</p>
+<h2>Putting it back</h2>
+<p>The fake must not leak into the next test, or a later test might get
+an answer it didn't ask for. <code>vite.config.js</code> sets <code>mockReset: true</code>,
+which puts every <code>vi.spyOn()</code> back to the real function after each test
+(Stage 0, topic 08). So no test needs to tidy up after itself.</p>
+<h2>Try it</h2>
+<p>Write the test that README exercise 6 asks for: in <code>TagsPage.test.jsx</code>,
+check that clicking <strong>Delete bug</strong> and then Cancel doesn't call
+<code>deleteTag</code>. Use the &quot;deletes a tag when confirmed&quot; test as your model.</p>
+</div>
+    
+  </main>
+</body>
+</html>

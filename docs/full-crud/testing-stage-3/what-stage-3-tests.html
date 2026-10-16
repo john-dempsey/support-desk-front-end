@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What Stage 3 Tests — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/filter-sort-and-page/answers-out-of-order.html">← Answers Out of Order</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/testing-stage-3/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/testing-stage-3/typing-and-choosing.html">Typing and Choosing →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>What Stage 3 Tests</h1>
+    <p class="lede">Stage 3&#39;s tests do what a user does, typing, choosing and clicking, against the real pages, with fakes for everything outside them.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Stage 2's page tests mostly <strong>waited</strong>: render the page, let the fake
+API answer, and check what appeared. Stage 3's pages are about what the
+user <strong>does</strong>, so their tests do it too: type into a form, choose from a
+dropdown, click a button, answer a confirmation box.</p>
+<p>The page and its components are the real code. Everything the page
+talks to is a fake that the test controls:</p>
+<p><img src="/support-desk-front-end/assets/images/real-and-fake-in-a-page-test.svg" alt="Diagram: three columns. The test, on the left: 1 sets up the fakes, 2 types and clicks with userEvent, 3 checks the screen, 4 checks the fakes. In the middle, real, the code under test: the page, such as NewTicketPage, and every component it renders, such as TicketForm, FieldError and ErrorMessage, all inside a MemoryRouter from renderWithProviders. The test only does what a user can: it never calls the page's functions itself. On the right, fakes the page talks to: the API module, which it calls, faked with vi.mock(...) to return what the test says; window.confirm, which it asks, faked with vi.spyOn(...) to answer OK or Cancel; and the next page, which it goes to, a stand-in Route with a plain h1."></p>
+<p>You've met the first fake (Stage 0) and the router (Stage 1). The other
+two are new in this stage.</p>
+<h2>The new test files</h2>
+<table>
+<thead>
+<tr>
+<th>Test file</th>
+<th>Tests</th>
+<th>What it covers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pages/NewTicketPage.test.jsx</code></td>
+<td>5</td>
+<td>what's sent, where it goes, <code>details</code> by the field, a <code>403</code>, the disabled button</td>
+</tr>
+<tr>
+<td><code>pages/EditTicketPage.test.jsx</code></td>
+<td>4</td>
+<td>the starting values, <code>PATCH</code> with a number or <code>null</code>, a load error</td>
+</tr>
+<tr>
+<td><code>pages/TagsPage.test.jsx</code></td>
+<td>7</td>
+<td>the list, empty, add, <code>409</code>, rename, cancel, delete</td>
+</tr>
+<tr>
+<td><code>components/Pagination.test.jsx</code></td>
+<td>4</td>
+<td>the label, Next, disabled ends, one page</td>
+</tr>
+<tr>
+<td><code>utils/getFieldError.test.js</code></td>
+<td>4</td>
+<td>found, not found, no error, no details</td>
+</tr>
+<tr>
+<td><code>api/comments.api.test.js</code>, <code>tags.api.test.js</code>, <code>users.api.test.js</code></td>
+<td>8</td>
+<td>each function's URL, method and body</td>
+</tr>
+</tbody>
+</table>
+<p>And four test files from Stage 2 grow: <code>tickets.api.test.js</code>,
+<code>TicketListPage.test.jsx</code>, <code>TicketDetailPage.test.jsx</code> and
+<code>App.test.jsx</code>. The last slide lists them all.</p>
+<h2>The API module tests</h2>
+<p>The three new API test files are exactly like Stage 2's
+<code>tickets.api.test.js</code>: fake <code>apiRequest()</code>, call the function, and check
+what it was called with. For example, that <code>createComment(2, 'Thanks!')</code>
+asks for <code>/tickets/2/comments</code> with <code>{ body: 'Thanks!' }</code>. They're short,
+so these slides concentrate on the page tests.</p>
+<h2>Try it</h2>
+<p>Open <code>src/api/tags.api.test.js</code> next to <code>tags.api.js</code>, and match each
+test to the function it tests. Then add one more: check that
+<code>updateTag()</code> <strong>returns</strong> the tag the fake <code>apiRequest()</code> sends back,
+not just that it was called with the right URL.</p>
+</div>
+    
+  </main>
+</body>
+</html>

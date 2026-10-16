@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>When the API Says No — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>When the API Says No</h1>
+    <p class="lede">The browser checks the basics, but the API has the final say. Its validation details are shown under the field they belong to.</p>
+
+    
+      <ul class="listing">
+        
+          <li>
+            <a href="/support-desk-front-end/full-crud/when-the-api-says-no/two-sets-of-rules.html">Two Sets of Rules</a>
+            <p>The browser checks the form before it&#39;s sent, using the same rules as the back-end&#39;s Zod schema. But only the API&#39;s check counts.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/full-crud/when-the-api-says-no/keeping-the-whole-error.html">Keeping the Whole Error</a>
+            <p>The page keeps the error object itself, not just its message, because a form needs the details too. The form shows the message at the top.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/full-crud/when-the-api-says-no/from-details-to-the-field.html">From details to the Field</a>
+            <p>getFieldError() looks through the error&#39;s details for one field&#39;s message. The form asks once for each of its fields.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/full-crud/when-the-api-says-no/showing-it-under-the-field.html">Showing It Under the Field</a>
+            <p>FieldError shows the message, and two aria attributes link it to its input, so a screen reader reads it out and the input is marked as having a problem.</p>
+          </li>
+        
+      </ul>
+    
+
+    
+  </main>
+</body>
+</html>

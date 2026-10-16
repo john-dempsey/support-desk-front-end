@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Creating One as Casey — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/creating-a-ticket/following-a-new-ticket.html">← Following a New Ticket</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/creating-a-ticket/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/creating-a-ticket/forms-and-buttons-in-css.html">Forms and Buttons in CSS →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Creating One as Casey</h1>
+    <p class="lede">Only customers can create tickets, so with Ada&#39;s token the form shows a 403. Switch to Casey&#39;s token to create one, then switch back.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Fill in the form with Ada's token in <code>.env</code>, and click <strong>Create
+ticket</strong>. The form shows:</p>
+<blockquote>
+<p>You do not have permission to perform this action</p>
+</blockquote>
+<p>That's the API's <code>authorize('customer')</code> (topic 01): admins can do
+almost everything, but they can't report a problem. The front-end shows
+the API's message, which is the right thing to do. Stage 4 will hide
+the New ticket link from anyone who isn't a customer.</p>
+<h2>Switching to Casey</h2>
+<p>To create a ticket now, use a <strong>customer's</strong> token for a while:</p>
+<ol>
+<li>In your REST client, send <code>POST http://localhost:3000/auth/login</code>
+with <code>{ &quot;email&quot;: &quot;casey@example.com&quot;, &quot;password&quot;: &quot;password123&quot; }</code>.</li>
+<li>Copy the <code>token</code> into <code>.env</code> as <code>VITE_DEV_TOKEN</code>, in place of Ada's.
+Keep Ada's somewhere (a comment line in <code>.env</code>, starting with <code>#</code>,
+is fine), because you'll want it back.</li>
+<li>Save <code>.env</code>. Vite restarts itself; reload the page.</li>
+<li>Create a ticket. You land on its page.</li>
+</ol>
+<p>The API allows only 10 logins every 15 minutes. If you get
+<code>429 Too many requests</code>, wait a few minutes, and keep both tokens in
+<code>.env</code> so you don't have to log in again.</p>
+<h2>Seeing the app as Casey</h2>
+<p>While Casey's token is in <code>.env</code>, look around:</p>
+<ul>
+<li>The <strong>Tickets</strong> page shows only Casey's tickets, including the new
+one. The API scopes the list by who's asking (Lesson 4).</li>
+<li><strong>Edit ticket</strong> and <strong>Delete ticket</strong> are still there, because Stage 3
+shows every control. Try them. The edit page can't even load: it asks
+for the list of agents, and <code>GET /users</code> is for agents and admins
+only, so it gets a <code>403</code>. Delete gets a <code>403</code> too, because customers
+can't delete tickets.</li>
+</ul>
+<p>That's what Stage 4 fixes: the front-end will know who's logged in, and
+won't offer Casey buttons that can only fail.</p>
+<h2>Switching back</h2>
+<p>Put Ada's token back in <code>.env</code> when you've finished creating tickets.
+The rest of this lesson uses it.</p>
+<h2>Try it</h2>
+<p>As Casey, create two tickets. Switch back to Ada. Are Casey's new
+tickets in Ada's list? Who is each one's customer, and who is it
+assigned to? Where did the front-end send the customer's name? (It
+didn't. Where did it come from?)</p>
+</div>
+    
+  </main>
+</body>
+</html>

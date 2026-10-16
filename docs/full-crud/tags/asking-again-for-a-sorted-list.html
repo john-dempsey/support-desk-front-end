@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Asking Again for a Sorted List — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/tags/which-row-is-being-renamed.html">← Which Row Is Being Renamed?</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/tags/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/tags/deleting-a-tag.html">Deleting a Tag →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Asking Again for a Sorted List</h1>
+    <p class="lede">The API sorts tags by name, so a new or renamed tag could belong anywhere in the list. The page asks the API for the list again, instead of working out where.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Comments are easy to add to the list the page has: a new comment always
+goes at the end (topic 07). Tags are different. The API returns them
+<strong>sorted by name</strong>, so a new tag could belong anywhere:</p>
+<p><img src="/support-desk-front-end/assets/images/adding-to-a-sorted-list.svg" alt="Diagram: before, the list shows billing and bug, sorted by name, and the user adds api. Wrong: add it to the end with setTags([...tags, newTag]), and the list shows billing, bug, api: out of order, until a reload. Right: ask the API again with await reloadTags(), and the list shows api, billing, bug, because the API sorted it. TagsPage does the second: reloadTags() calls getTags() and setTags() after every add or rename."></p>
+<p>The page could sort the list itself. But the API already does, and its
+idea of alphabetical order (from the database) might not match
+JavaScript's in every case. So the page asks the API again, the other
+way from topic 07, slide 08:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 3.47: adding, then asking again (src/pages/TagsPage.jsx,</span>
+<span class="hljs-comment">// excerpt)</span>
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">reloadTags</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> latestTags = <span class="hljs-keyword">await</span> <span class="hljs-title function_">getTags</span>();
+  <span class="hljs-title function_">setTags</span>(latestTags);
+}
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">handleAddTag</span>(<span class="hljs-params">name</span>) {
+  <span class="hljs-title function_">setAddError</span>(<span class="hljs-literal">null</span>);
+  <span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">await</span> <span class="hljs-title function_">createTag</span>(name);
+    <span class="hljs-keyword">await</span> <span class="hljs-title function_">reloadTags</span>();
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+  } <span class="hljs-keyword">catch</span> (error) {
+    <span class="hljs-title function_">setAddError</span>(<span class="hljs-title function_">describeTagError</span>(error));
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+  }
+}
+</code></pre>
+<p>(The comments are left out. <code>describeTagError</code> is slide 06.)</p>
+<p><code>createTag()</code> returns the saved tag, but the page doesn't use it:
+<code>reloadTags()</code> gets the whole list again, in the right order, with the
+new tag in it. <code>reloadTags</code> is a separate function because renaming
+needs exactly the same thing.</p>
+<h2>Renaming</h2>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 3.48: renaming (src/pages/TagsPage.jsx, excerpt)</span>
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">handleRenameTag</span>(<span class="hljs-params">name</span>) {
+  <span class="hljs-title function_">setRenameError</span>(<span class="hljs-literal">null</span>);
+  <span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">await</span> <span class="hljs-title function_">updateTag</span>(editingTagId, name);
+    <span class="hljs-keyword">await</span> <span class="hljs-title function_">reloadTags</span>();
+    <span class="hljs-title function_">setEditingTagId</span>(<span class="hljs-literal">null</span>);
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+  } <span class="hljs-keyword">catch</span> (error) {
+    <span class="hljs-title function_">setRenameError</span>(<span class="hljs-title function_">describeTagError</span>(error));
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+  }
+}
+</code></pre>
+<p>Renaming &quot;billing&quot; to &quot;invoices&quot; moves it down the list, so the page
+asks again here too. Then <code>setEditingTagId(null)</code> puts the row back to
+showing its (new) name. The id comes from <code>editingTagId</code>: the form
+doesn't need to know which tag it's renaming.</p>
+<h2>One thing to notice</h2>
+<p>If <code>createTag()</code> works but <code>reloadTags()</code> fails (the API stops in
+between, say), the <code>catch</code> shows an error, although the tag <strong>was</strong>
+saved. It's rare, and a reload shows the truth, but it's the cost of
+two requests where one might fail.</p>
+<h2>Try it</h2>
+<p>Add tags called <code>api</code>, <code>zebra</code> and <code>Middle</code>. Where does each appear?
+Is <code>Middle</code>, with a capital, where you expected? Rename <code>zebra</code> to
+<code>aardvark</code>, and watch it move.</p>
+</div>
+    
+  </main>
+</body>
+</html>

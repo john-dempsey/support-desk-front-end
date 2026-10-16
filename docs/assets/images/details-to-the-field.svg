@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 448" width="760" height="448" role="img" aria-labelledby="title desc" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <title id="title">From the API's details to the field</title>
+  <desc id="desc">Five steps. 1, the back-end's validate.js: the API answers 400, with a details list holding field subject and message subject is required. 2, client.js: apiRequest throws an error with status 400, the message Validation failed, and the details. 3, NewTicketPage.jsx: the page's catch keeps the whole error with setSaveError(error). 4, TicketForm.jsx: the form gets it as its error prop, and getFieldError(error, 'subject') gives subject is required. 5, FieldError.jsx: the message is shown under the Subject input, which gets aria-invalid and aria-describedby for screen readers.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#1a1a1a"/>
+    </marker>
+  </defs>
+  <rect width="760" height="448" fill="#ffffff"/>
+  <rect x="20" y="20" width="720" height="64" rx="8" fill="#f6f8fa" stroke="#59636e" stroke-width="2"/>
+  <text x="40" y="47" font-size="15" fill="#1a1a1a"><tspan font-weight="700">1</tspan>  The API answers <tspan font-family="ui-monospace, Consolas, monospace">400</tspan>, with a <tspan font-family="ui-monospace, Consolas, monospace">details</tspan> list:</text>
+  <text x="60" y="70" font-size="15" fill="#1a1a1a"><tspan font-family="ui-monospace, Consolas, monospace">[{ field: 'subject', message: 'subject is required' }]</tspan></text>
+  <text x="725" y="47" text-anchor="end" font-size="13" fill="#59636e">validate.js (back-end)</text>
+  <line x1="380" y1="86" x2="380" y2="104" stroke="#1a1a1a" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="20" y="106" width="720" height="64" rx="8" fill="#fff8c5" stroke="#7d4e00" stroke-width="2"/>
+  <text x="40" y="133" font-size="15" fill="#1a1a1a"><tspan font-weight="700">2</tspan>  <tspan font-family="ui-monospace, Consolas, monospace">apiRequest()</tspan> throws an error with <tspan font-family="ui-monospace, Consolas, monospace">status</tspan> 400,</text>
+  <text x="60" y="156" font-size="15" fill="#1a1a1a"><tspan font-family="ui-monospace, Consolas, monospace">message</tspan> 'Validation failed', and the <tspan font-family="ui-monospace, Consolas, monospace">details</tspan></text>
+  <text x="725" y="133" text-anchor="end" font-size="13" fill="#59636e">client.js</text>
+  <line x1="380" y1="172" x2="380" y2="190" stroke="#1a1a1a" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="20" y="192" width="720" height="64" rx="8" fill="#dafbe1" stroke="#116329" stroke-width="2"/>
+  <text x="40" y="219" font-size="15" fill="#1a1a1a"><tspan font-weight="700">3</tspan>  The page's catch keeps the whole error:</text>
+  <text x="60" y="242" font-size="15" fill="#1a1a1a"><tspan font-family="ui-monospace, Consolas, monospace">setSaveError(error)</tspan></text>
+  <text x="725" y="219" text-anchor="end" font-size="13" fill="#59636e">NewTicketPage.jsx</text>
+  <line x1="380" y1="258" x2="380" y2="276" stroke="#1a1a1a" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="20" y="278" width="720" height="64" rx="8" fill="#dafbe1" stroke="#116329" stroke-width="2"/>
+  <text x="40" y="305" font-size="15" fill="#1a1a1a"><tspan font-weight="700">4</tspan>  The form gets it as its <tspan font-family="ui-monospace, Consolas, monospace">error</tspan> prop, and asks for one field:</text>
+  <text x="60" y="328" font-size="15" fill="#1a1a1a"><tspan font-family="ui-monospace, Consolas, monospace">getFieldError(error, 'subject')</tspan> gives 'subject is required'</text>
+  <text x="725" y="305" text-anchor="end" font-size="13" fill="#59636e">TicketForm.jsx</text>
+  <line x1="380" y1="344" x2="380" y2="362" stroke="#1a1a1a" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="20" y="364" width="720" height="64" rx="8" fill="#ddf4ff" stroke="#0550ae" stroke-width="2"/>
+  <text x="40" y="391" font-size="15" fill="#1a1a1a"><tspan font-weight="700">5</tspan>  <tspan font-family="ui-monospace, Consolas, monospace">FieldError</tspan> shows it under Subject. The input gets</text>
+  <text x="60" y="414" font-size="15" fill="#1a1a1a"><tspan font-family="ui-monospace, Consolas, monospace">aria-invalid</tspan> and <tspan font-family="ui-monospace, Consolas, monospace">aria-describedby</tspan>, for screen readers</text>
+  <text x="725" y="391" text-anchor="end" font-size="13" fill="#59636e">FieldError.jsx</text>
+</svg>

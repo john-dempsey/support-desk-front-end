@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>One Form, Used Twice — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/tags/a-whole-resource-on-one-page.html">← A Whole Resource on One Page</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/tags/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/tags/which-row-is-being-renamed.html">Which Row Is Being Renamed? →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>One Form, Used Twice</h1>
+    <p class="lede">TagForm is a one-field form. The page uses it to add a tag and to rename one, which is why each use needs its own input id, and only one has a Cancel button.</p>
+
+    
+
+    
+      <div class="slide-body"><p><code>TagForm</code> is <code>CommentForm</code> (topic 07) with an input instead of a
+textarea. It looks after the name being typed, and calls <code>onSubmit</code>,
+which returns <code>true</code> if the tag was saved, so the form knows to empty
+its input. It also has three props the other forms didn't need:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 3.43: the tag form&#x27;s props (src/components/TagForm.jsx,</span>
+<span class="hljs-comment">// excerpt)</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">TagForm</span>(<span class="hljs-params">{
+  inputId,
+  label,
+  initialName = <span class="hljs-string">&#x27;&#x27;</span>,
+  submitLabel,
+  onSubmit,
+  onCancel,
+  error,
+}</span>) {
+  <span class="hljs-comment">// ...</span>
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">label</span> <span class="hljs-attr">htmlFor</span>=<span class="hljs-string">{inputId}</span>&gt;</span>{label}<span class="hljs-tag">&lt;/<span class="hljs-name">label</span>&gt;</span></span>
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">id</span>=<span class="hljs-string">{inputId}</span> <span class="hljs-attr">...</span> /&gt;</span></span>
+  <span class="hljs-comment">// ...</span>
+  {onCancel &amp;&amp; (
+    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;button&quot;</span> <span class="hljs-attr">className</span>=<span class="hljs-string">&quot;secondary-button&quot;</span> <span class="hljs-attr">onClick</span>=<span class="hljs-string">{onCancel}</span>&gt;</span>
+      Cancel
+    <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span></span>
+  )}
+</code></pre>
+<p>(The function's first line is one line in the file, split here to fit.
+<code>...</code> marks the parts left out.)</p>
+<p>The page uses it twice:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 3.44: the two uses (src/pages/TagsPage.jsx, excerpt)</span>
+&lt;<span class="hljs-title class_">TagForm</span>
+  inputId=<span class="hljs-string">&quot;new-tag-name&quot;</span>
+  label=<span class="hljs-string">&quot;New tag name&quot;</span>
+  submitLabel=<span class="hljs-string">&quot;Add tag&quot;</span>
+  onSubmit={handleAddTag}
+  error={addError}
+/&gt;
+<span class="hljs-comment">// ... and, in the row of the tag being renamed:</span>
+<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">TagForm</span>
+  <span class="hljs-attr">inputId</span>=<span class="hljs-string">{</span>`<span class="hljs-attr">tag-name-</span>${<span class="hljs-attr">tag.id</span>}`}
+  <span class="hljs-attr">label</span>=<span class="hljs-string">{</span>`<span class="hljs-attr">New</span> <span class="hljs-attr">name</span> <span class="hljs-attr">for</span> &quot;${<span class="hljs-attr">tag.name</span>}&quot;`}
+  <span class="hljs-attr">initialName</span>=<span class="hljs-string">{tag.name}</span>
+  <span class="hljs-attr">submitLabel</span>=<span class="hljs-string">&quot;Save&quot;</span>
+  <span class="hljs-attr">onSubmit</span>=<span class="hljs-string">{handleRenameTag}</span>
+  <span class="hljs-attr">onCancel</span>=<span class="hljs-string">{()</span> =&gt;</span> setEditingTagId(null)}
+  error={renameError}
+/&gt;</span>
+</code></pre>
+<h2><code>inputId</code>: every id is different</h2>
+<p><code>TicketForm</code> and <code>CommentForm</code> could use fixed ids like
+<code>ticket-subject</code>, because there's only ever one of each on a page. But
+both tag forms can be on screen at once, and an <code>id</code> must be <strong>unique</strong>
+on a page: <code>&lt;label htmlFor&gt;</code> and <code>aria-describedby</code> find their element
+by it. Two inputs with the same <code>id</code>, and clicking the second label
+would put the cursor in the first input.</p>
+<p>So the page passes the <code>id</code>. The rename form's includes the tag's own
+id: <code>tag-name-1</code>, <code>tag-name-2</code>, ... The form builds its error's <code>id</code>
+from it too: <code>`${inputId}-error`</code>.</p>
+<h2><code>label</code>: say what it's for</h2>
+<p>&quot;New tag name&quot; and <code>New name for &quot;bug&quot;</code> tell a screen reader user
+which form they're in, and which tag they're renaming.</p>
+<h2><code>onCancel</code>: optional</h2>
+<p>Adding needs no Cancel: you just don't click <strong>Add tag</strong>. Renaming does,
+to put the row back. So <code>onCancel</code> is <strong>optional</strong>: the add form doesn't
+pass it, it's <code>undefined</code>, and <code>onCancel &amp;&amp; (...)</code> shows no button.</p>
+<h2>Try it</h2>
+<p>Give the rename form the same <code>inputId</code> as the add form,
+<code>&quot;new-tag-name&quot;</code>. Save, click <strong>Rename</strong> on a tag, and then click the
+words <strong>New name for &quot;...&quot;</strong> above the rename input. Where does the
+cursor go? Why that input? Put it back.</p>
+</div>
+    
+  </main>
+</body>
+</html>

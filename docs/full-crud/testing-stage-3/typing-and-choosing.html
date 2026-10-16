@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Typing and Choosing — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/testing-stage-3/what-stage-3-tests.html">← What Stage 3 Tests</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/testing-stage-3/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/testing-stage-3/checking-what-was-sent.html">Checking What Was Sent →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Typing and Choosing</h1>
+    <p class="lede">userEvent types into inputs one key at a time and chooses from dropdowns, just as a user would, so every onChange runs.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Stage 2 used <code>userEvent.click()</code> to follow a link. Stage 3's tests type
+and choose too:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 3.58: filling in the form like a user</span>
+<span class="hljs-comment">// (src/pages/NewTicketPage.test.jsx, excerpt)</span>
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">fillInAndSubmit</span>(<span class="hljs-params">subject, description</span>) {
+  <span class="hljs-keyword">await</span> userEvent.<span class="hljs-title function_">type</span>(screen.<span class="hljs-title function_">getByLabelText</span>(<span class="hljs-string">&#x27;Subject&#x27;</span>), subject);
+  <span class="hljs-keyword">await</span> userEvent.<span class="hljs-title function_">type</span>(
+    screen.<span class="hljs-title function_">getByLabelText</span>(<span class="hljs-string">&#x27;Description&#x27;</span>),
+    description,
+  );
+  <span class="hljs-keyword">await</span> userEvent.<span class="hljs-title function_">click</span>(
+    screen.<span class="hljs-title function_">getByRole</span>(<span class="hljs-string">&#x27;button&#x27;</span>, { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Create ticket&#x27;</span> }),
+  );
+}
+</code></pre>
+<p>(The comment is left out, and the last two calls are each one line in
+the file, split here to fit.)</p>
+<h2><code>userEvent.type()</code></h2>
+<p><code>userEvent.type(input, 'Printer')</code> presses <strong>P</strong>, <strong>r</strong>, <strong>i</strong>, ... one
+key at a time. Each key fires the same events a real keyboard would, so
+the input's <code>onChange</code> runs seven times, and <code>TicketForm</code>'s
+<code>setSubject()</code> with it. The test exercises the controlled input exactly
+as a user does (topic 03, slide 02).</p>
+<p>It finds the input by its <strong>label</strong>, <code>getByLabelText('Subject')</code>. If the
+<code>&lt;label&gt;</code> and <code>htmlFor</code> didn't match, the test couldn't find the input,
+and neither could a screen reader. So the test checks the accessibility
+too, for free.</p>
+<h2><code>userEvent.selectOptions()</code> and <code>clear()</code></h2>
+<pre><code class="hljs language-jsx"><span class="hljs-keyword">await</span> userEvent.<span class="hljs-title function_">selectOptions</span>(
+  screen.<span class="hljs-title function_">getByLabelText</span>(<span class="hljs-string">&#x27;Status&#x27;</span>), <span class="hljs-string">&#x27;Resolved&#x27;</span>,
+);
+</code></pre>
+<p>chooses the option whose <strong>text</strong> is &quot;Resolved&quot;, the way a user picks
+it, and <code>onChange</code> gets its value, <code>'resolved'</code>.</p>
+<p><code>userEvent.clear(input)</code> empties an input first. The rename test uses
+it, because the rename input starts with the tag's name in it.</p>
+<h2>Always <code>await</code></h2>
+<p>Every <code>userEvent</code> call is <code>async</code>: it waits for React to finish
+updating after each event. Forget the <code>await</code>, and the test checks the
+screen before the typing has happened.</p>
+<h2>A helper for repeated steps</h2>
+<p>Four of <code>NewTicketPage</code>'s tests fill in the form the same way, so the
+steps are in <code>fillInAndSubmit()</code>. Each test reads as what's different
+about it: what the fake API answers, and what should happen.</p>
+<h2>Try it</h2>
+<p>In <code>NewTicketPage.test.jsx</code>, remove the <code>await</code> before the
+<code>userEvent.type()</code> for the subject. Run the tests. Which fail, and what
+do they say? Put it back.</p>
+</div>
+    
+  </main>
+</body>
+</html>

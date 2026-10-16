@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What Changes, and What Doesn&#39;t — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/what-stage-3-adds/three-new-routes.html">← Three New Routes</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/what-stage-3-adds/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/what-stage-3-adds/every-control-for-now.html">Every Control, for Now →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>What Changes, and What Doesn&#39;t</h1>
+    <p class="lede">Most of Stage 3 is new files. client.js doesn&#39;t change at all: the starter already knew how to send a body, read a 204 and keep validation details.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Stage 3 is the biggest stage so far, but most of it is <strong>new</strong> files
+that sit beside the old ones. Here's every file in <code>src/</code> it touches,
+leaving out the tests (topic 10):</p>
+<table>
+<thead>
+<tr>
+<th>Folder</th>
+<th>New</th>
+<th>Changed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>api/</code></td>
+<td><code>comments.api.js</code>, <code>tags.api.js</code>, <code>users.api.js</code></td>
+<td><code>tickets.api.js</code>: four new functions (topic 02, topic 09)</td>
+</tr>
+<tr>
+<td><code>pages/</code></td>
+<td><code>NewTicketPage</code>, <code>EditTicketPage</code>, <code>TagsPage</code></td>
+<td><code>TicketDetailPage</code>: comments and Delete. <code>TicketListPage</code>: filters and pages</td>
+</tr>
+<tr>
+<td><code>components/</code></td>
+<td><code>TicketForm</code>, <code>FieldError</code>, <code>CommentList</code>, <code>CommentForm</code>, <code>TagForm</code>, <code>TicketFilters</code>, <code>Pagination</code></td>
+<td><code>NavBar</code>: the Tags link. <code>StatusBadge</code>: its labels move out (topic 05)</td>
+</tr>
+<tr>
+<td><code>utils/</code></td>
+<td><code>getFieldError.js</code>, <code>ticketStatuses.js</code></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td><code>App.jsx</code>: three routes. <code>index.css</code>: forms and buttons</td>
+</tr>
+</tbody>
+</table>
+<h2>What doesn't change</h2>
+<ul>
+<li><strong><code>api/client.js</code>.</strong> Not one line. Stage 0's <code>apiRequest()</code> could
+already send a <code>body</code> as JSON, return <code>null</code> for a <code>204</code>, and attach
+<code>status</code> and <code>details</code> to an error (Stage 0, topic 05). Nothing used
+those parts until now. This is the payoff for writing the client once,
+completely, at the start.</li>
+<li><strong><code>TicketList</code>, <code>Loading</code>, <code>ErrorMessage</code>, <code>formatDate</code>.</strong> The new
+pages reuse them as they are.</li>
+<li><strong><code>main.jsx</code>, <code>HomePage</code>, <code>NotFoundPage</code>.</strong></li>
+</ul>
+<h2>The same split as before</h2>
+<p>Every new page follows the rule from Stage 1: <strong>pages own the data,
+components display it</strong>. Pages call the API and hold what comes back.
+Components get props.</p>
+<p>Forms add one twist, which topic 03 explains: a form component holds
+<strong>what's being typed</strong>, because only it needs that while the user types.
+The page still makes the request.</p>
+<h2>Try it</h2>
+<p>Once you've got the <code>stage-03</code> code, list every file in <code>src/</code> that
+changed since the end of Stage 2:</p>
+<pre><code class="hljs language-bash">git diff --<span class="hljs-built_in">stat</span> stage-02 stage-03 -- src
+</code></pre>
+<p>Then check the claim about <code>client.js</code>:</p>
+<pre><code class="hljs language-bash">git diff stage-02 stage-03 -- src/api/client.js
+</code></pre>
+<p>What does an empty answer from <code>git diff</code> mean?</p>
+</div>
+    
+  </main>
+</body>
+</html>

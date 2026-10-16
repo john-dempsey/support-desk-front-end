@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>One List of Statuses — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/editing-a-ticket/strings-and-numbers.html">← Strings and Numbers</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/editing-a-ticket/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/editing-a-ticket/saving-and-going-back.html">Saving, and Going Back →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>One List of Statuses</h1>
+    <p class="lede">The status words used to live in StatusBadge. Now three files need them, so they move to their own file in utils/.</p>
+
+    
+
+    
+      <div class="slide-body"><p>In Stage 1, <code>StatusBadge</code> held the words for each status, in a
+<code>STATUS_LABELS</code> object at the top of the file. It was the only file that
+needed them.</p>
+<p>Stage 3 has two more: the status dropdown in <code>TicketForm</code>, and the
+status filter on the list page (topic 09). Copying the object into each
+would work, until someone changed &quot;In progress&quot; to &quot;Being worked on&quot; in
+one file and forgot the others.</p>
+<p>So the list moves to its own file:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 3.28: every status, once (src/utils/ticketStatuses.js)</span>
+<span class="hljs-comment">// In the order they&#x27;re shown in a dropdown.</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> <span class="hljs-variable constant_">TICKET_STATUSES</span> = [
+  <span class="hljs-string">&#x27;open&#x27;</span>, <span class="hljs-string">&#x27;in_progress&#x27;</span>, <span class="hljs-string">&#x27;resolved&#x27;</span>, <span class="hljs-string">&#x27;closed&#x27;</span>,
+];
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> <span class="hljs-variable constant_">STATUS_LABELS</span> = {
+  <span class="hljs-attr">open</span>: <span class="hljs-string">&#x27;Open&#x27;</span>,
+  <span class="hljs-attr">in_progress</span>: <span class="hljs-string">&#x27;In progress&#x27;</span>,
+  <span class="hljs-attr">resolved</span>: <span class="hljs-string">&#x27;Resolved&#x27;</span>,
+  <span class="hljs-attr">closed</span>: <span class="hljs-string">&#x27;Closed&#x27;</span>,
+};
+</code></pre>
+<p>(The comment at the top of the file is left out, and <code>TICKET_STATUSES</code>
+is split here to fit. It's one line in the file.)</p>
+<ul>
+<li><strong><code>TICKET_STATUSES</code></strong> is the list to loop over, <strong>in order</strong>. A
+dropdown should always list the statuses in the same, sensible order:
+the order a ticket moves through them.</li>
+<li><strong><code>STATUS_LABELS</code></strong> looks up the words for one status, as
+<code>StatusBadge</code> always did.</li>
+</ul>
+<p>Why two? An object's keys can be looped over, but an array says
+plainly &quot;this is the order&quot;. The dropdowns <code>map()</code> over the array and
+look up each label in the object (Figure 3.25).</p>
+<h2>StatusBadge imports it</h2>
+<p><code>StatusBadge</code> loses its own copy, and imports the shared one instead:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 3.29: the change to StatusBadge (src/components/StatusBadge.jsx,</span>
+<span class="hljs-comment">// excerpt)</span>
+<span class="hljs-keyword">import</span> styles <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./StatusBadge.module.css&#x27;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-variable constant_">STATUS_LABELS</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;../utils/ticketStatuses.js&#x27;</span>;
+</code></pre>
+<p>Nothing else in <code>StatusBadge</code> changes, and it looks exactly the same on
+screen. Changing how code is organised without changing what it does is
+called <strong>refactoring</strong>. The tests from Stage 1 prove it worked: they
+still pass, untouched.</p>
+<p>The back-end has the same list, as <code>statusEnum</code> in
+<code>ticket.validators.js</code>, and its comment says it's kept in step with the
+Prisma schema by hand. The front-end's list has to be kept in step with
+the API's by hand too. If the API ever added a status, this is the one
+front-end file to change.</p>
+<h2>Try it</h2>
+<p>Change <code>'In progress'</code> to <code>'Being worked on'</code> in <code>ticketStatuses.js</code>.
+Where does the new wording appear? Run <code>npm test</code>: which tests fail, and
+why is that a good thing? Put it back.</p>
+</div>
+    
+  </main>
+</body>
+</html>

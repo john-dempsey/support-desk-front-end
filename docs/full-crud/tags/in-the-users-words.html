@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>In the User&#39;s Words — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/tags/deleting-a-tag.html">← Deleting a Tag</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/tags/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/filter-sort-and-page/choices-in-the-url.html">Choices in the URL →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>In the User&#39;s Words</h1>
+    <p class="lede">For a duplicate name, the API&#39;s message mentions a database index. The page replaces it with one a user understands, because the page decides what a status means.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Add a tag called <code>bug</code>. The API already has one, so it answers <code>409</code>,
+with this message:</p>
+<blockquote>
+<p>A record with that Tag_name_key already exists</p>
+</blockquote>
+<p><code>Tag_name_key</code> is the name of the database's <strong>unique index</strong> on the
+<code>name</code> column. The back-end's <code>errorHandler.js</code> builds its <code>409</code>
+message from what Prisma reports (Lesson 3), and for MySQL that's the
+index's name, not the field's. It's accurate, but it means nothing to
+someone using the app.</p>
+<p>The front-end can't change the API's message. But it decides what to
+<strong>show</strong>: that's been the pages' job since Stage 2. So <code>TagsPage</code> says
+it in its own words:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 3.50: rewording a 409 (src/pages/TagsPage.jsx, excerpt)</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">describeTagError</span>(<span class="hljs-params">error</span>) {
+  <span class="hljs-keyword">if</span> (error.<span class="hljs-property">status</span> === <span class="hljs-number">409</span>) {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&#x27;A tag with that name already exists.&#x27;</span>);
+  }
+  <span class="hljs-keyword">return</span> error;
+}
+<span class="hljs-comment">// ...</span>
+} <span class="hljs-keyword">catch</span> (error) {
+  <span class="hljs-title function_">setAddError</span>(<span class="hljs-title function_">describeTagError</span>(error));
+</code></pre>
+<p>(The comment above it is left out.)</p>
+<ul>
+<li>For a <code>409</code>, it returns a <strong>new</strong> error with a clear message. The
+form shows that instead.</li>
+<li>For anything else (a <code>400</code>, the API being down), it returns the
+error as it was, <code>details</code> and all.</li>
+</ul>
+<p>It's a plain function outside the component, because it uses nothing
+from the component: no state and no props.</p>
+<h2>Why only for adding and renaming?</h2>
+<p>When adding or renaming, a <code>409</code> can only mean one thing: the name is
+taken. When <strong>deleting</strong>, a <code>409</code> means the tag is on a ticket
+(slide 05). &quot;A tag with that name already exists&quot; would be wrong there,
+so <code>handleDeleteTag</code> doesn't use <code>describeTagError</code>.</p>
+<h2>The database decides what &quot;the same&quot; means</h2>
+<p>The unique index is in MySQL, and MySQL compares the names <strong>ignoring
+case</strong>. So these are all &quot;already exists&quot; too:</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Bug</code></td>
+<td>the same as <code>bug</code>, ignoring case</td>
+</tr>
+<tr>
+<td><code>bug</code></td>
+<td>Zod trims the spaces first (<code>.trim()</code>), then it's <code>bug</code></td>
+</tr>
+</tbody>
+</table>
+<p>No browser check could have told the user that. It needs the database,
+which is why the API's answer, not the form's <code>required</code>, has the final
+say (topic 04).</p>
+<h2>Three errors, three places</h2>
+<p>The page keeps three errors apart, so each shows next to what caused
+it:</p>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>Shown</th>
+<th>Kept as</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>addError</code></td>
+<td>in the add form</td>
+<td>the error (for <code>details</code>)</td>
+</tr>
+<tr>
+<td><code>renameError</code></td>
+<td>in the rename form, in that row</td>
+<td>the error (for <code>details</code>)</td>
+</tr>
+<tr>
+<td><code>deleteErrorMessage</code></td>
+<td>above the list</td>
+<td>just the message</td>
+</tr>
+</tbody>
+</table>
+<h2>Try it</h2>
+<p>Rename <strong>billing</strong> to <code>BUG</code>. What does the rename form say? Then try
+the idea from topic 06: on the ticket's page, show &quot;Delete this
+ticket's comments first&quot; for a <code>409</code>, in the same way as
+<code>describeTagError</code>.</p>
+</div>
+    
+  </main>
+</body>
+</html>

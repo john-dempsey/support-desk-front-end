@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Answers Out of Order — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/filter-sort-and-page/pages-of-tickets.html">← Pages of Tickets</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/filter-sort-and-page/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/testing-stage-3/what-stage-3-tests.html">What Stage 3 Tests →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Answers Out of Order</h1>
+    <p class="lede">With filters, a slow answer to an old question can arrive after the answer to a new one. The ignore flag from Stage 0 stops it from replacing the right tickets.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Since Stage 0, every effect that loads data has had an <code>ignore</code> flag
+(Stage 0, topic 06), so a response that arrives too late is ignored.
+Until now, it was hard to see that matter: each page asked one question,
+when it appeared.</p>
+<p>The ticket list asks a <strong>new</strong> question every time a dropdown changes.
+Requests don't always come back in the order they were sent. A request
+can be held up by the network, or the database might take longer for
+one query than another:</p>
+<p><img src="/support-desk-front-end/assets/images/a-slow-answer-arrives-last.svg" alt="Diagram: a timeline. The user chooses Open, and request A, GET /tickets?status=open, starts; it's slow. The user then chooses Closed: the cleanup sets A's ignore, and request B, for status=closed, starts. B arrives first, and the closed tickets are shown. Then A arrives, and is ignored. With the ignore flag, A does nothing, and the closed tickets stay. Without it, the page would show open tickets, under a dropdown saying Closed."></p>
+<h2>How the flag works here</h2>
+<p>Each time the effect runs, it makes its <strong>own</strong> <code>ignore</code>, set to
+<code>false</code>. When <code>queryString</code> changes, React runs the <strong>cleanup</strong> of the
+old effect before starting the new one:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 3.57: the cleanup (src/pages/TicketListPage.jsx, excerpt)</span>
+<span class="hljs-keyword">return</span> <span class="hljs-function">() =&gt;</span> {
+  ignore = <span class="hljs-literal">true</span>;
+  <span class="hljs-title function_">setTickets</span>(<span class="hljs-literal">null</span>);
+  <span class="hljs-title function_">setMeta</span>(<span class="hljs-literal">null</span>);
+  <span class="hljs-title function_">setErrorMessage</span>(<span class="hljs-string">&#x27;&#x27;</span>);
+  <span class="hljs-title function_">setIsLoading</span>(<span class="hljs-literal">true</span>);
+};
+</code></pre>
+<p>(The comment is left out.)</p>
+<ul>
+<li><strong><code>ignore = true</code></strong> marks the old request's answer as out of date.
+When it arrives, every <code>if (!ignore)</code> in that old <code>loadTickets</code> is
+false, so it changes nothing.</li>
+<li>The other four lines put the page back to <strong>loading</strong>, as the ticket's
+page did when its id changed (Stage 2, topic 05). So the old tickets
+and any old error disappear while the new ones are on their way.</li>
+</ul>
+<p>Only the newest request can ever change the page, so what's shown always
+matches the dropdowns.</p>
+<h2>Try it</h2>
+<p>In <code>loadTickets</code>, just after the line with <code>await getTickets(...)</code>, add:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-keyword">if</span> (ignore) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;ignored an old answer for&#x27;</span>, queryString);
+}
+</code></pre>
+<p>Set the Network tab to <strong>Slow 4G</strong>, and change the <strong>Status</strong> dropdown
+three times, quickly. Read the console: which answers were ignored?
+You'll also see one when the page first loads: that's StrictMode
+running the effect twice (Stage 0, topic 06). Remove the lines, and set
+throttling back.</p>
+</div>
+    
+  </main>
+</body>
+</html>

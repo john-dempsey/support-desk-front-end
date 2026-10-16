@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>From the URL to the API — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/filter-sort-and-page/reading-the-url.html">← Reading the URL</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/filter-sort-and-page/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/filter-sort-and-page/changing-the-url.html">Changing the URL →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>From the URL to the API</h1>
+    <p class="lede">The page turns its query string into a plain string, and the effect sends it to the API whenever it changes. getTickets() now returns meta as well.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The page's query string goes to the API unchanged. First, the page
+turns it into text:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 3.53: the query, as text (src/pages/TicketListPage.jsx,</span>
+<span class="hljs-comment">// excerpt)</span>
+<span class="hljs-keyword">const</span> queryString = searchParams.<span class="hljs-title function_">toString</span>();
+
+<span class="hljs-title function_">useEffect</span>(<span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-comment">// ... the ignore flag, as before</span>
+  <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">loadTickets</span>(<span class="hljs-params"></span>) {
+    <span class="hljs-keyword">try</span> {
+      <span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> <span class="hljs-title function_">getTickets</span>(queryString);
+      <span class="hljs-keyword">if</span> (!ignore) {
+        <span class="hljs-title function_">setTickets</span>(result.<span class="hljs-property">tickets</span>);
+        <span class="hljs-title function_">setMeta</span>(result.<span class="hljs-property">meta</span>);
+      }
+    } <span class="hljs-comment">// ... catch and finally, as before</span>
+  }
+  <span class="hljs-comment">// ...</span>
+}, [queryString]);
+</code></pre>
+<p><code>searchParams.toString()</code> gives the query string without the <code>?</code>:
+<code>'status=open&amp;page=2'</code>, or <code>''</code> on plain <code>/tickets</code>.</p>
+<h2>Why a string in the dependency array?</h2>
+<p>The effect must run again whenever the query changes. React decides by
+comparing each dependency with its value last time. Two strings with
+the same letters are equal, so <code>queryString</code> changes <strong>only</strong> when the
+query really does. <code>searchParams</code> is an object, and two objects are only
+equal if they're the very same object (topic 07, slide 06), so it's
+safer not to depend on it.</p>
+<h2><code>getTickets()</code> grows up</h2>
+<p>In Stage 2, <code>getTickets()</code> took nothing and returned only the tickets,
+and its comment promised that Stage 3 would use <code>meta</code>. Here it is:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 3.54: getTickets(), now (src/api/tickets.api.js, excerpt)</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">getTickets</span>(<span class="hljs-params">queryString = <span class="hljs-string">&#x27;&#x27;</span></span>) {
+  <span class="hljs-keyword">let</span> path = <span class="hljs-string">&#x27;/tickets&#x27;</span>;
+  <span class="hljs-keyword">if</span> (queryString) {
+    path = <span class="hljs-string">`/tickets?<span class="hljs-subst">${queryString}</span>`</span>;
+  }
+
+  <span class="hljs-keyword">const</span> responseBody = <span class="hljs-keyword">await</span> <span class="hljs-title function_">apiRequest</span>(path);
+  <span class="hljs-keyword">return</span> { <span class="hljs-attr">tickets</span>: responseBody.<span class="hljs-property">data</span>, <span class="hljs-attr">meta</span>: responseBody.<span class="hljs-property">meta</span> };
+}
+</code></pre>
+<p>(The comment above it is left out.)</p>
+<ul>
+<li>With no query, it asks for <code>/tickets</code>, as before. <code>= ''</code> makes the
+argument optional.</li>
+<li>It returns an object with <strong>both</strong> parts of the response: the
+tickets, and <code>meta</code> (<code>{ page, pageSize, total, totalPages }</code>), which
+the page needs for its Previous and Next buttons (slide 05).</li>
+</ul>
+<h2>The whole loop</h2>
+<p><img src="/support-desk-front-end/assets/images/url-and-the-list.svg" alt="Diagram: a loop. 1, the browser's URL is /tickets?status=open&amp;page=2. 2, in TicketListPage.jsx, useSearchParams() reads it, and queryString is 'status=open&amp;page=2'. 3, the effect runs: getTickets(queryString) sends GET /tickets?status=open&amp;page=2, through tickets.api.js. 4, setTickets and setMeta: the list, and &quot;Page 2 of 3&quot;. Then, on the right: 5, the user picks another status, or clicks Next. 6, handleFilterChange or handlePageChange calls setSearchParams(...). The URL changes, and the loop starts again at 1."></p>
+<p>Steps 1 to 4 run when the page first appears, and again every time
+the URL changes. Steps 5 and 6 are the next slide.</p>
+<h2>Try it</h2>
+<p>Open <code>/tickets?status=open&amp;pageSize=2</code> with the Network tab open, and
+find the request to the API. Is its query string the same as the
+page's? Now add <code>&amp;colour=blue</code> to the page's URL. What does the API do
+with a parameter it doesn't know?</p>
+</div>
+    
+  </main>
+</body>
+</html>

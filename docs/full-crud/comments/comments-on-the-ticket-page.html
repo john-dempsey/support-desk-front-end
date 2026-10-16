@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Comments on the Ticket&#39;s Page — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/deleting-a-ticket/delete-then-go-back.html">← Delete, Then Go Back</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/comments/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/full-crud/comments/loading-them-with-the-ticket.html">Loading Them With the Ticket →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Comments on the Ticket&#39;s Page</h1>
+    <p class="lede">Under a ticket&#39;s description, its comments, and a box to add one. Every comment request goes through comments.api.js, using the API&#39;s nested URLs.</p>
+
+    
+
+    
+      <div class="slide-body"><p>At the bottom of a ticket's page, under its description, there's now a
+<strong>Comments</strong> section: each comment with its author and date, a
+<strong>Delete</strong> button on each, and an <strong>Add a comment</strong> box.</p>
+<h2>Nested URLs</h2>
+<p>In the API, comments belong to a ticket, and their routes say so: every
+one starts with <code>/tickets/:ticketId/comments</code> (Lesson 3). So every
+function in <code>comments.api.js</code> needs the ticket's id:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 3.34: two of the comment requests</span>
+<span class="hljs-comment">// (src/api/comments.api.js, excerpt)</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">getComments</span>(<span class="hljs-params">ticketId</span>) {
+  <span class="hljs-keyword">const</span> responseBody = <span class="hljs-keyword">await</span> <span class="hljs-title function_">apiRequest</span>(
+    <span class="hljs-string">`/tickets/<span class="hljs-subst">${ticketId}</span>/comments`</span>,
+  );
+  <span class="hljs-keyword">return</span> responseBody.<span class="hljs-property">data</span>;
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">createComment</span>(<span class="hljs-params">ticketId, commentText</span>) {
+  <span class="hljs-keyword">const</span> responseBody = <span class="hljs-keyword">await</span> <span class="hljs-title function_">apiRequest</span>(
+    <span class="hljs-string">`/tickets/<span class="hljs-subst">${ticketId}</span>/comments`</span>,
+    { <span class="hljs-attr">method</span>: <span class="hljs-string">&#x27;POST&#x27;</span>, <span class="hljs-attr">body</span>: { <span class="hljs-attr">body</span>: commentText } },
+  );
+  <span class="hljs-keyword">return</span> responseBody.<span class="hljs-property">data</span>;
+}
+</code></pre>
+<p>(The comments are left out, and both <code>apiRequest()</code> calls are laid out
+differently in the file. They're rearranged here to fit.)</p>
+<p>The third, <code>deleteComment(ticketId, commentId)</code>, sends
+<code>DELETE /tickets/:ticketId/comments/:id</code>, with both ids in the URL.</p>
+<h2><code>{ body: commentText }</code></h2>
+<p>That line looks odd. The API calls a comment's text <strong><code>body</code></strong> (the
+column in the Prisma schema, and the field in <code>createCommentSchema</code>). So
+the request's body is an object with a <code>body</code> field:</p>
+<pre><code class="hljs language-json"><span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;body&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Have you checked your spam folder?&quot;</span> <span class="hljs-punctuation">}</span>
+</code></pre>
+<p>Inside the front-end, the text is called <code>commentText</code>, so it's never
+confused with the body of a request. It only becomes <code>body</code> here, at
+the edge, where the API's name has to be used.</p>
+<h2>What a comment looks like</h2>
+<p><code>GET /tickets/1/comments</code> returns the comments <strong>oldest first</strong>, each
+with its author, as the back-end's <code>comment.service.js</code> includes them:</p>
+<pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;body&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Looking into this now — can you confirm ...&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;ticketId&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;authorId&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">3</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;author&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">3</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Alex Agent&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;email&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;...&quot;</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;createdAt&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2026-10-14T20:04:29.777Z&quot;</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<p>(Shortened. Your ids and dates will be different.)</p>
+<h2>Try it</h2>
+<p>Write <code>deleteComment(ticketId, commentId)</code> yourself, using
+<code>deleteTicket()</code> (Figure 3.5) as a model, before you look at the real
+one in <code>comments.api.js</code>. How does yours differ?</p>
+</div>
+    
+  </main>
+</body>
+</html>

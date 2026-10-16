@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Try It Yourself — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/making-it-yours/your-stage-3-checklist.html">← Your Stage 3 Checklist</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/full-crud/making-it-yours/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Try It Yourself</h1>
+    <p class="lede">Challenges that use everything in this lesson. Run the tests after each one, and commit when they pass.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Each of these builds on something from this lesson. After each one, run
+<code>npm test</code> and <code>npm run lint</code>, and commit when both pass.</p>
+<h2>Warm-up</h2>
+<ol>
+<li><strong>How many tickets?</strong> Under the Tickets heading, show &quot;4 tickets&quot;
+(or &quot;1 ticket&quot;), using <code>meta.total</code>. Does it change when you filter?
+Add a test.</li>
+<li><strong>Clear the filters.</strong> Add a <strong>Clear filters</strong> link above the list
+that goes to plain <code>/tickets</code>. Should it be a <code>&lt;Link&gt;</code> or a
+<code>&lt;button&gt;</code>? Why does it need no state and no handler?</li>
+</ol>
+<h2>Build something</h2>
+<ol start="3">
+<li><strong>Edit a comment.</strong> The API has
+<code>PATCH /tickets/:ticketId/comments/:id</code>. Add <code>updateComment()</code> to
+<code>comments.api.js</code>, and an <strong>Edit</strong> button on each comment that turns
+it into a form, using <code>TagsPage</code>'s rename as your model (topic 08,
+slide 03). Should the page update its list from the response, or ask
+again? Test it.</li>
+<li><strong>Close ticket.</strong> Add a <strong>Close ticket</strong> button to the ticket's
+page, which sends <code>PATCH</code> with <code>{ &quot;status&quot;: &quot;closed&quot; }</code> and stays on
+the page. Update <code>ticket</code> from what <code>updateTicket()</code> returns (topic
+07, slide 08). Hide the button when the ticket is already closed.
+Test both.</li>
+<li><strong>Tickets per page.</strong> Add a fourth dropdown above the list, for 10,
+25 or 50 tickets per page. Which existing function can handle its
+<code>onChange</code> without any changes? What should happen to <code>page</code>?</li>
+<li><strong>Past the end.</strong> On <code>/tickets?pageSize=2&amp;page=3</code>, the list is empty
+and <code>Pagination</code> says &quot;Page 3 of 2&quot;. Make the page offer a link back
+to the last real page instead. Test it.</li>
+</ol>
+<h2>Investigate</h2>
+<ol start="7">
+<li><strong>Two tabs.</strong> Open ticket 2 in two tabs. In the first, edit it and
+change its status. Look at the second. What does it show, and why?
+What makes it show the change?</li>
+<li><strong>Who gets the email?</strong> With Mailpit open, add a comment to ticket 1
+as Ada. Who is emailed? Is Alex, the assigned agent? Find the reason
+in the back-end's <code>comment.service.js</code>.</li>
+<li><strong>Every request.</strong> With the Network tab on <strong>Fetch/XHR</strong>, create a
+ticket as Casey. List every request, in order, from clicking
+<strong>Create ticket</strong> to the new ticket's comments appearing. Which page
+sent each one? Why are some there twice in development?</li>
+</ol>
+<h2>Commit</h2>
+<pre><code class="hljs language-bash">git add .
+git commit -m <span class="hljs-string">&quot;Stage 3: ticket count, clear filters, ...&quot;</span>
+</code></pre>
+<p>When your own case study can create, edit and delete its records from
+your front-end, with validation errors by the field, confirmation
+before deleting, and tests for each, it's ready for Stage 4: logging in,
+and showing each user only what their role allows.</p>
+</div>
+    
+  </main>
+</body>
+</html>
