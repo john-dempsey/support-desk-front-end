@@ -72,6 +72,24 @@ a {
   list-style: none;
 }
 
+/* Who is logged in, and Log out (or Log in and Register), pushed to the
+   right-hand end of the header by margin-left: auto. */
+.user-menu {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  margin-left: auto;
+}
+
+.user-name {
+  margin: 0;
+}
+
+.user-role {
+  color: var(--colour-muted);
+}
+
 /* NavLink adds the "active" class to the link for the current page. */
 .nav-links a.active {
   font-weight: 700;
@@ -217,6 +235,12 @@ select {
    the message under it, so it isn't shown by colour alone. */
 [aria-invalid='true'] {
   border: 2px solid var(--colour-error-text);
+}
+
+/* A hint under an input, such as "At least 8 characters". */
+.field-hint {
+  margin: 0;
+  color: var(--colour-muted);
 }
 
 .field-error {

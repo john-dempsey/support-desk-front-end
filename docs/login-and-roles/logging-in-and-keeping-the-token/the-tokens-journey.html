@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Token&#39;s Journey — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/login-and-roles/logging-in-and-keeping-the-token/gettoken-reads-the-saved-token.html">← getToken() Reads the Saved Token</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/login-and-roles/logging-in-and-keeping-the-token/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/login-and-roles/sharing-whos-logged-in/who-needs-the-user.html">Who Needs the User? →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>The Token&#39;s Journey</h1>
+    <p class="lede">The token is written once, at login, and read on every request after that. Only two files ever touch it.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Here's the whole journey, from the login form to the API checking the
+token on a later request:</p>
+<p><img src="/support-desk-front-end/assets/images/the-tokens-journey.svg" alt="Diagram: two columns. On the left, logging in, which happens once: LoginPage, where the user types their email and password; login(email, password) in AuthProvider (topic 04); login() in auth.api.js, which calls apiRequest() in client.js; POST /auth/login, sent with no Authorization header because there's no token yet; the API checks the password and signs a new token, and answers with data holding user and token; AuthProvider calls saveToken(token) and setUser(user). An arrow labelled saved goes down to a box for the browser's localStorage, holding supportDeskToken, which survives a reload and closing the tab. On the right, every request after that: any page, for example TicketListPage, calls getTickets(queryString); tickets.api.js calls apiRequest('/tickets…'); getToken() in client.js reads the saved token, shown by an arrow from localStorage labelled read on every request; GET /tickets is sent with Authorization: Bearer and the token; the API's authenticate.js checks the signature and sets req.user."></p>
+<h2>Written once, read many times</h2>
+<ul>
+<li><strong>Left, once per login.</strong> The token arrives in the answer to
+<code>POST /auth/login</code>, and <code>saveToken()</code> writes it to <code>localStorage</code>.
+Registering does the same, with <code>POST /auth/register</code>.</li>
+<li><strong>Right, on every request.</strong> <code>getToken()</code> reads it back, and
+<code>buildHeaders()</code> puts it in the <code>Authorization</code> header. The back-end's
+<code>authenticate.js</code> checks it, as it did for the stand-in token.</li>
+</ul>
+<p>The right-hand column is the same as Stage 2's trace of a ticket
+request (topic 06). Only the box where <code>getToken()</code> finds the token has
+changed.</p>
+<h2>Who touches the token</h2>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>What it does with the token</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tokenStorage.js</code></td>
+<td>the only file that reads or writes <code>localStorage</code></td>
+</tr>
+<tr>
+<td><code>client.js</code></td>
+<td>reads it on every request, and puts it in the header</td>
+</tr>
+<tr>
+<td><code>AuthProvider.jsx</code></td>
+<td>saves it after login and register, and clears it on logout</td>
+</tr>
+<tr>
+<td>every page and <code>*.api.js</code> file (except <code>auth.api.js</code>)</td>
+<td>nothing: they don't know it exists</td>
+</tr>
+</tbody>
+</table>
+<p><code>auth.api.js</code> only passes the token back from the login answer to
+<code>AuthProvider</code>. Pages never see it.</p>
+<h2>Try it</h2>
+<p>Close these notes, and answer from memory:</p>
+<ol>
+<li>Which file writes the token into <code>localStorage</code>, and which function
+calls it?</li>
+<li>Which file reads it before every request?</li>
+<li>You click a ticket's subject in the list. Which files run, from the
+click to the header the API reads?</li>
+</ol>
+<p>Then check your answers by searching the code:</p>
+<pre><code class="hljs language-bash">grep -rn <span class="hljs-string">&quot;localStorage&quot;</span> src --exclude=<span class="hljs-string">&quot;*.test.*&quot;</span>
+</code></pre>
+</div>
+    
+  </main>
+</body>
+</html>

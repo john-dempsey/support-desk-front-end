@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Where Does It Send You? — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/login-and-roles/testing-stage-4/checking-what-the-page-asked-for.html">← Checking What the Page Asked For</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/login-and-roles/testing-stage-4/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/login-and-roles/testing-stage-4/testing-the-real-authprovider.html">Testing the Real AuthProvider →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Where Does It Send You?</h1>
+    <p class="lede">ProtectedRoute&#39;s tests put it in a tiny route table, with plain headings standing in for the real pages, and check which heading appears for each user.</p>
+
+    
+
+    
+      <div class="slide-body"><p><code>ProtectedRoute</code> decides between three outcomes (topic 07). Its tests
+don't need any real pages to check that. Plain headings stand in for
+them:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 4.36: a route table made for the test</span>
+<span class="hljs-comment">// (src/components/ProtectedRoute.test.jsx, excerpt)</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">renderTagsRouteAs</span>(<span class="hljs-params">user</span>) {
+  <span class="hljs-title function_">renderWithProviders</span>(
+    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">Routes</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">Route</span>
+        <span class="hljs-attr">path</span>=<span class="hljs-string">&quot;/tags&quot;</span>
+        <span class="hljs-attr">element</span>=<span class="hljs-string">{</span>
+          &lt;<span class="hljs-attr">ProtectedRoute</span> <span class="hljs-attr">allowedRoles</span>=<span class="hljs-string">{[</span>&#x27;<span class="hljs-attr">agent</span>&#x27;, &#x27;<span class="hljs-attr">admin</span>&#x27;]}&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>Tags page<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>
+          <span class="hljs-tag">&lt;/<span class="hljs-name">ProtectedRoute</span>&gt;</span>
+        }
+      /&gt;
+      <span class="hljs-tag">&lt;<span class="hljs-name">Route</span> <span class="hljs-attr">path</span>=<span class="hljs-string">&quot;/login&quot;</span> <span class="hljs-attr">element</span>=<span class="hljs-string">{</span>&lt;<span class="hljs-attr">h1</span>&gt;</span>Login page<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>} /&gt;
+    <span class="hljs-tag">&lt;/<span class="hljs-name">Routes</span>&gt;</span></span>,
+    { <span class="hljs-attr">route</span>: <span class="hljs-string">&#x27;/tags&#x27;</span>, user },
+  );
+}
+
+<span class="hljs-title function_">it</span>(<span class="hljs-string">&#x27;sends a visitor who is not logged in to the login page&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-title function_">renderTagsRouteAs</span>(<span class="hljs-literal">null</span>);
+
+  <span class="hljs-title function_">expect</span>(screen.<span class="hljs-title function_">getByRole</span>(<span class="hljs-string">&#x27;heading&#x27;</span>, { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Login page&#x27;</span> }))
+    .<span class="hljs-title function_">toBeInTheDocument</span>();
+});
+</code></pre>
+<p>(Split to fit, and two of the three tests are left out.)</p>
+<p><code>&lt;h1&gt;Tags page&lt;/h1&gt;</code> is the <code>children</code>. If it appears, <code>ProtectedRoute</code>
+returned its children. If &quot;Login page&quot; appears, the <code>&lt;Navigate&gt;</code> took
+the router to <code>/login</code>. Stage 3 used the same trick to check where a
+page went after saving (Stage 3, topic 10, &quot;Where Did It Go?&quot;).</p>
+<p>The three tests call <code>renderTagsRouteAs()</code> with <code>null</code>, <code>customerUser</code>
+and <code>agentUser</code>: one per outcome.</p>
+<h2>No waiting needed</h2>
+<p>These tests don't <code>await</code> anything. <code>ProtectedRoute</code> decides from <code>user</code>
+straight away, and Testing Library's <code>render()</code> finishes React's work,
+including the <code>&lt;Navigate&gt;</code>, before it returns. Nothing is fetched, so
+there's nothing to wait for.</p>
+<h2>The real route table, too</h2>
+<p><code>App.test.jsx</code> checks the same thing through the real <code>App</code>: a visitor
+on <code>/tickets</code> sees the login page, <strong>and</strong> <code>getTickets</code> was never called.
+That second check proves the page didn't even start loading, which is
+the point of <code>ProtectedRoute</code>.</p>
+<h2>Try it</h2>
+<p>In <code>ProtectedRoute.jsx</code>, swap the two <code>if</code> blocks, so the role check
+comes first. Before you run the tests, predict which one will fail. Then
+run them. Were you right? What does the visitor see instead of the
+login page? Put the blocks back when you're done.</p>
+</div>
+    
+  </main>
+</body>
+</html>

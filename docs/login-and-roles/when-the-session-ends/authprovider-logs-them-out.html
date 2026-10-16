@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AuthProvider Logs Them Out — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/login-and-roles/when-the-session-ends/calling-it-on-a-401.html">← Calling It on a 401</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/login-and-roles/when-the-session-ends/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/login-and-roles/testing-stage-4/what-stage-4-tests.html">What Stage 4 Tests →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>AuthProvider Logs Them Out</h1>
+    <p class="lede">AuthProvider puts a function in client.js that clears the token and the user. ProtectedRoute does the rest: with no user, every protected page goes to /login.</p>
+
+    
+
+    
+      <div class="slide-body"><pre><code class="hljs language-js"><span class="hljs-comment">// Figure 4.32: registering the handler (src/context/AuthProvider.jsx,</span>
+<span class="hljs-comment">// excerpt)</span>
+<span class="hljs-comment">// A 401 from any later request means the session is over, so client.js</span>
+<span class="hljs-comment">// calls this function, and the user is logged out wherever they are.</span>
+<span class="hljs-comment">// ProtectedRoute then sends them to the login page.</span>
+<span class="hljs-title function_">useEffect</span>(<span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-title function_">setSessionExpiredHandler</span>(<span class="hljs-function">() =&gt;</span> {
+    <span class="hljs-title function_">clearSavedToken</span>();
+    <span class="hljs-title function_">setUser</span>(<span class="hljs-literal">null</span>);
+  });
+  <span class="hljs-keyword">return</span> <span class="hljs-function">() =&gt;</span> {
+    <span class="hljs-title function_">setSessionExpiredHandler</span>(<span class="hljs-literal">null</span>);
+  };
+}, []);
+</code></pre>
+<p>(Indented one step further in the file.)</p>
+<p>When <code>AuthProvider</code> first appears, this effect gives <code>client.js</code> a
+function. Its body is the same as <code>logout()</code>: forget the token, forget
+the user. The cleanup takes it away again if <code>AuthProvider</code> is ever
+removed, so <code>client.js</code> never calls a function belonging to a component
+that's gone.</p>
+<h2>From a 401 to the login page</h2>
+<p>Nothing in the handler mentions <code>/login</code>. It doesn't need to:</p>
+<p><img src="/support-desk-front-end/assets/images/when-the-session-ends.svg" alt="Diagram: seven steps from a request to the login page. Page: any page loads, for example TicketDetailPage calls getTicket(ticketId) in its effect. HTTP: GET /tickets/1 goes out with the saved token, a day old, in the Authorization header. The API: authenticate.js answers 401, &quot;Invalid or expired token&quot;. client.js: status === 401 &amp;&amp; token &amp;&amp; sessionExpiredHandler, so it calls sessionExpiredHandler(), then throws the error as usual. AuthProvider: the handler it registered calls clearSavedToken() and setUser(null). Re-render: ProtectedRoute finds no user, and renders Navigate to /login with replace. Result: the login page. The user is logged out from one place, whichever page was open."></p>
+<p><code>setUser(null)</code> re-renders everything that uses <code>useAuth()</code> (topic 04).
+That includes the <code>ProtectedRoute</code> around the open page, which now finds
+no user, and sends the browser to <code>/login</code> (topic 07). Each piece does
+one job, and together they log the user out from anywhere.</p>
+<h2>Two ways a session is found to be over</h2>
+<table>
+<thead>
+<tr>
+<th>When</th>
+<th>Who notices</th>
+<th>Topic</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The app starts with a saved token</td>
+<td><code>GET /auth/me</code> in <code>AuthProvider</code>'s first effect</td>
+<td>05</td>
+</tr>
+<tr>
+<td>Any request, later</td>
+<td><code>apiRequest()</code> in <code>client.js</code>, then <code>AuthProvider</code>'s handler</td>
+<td>09</td>
+</tr>
+</tbody>
+</table>
+<h2>Try it</h2>
+<p>You don't have to wait a day. Log in as Casey and open the ticket list.
+In the <strong>Application</strong> tab, change one letter of <code>supportDeskToken</code>,
+but <strong>don't</strong> reload. Now click a ticket.</p>
+<p>What happens? In the Network tab, what did the ticket request get back?
+What's left in Local storage?</p>
+</div>
+    
+  </main>
+</body>
+</html>

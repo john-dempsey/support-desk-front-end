@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ProtectedRoute, Line by Line — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/login-and-roles/protected-pages/wrapping-a-page.html">← Wrapping a Page</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/login-and-roles/protected-pages/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/login-and-roles/protected-pages/not-available.html">Not Available →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>ProtectedRoute, Line by Line</h1>
+    <p class="lede">Three questions, three outcomes: nobody logged in goes to /login, the wrong role sees &quot;Not available&quot;, and everyone else gets the page.</p>
+
+    
+
+    
+      <div class="slide-body"><pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 4.23: deciding what to show</span>
+<span class="hljs-comment">// (src/components/ProtectedRoute.jsx, excerpt)</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">ProtectedRoute</span>(<span class="hljs-params">{ allowedRoles, children }</span>) {
+  <span class="hljs-keyword">const</span> { user, hasRole } = <span class="hljs-title function_">useAuth</span>();
+
+  <span class="hljs-keyword">if</span> (!user) {
+    <span class="hljs-comment">// `replace` swaps this URL for /login in the browser&#x27;s history, so the</span>
+    <span class="hljs-comment">// Back button doesn&#x27;t bring the user straight back here.</span>
+    <span class="hljs-keyword">return</span> <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">Navigate</span> <span class="hljs-attr">to</span>=<span class="hljs-string">&quot;/login&quot;</span> <span class="hljs-attr">replace</span> /&gt;</span></span>;
+  }
+
+  <span class="hljs-keyword">if</span> (allowedRoles &amp;&amp; !<span class="hljs-title function_">hasRole</span>(...allowedRoles)) {
+    <span class="hljs-keyword">return</span> (
+      <span class="language-xml"><span class="hljs-tag">&lt;&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>Not available<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Your account can&#x27;t use this page.<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-name">Link</span> <span class="hljs-attr">to</span>=<span class="hljs-string">&quot;/tickets&quot;</span>&gt;</span>Go to the tickets<span class="hljs-tag">&lt;/<span class="hljs-name">Link</span>&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+      <span class="hljs-tag">&lt;/&gt;</span></span>
+    );
+  }
+
+  <span class="hljs-keyword">return</span> children;
+}
+</code></pre>
+<p><img src="/support-desk-front-end/assets/images/what-protectedroute-decides.svg" alt="Diagram: ProtectedRoute, around a page in App.jsx, asks up to three questions. First, is anyone logged in, is user set? If not, it renders Navigate to /login with replace, and the login page shows. If so, second, was allowedRoles given? If not, anyone logged in gets children: the page. If it was, third, is the user one of those roles, does hasRole(...allowedRoles) say yes? If yes, children: the page. If no, &quot;Not available&quot;: your account can't use this page, and the page never loads."></p>
+<h2>No user: go to the login page</h2>
+<p><code>&lt;Navigate&gt;</code>, as on the login page (topic 06), with <code>replace</code>. Without
+<code>replace</code>, pressing Back on the login page would return to the protected
+URL, which would send the user straight back to the login page: Back
+would seem to do nothing.</p>
+<h2>Wrong role: say so</h2>
+<p><code>allowedRoles &amp;&amp;</code> comes first: with no <code>allowedRoles</code> (as for
+<code>/tickets</code>), there's nothing to check, and any logged-in user may see
+the page. Otherwise, <code>hasRole(...allowedRoles)</code> spreads the array back
+into separate arguments, <code>hasRole('agent', 'admin')</code>, the call from
+topic 04.</p>
+<p>The order of the two <code>if</code>s matters. Someone who isn't logged in has no
+role at all, so they'd fail the role check too, and see &quot;Not available&quot;
+instead of being sent to log in.</p>
+<h2>Otherwise: the page</h2>
+<p><code>return children</code> returns the page exactly as <code>App.jsx</code> wrote it.
+<code>ProtectedRoute</code> adds nothing around it.</p>
+<h2>Try it</h2>
+<p>Log in as Casey, then open <code>/tags</code>. Which <code>return</code> in Figure 4.23
+produced what you see? Then answer, without trying it: which one would
+run for Ada on <code>/tags</code>? For someone logged out on <code>/tickets/new</code>?</p>
+</div>
+    
+  </main>
+</body>
+</html>

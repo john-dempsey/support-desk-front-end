@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Testing Stage 4 — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/login-and-roles/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Testing Stage 4</h1>
+    <p class="lede">A fake logged-in user for page tests, the real AuthProvider tested on its own, the 401 handler, and a whole visit from login to logout.</p>
+
+    
+      <ul class="listing">
+        
+          <li>
+            <a href="/support-desk-front-end/login-and-roles/testing-stage-4/what-stage-4-tests.html">What Stage 4 Tests</a>
+            <p>Most page tests fake who is logged in. AuthProvider is tested on its own, with only its API calls faked. And one test follows a whole visit through the real app.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/login-and-roles/testing-stage-4/a-fake-logged-in-user.html">A Fake Logged-In User</a>
+            <p>renderWithProviders now fills the auth context with a fake value. A test says who is logged in with `user`, and Ada is the default, so Stage 3&#39;s tests didn&#39;t change.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/login-and-roles/testing-stage-4/testing-by-role.html">Testing by Role</a>
+            <p>A role test renders the same page as different users, and checks what&#39;s there and what isn&#39;t. queryBy... finds nothing without failing, so it can prove a button is missing.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/login-and-roles/testing-stage-4/checking-what-the-page-asked-for.html">Checking What the Page Asked For</a>
+            <p>In a page test, login() is a vi.fn(). The test checks it was called with what was typed, and makes it fail to see how the page shows the error.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/login-and-roles/testing-stage-4/where-does-it-send-you.html">Where Does It Send You?</a>
+            <p>ProtectedRoute&#39;s tests put it in a tiny route table, with plain headings standing in for the real pages, and check which heading appears for each user.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/login-and-roles/testing-stage-4/testing-the-real-authprovider.html">Testing the Real AuthProvider</a>
+            <p>AuthProvider has no screen of its own, so its tests put a tiny component inside it that shows what useAuth() gives. Only auth.api.js is faked; localStorage is real.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/login-and-roles/testing-stage-4/testing-the-401.html">Testing the 401</a>
+            <p>Two client.js tests pin down when the session-expired handler is called: a 401 with a token, yes; a 401 without one, no. A vi.fn() stands in for the handler.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/login-and-roles/testing-stage-4/a-whole-visit.html">A Whole Visit</a>
+            <p>One App test uses the real AuthProvider with only the API modules faked, and follows a visit from start to finish: log in, move around, log out, and log in as someone else.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/login-and-roles/testing-stage-4/running-everything.html">Running Everything</a>
+            <p>Stage 4 ends with 122 passing tests in 24 files, no lint warnings and a working build, with no token in .env.</p>
+          </li>
+        
+      </ul>
+    
+
+    
+  </main>
+</body>
+</html>

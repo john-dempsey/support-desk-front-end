@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wrapping a Page — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/login-and-roles/the-login-and-register-pages/the-register-page.html">← The Register Page</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/login-and-roles/protected-pages/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/login-and-roles/protected-pages/protectedroute-line-by-line.html">ProtectedRoute, Line by Line →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Wrapping a Page</h1>
+    <p class="lede">In App.jsx, each page that needs a login is written between &lt;ProtectedRoute&gt; tags. The route table now says who can open each page, as the back-end&#39;s route files do.</p>
+
+    
+
+    
+      <div class="slide-body"><p>In Stage 3, every route in <code>App.jsx</code> gave its page straight to
+<code>element</code>. Now most pages are wrapped first:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 4.22: two protected routes (src/App.jsx, excerpt)</span>
+{<span class="hljs-comment">/* Any logged-in user. */</span>}
+&lt;<span class="hljs-title class_">Route</span>
+  path=<span class="hljs-string">&quot;/tickets&quot;</span>
+  element={
+    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">ProtectedRoute</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">TicketListPage</span> /&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">ProtectedRoute</span>&gt;</span></span>
+  }
+/&gt;
+
+<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">Route</span>
+  <span class="hljs-attr">path</span>=<span class="hljs-string">&quot;/tags&quot;</span>
+  <span class="hljs-attr">element</span>=<span class="hljs-string">{</span>
+    &lt;<span class="hljs-attr">ProtectedRoute</span> <span class="hljs-attr">allowedRoles</span>=<span class="hljs-string">{[</span>&#x27;<span class="hljs-attr">agent</span>&#x27;, &#x27;<span class="hljs-attr">admin</span>&#x27;]}&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">TagsPage</span> /&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">ProtectedRoute</span>&gt;</span>
+  }
+/&gt;</span>
+</code></pre>
+<p>(Less indented here than in the file, where other routes come between
+these two.)</p>
+<p><code>&lt;TicketListPage /&gt;</code> is written <strong>between</strong> <code>ProtectedRoute</code>'s tags, so
+it arrives in <code>ProtectedRoute</code> as <code>children</code>, the same prop
+<code>AuthProvider</code> uses (topic 04). <code>ProtectedRoute</code> decides whether to show
+it.</p>
+<h2>Every route, and who can open it</h2>
+<table>
+<thead>
+<tr>
+<th>Route</th>
+<th>Wrapped in</th>
+<th>Who</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/</code>, <code>/login</code>, <code>/register</code>, <code>*</code></td>
+<td>nothing</td>
+<td>anyone</td>
+</tr>
+<tr>
+<td><code>/tickets</code>, <code>/tickets/:ticketId</code></td>
+<td><code>&lt;ProtectedRoute&gt;</code></td>
+<td>anyone logged in</td>
+</tr>
+<tr>
+<td><code>/tickets/new</code></td>
+<td><code>&lt;ProtectedRoute allowedRoles={['customer']}&gt;</code></td>
+<td>customers</td>
+</tr>
+<tr>
+<td><code>/tickets/:ticketId/edit</code>, <code>/tags</code></td>
+<td><code>&lt;ProtectedRoute allowedRoles={['agent', 'admin']}&gt;</code></td>
+<td>agents and admins</td>
+</tr>
+</tbody>
+</table>
+<h2>The same table as the back-end's</h2>
+<p>The back-end does the same in its route files. <code>ticket.routes.js</code> starts
+with <code>router.use(authenticate)</code>, so every ticket route needs a token,
+and adds <code>authorize(...)</code> to the routes only some roles may use.</p>
+<table>
+<thead>
+<tr>
+<th>Back-end</th>
+<th>Front-end</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>authenticate</code></td>
+<td><code>&lt;ProtectedRoute&gt;</code></td>
+</tr>
+<tr>
+<td><code>authorize('agent', 'admin')</code></td>
+<td><code>&lt;ProtectedRoute allowedRoles={['agent', 'admin']}&gt;</code></td>
+</tr>
+<tr>
+<td><code>/auth/login</code> and <code>/auth/register</code> have no <code>authenticate</code></td>
+<td><code>/login</code> and <code>/register</code> have no <code>ProtectedRoute</code></td>
+</tr>
+</tbody>
+</table>
+<h2>Try it</h2>
+<ol>
+<li>Log out, then type <code>/tickets/1</code> into the address bar. Where do you
+end up? Try <code>/tags</code> too.</li>
+<li>Why must <code>/login</code> <strong>never</strong> be wrapped in <code>ProtectedRoute</code>? Think it
+through, step by step, for someone who isn't logged in. (The back-end's
+<code>auth.routes.js</code> has a comment about the same problem.)</li>
+</ol>
+</div>
+    
+  </main>
+</body>
+</html>

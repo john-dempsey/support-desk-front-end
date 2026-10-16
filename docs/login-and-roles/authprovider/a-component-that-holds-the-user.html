@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A Component That Holds the User — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/login-and-roles/sharing-whos-logged-in/why-two-files.html">← Why Two Files?</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/login-and-roles/authprovider/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/login-and-roles/authprovider/wrapping-the-app.html">Wrapping the App →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>A Component That Holds the User</h1>
+    <p class="lede">AuthProvider is a component with no HTML of its own. It holds the user in state, and puts it, with the functions that change it, into the context for everything inside it.</p>
+
+    
+
+    
+      <div class="slide-body"><p><code>AuthProvider.jsx</code> is the longest new file in Stage 4. Here's its
+outline, with the details left for later:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 4.9: the outline of AuthProvider</span>
+<span class="hljs-comment">// (src/context/AuthProvider.jsx, excerpt)</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">AuthProvider</span>(<span class="hljs-params">{ children }</span>) {
+  <span class="hljs-keyword">const</span> [user, setUser] = <span class="hljs-title function_">useState</span>(<span class="hljs-literal">null</span>);
+
+  <span class="hljs-comment">// … isCheckingSession, and two effects (topics 05 and 09)</span>
+  <span class="hljs-comment">// … login(), register(), logout() and hasRole() (next slides)</span>
+
+  <span class="hljs-keyword">const</span> authValue = {
+    user, isCheckingSession, login, register, logout, hasRole,
+  };
+
+  <span class="hljs-comment">// Every component inside the provider can now read authValue.</span>
+  <span class="hljs-keyword">return</span> <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">AuthContext</span> <span class="hljs-attr">value</span>=<span class="hljs-string">{authValue}</span>&gt;</span>{children}<span class="hljs-tag">&lt;/<span class="hljs-name">AuthContext</span>&gt;</span></span>;
+}
+</code></pre>
+<p>(The two <code>// …</code> lines stand for code that's left out here; they aren't
+in the file. <code>authValue</code> is on one line in the file.)</p>
+<h2>State, like any component</h2>
+<p><code>user</code> is ordinary state: <code>null</code> when nobody is logged in, and the
+user's details (<code>{ id, name, email, role, ... }</code>) when someone is. It's
+the same <code>useState</code> as the ticket list's tickets. The difference is
+where it's shared.</p>
+<h2><code>authValue</code>, into the context</h2>
+<p><code>authValue</code> gathers everything other components need into one object:
+the user, and the functions that log in and out.</p>
+<p><code>AuthContext</code> is the context from <code>authContext.js</code>, written as if it
+were a component. <code>&lt;AuthContext value={authValue}&gt;</code> fills the context
+with that object, for everything between its tags. Any component inside
+can now get it with <code>useAuth()</code>.</p>
+<p>You'll often see <code>&lt;AuthContext.Provider value={...}&gt;</code> in examples
+online. That's the older way, from before React 19, and does the same
+thing.</p>
+<h2><code>children</code></h2>
+<p><code>AuthProvider</code> shows nothing of its own: no heading, no <code>&lt;div&gt;</code>. It
+wraps whatever is written <strong>between its tags</strong>. In <code>main.jsx</code> that's
+<code>&lt;App /&gt;</code>:</p>
+<pre><code class="hljs language-jsx">&lt;<span class="hljs-title class_">AuthProvider</span>&gt;
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">App</span> /&gt;</span></span>
+&lt;/<span class="hljs-title class_">AuthProvider</span>&gt;
+</code></pre>
+<p>React passes what's between the tags as a prop called <strong><code>children</code></strong>.
+<code>AuthProvider</code> takes it from its props, <code>{ children }</code>, and renders it
+inside the provider. So <code>App</code>, and everything <code>App</code> renders, ends up
+inside the context.</p>
+<p>It's the same idea as a Blade component's <code>{{ $slot }}</code>: the component
+decides where the content goes, and the page using it decides what the
+content is.</p>
+<h2>Try it</h2>
+<p>Find every component in <code>src/</code> that takes <code>children</code>:</p>
+<pre><code class="hljs language-bash">grep -rn <span class="hljs-string">&quot;children&quot;</span> src --include=<span class="hljs-string">&quot;*.jsx&quot;</span> --exclude=<span class="hljs-string">&quot;*.test.*&quot;</span>
+</code></pre>
+<p>You'll find a second one. What gets written between its tags, and where
+in the app is that done?</p>
+</div>
+    
+  </main>
+</body>
+</html>

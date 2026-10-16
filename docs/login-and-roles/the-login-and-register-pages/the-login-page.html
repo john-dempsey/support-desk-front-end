@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Login Page — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/login-and-roles/checking-the-session/why-app-waits.html">← Why App Waits</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/login-and-roles/the-login-and-register-pages/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/login-and-roles/the-login-and-register-pages/leaving-once-logged-in.html">Leaving Once Logged In →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>The Login Page</h1>
+    <p class="lede">LoginPage holds what&#39;s typed, calls login() from useAuth(), and on success does nothing at all: the new user makes the page leave by itself.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The login form is only used on one page, so it's written inside the
+page. In Stage 3, <code>TicketForm</code> was a separate component because two
+pages used it. Here there's nothing to share.</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 4.17: logging in (src/pages/LoginPage.jsx, excerpt)</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">LoginPage</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> { user, login } = <span class="hljs-title function_">useAuth</span>();
+  <span class="hljs-keyword">const</span> [email, setEmail] = <span class="hljs-title function_">useState</span>(<span class="hljs-string">&#x27;&#x27;</span>);
+  <span class="hljs-keyword">const</span> [password, setPassword] = <span class="hljs-title function_">useState</span>(<span class="hljs-string">&#x27;&#x27;</span>);
+  <span class="hljs-keyword">const</span> [loginError, setLoginError] = <span class="hljs-title function_">useState</span>(<span class="hljs-literal">null</span>);
+  <span class="hljs-keyword">const</span> [isSubmitting, setIsSubmitting] = <span class="hljs-title function_">useState</span>(<span class="hljs-literal">false</span>);
+
+  <span class="hljs-comment">// ... if (user): the next slide</span>
+
+  <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">handleSubmit</span>(<span class="hljs-params">event</span>) {
+    event.<span class="hljs-title function_">preventDefault</span>();
+    <span class="hljs-title function_">setLoginError</span>(<span class="hljs-literal">null</span>);
+    <span class="hljs-title function_">setIsSubmitting</span>(<span class="hljs-literal">true</span>);
+    <span class="hljs-keyword">try</span> {
+      <span class="hljs-keyword">await</span> <span class="hljs-title function_">login</span>(email, password);
+    } <span class="hljs-keyword">catch</span> (error) {
+      <span class="hljs-title function_">setLoginError</span>(<span class="hljs-title function_">describeAuthError</span>(error));
+      <span class="hljs-title function_">setIsSubmitting</span>(<span class="hljs-literal">false</span>);
+    }
+  }
+</code></pre>
+<p>(The <code>// ...</code> line stands for code that's left out here.)</p>
+<p>Most of this is Stage 3 again:</p>
+<ul>
+<li><strong>Controlled inputs</strong>: <code>email</code> and <code>password</code> hold what's typed, as in
+<code>TicketForm</code>.</li>
+<li><strong><code>isSubmitting</code></strong> disables the button while the request is on its
+way, so a double-click doesn't log in twice.</li>
+<li><strong>The whole error</strong> is kept, not just its message, so the form can
+find the <code>details</code> for the email field.</li>
+</ul>
+<h2><code>login()</code> comes from <code>useAuth()</code></h2>
+<p>The page doesn't call <code>auth.api.js</code> itself. It calls <code>login()</code> from the
+context, which asks the API, saves the token and sets the user (topic
+04). If anything goes wrong, <code>login()</code> throws, and the <code>catch</code> here
+shows it.</p>
+<h2>On success: nothing</h2>
+<p>Look at the <code>try</code>: after <code>await login(...)</code>, there's nothing. No
+<code>navigate()</code>, no message, and <code>isSubmitting</code> is never set back to
+<code>false</code>. Yet after a successful login, you end up on the ticket list.</p>
+<p>That's because <code>login()</code> changed <code>user</code>, and <code>LoginPage</code> reads <code>user</code>
+from <code>useAuth()</code>. So the page re-renders, with a user this time, and the
+next slide shows what it does then.</p>
+<h2>Try it</h2>
+<p>Open DevTools' Network tab and log in as Priya. Count the requests that
+go out between clicking <strong>Log in</strong> and seeing the ticket list. Which one
+is the login, and which ones are the ticket list's?</p>
+</div>
+    
+  </main>
+</body>
+</html>

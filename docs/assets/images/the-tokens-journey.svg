@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 674" width="820" height="674" role="img" aria-labelledby="title desc" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <title id="title">The token's journey</title>
+  <desc id="desc">Two columns. On the left, logging in, which happens once. LoginPage: the user types their email and password. AuthProvider's login(email, password). auth.api.js's login() calls apiRequest() in client.js. POST /auth/login is sent with no Authorization header, because there's no token yet. The API checks the password and signs a new token, and answers with data holding user and token. AuthProvider calls saveToken(token) and setUser(user), and the token goes into the browser's localStorage, under the key supportDeskToken, where it survives a reload and closing the tab. On the right, every request after that. Any page, for example TicketListPage, calls getTickets(queryString). tickets.api.js calls apiRequest('/tickets…'). client.js's getToken() reads the saved token from localStorage. GET /tickets is sent with the header Authorization: Bearer and the token. The API's authenticate.js checks the signature and sets req.user.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#1a1a1a"/>
+    </marker>
+  </defs>
+  <rect width="820" height="674" fill="#ffffff"/>
+  <text x="20" y="40" font-size="16" font-weight="700" fill="#1a1a1a">1. Logging in (once)</text>
+  <text x="440" y="40" font-size="16" font-weight="700" fill="#1a1a1a">2. Every request after that</text>
+  <rect x="20" y="70" width="360" height="56" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+  <text x="34" y="92" font-size="14" fill="#1a1a1a">LoginPage</text>
+  <text x="34" y="112" font-size="13" fill="#3d444d">the user types their email and password</text>
+  <rect x="20" y="152" width="360" height="56" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+  <text x="34" y="174" font-size="14" fill="#1a1a1a"><tspan font-family="ui-monospace, Consolas, monospace">login(email, password)</tspan> in AuthProvider</text>
+  <text x="34" y="194" font-size="13" fill="#3d444d">AuthProvider is topic 04</text>
+  <line x1="60" y1="126" x2="60" y2="150" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="20" y="234" width="360" height="56" rx="6" fill="#fff8c5" stroke="#7d4e00" stroke-width="1.5"/>
+  <text x="34" y="256" font-size="14" fill="#1a1a1a"><tspan font-family="ui-monospace, Consolas, monospace">login()</tspan> in auth.api.js</text>
+  <text x="34" y="276" font-size="13" fill="#3d444d">calls <tspan font-family="ui-monospace, Consolas, monospace">apiRequest()</tspan> in client.js</text>
+  <line x1="60" y1="208" x2="60" y2="232" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="20" y="316" width="360" height="56" rx="6" fill="#fff8c5" stroke="#7d4e00" stroke-width="1.5"/>
+  <text x="34" y="338" font-size="14" fill="#1a1a1a"><tspan font-family="ui-monospace, Consolas, monospace">POST /auth/login</tspan></text>
+  <text x="34" y="358" font-size="13" fill="#3d444d">no token yet, so no Authorization header</text>
+  <line x1="60" y1="290" x2="60" y2="314" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="20" y="398" width="360" height="56" rx="6" fill="#f6f8fa" stroke="#59636e" stroke-width="1.5"/>
+  <text x="34" y="420" font-size="14" fill="#1a1a1a">The API</text>
+  <text x="34" y="440" font-size="13" fill="#3d444d">checks the password, signs a new token</text>
+  <line x1="60" y1="372" x2="60" y2="396" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="20" y="480" width="360" height="56" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+  <text x="34" y="502" font-size="14" fill="#1a1a1a">AuthProvider</text>
+  <text x="34" y="522" font-size="13" fill="#3d444d"><tspan font-family="ui-monospace, Consolas, monospace">saveToken(token)</tspan> and <tspan font-family="ui-monospace, Consolas, monospace">setUser(user)</tspan></text>
+  <line x1="60" y1="454" x2="60" y2="478" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="70" y="471" font-size="12" fill="#1a1a1a"><tspan font-family="ui-monospace, Consolas, monospace">{ data: { user, token } }</tspan></text>
+  <rect x="440" y="70" width="330" height="56" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+  <text x="454" y="92" font-size="14" fill="#1a1a1a">Any page, e.g. <tspan font-family="ui-monospace, Consolas, monospace">TicketListPage</tspan></text>
+  <text x="454" y="112" font-size="13" fill="#3d444d"><tspan font-family="ui-monospace, Consolas, monospace">getTickets(queryString)</tspan></text>
+  <rect x="440" y="152" width="330" height="56" rx="6" fill="#fff8c5" stroke="#7d4e00" stroke-width="1.5"/>
+  <text x="454" y="174" font-size="14" fill="#1a1a1a">tickets.api.js</text>
+  <text x="454" y="194" font-size="13" fill="#3d444d"><tspan font-family="ui-monospace, Consolas, monospace">apiRequest('/tickets…')</tspan></text>
+  <line x1="480" y1="126" x2="480" y2="150" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="440" y="234" width="330" height="56" rx="6" fill="#fff8c5" stroke="#7d4e00" stroke-width="1.5"/>
+  <text x="454" y="256" font-size="14" fill="#1a1a1a"><tspan font-family="ui-monospace, Consolas, monospace">getToken()</tspan> in client.js</text>
+  <text x="454" y="276" font-size="13" fill="#3d444d">reads the saved token</text>
+  <line x1="480" y1="208" x2="480" y2="232" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="440" y="316" width="330" height="56" rx="6" fill="#fff8c5" stroke="#7d4e00" stroke-width="1.5"/>
+  <text x="454" y="338" font-size="14" fill="#1a1a1a"><tspan font-family="ui-monospace, Consolas, monospace">GET /tickets</tspan></text>
+  <text x="454" y="358" font-size="13" fill="#3d444d"><tspan font-family="ui-monospace, Consolas, monospace">Authorization: Bearer eyJhbGci…</tspan></text>
+  <line x1="480" y1="290" x2="480" y2="314" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="440" y="398" width="330" height="56" rx="6" fill="#f6f8fa" stroke="#59636e" stroke-width="1.5"/>
+  <text x="454" y="420" font-size="14" fill="#1a1a1a">The API's <tspan font-family="ui-monospace, Consolas, monospace">authenticate.js</tspan></text>
+  <text x="454" y="440" font-size="13" fill="#3d444d">checks the signature, sets <tspan font-family="ui-monospace, Consolas, monospace">req.user</tspan></text>
+  <line x1="480" y1="372" x2="480" y2="396" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="160" y="586" width="500" height="64" rx="8" fill="#ddf4ff" stroke="#0550ae" stroke-width="2"/>
+  <text x="176" y="610" font-size="15" font-weight="700" fill="#1a1a1a">The browser's <tspan font-family="ui-monospace, Consolas, monospace">localStorage</tspan></text>
+  <text x="176" y="632" font-size="13" fill="#3d444d"><tspan font-family="ui-monospace, Consolas, monospace">supportDeskToken</tspan>: &quot;eyJhbGci…&quot;  · survives a reload and closing the tab</text>
+  <line x1="200" y1="536" x2="200" y2="584" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="210" y="565" font-size="12" fill="#1a1a1a">saved</text>
+  <path d="M 660 618 H 800 V 262 H 772" fill="none" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="792" y="552" font-size="12" fill="#1a1a1a" text-anchor="end">read on</text>
+  <text x="792" y="568" font-size="12" fill="#1a1a1a" text-anchor="end">every request</text>
+</svg>

@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 870 514" width="870" height="514" role="img" aria-labelledby="title desc" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <title id="title">Who sees what in Stage 4</title>
+  <desc id="desc">A grid of what each kind of user can use. Columns: logged out, customer (Casey, Priya), agent (Alex), admin (Ada). Home (/): logged out yes; customer yes; agent yes; admin yes. Log in, Register (/login, /register): logged out yes; customer sent to /tickets; agent sent to /tickets; admin sent to /tickets. The ticket list (/tickets): logged out sent to /login; customer their own; agent theirs + unassigned; admin every ticket. A ticket (/tickets/:ticketId): logged out sent to /login; customer their own; agent theirs + unassigned; admin every ticket. New ticket (/tickets/new): logged out sent to /login; customer yes; agent Not available; admin Not available. Edit or delete a ticket (/tickets/:ticketId/edit): logged out sent to /login; customer Not available; agent yes; admin yes. Tags (/tags): logged out sent to /login; customer Not available; agent yes; admin yes. Delete a comment (a button on a ticket): logged out no; customer their own; agent their own; admin any comment. Green cells can use it, blue cells are sent to another page, grey cells cannot use it.</desc>
+  <rect width="870" height="514" fill="#ffffff"/>
+  <text x="325" y="42" text-anchor="middle" font-size="15" font-weight="700" fill="#1a1a1a">Logged out</text>
+  <text x="325" y="60" text-anchor="middle" font-size="12" fill="#59636e">nobody</text>
+  <text x="475" y="42" text-anchor="middle" font-size="15" font-weight="700" fill="#1a1a1a">Customer</text>
+  <text x="475" y="60" text-anchor="middle" font-size="12" fill="#59636e">Casey, Priya</text>
+  <text x="625" y="42" text-anchor="middle" font-size="15" font-weight="700" fill="#1a1a1a">Agent</text>
+  <text x="625" y="60" text-anchor="middle" font-size="12" fill="#59636e">Alex</text>
+  <text x="775" y="42" text-anchor="middle" font-size="15" font-weight="700" fill="#1a1a1a">Admin</text>
+  <text x="775" y="60" text-anchor="middle" font-size="12" fill="#59636e">Ada</text>
+  <text x="20" y="90" font-size="14" font-weight="700" fill="#1a1a1a">Home</text>
+  <text x="20" y="107" font-size="12" fill="#59636e" font-family="ui-monospace, Consolas, monospace">/</text>
+  <rect x="252" y="72" width="146" height="42" rx="5" fill="#dafbe1" stroke="#116329" stroke-width="1"/>
+  <text x="325" y="98" text-anchor="middle" font-size="17" fill="#116329">✓</text>
+  <rect x="402" y="72" width="146" height="42" rx="5" fill="#dafbe1" stroke="#116329" stroke-width="1"/>
+  <text x="475" y="98" text-anchor="middle" font-size="17" fill="#116329">✓</text>
+  <rect x="552" y="72" width="146" height="42" rx="5" fill="#dafbe1" stroke="#116329" stroke-width="1"/>
+  <text x="625" y="98" text-anchor="middle" font-size="17" fill="#116329">✓</text>
+  <rect x="702" y="72" width="146" height="42" rx="5" fill="#dafbe1" stroke="#116329" stroke-width="1"/>
+  <text x="775" y="98" text-anchor="middle" font-size="17" fill="#116329">✓</text>
+  <text x="20" y="136" font-size="14" font-weight="700" fill="#1a1a1a">Log in, Register</text>
+  <text x="20" y="153" font-size="12" fill="#59636e" font-family="ui-monospace, Consolas, monospace">/login, /register</text>
+  <rect x="252" y="118" width="146" height="42" rx="5" fill="#dafbe1" stroke="#116329" stroke-width="1"/>
+  <text x="325" y="144" text-anchor="middle" font-size="17" fill="#116329">✓</text>
+  <rect x="402" y="118" width="146" height="42" rx="5" fill="#ddf4ff" stroke="#0550ae" stroke-width="1"/>
+  <text x="475" y="144" text-anchor="middle" font-size="13" fill="#0550ae" font-family="ui-monospace, Consolas, monospace">→ /tickets</text>
+  <rect x="552" y="118" width="146" height="42" rx="5" fill="#ddf4ff" stroke="#0550ae" stroke-width="1"/>
+  <text x="625" y="144" text-anchor="middle" font-size="13" fill="#0550ae" font-family="ui-monospace, Consolas, monospace">→ /tickets</text>
+  <rect x="702" y="118" width="146" height="42" rx="5" fill="#ddf4ff" stroke="#0550ae" stroke-width="1"/>
+  <text x="775" y="144" text-anchor="middle" font-size="13" fill="#0550ae" font-family="ui-monospace, Consolas, monospace">→ /tickets</text>
+  <text x="20" y="182" font-size="14" font-weight="700" fill="#1a1a1a">The ticket list</text>
+  <text x="20" y="199" font-size="12" fill="#59636e" font-family="ui-monospace, Consolas, monospace">/tickets</text>
+  <rect x="252" y="164" width="146" height="42" rx="5" fill="#ddf4ff" stroke="#0550ae" stroke-width="1"/>
+  <text x="325" y="190" text-anchor="middle" font-size="13" fill="#0550ae" font-family="ui-monospace, Consolas, monospace">→ /login</text>
+  <rect x="402" y="164" width="146" height="42" rx="5" fill="#dafbe1" stroke="#116329" stroke-width="1"/>
+  <text x="475" y="190" text-anchor="middle" font-size="13" fill="#116329">their own</text>
+  <rect x="552" y="164" width="146" height="42" rx="5" fill="#dafbe1" stroke="#116329" stroke-width="1"/>
+  <text x="625" y="190" text-anchor="middle" font-size="13" fill="#116329">theirs + unassigned</text>
+  <rect x="702" y="164" width="146" height="42" rx="5" fill="#dafbe1" stroke="#116329" stroke-width="1"/>
+  <text x="775" y="190" text-anchor="middle" font-size="13" fill="#116329">every ticket</text>
+  <text x="20" y="228" font-size="14" font-weight="700" fill="#1a1a1a">A ticket</text>
+  <text x="20" y="245" font-size="12" fill="#59636e" font-family="ui-monospace, Consolas, monospace">/tickets/:ticketId</text>
+  <rect x="252" y="210" width="146" height="42" rx="5" fill="#ddf4ff" stroke="#0550ae" stroke-width="1"/>
+  <text x="325" y="236" text-anchor="middle" font-size="13" fill="#0550ae" font-family="ui-monospace, Consolas, monospace">→ /login</text>
+  <rect x="402" y="210" width="146" height="42" rx="5" fill="#dafbe1" stroke="#116329" stroke-width="1"/>
+  <text x="475" y="236" text-anchor="middle" font-size="13" fill="#116329">their own</text>
+  <rect x="552" y="210" width="146" height="42" rx="5" fill="#dafbe1" stroke="#116329" stroke-width="1"/>
+  <text x="625" y="236" text-anchor="middle" font-size="13" fill="#116329">theirs + unassigned</text>
+  <rect x="702" y="210" width="146" height="42" rx="5" fill="#dafbe1" stroke="#116329" stroke-width="1"/>
+  <text x="775" y="236" text-anchor="middle" font-size="13" fill="#116329">every ticket</text>
+  <text x="20" y="274" font-size="14" font-weight="700" fill="#1a1a1a">New ticket</text>
+  <text x="20" y="291" font-size="12" fill="#59636e" font-family="ui-monospace, Consolas, monospace">/tickets/new</text>
+  <rect x="252" y="256" width="146" height="42" rx="5" fill="#ddf4ff" stroke="#0550ae" stroke-width="1"/>
+  <text x="325" y="282" text-anchor="middle" font-size="13" fill="#0550ae" font-family="ui-monospace, Consolas, monospace">→ /login</text>
+  <rect x="402" y="256" width="146" height="42" rx="5" fill="#dafbe1" stroke="#116329" stroke-width="1"/>
+  <text x="475" y="282" text-anchor="middle" font-size="17" fill="#116329">✓</text>
+  <rect x="552" y="256" width="146" height="42" rx="5" fill="#f6f8fa" stroke="#59636e" stroke-width="1"/>
+  <text x="625" y="282" text-anchor="middle" font-size="13" fill="#59636e">Not available</text>
+  <rect x="702" y="256" width="146" height="42" rx="5" fill="#f6f8fa" stroke="#59636e" stroke-width="1"/>
+  <text x="775" y="282" text-anchor="middle" font-size="13" fill="#59636e">Not available</text>
+  <text x="20" y="320" font-size="14" font-weight="700" fill="#1a1a1a">Edit or delete a ticket</text>
+  <text x="20" y="337" font-size="12" fill="#59636e" font-family="ui-monospace, Consolas, monospace">/tickets/:ticketId/edit</text>
+  <rect x="252" y="302" width="146" height="42" rx="5" fill="#ddf4ff" stroke="#0550ae" stroke-width="1"/>
+  <text x="325" y="328" text-anchor="middle" font-size="13" fill="#0550ae" font-family="ui-monospace, Consolas, monospace">→ /login</text>
+  <rect x="402" y="302" width="146" height="42" rx="5" fill="#f6f8fa" stroke="#59636e" stroke-width="1"/>
+  <text x="475" y="328" text-anchor="middle" font-size="13" fill="#59636e">Not available</text>
+  <rect x="552" y="302" width="146" height="42" rx="5" fill="#dafbe1" stroke="#116329" stroke-width="1"/>
+  <text x="625" y="328" text-anchor="middle" font-size="17" fill="#116329">✓</text>
+  <rect x="702" y="302" width="146" height="42" rx="5" fill="#dafbe1" stroke="#116329" stroke-width="1"/>
+  <text x="775" y="328" text-anchor="middle" font-size="17" fill="#116329">✓</text>
+  <text x="20" y="366" font-size="14" font-weight="700" fill="#1a1a1a">Tags</text>
+  <text x="20" y="383" font-size="12" fill="#59636e" font-family="ui-monospace, Consolas, monospace">/tags</text>
+  <rect x="252" y="348" width="146" height="42" rx="5" fill="#ddf4ff" stroke="#0550ae" stroke-width="1"/>
+  <text x="325" y="374" text-anchor="middle" font-size="13" fill="#0550ae" font-family="ui-monospace, Consolas, monospace">→ /login</text>
+  <rect x="402" y="348" width="146" height="42" rx="5" fill="#f6f8fa" stroke="#59636e" stroke-width="1"/>
+  <text x="475" y="374" text-anchor="middle" font-size="13" fill="#59636e">Not available</text>
+  <rect x="552" y="348" width="146" height="42" rx="5" fill="#dafbe1" stroke="#116329" stroke-width="1"/>
+  <text x="625" y="374" text-anchor="middle" font-size="17" fill="#116329">✓</text>
+  <rect x="702" y="348" width="146" height="42" rx="5" fill="#dafbe1" stroke="#116329" stroke-width="1"/>
+  <text x="775" y="374" text-anchor="middle" font-size="17" fill="#116329">✓</text>
+  <text x="20" y="412" font-size="14" font-weight="700" fill="#1a1a1a">Delete a comment</text>
+  <text x="20" y="429" font-size="12" fill="#59636e">a button on a ticket</text>
+  <rect x="252" y="394" width="146" height="42" rx="5" fill="#f6f8fa" stroke="#59636e" stroke-width="1"/>
+  <text x="325" y="420" text-anchor="middle" font-size="13" fill="#59636e">—</text>
+  <rect x="402" y="394" width="146" height="42" rx="5" fill="#dafbe1" stroke="#116329" stroke-width="1"/>
+  <text x="475" y="420" text-anchor="middle" font-size="13" fill="#116329">their own</text>
+  <rect x="552" y="394" width="146" height="42" rx="5" fill="#dafbe1" stroke="#116329" stroke-width="1"/>
+  <text x="625" y="420" text-anchor="middle" font-size="13" fill="#116329">their own</text>
+  <rect x="702" y="394" width="146" height="42" rx="5" fill="#dafbe1" stroke="#116329" stroke-width="1"/>
+  <text x="775" y="420" text-anchor="middle" font-size="13" fill="#116329">any comment</text>
+  <rect x="20" y="454" width="26" height="20" rx="4" fill="#dafbe1" stroke="#116329" stroke-width="1"/>
+  <text x="54" y="469" font-size="13" fill="#1a1a1a">can use it (✓, or which ones)</text>
+  <rect x="292.8" y="454" width="26" height="20" rx="4" fill="#ddf4ff" stroke="#0550ae" stroke-width="1"/>
+  <text x="326.8" y="469" font-size="13" fill="#1a1a1a">sent to another page</text>
+  <rect x="500.8" y="454" width="26" height="20" rx="4" fill="#f6f8fa" stroke="#59636e" stroke-width="1"/>
+  <text x="534.8" y="469" font-size="13" fill="#1a1a1a">can't use it</text>
+  <text x="20" y="502" font-size="13" fill="#1a1a1a">"Not available" is a message on the page. The API makes the same decisions for itself, whatever the page shows.</text>
+</svg>

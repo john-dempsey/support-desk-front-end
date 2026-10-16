@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wrapping the App — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/login-and-roles/authprovider/a-component-that-holds-the-user.html">← A Component That Holds the User</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/login-and-roles/authprovider/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/login-and-roles/authprovider/logging-in-and-out.html">Logging In and Out →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Wrapping the App</h1>
+    <p class="lede">main.jsx puts AuthProvider around App, inside BrowserRouter. When the user changes, every component that called useAuth() re-renders with the new value.</p>
+
+    
+
+    
+      <div class="slide-body"><p><code>main.jsx</code> has had one wrapper since Stage 0. It now has two:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 4.10: two providers around the app (src/main.jsx, excerpt)</span>
+<span class="hljs-title function_">createRoot</span>(<span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;root&#x27;</span>)).<span class="hljs-title function_">render</span>(
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">StrictMode</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">BrowserRouter</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">AuthProvider</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">App</span> /&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">AuthProvider</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">BrowserRouter</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">StrictMode</span>&gt;</span></span>,
+);
+</code></pre>
+<p><code>App</code> is inside both, so every component it renders can use both the
+router's hooks and <code>useAuth()</code>.</p>
+<p><code>AuthProvider</code> itself uses nothing from the router, so the two could go
+the other way round. The order only matters for a provider that uses
+another one: it has to be inside it.</p>
+<h2>When the user changes</h2>
+<p>Logging in calls <code>setUser()</code> inside <code>AuthProvider</code>. Then:</p>
+<ol>
+<li><code>AuthProvider</code> re-renders, as any component does when its state
+changes, and makes a new <code>authValue</code> with the new <code>user</code>.</li>
+<li>The provider now holds a different value, so React re-renders
+<strong>every component that called <code>useAuth()</code></strong>, wherever it is.</li>
+<li>Each one shows what's right for the new user: <code>NavBar</code> shows their
+name and Log out, <code>HomePage</code> swaps &quot;Log in&quot; for &quot;View the tickets&quot;,
+and so on.</li>
+</ol>
+<p>Logging out is the same, with <code>setUser(null)</code>. Nothing has to tell
+<code>NavBar</code> that someone logged in. It reads <code>user</code>, so it re-renders when
+<code>user</code> changes.</p>
+<h2>Try it</h2>
+<p>In <code>main.jsx</code>, swap <code>&lt;BrowserRouter&gt;</code> and <code>&lt;AuthProvider&gt;</code>, so
+<code>AuthProvider</code> is on the outside (and the closing tags match). Does the
+app still work? Now explain why it would break if <code>AuthProvider</code> ever
+called <code>useNavigate()</code>.</p>
+<p>Put them back the way they were when you're done.</p>
+</div>
+    
+  </main>
+</body>
+</html>

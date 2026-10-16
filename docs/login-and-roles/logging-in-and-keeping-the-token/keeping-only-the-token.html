@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Keeping Only the Token — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/login-and-roles/logging-in-and-keeping-the-token/three-requests-about-who-you-are.html">← Three Requests About Who You Are</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/login-and-roles/logging-in-and-keeping-the-token/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/login-and-roles/logging-in-and-keeping-the-token/whats-inside-a-token.html">What&#39;s Inside a Token →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Keeping Only the Token</h1>
+    <p class="lede">The token is saved in the browser&#39;s localStorage, so a reload doesn&#39;t log the user out. Three small functions in tokenStorage.js are the only code that touches it.</p>
+
+    
+
+    
+      <div class="slide-body"><p>React state disappears when the page reloads: the whole app starts
+again from nothing. If the token were only kept in state, pressing F5
+would log you out. So the token is also saved somewhere that lasts.</p>
+<h2>localStorage</h2>
+<p>Every browser gives each site a small store of its own, called
+<strong><code>localStorage</code></strong>:</p>
+<ul>
+<li>it holds <strong>text</strong>, saved under a name (a key), like a tiny dictionary</li>
+<li>it lasts through a reload, closing the tab, and restarting the browser</li>
+<li>each site has its own. <code>http://localhost:5173</code> can't see another
+site's store, and doesn't even share one with <code>http://localhost:4173</code>,
+because the port is part of what counts as &quot;the site&quot;</li>
+</ul>
+<h2>One file touches it</h2>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 4.3: saving the token (src/api/tokenStorage.js, excerpt)</span>
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">TOKEN_KEY</span> = <span class="hljs-string">&#x27;supportDeskToken&#x27;</span>;
+
+<span class="hljs-comment">// Returns the saved token, or null if there isn&#x27;t one.</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">getSavedToken</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">return</span> <span class="hljs-variable language_">localStorage</span>.<span class="hljs-title function_">getItem</span>(<span class="hljs-variable constant_">TOKEN_KEY</span>);
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">saveToken</span>(<span class="hljs-params">token</span>) {
+  <span class="hljs-variable language_">localStorage</span>.<span class="hljs-title function_">setItem</span>(<span class="hljs-variable constant_">TOKEN_KEY</span>, token);
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">clearSavedToken</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-variable language_">localStorage</span>.<span class="hljs-title function_">removeItem</span>(<span class="hljs-variable constant_">TOKEN_KEY</span>);
+}
+</code></pre>
+<p>Three one-line functions might seem like too little for a file. They're
+there so that the key <code>'supportDeskToken'</code> is written once, and no other
+file uses <code>localStorage</code> directly. If the token ever moved somewhere
+else, this would be the only file to change.</p>
+<h2>Only the token</h2>
+<p>The user's details (name, role, ...) are <strong>not</strong> saved, only the token.
+A saved copy of the user could go out of date: their name could change,
+or their account could be deleted. Instead, when the app starts, it asks
+the API who the token belongs to, with <code>GET /auth/me</code>. That's later in
+this lesson.</p>
+<p>In Laravel, the browser kept a session <strong>cookie</strong>, and sent it with
+every request by itself. Here, nothing happens by itself: the app saves
+the token, and <code>client.js</code> adds it to each request.</p>
+<h2>Try it</h2>
+<p>Log in to the app as Casey. In DevTools, open the <strong>Application</strong> tab,
+then <strong>Storage</strong> › <strong>Local storage</strong> › <code>http://localhost:5173</code>. What
+keys are there?</p>
+<p>Then:</p>
+<ol>
+<li>Reload the page. Are you still logged in?</li>
+<li>Open the app in a second tab. Are you logged in there?</li>
+<li>Click <strong>Log out</strong>, and look at Local storage again. (Click the
+refresh button above the list if it hasn't changed.)</li>
+</ol>
+</div>
+    
+  </main>
+</body>
+</html>

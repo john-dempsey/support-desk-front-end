@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Why App Waits — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/login-and-roles/checking-the-session/asking-get-auth-me.html">← Asking GET /auth/me</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/login-and-roles/checking-the-session/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/login-and-roles/the-login-and-register-pages/the-login-page.html">The Login Page →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Why App Waits</h1>
+    <p class="lede">While the session is being checked, App shows a message instead of the routes. Without it, a logged-in user who reloads a ticket&#39;s page would end up on the ticket list.</p>
+
+    
+
+    
+      <div class="slide-body"><pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 4.16: waiting for the answer (src/App.jsx, excerpt)</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">App</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> { isCheckingSession } = <span class="hljs-title function_">useAuth</span>();
+
+  <span class="hljs-comment">// While a saved token is being checked, nobody knows yet whether the</span>
+  <span class="hljs-comment">// user is logged in. Showing the routes now would make ProtectedRoute</span>
+  <span class="hljs-comment">// send a logged-in user to /login for a moment, so wait.</span>
+  <span class="hljs-keyword">if</span> (isCheckingSession) {
+    <span class="hljs-keyword">return</span> (
+      <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">main</span> <span class="hljs-attr">className</span>=<span class="hljs-string">&quot;container&quot;</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">Loading</span> <span class="hljs-attr">message</span>=<span class="hljs-string">&quot;Checking your session…&quot;</span> /&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">main</span>&gt;</span></span>
+    );
+  }
+
+  <span class="hljs-keyword">return</span> (
+    <span class="language-xml"><span class="hljs-tag">&lt;&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">NavBar</span> /&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">main</span> <span class="hljs-attr">className</span>=<span class="hljs-string">&quot;container&quot;</span>&gt;</span>
+        {/* … the routes, as before */}
+      <span class="hljs-tag">&lt;/<span class="hljs-name">main</span>&gt;</span>
+    <span class="hljs-tag">&lt;/&gt;</span></span>
+  );
+}
+</code></pre>
+<p>(The routes are left out here.)</p>
+<p>While the check runs, <code>App</code> shows Stage 0's <code>Loading</code> component and
+nothing else: no navigation bar, no page. When <code>finally</code> sets
+<code>isCheckingSession</code> to <code>false</code>, <code>App</code> re-renders and shows the routes,
+with <code>user</code> already set (or not).</p>
+<h2>What would go wrong without it</h2>
+<p>Say Casey is on <code>/tickets/1</code>, and reloads. Without the wait:</p>
+<ol>
+<li>The routes show straight away, while <code>user</code> is still <code>null</code>.</li>
+<li><code>/tickets/1</code> is a protected page (topic 07), so with no user, the
+app goes to <code>/login</code>.</li>
+<li>The check finishes, and <code>user</code> is set. The login page sees a user,
+and sends Casey to <code>/tickets</code>.</li>
+</ol>
+<p>Casey is logged in, but on the ticket list instead of ticket 1. Nothing
+crashed, but the reload lost Casey's place.</p>
+<p>The wait is short, usually a fraction of a second. The answer to
+<code>GET /auth/me</code> decides what every page shows, so nothing is shown until
+it arrives.</p>
+<h2>Try it</h2>
+<ol>
+<li>Log in as Casey, and open <code>/tickets/1</code>. In the Network tab, set the
+throttling to <strong>Slow 4G</strong>, and reload. Watch for &quot;Checking your
+session…&quot;.</li>
+<li>In <code>App.jsx</code>, put <code>//</code> in front of each line of the
+<code>if (isCheckingSession) { ... }</code> block. Save, then reload on
+<code>/tickets/1</code>, still on Slow 4G. Where do you end up?</li>
+</ol>
+<p>Remove the <code>//</code>s, and set the throttling back to <strong>No throttling</strong>.</p>
+</div>
+    
+  </main>
+</body>
+</html>

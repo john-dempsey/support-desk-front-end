@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>describeAuthError — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/login-and-roles/the-login-and-register-pages/when-login-fails.html">← When Login Fails</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/login-and-roles/the-login-and-register-pages/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/login-and-roles/the-login-and-register-pages/the-register-page.html">The Register Page →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>describeAuthError</h1>
+    <p class="lede">Two of the API&#39;s auth errors need saying in the user&#39;s own words: too many attempts, and an email that&#39;s already registered. A small function in utils/ rewords them for both pages.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Most of the API's error messages are fine to show as they are. Two
+aren't:</p>
+<table>
+<thead>
+<tr>
+<th>Status</th>
+<th>The API says</th>
+<th>Why that's not enough</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>429</code></td>
+<td>&quot;Too many requests — please try again later.&quot;</td>
+<td>It doesn't say how long, or that it's only logging in that's blocked</td>
+</tr>
+<tr>
+<td><code>409</code> on register</td>
+<td>&quot;A record with that User_email_key already exists&quot;</td>
+<td><code>User_email_key</code> is the name of a database index. It means nothing to a user</td>
+</tr>
+</tbody>
+</table>
+<p>So both pages pass every error through one small function first:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 4.20: rewording two errors (src/utils/describeAuthError.js,</span>
+<span class="hljs-comment">// excerpt)</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">describeAuthError</span>(<span class="hljs-params">error</span>) {
+  <span class="hljs-keyword">if</span> (error.<span class="hljs-property">status</span> === <span class="hljs-number">429</span>) {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(
+      <span class="hljs-string">&#x27;Too many attempts. Wait a few minutes, then try again.&#x27;</span>
+    );
+  }
+  <span class="hljs-keyword">if</span> (error.<span class="hljs-property">status</span> === <span class="hljs-number">409</span>) {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(
+      <span class="hljs-string">&#x27;An account with that email already exists. Try logging in.&#x27;</span>
+    );
+  }
+  <span class="hljs-keyword">return</span> error;
+}
+</code></pre>
+<p>(Each <code>return new Error(...)</code> is one line in the file. They're split
+here to fit.)</p>
+<p>Any other error comes back <strong>unchanged</strong>, <code>details</code> and all, so a <code>400</code>
+still reaches the form's fields.</p>
+<h2>Why a function, and why in <code>utils/</code></h2>
+<p>Both <code>LoginPage</code> and <code>RegisterPage</code> need it, so it's written once. It
+has nothing to do with React: it takes an error and returns an error.
+Like <code>getFieldError()</code> and <code>formatDate()</code>, that makes it a plain function
+in <code>utils/</code>, and easy to test on its own (topic 10).</p>
+<p>Stage 3's tags page did the same thing for its own <code>409</code> (Stage 3,
+topic 08). The API's message names the index there too.</p>
+<h2>The rate limit</h2>
+<p>The back-end allows <strong>10</strong> requests to <code>/auth/login</code> and <code>/auth/register</code>
+every 15 minutes from one address, successful or not (Lesson 6). It's
+there to stop someone guessing passwords. The <code>429</code> is what makes the
+first message necessary.</p>
+<p>The API also tells the browser how many attempts are left, in a
+response header.</p>
+<h2>Try it</h2>
+<p>Log in once, then click the <code>login</code> request in the Network tab. Under
+<strong>Response Headers</strong>, find <code>RateLimit-Remaining</code>. How many attempts do
+you have left? What does <code>RateLimit-Reset</code> count?</p>
+</div>
+    
+  </main>
+</body>
+</html>

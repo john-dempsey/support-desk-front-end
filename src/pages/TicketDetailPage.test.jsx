@@ -12,6 +12,7 @@ import { createComment, deleteComment, getComments } from '../api/comments.api.j
 import { renderWithProviders } from '../test/renderWithProviders.jsx';
 import { ticketAssignedToAlex, unassignedTicket } from '../test/testTickets.js';
 import { testComments } from '../test/testComments.js';
+import { agentUser, customerUser } from '../test/testUsers.js';
 
 vi.mock('../api/tickets.api.js');
 vi.mock('../api/comments.api.js');
@@ -200,6 +201,35 @@ describe('TicketDetailPage', () => {
     });
   });
 
+  describe('controls by role', () => {
+    it("doesn't show a customer Edit or Delete", async () => {
+      getTicket.mockResolvedValue(ticketAssignedToAlex);
+
+      renderWithProviders(<TicketDetailPage />, {
+        route: '/tickets/1',
+        path: DETAIL_PATH,
+        user: customerUser,
+      });
+      await screen.findByRole('heading', { level: 1, name: 'Cannot log in' });
+
+      expect(screen.queryByRole('link', { name: 'Edit ticket' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Delete ticket' })).not.toBeInTheDocument();
+    });
+
+    it('shows an agent Edit and Delete', async () => {
+      getTicket.mockResolvedValue(ticketAssignedToAlex);
+
+      renderWithProviders(<TicketDetailPage />, {
+        route: '/tickets/1',
+        path: DETAIL_PATH,
+        user: agentUser,
+      });
+
+      expect(await screen.findByRole('link', { name: 'Edit ticket' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Delete ticket' })).toBeInTheDocument();
+    });
+  });
+
   describe('comments', () => {
     it("shows the ticket's comments with their authors", async () => {
       await renderTicketWithComments();
@@ -252,6 +282,26 @@ describe('TicketDetailPage', () => {
       expect(deleteComment).toHaveBeenCalledWith(1, 1);
       expect(screen.queryByText('Have you checked your spam folder?')).not.toBeInTheDocument();
       expect(screen.getAllByRole('listitem')).toHaveLength(1);
+    });
+
+    it('only offers Delete on your own comments', async () => {
+      getTicket.mockResolvedValue(ticketAssignedToAlex);
+      getComments.mockResolvedValue(testComments);
+
+      // Casey wrote the second comment; Alex wrote the first.
+      renderWithProviders(<TicketDetailPage />, {
+        route: '/tickets/1',
+        path: DETAIL_PATH,
+        user: customerUser,
+      });
+      await screen.findByRole('heading', { level: 1, name: 'Cannot log in' });
+
+      expect(
+        screen.getByRole('button', { name: 'Delete comment by Casey Customer' }),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Delete comment by Alex Agent' }),
+      ).not.toBeInTheDocument();
     });
   });
 });

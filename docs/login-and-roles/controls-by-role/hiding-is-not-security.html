@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hiding Is Not Security — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/login-and-roles/controls-by-role/which-comments-can-be-deleted.html">← Which Comments Can Be Deleted</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/login-and-roles/controls-by-role/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/login-and-roles/when-the-session-ends/a-token-runs-out.html">A Token Runs Out →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Hiding Is Not Security</h1>
+    <p class="lede">Every check in the front-end can be skipped: the code runs on the user&#39;s computer. The API&#39;s checks are the ones that keep the data safe. The front-end&#39;s make the app easier to use.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Stage 3 said it, and Stage 4 has now built it: the front-end hides
+what a role can't use. It's worth being clear about what that does,
+and what it doesn't.</p>
+<h2>The front-end runs on the user's computer</h2>
+<p>Everything in <code>src/</code> is downloaded to the browser. The user can read
+it in DevTools' <strong>Sources</strong> tab, change it, or skip it entirely and send
+requests with a REST client. No check in the front-end can stop that.</p>
+<p>So:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Front-end</th>
+<th>Back-end</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Where it runs</td>
+<td>the user's browser</td>
+<td>your server</td>
+</tr>
+<tr>
+<td>Who controls it</td>
+<td>the user</td>
+<td>you</td>
+</tr>
+<tr>
+<td>Its checks are for</td>
+<td>the user's convenience: no buttons that can only fail</td>
+<td>security: no request gets through that shouldn't</td>
+</tr>
+<tr>
+<td>If its check is missing</td>
+<td>the user sees a button, clicks, gets a <code>403</code></td>
+<td>anyone can do anything</td>
+</tr>
+</tbody>
+</table>
+<h2>Try it</h2>
+<p>The front-end now hides these buttons from Casey. Go around it: in your
+REST client, log in as Casey, and use Casey's token for these:</p>
+<ol>
+<li><code>GET /tickets/1/comments</code>. Find the <code>id</code> of Alex's comment.</li>
+<li><code>DELETE /tickets/1/comments/&lt;that id&gt;</code>. What comes back?</li>
+<li><code>PATCH /tickets/1</code> with the body <code>{ &quot;status&quot;: &quot;closed&quot; }</code>. What comes
+back, and which line of the back-end's <code>ticket.routes.js</code> sent it?</li>
+</ol>
+<p>The front-end never showed Casey a button for either. The API refused
+anyway, because it checks every request itself, whoever sends it. That's
+the only reason it's safe for the front-end's checks to be &quot;just&quot; for
+convenience.</p>
+</div>
+    
+  </main>
+</body>
+</html>

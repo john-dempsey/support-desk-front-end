@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login and Roles — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Login and Roles</h1>
+    <p class="lede">Users log in instead of pasting a token into .env. The app knows who they are, shows each role only what it can use, and logs them out when their session ends.</p>
+
+    
+      <ul class="listing">
+        
+          <li>
+            <a href="/support-desk-front-end/login-and-roles/what-stage-4-adds/index.html">What Stage 4 Adds</a>
+            <p>Who this stage is for, what each kind of user sees, and which files change, before any of the code.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/login-and-roles/logging-in-and-keeping-the-token/index.html">Logging In, and Keeping the Token</a>
+            <p>The three requests about who the user is, where the token is kept between visits, what&#39;s inside it, and how it reaches every request.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/login-and-roles/sharing-whos-logged-in/index.html">Sharing Who&#39;s Logged In</a>
+            <p>Eight components need to know who is logged in. A React context lets each one ask, instead of having the user passed down to it as a prop.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/login-and-roles/authprovider/index.html">AuthProvider</a>
+            <p>The component that holds the logged-in user, logs them in and out, and answers hasRole(). Everything inside it can read it with useAuth().</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/login-and-roles/checking-the-session/index.html">Checking the Session on Load</a>
+            <p>After a reload, the token is still saved but the user is gone. The app asks the API who the token belongs to, and waits for the answer before showing any page.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/login-and-roles/the-login-and-register-pages/index.html">The Login and Register Pages</a>
+            <p>Two forms written inside their pages: what they send, how they leave once someone is logged in, and how they show the API&#39;s errors.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/login-and-roles/protected-pages/index.html">Protected Pages</a>
+            <p>ProtectedRoute wraps a page in App.jsx&#39;s route table. It sends a visitor to the login page, and tells a user whose role can&#39;t use the page, before the page ever loads.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/login-and-roles/controls-by-role/index.html">Controls by Role</a>
+            <p>The navigation bar, the ticket list and the ticket page show each user only the links and buttons their role can use. That&#39;s for the user&#39;s sake: the API still checks every request.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/login-and-roles/when-the-session-ends/index.html">When the Session Ends</a>
+            <p>A token stops working after a day. When any request gets a 401, client.js tells AuthProvider, and the user is logged out from one place, whatever page they&#39;re on.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/login-and-roles/testing-stage-4/index.html">Testing Stage 4</a>
+            <p>A fake logged-in user for page tests, the real AuthProvider tested on its own, the 401 handler, and a whole visit from login to logout.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/login-and-roles/making-it-yours/index.html">Making It Yours</a>
+            <p>Tracing a login through Stage 4, then adding login, register and roles to your own case study&#39;s front-end.</p>
+          </li>
+        
+      </ul>
+    
+
+    
+  </main>
+</body>
+</html>

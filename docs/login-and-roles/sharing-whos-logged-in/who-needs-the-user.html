@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Who Needs the User? — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/login-and-roles/logging-in-and-keeping-the-token/the-tokens-journey.html">← The Token&#39;s Journey</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/login-and-roles/sharing-whos-logged-in/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/login-and-roles/sharing-whos-logged-in/youve-used-a-context-already.html">You&#39;ve Used a Context Already →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Who Needs the User?</h1>
+    <p class="lede">The navigation bar, the protected routes, the login page and three other pages all need the logged-in user. Passing it to each one as a prop would work, but every component in the way would have to carry it.</p>
+
+    
+
+    
+      <div class="slide-body"><p>So far, every piece of state has belonged to one page. The ticket list
+holds its tickets; the detail page holds its ticket and comments. When
+two components needed the same thing, the page above them held it and
+passed it down as props (Stage 3, &quot;The Page in the Middle&quot;).</p>
+<p>The logged-in user is different. <strong>Eight</strong> components need something
+about it:</p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Needs</th>
+<th>For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>App</code></td>
+<td>whether the session is still being checked</td>
+<td>topic 05</td>
+</tr>
+<tr>
+<td><code>NavBar</code></td>
+<td>the user, their role, <code>logout()</code></td>
+<td>the name, the Tags link, Log out</td>
+</tr>
+<tr>
+<td><code>ProtectedRoute</code></td>
+<td>the user, their role</td>
+<td>who may open each page</td>
+</tr>
+<tr>
+<td><code>LoginPage</code>, <code>RegisterPage</code></td>
+<td>the user, <code>login()</code> or <code>register()</code></td>
+<td>logging in</td>
+</tr>
+<tr>
+<td><code>HomePage</code></td>
+<td>the user</td>
+<td>&quot;Log in&quot; or &quot;View the tickets&quot;</td>
+</tr>
+<tr>
+<td><code>TicketListPage</code></td>
+<td>their role</td>
+<td>the New ticket link</td>
+</tr>
+<tr>
+<td><code>TicketDetailPage</code></td>
+<td>the user, their role</td>
+<td>Edit, Delete, and which comments can be deleted</td>
+</tr>
+</tbody>
+</table>
+<h2>With props</h2>
+<p>The page-in-the-middle answer would be to hold the user in the
+component above all of them, <code>App</code>, and pass it down:</p>
+<p><img src="/support-desk-front-end/assets/images/props-or-a-context.svg" alt="Diagram: two ways to share the logged-in user. On the left, without a context: App holds user, login, logout and hasRole, and passes each component what it needs as props: NavBar gets user, hasRole and logout; LoginPage gets user and login; ProtectedRoute gets user and hasRole; TicketListPage gets hasRole; TicketDetailPage gets user and hasRole. App passes them to every component by name, and every component lists them as props. On the right, with a context: AuthProvider holds the value, user, login, logout, hasRole and more, and App and every component are inside it. App, NavBar, LoginPage, ProtectedRoute, TicketListPage and TicketDetailPage each call useAuth() and read the value themselves. App passes nothing down."></p>
+<p>The left-hand side would work. But:</p>
+<ul>
+<li><code>App.jsx</code> would hold the login code as well as the route table, and
+every route line would pass the same props, by name.</li>
+<li>A component that only <strong>passes props on</strong> has to accept them anyway.
+If <code>CommentList</code> ever needed the user, <code>TicketDetailPage</code> would have
+to hand it over, and so would anything else in between.</li>
+</ul>
+<p>This problem has a name, <strong>prop drilling</strong>: props drilled down through
+layers that don't use them.</p>
+<h2>With a context</h2>
+<p>The right-hand side is what Stage 4 does. A <strong>context</strong> holds a value
+that any component inside it can read directly, however deep it is.
+<code>AuthProvider</code> holds the user, and each component that needs it asks
+with one line, <code>useAuth()</code>. Nothing is passed down.</p>
+<h2>Try it</h2>
+<p>Find all eight for yourself:</p>
+<pre><code class="hljs language-bash">grep -rn <span class="hljs-string">&quot;= useAuth()&quot;</span> src --exclude=<span class="hljs-string">&quot;*.test.*&quot;</span>
+</code></pre>
+<p>For each line, look at what's inside <code>{ }</code>. Does it match the table?</p>
+</div>
+    
+  </main>
+</body>
+</html>

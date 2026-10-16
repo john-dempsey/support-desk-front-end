@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A Fake Logged-In User — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/login-and-roles/testing-stage-4/what-stage-4-tests.html">← What Stage 4 Tests</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/login-and-roles/testing-stage-4/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/login-and-roles/testing-stage-4/testing-by-role.html">Testing by Role →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>A Fake Logged-In User</h1>
+    <p class="lede">renderWithProviders now fills the auth context with a fake value. A test says who is logged in with `user`, and Ada is the default, so Stage 3&#39;s tests didn&#39;t change.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Stage 1's <code>renderWithProviders</code> put a router around the component. It
+now puts the auth context around it too:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 4.33: two providers for a test</span>
+<span class="hljs-comment">// (src/test/renderWithProviders.jsx, excerpt)</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">renderWithProviders</span>(<span class="hljs-params">
+  componentToTest,
+  { route = <span class="hljs-string">&#x27;/&#x27;</span>, path, user = adminUser } = {},
+</span>) {
+  <span class="hljs-comment">// ... the Routes for `path`, as in Stage 1</span>
+
+  <span class="hljs-keyword">const</span> auth = <span class="hljs-title function_">createFakeAuth</span>(user);
+  <span class="hljs-keyword">const</span> result = <span class="hljs-title function_">render</span>(
+    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">AuthContext</span> <span class="hljs-attr">value</span>=<span class="hljs-string">{auth}</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">MemoryRouter</span> <span class="hljs-attr">initialEntries</span>=<span class="hljs-string">{[route]}</span>&gt;</span>{content}<span class="hljs-tag">&lt;/<span class="hljs-name">MemoryRouter</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">AuthContext</span>&gt;</span></span>,
+  );
+  <span class="hljs-keyword">return</span> { ...result, auth };
+}
+</code></pre>
+<p>(The <code>// ...</code> line stands for code left out here.)</p>
+<p><code>createFakeAuth(user)</code> is Figure 4.13 from topic 04: the same six names
+<code>AuthProvider</code> provides, with <code>login</code>, <code>register</code> and <code>logout</code> as
+<code>vi.fn()</code> fakes, and a real <code>hasRole()</code>.</p>
+<h2>Choosing who's logged in</h2>
+<p>The new option, <code>user</code>, says who it is:</p>
+<pre><code class="hljs language-js"><span class="hljs-title function_">renderWithProviders</span>(<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">NavBar</span> /&gt;</span></span>, { <span class="hljs-attr">user</span>: customerUser }); <span class="hljs-comment">// Casey</span>
+<span class="hljs-title function_">renderWithProviders</span>(<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">NavBar</span> /&gt;</span></span>, { <span class="hljs-attr">user</span>: agentUser });    <span class="hljs-comment">// Alex</span>
+<span class="hljs-title function_">renderWithProviders</span>(<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">NavBar</span> /&gt;</span></span>, { <span class="hljs-attr">user</span>: <span class="hljs-literal">null</span> });         <span class="hljs-comment">// nobody</span>
+<span class="hljs-title function_">renderWithProviders</span>(<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">NavBar</span> /&gt;</span></span>);                          <span class="hljs-comment">// Ada</span>
+</code></pre>
+<p>The three users are in <code>src/test/testUsers.js</code>, in the shape the API
+sends. Their <code>id</code>s match the customer and the comment authors in
+<code>testTickets.js</code> and <code>testComments.js</code>, so a test can check, for
+example, that Casey may delete Casey's own comment.</p>
+<h2>Why Ada by default</h2>
+<p>Stage 3's page tests were written when every control was shown. With
+Ada, an admin, as the default user, they still see every control, and
+didn't need to change. Only tests that are <strong>about</strong> a role pass
+<code>user</code>.</p>
+<h2>It returns the fake</h2>
+<p><code>renderWithProviders</code> now returns <code>auth</code> too, so a test can check what
+the component asked for: <code>expect(auth.logout).toHaveBeenCalled()</code>.</p>
+<h2>Try it</h2>
+<p>In <code>renderWithProviders.jsx</code>, change the default to
+<code>user = customerUser</code> (and import <code>customerUser</code>). Run <code>npm test</code>. How
+many tests fail, and in which files? What do they have in common? Put
+it back when you're done.</p>
+</div>
+    
+  </main>
+</body>
+</html>

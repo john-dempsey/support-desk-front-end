@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Testing by Role — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/login-and-roles/testing-stage-4/a-fake-logged-in-user.html">← A Fake Logged-In User</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/login-and-roles/testing-stage-4/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/login-and-roles/testing-stage-4/checking-what-the-page-asked-for.html">Checking What the Page Asked For →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Testing by Role</h1>
+    <p class="lede">A role test renders the same page as different users, and checks what&#39;s there and what isn&#39;t. queryBy... finds nothing without failing, so it can prove a button is missing.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The ticket page's role tests render the <strong>same</strong> page twice, as two
+different users:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 4.34: as a customer, then as an agent</span>
+<span class="hljs-comment">// (src/pages/TicketDetailPage.test.jsx, excerpt)</span>
+<span class="hljs-title function_">it</span>(<span class="hljs-string">&quot;doesn&#x27;t show a customer Edit or Delete&quot;</span>, <span class="hljs-title function_">async</span> () =&gt; {
+  getTicket.<span class="hljs-title function_">mockResolvedValue</span>(ticketAssignedToAlex);
+
+  <span class="hljs-title function_">renderWithProviders</span>(<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">TicketDetailPage</span> /&gt;</span></span>, {
+    <span class="hljs-attr">route</span>: <span class="hljs-string">&#x27;/tickets/1&#x27;</span>,
+    <span class="hljs-attr">path</span>: <span class="hljs-variable constant_">DETAIL_PATH</span>,
+    <span class="hljs-attr">user</span>: customerUser,
+  });
+  <span class="hljs-keyword">await</span> screen.<span class="hljs-title function_">findByRole</span>(<span class="hljs-string">&#x27;heading&#x27;</span>, { <span class="hljs-attr">level</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Cannot log in&#x27;</span> });
+
+  <span class="hljs-title function_">expect</span>(screen.<span class="hljs-title function_">queryByRole</span>(<span class="hljs-string">&#x27;link&#x27;</span>, { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Edit ticket&#x27;</span> }))
+    .<span class="hljs-property">not</span>.<span class="hljs-title function_">toBeInTheDocument</span>();
+  <span class="hljs-title function_">expect</span>(screen.<span class="hljs-title function_">queryByRole</span>(<span class="hljs-string">&#x27;button&#x27;</span>, { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Delete ticket&#x27;</span> }))
+    .<span class="hljs-property">not</span>.<span class="hljs-title function_">toBeInTheDocument</span>();
+});
+
+<span class="hljs-title function_">it</span>(<span class="hljs-string">&#x27;shows an agent Edit and Delete&#x27;</span>, <span class="hljs-title function_">async</span> () =&gt; {
+  <span class="hljs-comment">// ... the same, with user: agentUser</span>
+  <span class="hljs-title function_">expect</span>(<span class="hljs-keyword">await</span> screen.<span class="hljs-title function_">findByRole</span>(<span class="hljs-string">&#x27;link&#x27;</span>, { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Edit ticket&#x27;</span> }))
+    .<span class="hljs-title function_">toBeInTheDocument</span>();
+});
+</code></pre>
+<p>(Less indented, and split to fit. The second test is shortened.)</p>
+<h2><code>queryBy...</code> to prove something is missing</h2>
+<p><code>getByRole()</code> <strong>throws</strong> if it finds nothing, so the test would fail
+before it reached <code>expect</code>. <code>queryByRole()</code> returns <code>null</code> instead, and
+<code>.not.toBeInTheDocument()</code> checks for exactly that.</p>
+<table>
+<thead>
+<tr>
+<th>Query</th>
+<th>Finds it</th>
+<th>Finds nothing</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>getBy...</code></td>
+<td>returns it</td>
+<td>throws: the test fails</td>
+</tr>
+<tr>
+<td><code>queryBy...</code></td>
+<td>returns it</td>
+<td>returns <code>null</code></td>
+</tr>
+<tr>
+<td><code>findBy...</code></td>
+<td>returns it, once it appears</td>
+<td>waits, then throws</td>
+</tr>
+</tbody>
+</table>
+<h2>Wait first, then check what's missing</h2>
+<p>The first <code>await screen.findByRole('heading', ...)</code> matters. Before the
+fake API answers, the page shows &quot;Loading the ticket…&quot;, and there's no
+Edit link on a loading page <strong>either</strong>. Checking then would pass for
+the wrong reason. Waiting for the heading makes sure the page has
+loaded, so a missing button is really missing.</p>
+<h2>One test per answer</h2>
+<p>There's a test for &quot;no&quot; (the customer) <strong>and</strong> for &quot;yes&quot; (the agent). A
+test that only checked the customer would also pass if the buttons were
+never shown to anyone.</p>
+<h2>Try it</h2>
+<p>In <code>TicketDetailPage.jsx</code>, change <code>canDeleteComment</code> to
+<code>return comment.author.id === user.id;</code>, leaving out the admin. Run the
+tests. Which one fails, and who does <code>renderWithProviders</code> log in as
+in that test? Put it back when you're done.</p>
+</div>
+    
+  </main>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Controls by Role — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/login-and-roles/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Controls by Role</h1>
+    <p class="lede">The navigation bar, the ticket list and the ticket page show each user only the links and buttons their role can use. That&#39;s for the user&#39;s sake: the API still checks every request.</p>
+
+    
+      <ul class="listing">
+        
+          <li>
+            <a href="/support-desk-front-end/login-and-roles/controls-by-role/the-navigation-bar.html">The Navigation Bar</a>
+            <p>NavBar shows Tickets to anyone logged in, Tags to agents and admins, and the user&#39;s name and a Log out button, or Log in and Register for a visitor.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/login-and-roles/controls-by-role/buttons-by-role.html">Buttons by Role</a>
+            <p>The ticket list shows New ticket only to customers. The ticket page shows Edit and Delete only to agents and admins. Each is one hasRole() check around JSX that was already there.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/login-and-roles/controls-by-role/which-comments-can-be-deleted.html">Which Comments Can Be Deleted</a>
+            <p>The rule for deleting a comment depends on each comment, not just the user&#39;s role. The page passes CommentList a function, canDelete(comment), that answers the question for each one.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/login-and-roles/controls-by-role/hiding-is-not-security.html">Hiding Is Not Security</a>
+            <p>Every check in the front-end can be skipped: the code runs on the user&#39;s computer. The API&#39;s checks are the ones that keep the data safe. The front-end&#39;s make the app easier to use.</p>
+          </li>
+        
+      </ul>
+    
+
+    
+  </main>
+</body>
+</html>

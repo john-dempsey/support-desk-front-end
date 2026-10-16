@@ -1,11 +1,9 @@
 // The page at /tickets/new: a form to report a new problem. It sends
 // POST /tickets, then goes to the new ticket's own page.
 //
-// Only customers can create tickets. With Ada's admin token in
-// VITE_DEV_TOKEN, the API answers 403, and the form shows its message:
-// "You do not have permission to perform this action". To create a
-// ticket, put a customer's token (e.g. Casey's) in VITE_DEV_TOKEN instead.
-// Stage 4 hides this page from agents and admins.
+// Only customers can create tickets, so App.jsx's ProtectedRoute only
+// lets customers reach this page. If anyone else sends POST /tickets, the
+// API answers 403, and the form would show its message.
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { createTicket } from '../api/tickets.api.js';

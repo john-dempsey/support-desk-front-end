@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Navigation Bar — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/login-and-roles/protected-pages/not-available.html">← Not Available</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/login-and-roles/controls-by-role/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/login-and-roles/controls-by-role/buttons-by-role.html">Buttons by Role →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>The Navigation Bar</h1>
+    <p class="lede">NavBar shows Tickets to anyone logged in, Tags to agents and admins, and the user&#39;s name and a Log out button, or Log in and Register for a visitor.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The navigation bar is on every page, so it's the first place the user
+sees who the app thinks they are.</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 4.24: links by role (src/components/NavBar.jsx, excerpt)</span>
+{user &amp;&amp; (
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">li</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">NavLink</span> <span class="hljs-attr">to</span>=<span class="hljs-string">&quot;/tickets&quot;</span>&gt;</span>Tickets<span class="hljs-tag">&lt;/<span class="hljs-name">NavLink</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span></span>
+)}
+{<span class="hljs-title function_">hasRole</span>(<span class="hljs-string">&#x27;agent&#x27;</span>, <span class="hljs-string">&#x27;admin&#x27;</span>) &amp;&amp; (
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">li</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">NavLink</span> <span class="hljs-attr">to</span>=<span class="hljs-string">&quot;/tags&quot;</span>&gt;</span>Tags<span class="hljs-tag">&lt;/<span class="hljs-name">NavLink</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span></span>
+)}
+</code></pre>
+<p>(Less indented here than in the file, and a comment is left out.)</p>
+<p><code>{condition &amp;&amp; (...)}</code> is the same pattern as Stage 3's
+<code>{deleteErrorMessage &amp;&amp; &lt;ErrorMessage ... /&gt;}</code>: if the condition is
+<code>false</code> (or <code>null</code>), React shows nothing there.</p>
+<ul>
+<li><strong>Tickets</strong>: anyone logged in. <code>user</code> is <code>null</code> for a visitor, so the
+link isn't shown.</li>
+<li><strong>Tags</strong>: <code>hasRole('agent', 'admin')</code>, the same roles as the <code>/tags</code>
+route's <code>allowedRoles</code> (topic 07). A link should never lead to &quot;Not
+available&quot;.</li>
+</ul>
+<h2>Who's logged in, and Log out</h2>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 4.25: the user menu (src/components/NavBar.jsx, excerpt)</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">handleLogout</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-title function_">logout</span>();
+  <span class="hljs-title function_">navigate</span>(<span class="hljs-string">&#x27;/login&#x27;</span>);
+}
+<span class="hljs-comment">// ...</span>
+{user ? (
+  <span class="language-xml"><span class="hljs-tag">&lt;&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">p</span> <span class="hljs-attr">className</span>=<span class="hljs-string">&quot;user-name&quot;</span>&gt;</span>
+      {/* ... the user&#x27;s name and role */}
+    <span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;button&quot;</span> <span class="hljs-attr">className</span>=<span class="hljs-string">&quot;secondary-button&quot;</span>
+      <span class="hljs-attr">onClick</span>=<span class="hljs-string">{handleLogout}</span>&gt;</span>
+      Log out
+    <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+  <span class="hljs-tag">&lt;/&gt;</span></span>
+) : (
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">ul</span> <span class="hljs-attr">className</span>=<span class="hljs-string">&quot;nav-links&quot;</span>&gt;</span>
+    {/* ... NavLinks to /login and /register */}
+  <span class="hljs-tag">&lt;/<span class="hljs-name">ul</span>&gt;</span></span>
+)}
+</code></pre>
+<p>(Shortened: the <code>...</code> comments stand for code left out. The <code>&lt;button&gt;</code>
+tag is one line in the file.)</p>
+<p>The left-out line shows the name, then the role in brackets:
+<code>{user.name}</code>, then <code>({ROLE_LABELS[user.role]})</code> in a <code>&lt;span&gt;</code> styled
+in a quieter colour. <code>ROLE_LABELS</code> turns the API's <code>'customer'</code> into
+&quot;Customer&quot; for display, like Stage 3's <code>STATUS_LABELS</code> for statuses.
+The role is shown so the user always knows which account they're in:
+useful in class, when you switch between Casey, Alex and Ada.</p>
+<p><strong>Log out</strong> calls <code>logout()</code> from <code>useAuth()</code> (topic 04), then goes to
+the login page. Logging out on the home page would otherwise leave the
+user where they were, so <code>navigate('/login')</code> makes every logout end in
+the same place.</p>
+<h2>Try it</h2>
+<p>Log in as each of Casey, Alex and Ada. For each, write down the links
+and the name shown. Then, as Alex, click <strong>Log out</strong> on the home page,
+and on a ticket's page. Do both end on the same page?</p>
+</div>
+    
+  </main>
+</body>
+</html>

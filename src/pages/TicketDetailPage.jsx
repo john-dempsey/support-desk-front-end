@@ -5,10 +5,16 @@
 //
 // Since Stage 3 it can also delete the ticket, and add and delete
 // comments. It links to EditTicketPage to change the ticket.
+//
+// Since Stage 4 it only shows what the user's role can use: Edit and
+// Delete for agents and admins, and a comment's Delete for its author or
+// an admin. That's for the user's sake: the API still checks every
+// request, whatever the page shows.
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { deleteTicket, getTicket } from '../api/tickets.api.js';
 import { createComment, deleteComment, getComments } from '../api/comments.api.js';
+import { useAuth } from '../context/authContext.js';
 import StatusBadge from '../components/StatusBadge.jsx';
 import CommentList from '../components/CommentList.jsx';
 import CommentForm from '../components/CommentForm.jsx';
@@ -19,6 +25,7 @@ import { formatDate } from '../utils/formatDate.js';
 function TicketDetailPage() {
   const { ticketId } = useParams();
   const navigate = useNavigate();
+  const { user, hasRole } = useAuth();
   const [ticket, setTicket] = useState(null);
   const [comments, setComments] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
@@ -125,6 +132,13 @@ function TicketDetailPage() {
     }
   }
 
+  // The API's rule for comments: only the author, or an admin, may delete
+  // one. CommentList calls this for each comment, to decide whether to
+  // show its Delete button.
+  function canDeleteComment(comment) {
+    return comment.author.id === user.id || hasRole('admin');
+  }
+
   // Called by CommentList with the comment whose Delete button was clicked.
   async function handleDeleteComment(commentToDelete) {
     const isConfirmed = window.confirm('Delete this comment? This can\'t be undone.');
@@ -196,23 +210,30 @@ function TicketDetailPage() {
         <dd>{formatDate(ticket.updatedAt)}</dd>
       </dl>
 
-      {/* A link, not a button, because it goes to another page. The
-          Delete button does something on this page instead. */}
-      <div className="button-row">
-        <Link to={`/tickets/${ticket.id}/edit`} className="button-link">
-          Edit ticket
-        </Link>
-        <button type="button" className="danger-button" onClick={handleDeleteTicket}>
-          Delete ticket
-        </button>
-      </div>
+      {/* Only agents and admins can change or delete a ticket.
+          Edit is a link, not a button, because it goes to another page.
+          The Delete button does something on this page instead. */}
+      {hasRole('agent', 'admin') && (
+        <div className="button-row">
+          <Link to={`/tickets/${ticket.id}/edit`} className="button-link">
+            Edit ticket
+          </Link>
+          <button type="button" className="danger-button" onClick={handleDeleteTicket}>
+            Delete ticket
+          </button>
+        </div>
+      )}
       {deleteErrorMessage && <ErrorMessage message={deleteErrorMessage} />}
 
       <h2>Description</h2>
       <p className="multiline-text">{ticket.description}</p>
 
       <h2>Comments</h2>
-      <CommentList comments={comments} onDelete={handleDeleteComment} />
+      <CommentList
+        comments={comments}
+        canDelete={canDeleteComment}
+        onDelete={handleDeleteComment}
+      />
       <CommentForm onSubmit={handleAddComment} error={commentError} />
     </>
   );

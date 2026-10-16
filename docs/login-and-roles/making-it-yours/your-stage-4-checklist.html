@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Your Stage 4 Checklist — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/login-and-roles/making-it-yours/tracing-a-login.html">← Tracing a Login</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/login-and-roles/making-it-yours/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/login-and-roles/making-it-yours/try-it-yourself.html">Try It Yourself →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Your Stage 4 Checklist</h1>
+    <p class="lede">The same steps for your own case study: log in and register, keep the token, check it on load, protect pages, show controls by role, and log out on a 401.</p>
+
+    
+
+    
+      <div class="slide-body"><p><strong>Only if your API has authentication.</strong> If it doesn't, your app is
+complete at Stage 3 (topic 01).</p>
+<p>Here's how to add Stage 4 to your own front-end, in the order this
+lesson did it. The examples use a booking system; swap in your own
+roles and entities. Run <code>npm test</code> and try the app in the browser after
+<strong>every</strong> step, and commit when both work.</p>
+<h2>0. Check your API</h2>
+<p>In your REST client, find out:</p>
+<ul>
+<li>what your login and register routes are called, what they take, and
+what they answer. The Support Desk sends <code>{ data: { user, token } }</code>.
+Yours may differ, and <code>auth.api.js</code> will need to match it.</li>
+<li>your role names, exactly as the API spells them.</li>
+<li>whether you have a &quot;who am I&quot; route like <code>GET /auth/me</code>. If not, add
+one to your back-end: Lesson 7 shows how. Without it, the app can't
+check a saved token when it starts.</li>
+</ul>
+<h2>1. Logging in, and keeping the token</h2>
+<p><code>auth.api.js</code> (Figure 4.2), and <code>tokenStorage.js</code> with your own key
+name (Figure 4.3). Change <code>getToken()</code> in <code>client.js</code> (Figure 4.6), and
+delete <code>VITE_DEV_TOKEN</code> from <code>.env</code> and <code>.env.example</code>.</p>
+<h2>2. The context</h2>
+<p><code>authContext.js</code> as it is (Figure 4.8). <code>AuthProvider.jsx</code> with <code>user</code>,
+<code>login()</code>, <code>register()</code>, <code>logout()</code> and <code>hasRole()</code> (Figures 4.9, 4.11
+and 4.12). Wrap <code>&lt;App /&gt;</code> in <code>main.jsx</code> (Figure 4.10).</p>
+<h2>3. Checking the session</h2>
+<p><code>isCheckingSession</code>, the <code>/auth/me</code> effect, and the wait in <code>App.jsx</code>
+(Figures 4.14 to 4.16). Reload while logged in: you should stay logged
+in, on the same page.</p>
+<h2>4. Login and register pages</h2>
+<p><code>LoginPage</code> and <code>RegisterPage</code> at <code>/login</code> and <code>/register</code>, each with
+<code>if (user)</code> to leave (Figures 4.17 to 4.21). Copy your register schema's
+rules into the inputs. Reuse <code>FieldError</code> and <code>getFieldError()</code> from
+Stage 3. Adapt <code>describeAuthError()</code> to the messages your API sends.</p>
+<h2>5. Protected pages</h2>
+<p>Copy <code>ProtectedRoute.jsx</code> <strong>as it is</strong> (Figure 4.23). Wrap each page in
+<code>App.jsx</code>, with <code>allowedRoles</code> matching each back-end route's
+<code>authorize(...)</code> (Figure 4.22).</p>
+<h2>6. Controls by role</h2>
+<p><code>NavBar</code>: links by role, the user's name, Log out (Figures 4.24 and
+4.25). Then one <code>hasRole()</code> check around each button that only some
+roles can use (Figures 4.26 and 4.27). If a rule depends on the record
+(like &quot;only your own comments&quot;), use a function prop (Figures 4.28 and
+4.29).</p>
+<h2>7. When the session ends</h2>
+<p><code>setSessionExpiredHandler()</code> in <code>client.js</code>, the <code>401</code> check in
+<code>apiRequest()</code>, and the effect in <code>AuthProvider</code> (Figures 4.30 to
+4.32).</p>
+<h2>8. Tests</h2>
+<ul>
+<li><code>testUsers.js</code> with one user per role, and the <code>user</code> option in
+<code>renderWithProviders</code> (Figure 4.33). Pick a default that sees every
+control, so your Stage 3 tests keep passing.</li>
+<li><code>AuthProvider.test.jsx</code> with a <code>ShowAuth</code> component (Figures 4.37 and
+4.38), and <code>localStorage.clear()</code> in <code>setup.js</code>.</li>
+<li><code>ProtectedRoute</code>, the login and register pages, and a &quot;yes&quot; and &quot;no&quot;
+test for each control by role.</li>
+<li>The two <code>401</code> tests in <code>client.test.js</code> (Figure 4.39).</li>
+</ul>
+</div>
+    
+  </main>
+</body>
+</html>

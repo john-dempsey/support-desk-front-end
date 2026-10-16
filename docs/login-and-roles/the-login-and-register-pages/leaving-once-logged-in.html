@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Leaving Once Logged In — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/login-and-roles/the-login-and-register-pages/the-login-page.html">← The Login Page</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/login-and-roles/the-login-and-register-pages/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/login-and-roles/the-login-and-register-pages/when-login-fails.html">When Login Fails →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Leaving Once Logged In</h1>
+    <p class="lede">If there&#39;s a user, LoginPage renders a &lt;Navigate&gt; to the ticket list. One rule covers someone who has just logged in and someone who was already logged in.</p>
+
+    
+
+    
+      <div class="slide-body"><pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 4.18: leaving the login page (src/pages/LoginPage.jsx, excerpt)</span>
+<span class="hljs-comment">// Once someone is logged in, this page has nothing to do. That includes</span>
+<span class="hljs-comment">// straight after logging in: login() sets the user, this page re-renders,</span>
+<span class="hljs-comment">// and this sends them to the ticket list.</span>
+<span class="hljs-keyword">if</span> (user) {
+  <span class="hljs-keyword">return</span> <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">Navigate</span> <span class="hljs-attr">to</span>=<span class="hljs-string">&quot;/tickets&quot;</span> <span class="hljs-attr">replace</span> /&gt;</span></span>;
+}
+</code></pre>
+<p>(Indented one step further in the file.)</p>
+<h2><code>&lt;Navigate&gt;</code></h2>
+<p><code>&lt;Navigate&gt;</code> is a React Router component. Rendering it changes the URL,
+straight away, like <code>navigate()</code> from <code>useNavigate()</code> in Stage 3. The
+difference is <strong>when</strong> each one is used:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Used</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>navigate('/tickets')</code></td>
+<td>in an event handler, after something happens</td>
+<td>Stage 3: after deleting a ticket</td>
+</tr>
+<tr>
+<td><code>&lt;Navigate to=&quot;/tickets&quot; /&gt;</code></td>
+<td>while rendering, when the page shouldn't be shown at all</td>
+<td>here: there's already a user</td>
+</tr>
+</tbody>
+</table>
+<p><code>replace</code> swaps <code>/login</code> for <code>/tickets</code> in the browser's history, instead
+of adding a new entry. So <strong>Back</strong> doesn't bring the user back to a login
+form they no longer need.</p>
+<h2>One rule, two cases</h2>
+<p><code>if (user)</code> is true in two situations, and both should end on the
+ticket list:</p>
+<ol>
+<li><strong>Just logged in.</strong> <code>login()</code> set the user, and the page re-rendered.</li>
+<li><strong>Already logged in.</strong> Someone types <code>/login</code> into the address bar,
+or clicks a bookmark to it.</li>
+</ol>
+<p>The page doesn't need to know which. That's why <code>handleSubmit</code> does
+nothing after <code>login()</code>: the redirect would happen anyway.</p>
+<h2>After the hooks</h2>
+<p>The <code>if (user)</code> comes <strong>after</strong> every <code>useState</code> call, never before.
+React needs a component to call the same hooks, in the same order, on
+every render. A <code>return</code> above a <code>useState</code> would skip it on some
+renders but not others, and React would stop with an error. Return
+early only once all the hooks have been called.</p>
+<h2>Try it</h2>
+<ol>
+<li>Log in as Alex. Then type <code>/login</code> into the address bar. What
+happens?</li>
+<li>Log out. Starting from the home page, click <strong>Log in</strong> and log in as
+Alex. Now press the browser's <strong>Back</strong> button once. Which page do you
+land on? Would that be different without <code>replace</code>?</li>
+</ol>
+</div>
+    
+  </main>
+</body>
+</html>

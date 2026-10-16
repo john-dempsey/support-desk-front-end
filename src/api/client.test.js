@@ -2,7 +2,8 @@
 // back-end — so these tests run without the API running, and can create
 // situations (a 400, a network failure) that are hard to cause on demand.
 import { describe, expect, it, vi } from 'vitest';
-import { apiRequest } from './client.js';
+import { apiRequest, setSessionExpiredHandler } from './client.js';
+import { saveToken } from './tokenStorage.js';
 
 // A fake fetch() that answers every request with the given status and JSON
 // body. Only the parts of a real Response that apiRequest() reads are faked.
@@ -46,9 +47,7 @@ describe('apiRequest', () => {
   });
 
   it('sends no Authorization header when there is no token', async () => {
-    // Vitest reads your .env too, so without this the test would see your
-    // real VITE_DEV_TOKEN. stubEnv() replaces it for this test only.
-    vi.stubEnv('VITE_DEV_TOKEN', '');
+    // Nobody has logged in: setup.js clears localStorage after every test.
     const fakeFetch = fakeFetchResponding(200, { data: {} });
 
     await apiRequest('/welcome');
@@ -57,8 +56,8 @@ describe('apiRequest', () => {
     expect(requestOptions.headers.Authorization).toBeUndefined();
   });
 
-  it('sends the token as a Bearer Authorization header', async () => {
-    vi.stubEnv('VITE_DEV_TOKEN', 'test-token');
+  it('sends the saved token as a Bearer Authorization header', async () => {
+    saveToken('test-token');
     const fakeFetch = fakeFetchResponding(200, { data: {} });
 
     await apiRequest('/welcome');
@@ -85,6 +84,31 @@ describe('apiRequest', () => {
       status: 400,
       details,
     });
+  });
+
+  it('calls the session-expired handler for a 401 when a token was sent', async () => {
+    const handleSessionExpired = vi.fn();
+    setSessionExpiredHandler(handleSessionExpired);
+    saveToken('expired-token');
+    fakeFetchResponding(401, { error: { message: 'Invalid or expired token' } });
+
+    await expect(apiRequest('/tickets')).rejects.toMatchObject({ status: 401 });
+
+    expect(handleSessionExpired).toHaveBeenCalled();
+    setSessionExpiredHandler(null);
+  });
+
+  it("doesn't call the handler for a 401 with no token, e.g. a wrong password", async () => {
+    const handleSessionExpired = vi.fn();
+    setSessionExpiredHandler(handleSessionExpired);
+    fakeFetchResponding(401, { error: { message: 'Invalid email or password' } });
+
+    await expect(apiRequest('/auth/login', { method: 'POST', body: {} })).rejects.toMatchObject({
+      status: 401,
+    });
+
+    expect(handleSessionExpired).not.toHaveBeenCalled();
+    setSessionExpiredHandler(null);
   });
 
   it('throws a helpful message when the API cannot be reached', async () => {

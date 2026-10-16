@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Register Page — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/login-and-roles/the-login-and-register-pages/describeautherror.html">← describeAuthError</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/login-and-roles/the-login-and-register-pages/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/login-and-roles/protected-pages/wrapping-a-page.html">Wrapping a Page →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>The Register Page</h1>
+    <p class="lede">RegisterPage is LoginPage with a name field, a password rule, and register() instead of login(). A new account is always a customer, and is logged in straight away.</p>
+
+    
+
+    
+      <div class="slide-body"><p><code>RegisterPage</code> works exactly like <code>LoginPage</code>: controlled inputs,
+<code>isSubmitting</code>, <code>describeAuthError()</code>, and <code>if (user)</code> to leave once
+it's done. What's different:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><code>LoginPage</code></th>
+<th><code>RegisterPage</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fields</td>
+<td>email, password</td>
+<td>name, email, password</td>
+</tr>
+<tr>
+<td>Calls</td>
+<td><code>login(email, password)</code></td>
+<td><code>register(name, email, password)</code></td>
+</tr>
+<tr>
+<td>Browser checks</td>
+<td><code>required</code>, <code>type=&quot;email&quot;</code></td>
+<td>also <code>maxLength={100}</code> on the name, <code>minLength={8}</code> on the password</td>
+</tr>
+<tr>
+<td>Field errors shown</td>
+<td>email</td>
+<td>name, email and password</td>
+</tr>
+</tbody>
+</table>
+<p>The browser's limits match the back-end's <code>registerSchema</code>: a name of
+at most 100 characters, a password of at least 8.</p>
+<h2>Telling the user the rule first</h2>
+<p>A password rule is easier to follow if you know it <strong>before</strong> you
+type:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 4.21: the password field (src/pages/RegisterPage.jsx, excerpt)</span>
+&lt;input
+  id=<span class="hljs-string">&quot;register-password&quot;</span>
+  type=<span class="hljs-string">&quot;password&quot;</span>
+  autoComplete=<span class="hljs-string">&quot;new-password&quot;</span>
+  required
+  minLength={<span class="hljs-number">8</span>}
+  value={password}
+  onChange={<span class="hljs-function">(<span class="hljs-params">event</span>) =&gt;</span> <span class="hljs-title function_">setPassword</span>(event.<span class="hljs-property">target</span>.<span class="hljs-property">value</span>)}
+  aria-invalid={<span class="hljs-title class_">Boolean</span>(passwordError)}
+  aria-describedby={
+    passwordError
+      ? <span class="hljs-string">&#x27;register-password-hint register-password-error&#x27;</span>
+      : <span class="hljs-string">&#x27;register-password-hint&#x27;</span>
+  }
+/&gt;
+<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">p</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;register-password-hint&quot;</span> <span class="hljs-attr">className</span>=<span class="hljs-string">&quot;field-hint&quot;</span>&gt;</span>
+  At least 8 characters.
+<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span></span>
+<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">FieldError</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;register-password-error&quot;</span> <span class="hljs-attr">message</span>=<span class="hljs-string">{passwordError}</span> /&gt;</span></span>
+</code></pre>
+<p>(Less indented here than in the file.)</p>
+<p><code>aria-describedby</code> can name <strong>more than one</strong> id, separated by spaces.
+The hint is always linked, so a screen reader reads &quot;At least 8
+characters&quot; when the field is reached. If the API sends an error for
+the password, its id is added too, and both are read.</p>
+<h2>Always a customer</h2>
+<p>The API's <code>register</code> always creates a <strong>customer</strong> (Lesson 4, &quot;Register:
+Always a Customer&quot;). There's no role field, and sending one would be
+ignored. Staff accounts are made another way, never through a public
+form.</p>
+<p>The answer includes a token, so <code>register()</code> saves it and sets the user,
+just like <code>login()</code>. The new customer lands on the ticket list, already
+logged in, with an empty list and a <strong>New ticket</strong> link.</p>
+<h2>Try it</h2>
+<ol>
+<li>Register with a name of only spaces. Which check lets it through,
+and which one stops it? Where does the message appear?</li>
+<li>Register with <code>casey@example.com</code>. What does the page say, and what
+did the API actually send? (Look at the Network tab.)</li>
+<li>Register yourself, with a real-looking name and a new email. What's
+in the navigation bar? Then reload the page. Are you still logged in?</li>
+</ol>
+<p>Every registration creates a real user in the database, and counts
+towards the 10-attempt limit.</p>
+</div>
+    
+  </main>
+</body>
+</html>

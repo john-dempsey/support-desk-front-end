@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What Stage 4 Tests — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/login-and-roles/when-the-session-ends/authprovider-logs-them-out.html">← AuthProvider Logs Them Out</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/login-and-roles/testing-stage-4/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/login-and-roles/testing-stage-4/a-fake-logged-in-user.html">A Fake Logged-In User →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>What Stage 4 Tests</h1>
+    <p class="lede">Most page tests fake who is logged in. AuthProvider is tested on its own, with only its API calls faked. And one test follows a whole visit through the real app.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Stage 4's code is about <strong>who</strong> is using the app. So its tests have to
+decide who that is, the same way Stage 2's tests decided what &quot;the API&quot;
+sent back.</p>
+<p>There are two ways to do that, and Stage 4 uses both:</p>
+<p><img src="/support-desk-front-end/assets/images/two-ways-to-test-auth.svg" alt="Diagram: two kinds of test, side by side. On the left, a page test, such as TicketDetailPage.test.jsx: the real page and its components, inside a MemoryRouter and a fake auth value from renderWithProviders. The fake auth value sets who is logged in, with login, register and logout as vi.fn() fakes. The API modules are faked with vi.mock(). On the right, AuthProvider's own test: the real AuthProvider, with a tiny ShowAuth component inside it that displays what useAuth() gives. Only auth.api.js is faked with vi.mock(), and the real localStorage holds the token, cleared after every test by setup.js."></p>
+<ul>
+<li><strong>Most tests fake the logged-in user.</strong> A page test isn't testing
+login. It needs a user so the page knows what to show, and a fake
+user is quicker and clearer than logging in.</li>
+<li><strong><code>AuthProvider</code> is tested for real</strong>, with only <code>auth.api.js</code> faked.
+Its tests check what it does with the API's answers: save the token,
+set the user, clear both.</li>
+</ul>
+<h2>The new test files</h2>
+<table>
+<thead>
+<tr>
+<th>Test file</th>
+<th>Tests</th>
+<th>What it covers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>context/AuthProvider.test.jsx</code></td>
+<td>6</td>
+<td>no token, a good and a bad saved token, <code>login()</code>, <code>logout()</code>, a <code>401</code></td>
+</tr>
+<tr>
+<td><code>pages/LoginPage.test.jsx</code></td>
+<td>4</td>
+<td>what's sent, a <code>401</code>, a <code>429</code>, leaving when logged in</td>
+</tr>
+<tr>
+<td><code>components/NavBar.test.jsx</code></td>
+<td>4</td>
+<td>a visitor, a customer, an agent, Log out</td>
+</tr>
+<tr>
+<td><code>components/ProtectedRoute.test.jsx</code></td>
+<td>3</td>
+<td>no user, the wrong role, the right role</td>
+</tr>
+<tr>
+<td><code>pages/RegisterPage.test.jsx</code></td>
+<td>3</td>
+<td>what's sent, <code>details</code> by the field, a <code>409</code></td>
+</tr>
+<tr>
+<td><code>api/auth.api.test.js</code></td>
+<td>3</td>
+<td>each function's URL, method and body</td>
+</tr>
+<tr>
+<td><code>utils/describeAuthError.test.js</code></td>
+<td>3</td>
+<td><code>429</code>, <code>409</code>, anything else</td>
+</tr>
+</tbody>
+</table>
+<p><code>auth.api.test.js</code> and <code>describeAuthError.test.js</code> follow patterns
+you've seen: Stage 2's API module tests, and Stage 3's tests of
+<code>getFieldError()</code>.</p>
+<h2>Try it</h2>
+<p>Open <code>src/utils/describeAuthError.test.js</code> next to
+<code>describeAuthError.js</code>. The last test passes a <code>401</code>, and checks the
+result with <code>toBe(error)</code>, not <code>toEqual</code>. Why does <code>toBe</code> prove the
+error came back <strong>unchanged</strong>? Add a fourth test: a <code>400</code> with <code>details</code>,
+checking that <code>result.details</code> is still there.</p>
+</div>
+    
+  </main>
+</body>
+</html>

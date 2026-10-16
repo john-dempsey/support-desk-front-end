@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Logging In and Out — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/login-and-roles/authprovider/wrapping-the-app.html">← Wrapping the App</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/login-and-roles/authprovider/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/login-and-roles/authprovider/hasrole.html">hasRole(...roles) →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Logging In and Out</h1>
+    <p class="lede">login() and register() ask the API, save the token, and set the user. logout() sends no request at all: it forgets the token and the user.</p>
+
+    
+
+    
+      <div class="slide-body"><pre><code class="hljs language-js"><span class="hljs-comment">// Figure 4.11: logging in and out (src/context/AuthProvider.jsx,</span>
+<span class="hljs-comment">// excerpt)</span>
+<span class="hljs-comment">// login() and register() use the user in the API&#x27;s response directly:</span>
+<span class="hljs-comment">// there&#x27;s no need to ask GET /auth/me again. Errors aren&#x27;t caught here,</span>
+<span class="hljs-comment">// so the page that called them can show the message.</span>
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">login</span>(<span class="hljs-params">email, password</span>) {
+  <span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> authApi.<span class="hljs-title function_">login</span>(email, password);
+  <span class="hljs-title function_">saveToken</span>(result.<span class="hljs-property">token</span>);
+  <span class="hljs-title function_">setUser</span>(result.<span class="hljs-property">user</span>);
+}
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">register</span>(<span class="hljs-params">name, email, password</span>) {
+  <span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> authApi.<span class="hljs-title function_">register</span>(name, email, password);
+  <span class="hljs-title function_">saveToken</span>(result.<span class="hljs-property">token</span>);
+  <span class="hljs-title function_">setUser</span>(result.<span class="hljs-property">user</span>);
+}
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">logout</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-title function_">clearSavedToken</span>();
+  <span class="hljs-title function_">setUser</span>(<span class="hljs-literal">null</span>);
+}
+</code></pre>
+<p>(These functions sit inside <code>AuthProvider</code>, so they're indented one
+step further in the file.)</p>
+<h2><code>login()</code>, in three steps</h2>
+<ol>
+<li><strong>Ask the API.</strong> <code>authApi.login()</code> sends <code>POST /auth/login</code>, and
+returns <code>{ user, token }</code> (topic 02).</li>
+<li><strong>Save the token</strong>, so it lasts through a reload and goes with every
+later request.</li>
+<li><strong>Set the user.</strong> Every component that uses <code>useAuth()</code> re-renders
+with the new user (the last slide).</li>
+</ol>
+<p><code>register()</code> is the same, through <code>authApi.register()</code>. The API logs a
+new customer in straight away, so registering ends in the same place as
+logging in.</p>
+<h2>Errors go back to the page</h2>
+<p>There's no <code>try</code>/<code>catch</code> here. If the password is wrong, <code>authApi.login()</code>
+throws, and so does <code>login()</code>, before saving or setting anything. The
+error reaches the page that called <code>login()</code>, and the page shows it.
+That's the same split as Stage 3: the page decides what the user sees.</p>
+<h2>Logging out sends nothing</h2>
+<p><code>logout()</code> makes no request. The back-end keeps no record of who's
+logged in (a JWT is <strong>stateless</strong>, Lesson 4), so there's nothing on the
+server to end. Logging out means this browser forgets the token and the
+user.</p>
+<p>That has a consequence: the token itself still works until it expires.
+Anyone who had copied it could still use it. That's one more reason to
+keep tokens short-lived.</p>
+<h2>Try it</h2>
+<ol>
+<li>In <code>login()</code>, put <code>//</code> in front of <code>setUser(result.user);</code>, and log
+in as Casey. What happens to the page and the button? Look at Local
+storage in the Application tab. Then reload the page. Why are you
+logged in now? Remove the <code>//</code> when you're done.</li>
+<li>Log in as Alex, and copy the <code>supportDeskToken</code> value from the
+Application tab. Log out. In your REST client, send <code>GET /tickets</code>
+with that token. Does it still work?</li>
+</ol>
+</div>
+    
+  </main>
+</body>
+</html>

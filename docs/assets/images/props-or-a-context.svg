@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 586" width="820" height="586" role="img" aria-labelledby="title desc" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <title id="title">Passing the user as props, or reading it from a context</title>
+  <desc id="desc">Two ways to share the logged-in user. On the left, without a context: App holds user, login and logout, and passes them down as props to each component by name: NavBar gets user, hasRole and logout; LoginPage gets user and login; ProtectedRoute gets user and hasRole; TicketListPage gets hasRole; TicketDetailPage gets user and hasRole. On the right, with a context: AuthProvider holds the value, user, login, logout, hasRole and more, and App and every component are inside it. App, NavBar, LoginPage, ProtectedRoute, TicketListPage and TicketDetailPage each call useAuth() and read the value directly, and App passes nothing down.</desc>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#0550ae"/>
+    </marker>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#1a1a1a"/>
+    </marker>
+  </defs>
+  <rect width="820" height="586" fill="#ffffff"/>
+  <text x="20" y="36" font-size="16" fill="#1a1a1a" font-weight="700">Without a context: props from App</text>
+  <rect x="20" y="60" width="370" height="64" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+  <text x="36" y="86" font-size="15" fill="#1a1a1a" font-weight="700">App</text>
+  <text x="36" y="108" font-size="13" fill="#3d444d">holds user, login(), logout(), hasRole()</text>
+  <text x="64" y="156" font-size="12" fill="#1a1a1a">passes each one what it needs, as props</text>
+  <line x1="50" y1="124" x2="50" y2="476" stroke="#1a1a1a" stroke-width="1.5"/>
+  <rect x="80" y="196" width="310" height="48" rx="6" fill="#ffffff" stroke="#116329" stroke-width="1.5"/>
+  <text x="94" y="216" font-size="14" fill="#1a1a1a" font-weight="700">NavBar</text>
+  <text x="94" y="234" font-size="12" fill="#3d444d" font-family="ui-monospace, Consolas, monospace">props: user, hasRole, logout</text>
+  <line x1="50" y1="220" x2="78" y2="220" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="80" y="260" width="310" height="48" rx="6" fill="#ffffff" stroke="#116329" stroke-width="1.5"/>
+  <text x="94" y="280" font-size="14" fill="#1a1a1a" font-weight="700">LoginPage</text>
+  <text x="94" y="298" font-size="12" fill="#3d444d" font-family="ui-monospace, Consolas, monospace">props: user, login</text>
+  <line x1="50" y1="284" x2="78" y2="284" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="80" y="324" width="310" height="48" rx="6" fill="#ffffff" stroke="#116329" stroke-width="1.5"/>
+  <text x="94" y="344" font-size="14" fill="#1a1a1a" font-weight="700">ProtectedRoute</text>
+  <text x="94" y="362" font-size="12" fill="#3d444d" font-family="ui-monospace, Consolas, monospace">props: user, hasRole</text>
+  <line x1="50" y1="348" x2="78" y2="348" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="80" y="388" width="310" height="48" rx="6" fill="#ffffff" stroke="#116329" stroke-width="1.5"/>
+  <text x="94" y="408" font-size="14" fill="#1a1a1a" font-weight="700">TicketListPage</text>
+  <text x="94" y="426" font-size="12" fill="#3d444d" font-family="ui-monospace, Consolas, monospace">props: hasRole</text>
+  <line x1="50" y1="412" x2="78" y2="412" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="80" y="452" width="310" height="48" rx="6" fill="#ffffff" stroke="#116329" stroke-width="1.5"/>
+  <text x="94" y="472" font-size="14" fill="#1a1a1a" font-weight="700">TicketDetailPage</text>
+  <text x="94" y="490" font-size="12" fill="#3d444d" font-family="ui-monospace, Consolas, monospace">props: user, hasRole</text>
+  <line x1="50" y1="476" x2="78" y2="476" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="20" y="556" font-size="13" fill="#3d444d">App passes them to every component, by name,</text>
+  <text x="20" y="574" font-size="13" fill="#3d444d">and every component lists them as props.</text>
+  <text x="430" y="36" font-size="16" fill="#1a1a1a" font-weight="700">With a context: useAuth()</text>
+  <rect x="430" y="60" width="370" height="456" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+  <text x="446" y="86" font-size="15" fill="#1a1a1a" font-weight="700">AuthProvider</text>
+  <text x="446" y="108" font-size="12" fill="#3d444d" font-family="ui-monospace, Consolas, monospace">value: { user, login, logout, hasRole, … }</text>
+  <rect x="450" y="132" width="290" height="44" rx="6" fill="#ffffff" stroke="#116329" stroke-width="1.5"/>
+  <text x="464" y="150" font-size="14" fill="#1a1a1a" font-weight="700">App</text>
+  <text x="464" y="167" font-size="12" fill="#3d444d" font-family="ui-monospace, Consolas, monospace">useAuth()</text>
+  <line x1="740" y1="154" x2="770" y2="154" stroke="#0550ae" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <rect x="450" y="196" width="290" height="48" rx="6" fill="#ffffff" stroke="#116329" stroke-width="1.5"/>
+  <text x="464" y="216" font-size="14" fill="#1a1a1a" font-weight="700">NavBar</text>
+  <text x="464" y="234" font-size="12" fill="#3d444d" font-family="ui-monospace, Consolas, monospace">useAuth()</text>
+  <line x1="740" y1="220" x2="770" y2="220" stroke="#0550ae" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <rect x="450" y="260" width="290" height="48" rx="6" fill="#ffffff" stroke="#116329" stroke-width="1.5"/>
+  <text x="464" y="280" font-size="14" fill="#1a1a1a" font-weight="700">LoginPage</text>
+  <text x="464" y="298" font-size="12" fill="#3d444d" font-family="ui-monospace, Consolas, monospace">useAuth()</text>
+  <line x1="740" y1="284" x2="770" y2="284" stroke="#0550ae" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <rect x="450" y="324" width="290" height="48" rx="6" fill="#ffffff" stroke="#116329" stroke-width="1.5"/>
+  <text x="464" y="344" font-size="14" fill="#1a1a1a" font-weight="700">ProtectedRoute</text>
+  <text x="464" y="362" font-size="12" fill="#3d444d" font-family="ui-monospace, Consolas, monospace">useAuth()</text>
+  <line x1="740" y1="348" x2="770" y2="348" stroke="#0550ae" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <rect x="450" y="388" width="290" height="48" rx="6" fill="#ffffff" stroke="#116329" stroke-width="1.5"/>
+  <text x="464" y="408" font-size="14" fill="#1a1a1a" font-weight="700">TicketListPage</text>
+  <text x="464" y="426" font-size="12" fill="#3d444d" font-family="ui-monospace, Consolas, monospace">useAuth()</text>
+  <line x1="740" y1="412" x2="770" y2="412" stroke="#0550ae" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <rect x="450" y="452" width="290" height="48" rx="6" fill="#ffffff" stroke="#116329" stroke-width="1.5"/>
+  <text x="464" y="472" font-size="14" fill="#1a1a1a" font-weight="700">TicketDetailPage</text>
+  <text x="464" y="490" font-size="12" fill="#3d444d" font-family="ui-monospace, Consolas, monospace">useAuth()</text>
+  <line x1="740" y1="476" x2="770" y2="476" stroke="#0550ae" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <line x1="770" y1="476" x2="770" y2="118" stroke="#0550ae" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arrowBlue)"/>
+  <text x="764" y="128" font-size="12" fill="#0550ae" text-anchor="end">reads</text>
+  <text x="430" y="556" font-size="13" fill="#3d444d">Every component inside AuthProvider asks for</text>
+  <text x="430" y="574" font-size="13" fill="#3d444d">the value itself. App passes nothing down.</text>
+</svg>

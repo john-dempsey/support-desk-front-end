@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Which Comments Can Be Deleted — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/login-and-roles/controls-by-role/buttons-by-role.html">← Buttons by Role</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/login-and-roles/controls-by-role/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/login-and-roles/controls-by-role/hiding-is-not-security.html">Hiding Is Not Security →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Which Comments Can Be Deleted</h1>
+    <p class="lede">The rule for deleting a comment depends on each comment, not just the user&#39;s role. The page passes CommentList a function, canDelete(comment), that answers the question for each one.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The other controls depend only on the user's role. A comment's
+<strong>Delete</strong> depends on the comment too: the API lets its <strong>author</strong>
+delete it, and an <strong>admin</strong> delete any comment. Anyone else gets
+<code>403</code> &quot;You can only modify your own comments&quot;.</p>
+<p>So the question &quot;can this user delete this comment?&quot; has a different
+answer for each comment in the list.</p>
+<h2>The page answers the question</h2>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 4.28: the rule (src/pages/TicketDetailPage.jsx, excerpt)</span>
+<span class="hljs-comment">// The API&#x27;s rule for comments: only the author, or an admin, may delete</span>
+<span class="hljs-comment">// one. CommentList calls this for each comment, to decide whether to</span>
+<span class="hljs-comment">// show its Delete button.</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">canDeleteComment</span>(<span class="hljs-params">comment</span>) {
+  <span class="hljs-keyword">return</span> comment.<span class="hljs-property">author</span>.<span class="hljs-property">id</span> === user.<span class="hljs-property">id</span> || <span class="hljs-title function_">hasRole</span>(<span class="hljs-string">&#x27;admin&#x27;</span>);
+}
+</code></pre>
+<p>(Indented one step further in the file.)</p>
+<p>It's passed to <code>CommentList</code> as a prop, next to Stage 3's <code>onDelete</code>:</p>
+<pre><code class="hljs language-jsx">&lt;<span class="hljs-title class_">CommentList</span>
+  comments={comments}
+  canDelete={canDeleteComment}
+  onDelete={handleDeleteComment}
+/&gt;
+</code></pre>
+<h2>The list asks it, comment by comment</h2>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 4.29: asking (src/components/CommentList.jsx, excerpt)</span>
+{<span class="hljs-title function_">canDelete</span>(comment) &amp;&amp; (
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">button</span>
+    <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;button&quot;</span>
+    <span class="hljs-attr">className</span>=<span class="hljs-string">&quot;danger-button&quot;</span>
+    <span class="hljs-attr">aria-label</span>=<span class="hljs-string">{</span>`<span class="hljs-attr">Delete</span> <span class="hljs-attr">comment</span> <span class="hljs-attr">by</span> ${<span class="hljs-attr">comment.author.name</span>}`}
+    <span class="hljs-attr">onClick</span>=<span class="hljs-string">{()</span> =&gt;</span> onDelete(comment)}
+  &gt;
+    Delete
+  <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span></span>
+)}
+</code></pre>
+<p>(Inside the <code>comments.map()</code>, so indented further in the file.)</p>
+<h2>Two kinds of function prop</h2>
+<table>
+<thead>
+<tr>
+<th>Prop</th>
+<th>Called when</th>
+<th>Returns</th>
+<th>Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>onDelete(comment)</code></td>
+<td>the user clicks Delete</td>
+<td>nothing</td>
+<td>deletes, in the page</td>
+</tr>
+<tr>
+<td><code>canDelete(comment)</code></td>
+<td>the list renders each comment</td>
+<td><code>true</code> or <code>false</code></td>
+<td>nothing: it only answers</td>
+</tr>
+</tbody>
+</table>
+<p><code>CommentList</code> still knows nothing about users or roles, and doesn't
+call <code>useAuth()</code>. It displays what it's given, and asks the page when
+it needs to know something. The rule stays in the page, next to the
+user.</p>
+<h2>Try it</h2>
+<ol>
+<li>As Casey, open ticket 1 and add a comment. Which comments have a
+<strong>Delete</strong> button now? Then open ticket 1 as Ada.</li>
+<li>Change <code>canDeleteComment</code> to <code>return true;</code>, and save. As Casey,
+click <strong>Delete</strong> on Alex's comment, and confirm. What message
+appears, and where did it come from? Put the function back when
+you're done.</li>
+</ol>
+</div>
+    
+  </main>
+</body>
+</html>

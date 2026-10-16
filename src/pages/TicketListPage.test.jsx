@@ -10,6 +10,7 @@ import TicketListPage from './TicketListPage.jsx';
 import { getTickets } from '../api/tickets.api.js';
 import { renderWithProviders } from '../test/renderWithProviders.jsx';
 import { testTickets } from '../test/testTickets.js';
+import { customerUser } from '../test/testUsers.js';
 
 vi.mock('../api/tickets.api.js');
 
@@ -87,14 +88,23 @@ describe('TicketListPage', () => {
     expect(getTickets).toHaveBeenLastCalledWith('status=open&page=2');
   });
 
-  it('links to the new ticket page', () => {
+  it('links customers to the new ticket page', () => {
     getTickets.mockReturnValue(new Promise(() => {}));
 
-    renderWithProviders(<TicketListPage />, { route: '/tickets' });
+    renderWithProviders(<TicketListPage />, { route: '/tickets', user: customerUser });
 
     expect(screen.getByRole('link', { name: 'New ticket' })).toHaveAttribute(
       'href',
       '/tickets/new',
     );
+  });
+
+  it("doesn't offer New ticket to staff, who can't create tickets", () => {
+    getTickets.mockReturnValue(new Promise(() => {}));
+
+    // The default test user is Ada, an admin.
+    renderWithProviders(<TicketListPage />, { route: '/tickets' });
+
+    expect(screen.queryByRole('link', { name: 'New ticket' })).not.toBeInTheDocument();
   });
 });

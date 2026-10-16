@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A Whole Visit — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/login-and-roles/testing-stage-4/testing-the-401.html">← Testing the 401</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/login-and-roles/testing-stage-4/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/login-and-roles/testing-stage-4/running-everything.html">Running Everything →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>A Whole Visit</h1>
+    <p class="lede">One App test uses the real AuthProvider with only the API modules faked, and follows a visit from start to finish: log in, move around, log out, and log in as someone else.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Most tests check one piece. One test in <code>App.test.jsx</code> checks how the
+pieces work <strong>together</strong>, over a whole visit. It uses the real
+<code>AuthProvider</code>, the real routes and the real pages. Only the API
+modules are faked.</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 4.40: log in, move, log out, log in again</span>
+<span class="hljs-comment">// (src/App.test.jsx, excerpt)</span>
+login.<span class="hljs-title function_">mockResolvedValueOnce</span>({ <span class="hljs-attr">user</span>: adminUser, <span class="hljs-attr">token</span>: <span class="hljs-string">&#x27;ada-token&#x27;</span> });
+login.<span class="hljs-title function_">mockResolvedValueOnce</span>({ <span class="hljs-attr">user</span>: customerUser, <span class="hljs-attr">token</span>: <span class="hljs-string">&#x27;casey-token&#x27;</span> });
+getTickets.<span class="hljs-title function_">mockResolvedValue</span>({
+  <span class="hljs-attr">tickets</span>: testTickets, <span class="hljs-attr">meta</span>: { <span class="hljs-attr">page</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">totalPages</span>: <span class="hljs-number">3</span> },
+});
+<span class="hljs-title function_">render</span>(
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">MemoryRouter</span> <span class="hljs-attr">initialEntries</span>=<span class="hljs-string">{[</span>&#x27;/<span class="hljs-attr">login</span>&#x27;]}&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">AuthProvider</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">App</span> /&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">AuthProvider</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">MemoryRouter</span>&gt;</span></span>,
+);
+
+<span class="hljs-comment">// Ada logs in, moves to page 2, and logs out.</span>
+<span class="hljs-keyword">await</span> <span class="hljs-title function_">logInAs</span>(<span class="hljs-string">&#x27;ada@example.com&#x27;</span>);
+<span class="hljs-keyword">await</span> userEvent.<span class="hljs-title function_">click</span>(<span class="hljs-keyword">await</span> screen.<span class="hljs-title function_">findByRole</span>(<span class="hljs-string">&#x27;button&#x27;</span>, { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Next&#x27;</span> }));
+<span class="hljs-title function_">expect</span>(getTickets).<span class="hljs-title function_">toHaveBeenLastCalledWith</span>(<span class="hljs-string">&#x27;page=2&#x27;</span>);
+<span class="hljs-keyword">await</span> userEvent.<span class="hljs-title function_">click</span>(screen.<span class="hljs-title function_">getByRole</span>(<span class="hljs-string">&#x27;button&#x27;</span>, { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Log out&#x27;</span> }));
+
+<span class="hljs-comment">// Casey logs in, and the list is asked for with no query at all.</span>
+<span class="hljs-keyword">await</span> <span class="hljs-title function_">logInAs</span>(<span class="hljs-string">&#x27;casey@example.com&#x27;</span>);
+<span class="hljs-title function_">expect</span>(getTickets).<span class="hljs-title function_">toHaveBeenLastCalledWith</span>(<span class="hljs-string">&#x27;&#x27;</span>);
+</code></pre>
+<p>(Less indented, and split to fit. <code>logInAs()</code> fills in the login form,
+clicks <strong>Log in</strong>, and waits for the ticket list.)</p>
+<h2><code>mockResolvedValueOnce</code>, twice</h2>
+<p><code>mockResolvedValueOnce()</code> sets the answer for <strong>one</strong> call. Called twice,
+it queues two answers: the first <code>login()</code> gets Ada, the second gets
+Casey. It's how one test can log in as two different people.</p>
+<h2>What it proves</h2>
+<p>Each step relies on the pieces from this lesson:</p>
+<ol>
+<li><strong>Logging in</strong> goes through <code>LoginPage</code>, <code>login()</code> and the <code>if (user)</code>
+redirect, and lands on the ticket list.</li>
+<li><strong>Next</strong> changes the URL to <code>?page=2</code> (Stage 3), and the list asks for
+page 2.</li>
+<li><strong>Log out</strong> clears the user, and <code>NavBar</code> goes to the login page.</li>
+<li><strong>Casey logs in</strong> and lands on the plain ticket list, <code>/tickets</code>, so
+the list is asked for with an empty query: nothing from Ada's visit
+carries over.</li>
+</ol>
+<p>It's the only test that does all four, so it's the one that would catch
+the pieces not fitting together.</p>
+<h2>Try it</h2>
+<p>In <code>LoginPage.jsx</code>, delete the <code>if (user) { ... }</code> block. Run the tests.
+Two fail: which, and why does each one need that block? Put it back when
+you're done.</p>
+</div>
+    
+  </main>
+</body>
+</html>

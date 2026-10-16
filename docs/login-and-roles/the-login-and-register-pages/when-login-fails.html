@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>When Login Fails — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/login-and-roles/the-login-and-register-pages/leaving-once-logged-in.html">← Leaving Once Logged In</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/login-and-roles/the-login-and-register-pages/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/login-and-roles/the-login-and-register-pages/describeautherror.html">describeAuthError →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>When Login Fails</h1>
+    <p class="lede">A wrong password shows the API&#39;s message at the top of the form. An email the browser accepts but the API doesn&#39;t shows its message next to the email field, with Stage 3&#39;s FieldError.</p>
+
+    
+
+    
+      <div class="slide-body"><pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 4.19: the email field (src/pages/LoginPage.jsx, excerpt)</span>
+&lt;form className=<span class="hljs-string">&quot;form&quot;</span> onSubmit={handleSubmit}&gt;
+  {loginError &amp;&amp; <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">ErrorMessage</span> <span class="hljs-attr">message</span>=<span class="hljs-string">{loginError.message}</span> /&gt;</span></span>}
+
+  &lt;div className=<span class="hljs-string">&quot;form-field&quot;</span>&gt;
+    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">label</span> <span class="hljs-attr">htmlFor</span>=<span class="hljs-string">&quot;login-email&quot;</span>&gt;</span>Email<span class="hljs-tag">&lt;/<span class="hljs-name">label</span>&gt;</span></span>
+    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">input</span>
+      <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;login-email&quot;</span>
+      <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;email&quot;</span>
+      <span class="hljs-attr">autoComplete</span>=<span class="hljs-string">&quot;email&quot;</span>
+      <span class="hljs-attr">required</span>
+      <span class="hljs-attr">value</span>=<span class="hljs-string">{email}</span>
+      <span class="hljs-attr">onChange</span>=<span class="hljs-string">{(event)</span> =&gt;</span> setEmail(event.target.value)}
+      aria-invalid={Boolean(emailError)}
+      aria-describedby={emailError ? &#x27;login-email-error&#x27; : undefined}
+    /&gt;</span>
+    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">FieldError</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;login-email-error&quot;</span> <span class="hljs-attr">message</span>=<span class="hljs-string">{emailError}</span> /&gt;</span></span>
+  &lt;/div&gt;
+</code></pre>
+<p>(Less indented here than in the file, and a comment is left out.)
+<code>emailError</code> is <code>getFieldError(loginError, 'email')</code>, as in Stage 3.</p>
+<h2>Three kinds of failure</h2>
+<table>
+<thead>
+<tr>
+<th>What happens</th>
+<th>Answer</th>
+<th>Shown</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Wrong email or password</td>
+<td><code>401</code> &quot;Invalid email or password&quot;</td>
+<td>at the top, by <code>ErrorMessage</code></td>
+</tr>
+<tr>
+<td>An email the API rejects</td>
+<td><code>400</code> &quot;Validation failed&quot;, with <code>details</code></td>
+<td>at the top, and &quot;Invalid email&quot; under the field</td>
+</tr>
+<tr>
+<td>Too many attempts</td>
+<td><code>429</code></td>
+<td>at the top, reworded (next slide)</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>400</code> reuses Stage 3's pieces unchanged: <code>getFieldError()</code> finds the
+message for <code>email</code>, and <code>FieldError</code> shows it, linked to the input with
+<code>aria-describedby</code>.</p>
+<h2>Two checks of one email</h2>
+<p><code>type=&quot;email&quot;</code> and <code>required</code> make the <strong>browser</strong> check the form before
+it's sent. But the browser and the API don't agree on what an email
+address is. To the browser, <code>casey@example</code> is fine: a name, an <code>@</code>,
+and a domain. The API's Zod <code>.email()</code> wants a dot in the domain, so it
+answers <code>400</code>.</p>
+<p>So the browser's checks are for the user's convenience, and the API's
+are the ones that count. The page has to show the API's answer, whatever
+the browser let through.</p>
+<h2><code>autoComplete</code></h2>
+<p><code>autoComplete=&quot;email&quot;</code>, and <code>&quot;current-password&quot;</code> on the password field,
+tell the browser and password managers what each field is for, so they
+can fill them in. The register page uses <code>&quot;new-password&quot;</code> instead, so a
+password manager offers to make up a strong one.</p>
+<h2>Try it</h2>
+<ol>
+<li>Log in with the email <code>casey@example</code> (no <code>.com</code>) and any password.
+Where does each message appear?</li>
+<li>Log in as Casey with the wrong password. Now which message shows, and
+where?</li>
+<li>Try <code>casey</code> (no <code>@</code> at all). Who stops it this time, the browser or
+the API? How can you tell from the Network tab?</li>
+</ol>
+<p>Each attempt that reaches the API counts towards its limit of 10 every
+15 minutes. If you see &quot;Too many attempts&quot;, wait a few minutes.</p>
+</div>
+    
+  </main>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Logging In, and Keeping the Token — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/login-and-roles/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Logging In, and Keeping the Token</h1>
+    <p class="lede">The three requests about who the user is, where the token is kept between visits, what&#39;s inside it, and how it reaches every request.</p>
+
+    
+      <ul class="listing">
+        
+          <li>
+            <a href="/support-desk-front-end/login-and-roles/logging-in-and-keeping-the-token/three-requests-about-who-you-are.html">Three Requests About Who You Are</a>
+            <p>auth.api.js has one function per auth route: log in, register, and ask who a token belongs to. They follow the same three steps as every other API function.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/login-and-roles/logging-in-and-keeping-the-token/keeping-only-the-token.html">Keeping Only the Token</a>
+            <p>The token is saved in the browser&#39;s localStorage, so a reload doesn&#39;t log the user out. Three small functions in tokenStorage.js are the only code that touches it.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/login-and-roles/logging-in-and-keeping-the-token/whats-inside-a-token.html">What&#39;s Inside a Token</a>
+            <p>Anyone can read a token&#39;s payload: it holds the user&#39;s id, their role, and when it expires. The app could decode it, but doesn&#39;t need to, and shouldn&#39;t trust what it finds.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/login-and-roles/logging-in-and-keeping-the-token/any-script-can-read-it.html">Any Script on the Page Can Read It</a>
+            <p>The Console just read the token, and so could any other JavaScript on the page. That&#39;s the trade-off of localStorage, and why React showing text as text matters.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/login-and-roles/logging-in-and-keeping-the-token/gettoken-reads-the-saved-token.html">getToken() Reads the Saved Token</a>
+            <p>Stage 2 said getToken() would change in Stage 4. It now returns the token saved at login, and apiRequest() reads it once per request.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/login-and-roles/logging-in-and-keeping-the-token/the-tokens-journey.html">The Token&#39;s Journey</a>
+            <p>The token is written once, at login, and read on every request after that. Only two files ever touch it.</p>
+          </li>
+        
+      </ul>
+    
+
+    
+  </main>
+</body>
+</html>

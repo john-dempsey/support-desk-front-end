@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Calling It on a 401 — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/login-and-roles/when-the-session-ends/a-token-runs-out.html">← A Token Runs Out</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/login-and-roles/when-the-session-ends/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/login-and-roles/when-the-session-ends/authprovider-logs-them-out.html">AuthProvider Logs Them Out →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Calling It on a 401</h1>
+    <p class="lede">apiRequest() calls the handler when a request that carried a token gets a 401. A wrong password also gets a 401, but carried no token, so it doesn&#39;t log anyone out.</p>
+
+    
+
+    
+      <div class="slide-body"><pre><code class="hljs language-js"><span class="hljs-comment">// Figure 4.31: noticing the 401 (src/api/client.js, excerpt)</span>
+<span class="hljs-comment">// response.ok is true for any 2xx status. Anything else is an error, and</span>
+<span class="hljs-comment">// the back-end puts its explanation in { error: { message, details } }.</span>
+<span class="hljs-keyword">if</span> (!response.<span class="hljs-property">ok</span>) {
+  <span class="hljs-comment">// A 401 to a request that carried a token means the session is over.</span>
+  <span class="hljs-comment">// (A 401 with no token, such as a wrong password at login, doesn&#x27;t.)</span>
+  <span class="hljs-keyword">if</span> (response.<span class="hljs-property">status</span> === <span class="hljs-number">401</span> &amp;&amp; token &amp;&amp; sessionExpiredHandler) {
+    <span class="hljs-title function_">sessionExpiredHandler</span>();
+  }
+
+  <span class="hljs-keyword">const</span> message = responseBody?.<span class="hljs-property">error</span>?.<span class="hljs-property">message</span>
+    || <span class="hljs-string">`Request failed with status <span class="hljs-subst">${response.status}</span>`</span>;
+  <span class="hljs-keyword">throw</span> <span class="hljs-title function_">createApiError</span>(
+    response.<span class="hljs-property">status</span>, message, responseBody?.<span class="hljs-property">error</span>?.<span class="hljs-property">details</span>
+  );
+}
+</code></pre>
+<p>(Indented one step further in the file. The <code>message</code> and <code>throw</code> lines
+are one line each there, as in Figure 2.6.)</p>
+<p>Only the inner <code>if</code> is new. Three things must all be true:</p>
+<table>
+<thead>
+<tr>
+<th>Condition</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>response.status === 401</code></td>
+<td>the API says the token is no good</td>
+</tr>
+<tr>
+<td><code>token</code></td>
+<td>this request <strong>carried</strong> a token. That's why <code>apiRequest()</code> reads the token once, at the start (Figure 4.7): it needs to know now what it sent then</td>
+</tr>
+<tr>
+<td><code>sessionExpiredHandler</code></td>
+<td>someone has put a function there. In tests that use <code>client.js</code> on its own, nobody has</td>
+</tr>
+</tbody>
+</table>
+<h2>Not every 401 is a session ending</h2>
+<p>A wrong password at login also gets a <code>401</code>: &quot;Invalid email or
+password&quot;. But nobody is logged in yet, so no token was sent, <code>token</code> is
+<code>null</code>, and the handler isn't called. The login page just shows the
+message (topic 06). That's why <code>LoginPage</code> and <code>RegisterPage</code> didn't
+count on the last slide: their <code>401</code>s are about the details typed in.</p>
+<h2>Then it throws, as before</h2>
+<p>After calling the handler, <code>apiRequest()</code> still throws the error. The
+page that sent the request still gets it in its <code>catch</code>, exactly as in
+Stage 3. Nothing in any page had to change. The page is about to be
+replaced by the login page anyway (the next slide shows how).</p>
+<h2>Try it</h2>
+<p>Which of these calls the handler? Decide, then check against the table.</p>
+<ol>
+<li>Casey's token has expired. Casey clicks a ticket.</li>
+<li>Nobody is logged in, and someone types the wrong password.</li>
+<li>Casey is logged in, and tries to delete Alex's comment (with a REST
+client or a changed front-end).</li>
+<li>The API isn't running, and Ada clicks <strong>Tickets</strong>.</li>
+</ol>
+</div>
+    
+  </main>
+</body>
+</html>

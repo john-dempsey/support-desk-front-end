@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>You&#39;ve Used a Context Already — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/login-and-roles/sharing-whos-logged-in/who-needs-the-user.html">← Who Needs the User?</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/login-and-roles/sharing-whos-logged-in/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/login-and-roles/sharing-whos-logged-in/creating-a-context.html">Creating a Context →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>You&#39;ve Used a Context Already</h1>
+    <p class="lede">BrowserRouter is a context provider, and useParams() and useNavigate() read it. That&#39;s why a component with a &lt;Link&gt; fails in a test without a router.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Contexts aren't new to this app. One has been there since Stage 0.</p>
+<p><code>main.jsx</code> wraps the whole app in <code>&lt;BrowserRouter&gt;</code>. Nothing passes the
+URL down to <code>TicketDetailPage</code> as a prop, yet <code>useParams()</code> can read
+<code>:ticketId</code> from it. And <code>useNavigate()</code> works in any page. How?</p>
+<p><code>BrowserRouter</code> is a <strong>provider</strong>: it puts the router's information
+(the current URL, a way to change it) into a context. <code>useParams()</code>,
+<code>useNavigate()</code>, <code>&lt;Link&gt;</code> and <code>&lt;NavLink&gt;</code> all <strong>read</strong> that context,
+wherever they are inside it.</p>
+<h2>The error you've seen</h2>
+<p>Stage 1, topic 07 showed this error from a test that rendered a <code>&lt;Link&gt;</code>
+with no router around it:</p>
+<blockquote>
+<p><code>Cannot destructure property 'basename' of 'React$1.useContext(...)' as it is null.</code></p>
+</blockquote>
+<p>Now it makes sense. <code>&lt;Link&gt;</code> calls <code>useContext(...)</code> to read the
+router's context. With no <code>BrowserRouter</code> (or <code>MemoryRouter</code>) above it,
+there's nothing to read, so it gets <code>null</code>, and taking <code>basename</code> out of
+<code>null</code> fails.</p>
+<h2>Two halves</h2>
+<p>Every context has the same two halves:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>The router</th>
+<th>The logged-in user</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Provider</strong>: puts a value in place, for everything inside it</td>
+<td><code>&lt;BrowserRouter&gt;</code></td>
+<td><code>&lt;AuthProvider&gt;</code></td>
+</tr>
+<tr>
+<td><strong>Hook</strong>: reads that value, from anywhere inside</td>
+<td><code>useParams()</code>, <code>useNavigate()</code>, ...</td>
+<td><code>useAuth()</code></td>
+</tr>
+<tr>
+<td>Set up in</td>
+<td><code>main.jsx</code></td>
+<td><code>main.jsx</code></td>
+</tr>
+</tbody>
+</table>
+<p>React Router wrote its half for you. Stage 4 writes the second column
+itself, in two short files. The next slide shows the first of them.</p>
+<h2>Blade and Laravel</h2>
+<p>The nearest thing in Laravel is <code>auth()-&gt;user()</code>, or <code>@auth</code> in a Blade
+view. Any controller or view can ask &quot;who's logged in?&quot; without being
+handed the user. <code>useAuth()</code> gives React components the same thing.</p>
+<h2>Try it</h2>
+<p>Open <code>src/test/renderWithProviders.jsx</code>. Its top comment names both
+contexts that a component might need. Which two? Which one is real in a
+test, and which is a fake?</p>
+</div>
+    
+  </main>
+</body>
+</html>

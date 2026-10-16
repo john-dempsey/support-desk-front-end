@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tracing a Login — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/login-and-roles/testing-stage-4/running-everything.html">← Running Everything</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/login-and-roles/making-it-yours/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/login-and-roles/making-it-yours/your-stage-4-checklist.html">Your Stage 4 Checklist →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Tracing a Login</h1>
+    <p class="lede">Questions to practise the viva&#39;s trace with, now that the app knows who&#39;s using it: the token, the context, protected routes, and the 401.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The viva's trace is the same shape as before: <strong>component → API module
+→ HTTP request → state update → re-render</strong>. Stage 4 adds two new
+places for a step to happen: the <strong>context</strong>, whose state change
+re-renders every component that uses it, and <code>localStorage</code>, which
+outlives a reload.</p>
+<h2>Write one yourself</h2>
+<p>Write the trace for <strong>logging in</strong>, as a numbered list, one line per
+step, with the file each step is in. Start with the user clicking
+<strong>Log in</strong>, and finish with the ticket list on the screen and Casey's
+name in the navigation bar. You should need about twelve steps. The
+left-hand column of topic 02's diagram, &quot;The Token's Journey&quot;, covers
+the first half. Check the rest against topics 04 and 06.</p>
+<h2>Questions to practise with</h2>
+<p>Answer these out loud, with the code open. Then try them again with it
+closed.</p>
+<ol>
+<li>After a successful login, <code>handleSubmit</code> doesn't call <code>navigate()</code>.
+So what takes the user to the ticket list?</li>
+<li>Where is the token kept, and why does it survive a reload when
+<code>user</code> doesn't?</li>
+<li>Which file reads the token before every request? Which pages know
+the token exists?</li>
+<li>Why does the app save only the token, not the user? What does it do
+instead when it starts?</li>
+<li>You reload on <code>/tickets/1</code>. What does the app show first, which
+request goes out, and why doesn't the user end up on the login page?</li>
+<li><code>NavBar</code>, <code>HomePage</code> and <code>TicketDetailPage</code> all change when someone
+logs in. Nobody tells them. How do they find out?</li>
+<li>Why are <code>AuthContext</code> and <code>AuthProvider</code> in two files?</li>
+<li>Casey types <code>/tags</code> into the address bar. Which component decides
+what appears, and what does it check, in what order?</li>
+<li>What does <code>hasRole('agent', 'admin')</code> do with its arguments? What
+does it return when nobody is logged in?</li>
+<li>How does <code>CommentList</code> know which comments get a Delete button,
+without calling <code>useAuth()</code>?</li>
+<li>A token expires while Alex has the app open. Alex clicks a ticket.
+Name every file involved, from the <code>401</code> to the login page.</li>
+<li>A wrong password also gets a <code>401</code>. Why doesn't that call the
+session-expired handler?</li>
+<li>The front-end hides Edit and Delete from Casey. What stops Casey
+deleting a ticket anyway?</li>
+</ol>
+<h2>Try it</h2>
+<p>Pick two questions you couldn't answer with the code closed. Find the
+answers in the code, then explain each to someone else without
+looking.</p>
+</div>
+    
+  </main>
+</body>
+</html>

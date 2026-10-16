@@ -2,8 +2,8 @@
 // name, so this page shows full CRUD (create, read, update, delete) with
 // as little else in the way as possible.
 //
-// Only agents and admins can change tags. Ada's admin token can, so every
-// control is shown for now. Stage 4 hides this page from customers.
+// Only agents and admins can change tags, so App.jsx's ProtectedRoute
+// only lets them reach this page, and only they see its link in NavBar.
 import { useEffect, useState } from 'react';
 import { createTag, deleteTag, getTags, updateTag } from '../api/tags.api.js';
 import TagForm from '../components/TagForm.jsx';

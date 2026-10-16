@@ -8,55 +8,47 @@ It started as a copy of the front-end starter (Stage 0). Each stage adds
 one thing, and the code is tagged at the end of each stage (`stage-00`,
 `stage-01`, ...), so you can look at, or go back to, any stage.
 
-## Where we are: Stage 3, Full CRUD
+## Where we are: Stage 4, Login and roles
 
-The app can now change data as well as show it: create, edit and delete
-tickets, change a ticket's status, assign it to an agent, add and delete
-comments, and manage tags. The ticket list can be filtered, sorted and
-paged.
+**This stage needs authentication in your back-end** (back-end Step 4).
+If your own API has no login, stop at Stage 3: your app is complete and
+working without this stage.
 
-| URL | Page |
-|---|---|
-| `/` | `HomePage`: a welcome and a link to the tickets |
-| `/tickets` | `TicketListPage`: the tickets, filtered, sorted and paged |
-| `/tickets/new` | `NewTicketPage`: report a new problem (`POST /tickets`) |
-| `/tickets/:ticketId` | `TicketDetailPage`: one ticket, its comments, and Delete |
-| `/tickets/:ticketId/edit` | `EditTicketPage`: change the details, status and agent (`PATCH /tickets/:id`) |
-| `/tags` | `TagsPage`: list, add, rename and delete tags |
-| anything else | `NotFoundPage` |
+The app has a login. Each user sees only what their role can use, and
+the stand-in `VITE_DEV_TOKEN` from Stages 2 and 3 is gone.
+
+| URL | Page | Who can open it |
+|---|---|---|
+| `/` | `HomePage`: a welcome, and links to log in | anyone |
+| `/login` | `LoginPage` | anyone |
+| `/register` | `RegisterPage`: creates a **customer** account | anyone |
+| `/tickets` | `TicketListPage` | anyone logged in |
+| `/tickets/:ticketId` | `TicketDetailPage` | anyone logged in |
+| `/tickets/new` | `NewTicketPage` | customers |
+| `/tickets/:ticketId/edit` | `EditTicketPage` | agents and admins |
+| `/tags` | `TagsPage` | agents and admins |
+| anything else | `NotFoundPage` | anyone |
 
 New in this stage:
 
-- **Forms with controlled inputs.** Each input shows a piece of state, and
-  typing updates it. `TicketForm` is shared by the new and edit pages.
-  The form looks after what's typed; the page sends it to the API.
-- **Validation errors by the field.** The browser checks the basics
-  (`required`, `maxLength`), but the API has the final say. When it
-  answers `400 Validation failed`, each message in its `details` is shown
-  under the matching field (`getFieldError()` and `FieldError`).
-- **Create, update, delete.** `tickets.api.js`, `comments.api.js`,
-  `tags.api.js` and `users.api.js` have one function per endpoint. Every
-  delete asks for confirmation first.
-- **Updating the page after a change.** Sometimes the page changes its own
-  state from the API's response (a new comment is added to the list);
-  sometimes it asks the API again (the tags list, which the API sorts).
-  The comments in the code say which, and why.
-- **Filters in the URL.** The status filter, the sort order and the page
-  number live in the URL (`/tickets?status=open&page=2`), read with
-  `useSearchParams()`. A refresh or the Back button keeps them, and the
-  query is passed straight to the API.
-- **Every control is shown.** There's no login yet, and Ada's admin token
-  is allowed to do everything except one thing (next section). Stage 4
-  hides each control from the roles that can't use it.
-
-### Creating a ticket with Ada's token
-
-Only **customers** can create tickets. With Ada's (admin) token, the
-**New ticket** form shows the API's answer: *"You do not have permission
-to perform this action"* (`403`). That's the API protecting itself, and
-it's what Stage 4 is about. To create a ticket now, log in as
-`casey@example.com` and use Casey's token for a while. (Casey can't edit
-or delete tickets, so switch back to Ada's token afterwards.)
+- **Logging in and out.** `LoginPage` and `RegisterPage` send the user's
+  details to the API, which answers with a token. Only the token is saved
+  (in `localStorage`, see `api/tokenStorage.js`), and `client.js` sends it
+  with every request.
+- **One place that knows who's logged in.** `AuthProvider` holds the user,
+  and any component reads it with `useAuth()`: React **Context**. When the
+  app starts with a saved token, it asks the API who the token belongs to
+  (`GET /auth/me`) and shows "Checking your session…" until it knows.
+- **Protected pages.** `ProtectedRoute` sends a visitor to the login page,
+  and tells a user whose role can't use a page that it isn't for them,
+  like the back-end's `authenticate` and `authorize(...)`.
+- **Controls by role.** Only customers see **New ticket**; only agents and
+  admins see **Edit**, **Delete** and **Tags**; and a comment's **Delete**
+  only shows for its author, or an admin. That's for the user's sake: the
+  API still checks every request.
+- **A session that ends.** If any request gets a `401` (the token has
+  expired, after a day), the user is logged out and sent to the login
+  page.
 
 ## What you need
 
@@ -72,8 +64,7 @@ cp .env.example .env    # then change VITE_API_URL if your API isn't on port 300
 npm run dev             # front-end on http://localhost:5173
 ```
 
-Then get a token for `.env` (next section), open
-<http://localhost:5173> and click **Tickets**.
+Then open <http://localhost:5173> and log in (next section).
 
 | Command | What it does |
 |---|---|
@@ -87,74 +78,73 @@ Then get a token for `.env` (next section), open
 If you change `.env`, save it and Vite restarts itself (the terminal shows
 `.env changed, restarting server...`). Then reload the page.
 
-## The stand-in token (Stages 2 and 3 only)
+## Logging in
 
-The API only answers ticket requests that carry a token. Until Stage 4
-adds a login page, log in once by hand and paste the token into `.env`:
+The seeded accounts all have the password `password123`:
 
-1. In a REST client, send
-   `POST http://localhost:3000/auth/login` with the JSON body
-   `{ "email": "ada@example.com", "password": "password123" }`.
-   Ada is an admin, so she can see every ticket. (The API allows only 10
-   logins every 15 minutes. If you get `429 Too many requests`, wait a
-   few minutes.)
-2. Copy the `token` from the response (the long string, without the
-   quotes) into `.env`:
+| Email | Role | Sees |
+|---|---|---|
+| `casey@example.com` | customer | Casey's own tickets; **New ticket** |
+| `priya@example.com` | customer | Priya's own tickets; **New ticket** |
+| `alex@example.com` | agent | Alex's tickets and the unassigned ones; **Edit**, **Delete**, **Tags** |
+| `ada@example.com` | admin | every ticket and every control |
 
-   ```
-   VITE_DEV_TOKEN=eyJhbGciOi...
-   ```
+Try each one: the pages change to match the role. **Register** always
+creates a customer.
 
-3. Save `.env`. Vite restarts itself; reload the page.
+The API allows only **10 logins or registrations every 15 minutes**. If
+the login page says "Too many attempts", wait a few minutes.
 
-`api/client.js` sends this token in an `Authorization: Bearer ...`
-header with every request. Stage 4 removes `VITE_DEV_TOKEN` and uses the
-token of whoever logs in instead.
-
-**If your own API has no authentication**, leave `VITE_DEV_TOKEN` empty.
-No header is sent, and everything works the same.
-
-If the tickets page shows an error instead of tickets:
+If you still have a `VITE_DEV_TOKEN` line in your `.env` from Stage 3,
+delete it: nothing reads it any more.
 
 | Message | What it means |
 |---|---|
 | Can't reach the API at http://localhost:3000 — is the back-end running? | The API isn't running, or `VITE_API_URL` is wrong |
-| Authentication required | `VITE_DEV_TOKEN` is empty or missing |
-| Invalid or expired token | The token is wrong, or has expired. Tokens last one day: log in again and paste the new one |
+| Invalid email or password | Check both: the API doesn't say which was wrong |
+| You're sent back to the login page | Your session ended: tokens last one day. Log in again |
 
 ## How it's organised
 
 ```
 index.html              the single HTML page; React fills in <div id="root">
 src/
-  main.jsx              entry point: starts React and the router
+  main.jsx              entry point: starts React, the router and AuthProvider
   App.jsx               the route table: which page shows at which URL
   index.css             global styles
   api/
     client.js           apiRequest(): the only code that calls fetch()
+    tokenStorage.js     saves the token in localStorage
+    auth.api.js         login(), register(), getCurrentUser()
     tickets.api.js      getTickets(query), getTicket(id), createTicket(),
                         updateTicket(), deleteTicket()
     comments.api.js     getComments(), createComment(), deleteComment()
     tags.api.js         getTags(), createTag(), updateTag(), deleteTag()
     users.api.js        getAgents(), for the "Assigned to" dropdown
-  pages/                one component per URL: HomePage, TicketListPage,
-                        NewTicketPage, TicketDetailPage, EditTicketPage,
-                        TagsPage, NotFoundPage
+  pages/                one component per URL: HomePage, LoginPage,
+                        RegisterPage, TicketListPage, NewTicketPage,
+                        TicketDetailPage, EditTicketPage, TagsPage,
+                        NotFoundPage
   components/           reusable pieces: NavBar, TicketList, StatusBadge,
                         Loading, ErrorMessage, TicketForm, CommentList,
                         CommentForm, TagForm, TicketFilters, Pagination,
-                        FieldError
+                        FieldError, ProtectedRoute
   utils/
     formatDate.js       ISO date string → readable date
     getFieldError.js    finds one field's message in a 400's details
     ticketStatuses.js   the four statuses and their labels
-  context/              shared app-wide state (Stage 4, for login)
+    describeAuthError.js  friendlier wording for login and register errors
+  context/
+    authContext.js      the logged-in user's context, and useAuth()
+    AuthProvider.jsx    holds the user; login(), register(), logout()
   hooks/                your own custom hooks (Stage 6)
   test/
     setup.js            runs before the tests
-    renderWithProviders.jsx   renders a component inside a router, for tests
+    renderWithProviders.jsx   renders a component inside a router, with
+                        a fake logged-in user, for tests
     testTickets.js      tickets for the tests to "receive from the API"
     testComments.js     comments, likewise
+    testUsers.js        a customer, an agent and an admin to log in as
 ```
 
 It mirrors the layers you know from the back-end:
@@ -165,6 +155,8 @@ It mirrors the layers you know from the back-end:
 | `req.params.id` | `useParams()` |
 | `req.query` | `useSearchParams()` |
 | `res.redirect()` / Laravel's `redirect()` | `navigate()`, from `useNavigate()` |
+| `middleware/authenticate.js` and `authorize(...)` | `components/ProtectedRoute.jsx`, with `allowedRoles` |
+| `req.user` | `useAuth().user` |
 | controllers: handle a request, call a service | pages: hold the data, call an API function, decide what to show |
 | services: the only code that talks to the database | `api/*.api.js`: the only code that talks to the API |
 | `utils/response.js` + `errorHandler.js`: one response/error shape | `api/client.js`: reads that shape back |
@@ -183,8 +175,8 @@ npm test
 You should see:
 
 ```
- Test Files  17 passed (17)
-      Tests  87 passed (87)
+ Test Files  24 passed (24)
+      Tests  122 passed (122)
 ```
 
 Test files sit next to the file they test (`TicketList.jsx` →
@@ -207,7 +199,15 @@ Test files sit next to the file they test (`TicketList.jsx` →
   would, then check what was sent to the (fake) API and what the page
   shows. Tests that delete something replace `window.confirm()` with a
   fake that answers OK or Cancel (`vi.spyOn(window, 'confirm')`).
-- `src/App.test.jsx` checks which page shows at which URL.
+- `renderWithProviders()` also gives every test a fake logged-in user:
+  Ada, an admin, unless the test passes `user: customerUser`,
+  `user: agentUser` or `user: null` (nobody). So a test can check that a
+  customer doesn't see **Edit**, without any login requests.
+- `src/context/AuthProvider.test.jsx` tests the real `AuthProvider`, with
+  `auth.api.js` faked: checking a saved token, logging in and out, and
+  being logged out by a `401`.
+- `src/App.test.jsx` checks which page shows at which URL, and who is
+  sent to the login page.
 - `src/api/client.test.js` replaces `fetch()` with a fake, to test the API
   client without a back-end. `src/api/tickets.api.test.js` replaces
   `apiRequest()` with a fake, to check each function asks for the right
@@ -221,9 +221,10 @@ Find elements the way a user would: by role, label or text (`getByRole`,
 1. **Foundations:** components, props, routes, a hard-coded list.
 2. **Fetching from the API:** load the tickets with `GET /tickets`, with
    loading, error and "nothing here yet" states.
-3. **Full CRUD** (you are here): create, edit and delete tickets,
-   comments, tags, filtering, sorting and pagination.
-4. **Login and roles** *(needs authentication in the back-end)*.
+3. **Full CRUD:** create, edit and delete tickets, comments, tags,
+   filtering, sorting and pagination.
+4. **Login and roles** (you are here) *(needs authentication in the
+   back-end)*.
 5. **Notifications** *(needs notifications in the back-end)*.
 6. **Hardening:** a `useFetch` hook, an error boundary, accessibility and
    a production build.
@@ -232,28 +233,26 @@ Find elements the way a user would: by role, label or text (`getByRole`,
 
 Run `npm test` after each change, and commit when it passes.
 
-1. Open the ticket list and choose a status, a sort order and page 2.
-   Look at the address bar. Refresh the page, then press Back a few
-   times. What happens, and why wouldn't it if the choices were kept in
-   `useState`?
-2. On **New ticket**, type three spaces as the subject and submit. The
-   browser's `required` check lets it through: why? Which part of the app
-   writes the red message under the field, and where does its text come
-   from? Now try it with Casey's token, and then with Ada's again.
-3. Try to delete ticket 1, which has a comment. What does the API answer,
-   and why? Delete its comment first, then try again.
-4. In `TicketDetailPage.jsx`, `handleAddComment` adds the new comment to
-   the list itself, but `TagsPage.jsx` loads the tags again after adding
-   one. Explain why each page made the choice it did. What would go wrong
-   if `TagsPage` added the new tag to the end of its list instead?
-5. Open the **Network** tab and rename a tag. Find the `PATCH` request:
-   what did it send, and what came back? Then delete a tag: what status
-   came back, and why is there no response body?
-6. Add a test to `TagsPage.test.jsx` that checks the "Delete" button does
-   nothing when the user clicks **Cancel** in the confirmation box.
-7. **Challenge:** the API also has `PATCH /tickets/:ticketId/comments/:id`.
-   Add an `updateComment()` function to `comments.api.js`, and an **Edit**
-   button on each comment, using `TagsPage`'s rename as a model.
-8. **Challenge:** open `/tickets?page=99`. What does the page show? Change
-   `TicketListPage` (or `Pagination`) so the user can always get back to
-   a page that has tickets.
+1. Log in as each of the four seeded users in turn. Make a table of which
+   links and buttons each one sees. Then, as Casey, type
+   `/tickets/2/edit` into the address bar. What happens, and which file
+   decided?
+2. Log in, then open the browser's developer tools: **Application** →
+   **Local storage** → `http://localhost:5173`. What's saved? Delete it
+   and click a link. What happens? Now reload the page. Why is it
+   different?
+3. Log in, then edit the saved token in **Local storage** (change one
+   character) and reload. What do you see, briefly, and then? Which
+   request found the problem?
+4. As Casey, open a ticket and look at the comments. Which ones have a
+   **Delete** button, and why? Use a REST client to send the `DELETE`
+   for one that doesn't. What does the API answer?
+5. Log in with the wrong password eleven times. What does the login page
+   say on the eleventh, and which file chose those words?
+6. **Challenge:** after a `401`, the user lands on the login page with no
+   explanation. Make the login page say "Your session has ended. Please
+   log in again." when that's why they're there. (Hint: what could the
+   session-expired handler pass to the login page?)
+7. **Challenge:** let a comment's author **edit** it, as well as delete
+   it (`PATCH /tickets/:ticketId/comments/:id`), using the same
+   `canDelete` idea to decide who sees the button.

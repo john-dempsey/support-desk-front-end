@@ -8,19 +8,25 @@
 //   success: { data } or { data, meta }
 //   error:   { error: { message, details? } }   (with a 4xx/5xx status)
 
+import { getSavedToken } from './tokenStorage.js';
+
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
-// Where the auth token comes from. TEMPORARY: there's no login page until
-// Stage 4, so for now the token is one you pasted into .env by hand
-// (VITE_DEV_TOKEN). It's the same idea as the back-end's hard-coded
-// customerId before it had authentication. Stage 4 removes it and returns
-// the logged-in user's token instead; nothing else in this file changes.
-//
-// If your API has no authentication, leave VITE_DEV_TOKEN empty: this
-// returns null, no Authorization header is sent, and everything still
-// works.
+// Where the auth token comes from: since Stage 4, the token saved when the
+// user logged in (see tokenStorage.js), or null when nobody is logged in.
+// In Stages 2 and 3 this returned a token pasted into .env by hand.
 export function getToken() {
-  return import.meta.env.VITE_DEV_TOKEN || null;
+  return getSavedToken();
+}
+
+// What to do when the API says a token is no longer any good (401): it has
+// expired, or its user has gone. AuthProvider gives this file a function
+// that logs the user out, so every page gets that behaviour from one
+// place, instead of each page checking for 401 itself.
+let sessionExpiredHandler = null;
+
+export function setSessionExpiredHandler(handler) {
+  sessionExpiredHandler = handler;
 }
 
 // A plain Error with the extra information a page needs to decide what to
@@ -33,7 +39,7 @@ function createApiError(status, message, details) {
   return error;
 }
 
-function buildHeaders(hasBody) {
+function buildHeaders(hasBody, token) {
   const headers = {};
 
   if (hasBody) {
@@ -41,8 +47,8 @@ function buildHeaders(hasBody) {
   }
 
   // Only sent when a token exists, so the same client works against an API
-  // with authentication and one without.
-  const token = getToken();
+  // with authentication and one without, and logging in (when there's no
+  // token yet) sends none.
   if (token) {
     headers.Authorization = `Bearer ${token}`;
   }
@@ -68,12 +74,13 @@ async function readJson(response) {
 export async function apiRequest(path, options = {}) {
   const method = options.method || 'GET';
   const hasBody = options.body !== undefined;
+  const token = getToken();
 
   let response;
   try {
     response = await fetch(`${API_URL}${path}`, {
       method,
-      headers: buildHeaders(hasBody),
+      headers: buildHeaders(hasBody, token),
       body: hasBody ? JSON.stringify(options.body) : undefined,
     });
   } catch {
@@ -93,6 +100,12 @@ export async function apiRequest(path, options = {}) {
   // response.ok is true for any 2xx status. Anything else is an error, and
   // the back-end puts its explanation in { error: { message, details } }.
   if (!response.ok) {
+    // A 401 to a request that carried a token means the session is over.
+    // (A 401 with no token, such as a wrong password at login, doesn't.)
+    if (response.status === 401 && token && sessionExpiredHandler) {
+      sessionExpiredHandler();
+    }
+
     const message = responseBody?.error?.message || `Request failed with status ${response.status}`;
     throw createApiError(response.status, message, responseBody?.error?.details);
   }

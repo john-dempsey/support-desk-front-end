@@ -12,6 +12,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
 import { getTickets } from '../api/tickets.api.js';
+import { useAuth } from '../context/authContext.js';
 import TicketList from '../components/TicketList.jsx';
 import TicketFilters from '../components/TicketFilters.jsx';
 import Pagination from '../components/Pagination.jsx';
@@ -20,6 +21,7 @@ import ErrorMessage from '../components/ErrorMessage.jsx';
 
 function TicketListPage() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { hasRole } = useAuth();
   // null means "not loaded yet", which is different from [] ("loaded, and
   // there are none"). TicketList is only shown once this isn't null, so it
   // doesn't say "There are no tickets" while they're still on their way.
@@ -99,11 +101,15 @@ function TicketListPage() {
   return (
     <>
       <h1>Tickets</h1>
-      <p>
-        <Link to="/tickets/new" className="button-link">
-          New ticket
-        </Link>
-      </p>
+      {/* Only customers can report a problem (the API's
+          authorize('customer')), so only they get the link. */}
+      {hasRole('customer') && (
+        <p>
+          <Link to="/tickets/new" className="button-link">
+            New ticket
+          </Link>
+        </p>
+      )}
 
       {/* A missing value means "use the API's default", so the dropdowns
           show the same defaults the API uses: newest first. */}

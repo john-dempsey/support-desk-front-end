@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Login and Register Pages — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/login-and-roles/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>The Login and Register Pages</h1>
+    <p class="lede">Two forms written inside their pages: what they send, how they leave once someone is logged in, and how they show the API&#39;s errors.</p>
+
+    
+      <ul class="listing">
+        
+          <li>
+            <a href="/support-desk-front-end/login-and-roles/the-login-and-register-pages/the-login-page.html">The Login Page</a>
+            <p>LoginPage holds what&#39;s typed, calls login() from useAuth(), and on success does nothing at all: the new user makes the page leave by itself.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/login-and-roles/the-login-and-register-pages/leaving-once-logged-in.html">Leaving Once Logged In</a>
+            <p>If there&#39;s a user, LoginPage renders a &lt;Navigate&gt; to the ticket list. One rule covers someone who has just logged in and someone who was already logged in.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/login-and-roles/the-login-and-register-pages/when-login-fails.html">When Login Fails</a>
+            <p>A wrong password shows the API&#39;s message at the top of the form. An email the browser accepts but the API doesn&#39;t shows its message next to the email field, with Stage 3&#39;s FieldError.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/login-and-roles/the-login-and-register-pages/describeautherror.html">describeAuthError</a>
+            <p>Two of the API&#39;s auth errors need saying in the user&#39;s own words: too many attempts, and an email that&#39;s already registered. A small function in utils/ rewords them for both pages.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/login-and-roles/the-login-and-register-pages/the-register-page.html">The Register Page</a>
+            <p>RegisterPage is LoginPage with a name field, a password rule, and register() instead of login(). A new account is always a customer, and is logged in straight away.</p>
+          </li>
+        
+      </ul>
+    
+
+    
+  </main>
+</body>
+</html>

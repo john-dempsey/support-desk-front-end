@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sharing Who&#39;s Logged In — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/login-and-roles/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Sharing Who&#39;s Logged In</h1>
+    <p class="lede">Eight components need to know who is logged in. A React context lets each one ask, instead of having the user passed down to it as a prop.</p>
+
+    
+      <ul class="listing">
+        
+          <li>
+            <a href="/support-desk-front-end/login-and-roles/sharing-whos-logged-in/who-needs-the-user.html">Who Needs the User?</a>
+            <p>The navigation bar, the protected routes, the login page and three other pages all need the logged-in user. Passing it to each one as a prop would work, but every component in the way would have to carry it.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/login-and-roles/sharing-whos-logged-in/youve-used-a-context-already.html">You&#39;ve Used a Context Already</a>
+            <p>BrowserRouter is a context provider, and useParams() and useNavigate() read it. That&#39;s why a component with a &lt;Link&gt; fails in a test without a router.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/login-and-roles/sharing-whos-logged-in/creating-a-context.html">Creating a Context</a>
+            <p>createContext() makes the context, and useAuth() is a two-line hook that reads it. Every component asks for the logged-in user the same way.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/login-and-roles/sharing-whos-logged-in/why-two-files.html">Why Two Files?</a>
+            <p>The context and its hook are in authContext.js, and the provider component is in AuthProvider.jsx. Keeping them apart lets Vite update components in place while you edit.</p>
+          </li>
+        
+      </ul>
+    
+
+    
+  </main>
+</body>
+</html>

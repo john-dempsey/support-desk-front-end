@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Only If Your API Has a Login — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/full-crud/making-it-yours/try-it-yourself.html">← Try It Yourself</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/login-and-roles/what-stage-4-adds/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/login-and-roles/what-stage-4-adds/who-sees-what.html">Who Sees What →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Only If Your API Has a Login</h1>
+    <p class="lede">Stage 4 needs an API with authentication. If yours has none, your Stage 3 app is already complete.</p>
+
+    
+
+    
+      <div class="slide-body"><p><strong>This stage needs an API with authentication</strong>: Step 4 of the back-end
+assignment. If your own API has no login, <strong>stop at Stage 3</strong>. Your app
+is complete and working without this stage: nothing in Stages 1 to 3
+depends on a login, a role or a token. You can go on to the parts of
+Stage 6 that don't need a login.</p>
+<p>The Support Desk API has had authentication since Lesson 4, &quot;Auth &amp;
+Authorization&quot;:</p>
+<ul>
+<li><code>POST /auth/register</code> and <code>POST /auth/login</code> answer with a <strong>token</strong></li>
+<li><code>authenticate.js</code> refuses a request without a valid token (<code>401</code>)</li>
+<li><code>authorize(...)</code> refuses a role that isn't allowed (<code>403</code>)</li>
+</ul>
+<p>Lesson 7 added <code>GET /auth/me</code> for this stage: &quot;who does this token
+belong to?&quot;</p>
+<h2>The stand-in token goes</h2>
+<p>In Stages 2 and 3, you logged in with a REST client as Ada, and pasted
+Ada's token into <code>.env</code> as <code>VITE_DEV_TOKEN</code>. Every request used it, so
+the app always acted as Ada, an admin, whoever was using it.</p>
+<p>Stage 4 replaces that with a real login:</p>
+<ul>
+<li><strong>A login page and a register page.</strong> The user's token comes from the
+API when they log in, not from <code>.env</code>.</li>
+<li><strong>The app knows who's using it.</strong> The navigation bar shows their name
+and role, and a <strong>Log out</strong> button.</li>
+<li><strong>Each role sees what it can use.</strong> A customer gets <strong>New ticket</strong>;
+an agent or admin gets <strong>Edit</strong>, <strong>Delete</strong> and <strong>Tags</strong>.</li>
+<li><strong>A session can end.</strong> Tokens last one day. When one runs out, the
+user is logged out and sent to the login page, instead of every page
+showing an error.</li>
+</ul>
+<h2>Try it</h2>
+<p>Before you start, check your own API is ready. In your REST client:</p>
+<ol>
+<li>Send a request to one of your protected routes <strong>without</strong> a token.
+Do you get a <code>401</code>?</li>
+<li>Log in. Does the answer include a token?</li>
+<li>Send the first request again <strong>with</strong> that token, as
+<code>Authorization: Bearer &lt;token&gt;</code>. Does it work now?</li>
+</ol>
+<p>If all three do, your API is ready for Stage 4. If not, your app is
+finished at Stage 3.</p>
+</div>
+    
+  </main>
+</body>
+</html>

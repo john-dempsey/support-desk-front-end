@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A Token Runs Out — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/login-and-roles/controls-by-role/hiding-is-not-security.html">← Hiding Is Not Security</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/login-and-roles/when-the-session-ends/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/login-and-roles/when-the-session-ends/calling-it-on-a-401.html">Calling It on a 401 →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>A Token Runs Out</h1>
+    <p class="lede">Tokens last a day. When one runs out mid-session, every request gets a 401. Rather than each page handling that, client.js tells AuthProvider, once, for all of them.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Topic 05 handled a token that had run out <strong>before</strong> the app started:
+<code>GET /auth/me</code> answers <code>401</code>, and the user starts logged out.</p>
+<p>But a token can also run out <strong>while</strong> the app is open. Leave a tab
+open overnight, click a ticket in the morning, and the request is sent
+with yesterday's token. The API answers:</p>
+<blockquote>
+<p><code>401</code> &quot;Invalid or expired token&quot;</p>
+</blockquote>
+<p>In Stage 3, with a token pasted into <code>.env</code>, that's what every page
+said until you pasted in a new one. Now the app can do better: log the
+user out, and send them to the login page.</p>
+<h2>Where should that happen?</h2>
+<p>Every page that loads data could check for it:</p>
+<pre><code class="hljs language-js">} <span class="hljs-keyword">catch</span> (error) {
+  <span class="hljs-keyword">if</span> (error.<span class="hljs-property">status</span> === <span class="hljs-number">401</span>) {
+    <span class="hljs-title function_">logout</span>();
+  }
+  <span class="hljs-comment">// ...</span>
+}
+</code></pre>
+<p>That's the same lines in five pages, in a dozen <code>catch</code> blocks, and in
+every page anyone adds later. Forget it once, and that page shows an
+error instead.</p>
+<p>Every request already goes through <strong>one</strong> function: <code>apiRequest()</code> in
+<code>client.js</code>. It sees every <code>401</code>. So that's where to notice it.</p>
+<h2>But client.js can't log anyone out</h2>
+<p>Logging out means <code>setUser(null)</code>, which belongs to <code>AuthProvider</code>.
+<code>client.js</code> is plain JavaScript, not a component. It can't call
+<code>useAuth()</code>, and it shouldn't know about React at all.</p>
+<p>So <code>client.js</code> offers a place to put a function, and <code>AuthProvider</code>
+puts one there:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 4.30: a place for a function (src/api/client.js, excerpt)</span>
+<span class="hljs-comment">// What to do when the API says a token is no longer any good (401): it has</span>
+<span class="hljs-comment">// expired, or its user has gone. AuthProvider gives this file a function</span>
+<span class="hljs-comment">// that logs the user out, so every page gets that behaviour from one</span>
+<span class="hljs-comment">// place, instead of each page checking for 401 itself.</span>
+<span class="hljs-keyword">let</span> sessionExpiredHandler = <span class="hljs-literal">null</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">setSessionExpiredHandler</span>(<span class="hljs-params">handler</span>) {
+  sessionExpiredHandler = handler;
+}
+</code></pre>
+<p><code>sessionExpiredHandler</code> starts as <code>null</code>: nothing to call. Calling
+<code>setSessionExpiredHandler(someFunction)</code> stores a function in it for
+later. It's the same idea as passing <code>onDelete</code> to <code>CommentList</code>: &quot;when
+this happens, call this&quot;, except that <code>client.js</code> isn't a component, so
+it can't take props.</p>
+<h2>Try it</h2>
+<p>Count the <code>catch</code> blocks in <code>src/pages/</code>, leaving out <code>LoginPage</code> and
+<code>RegisterPage</code>:</p>
+<pre><code class="hljs language-bash">grep -c <span class="hljs-string">&quot;catch&quot;</span> src/pages/*Page.jsx
+</code></pre>
+<p>How many would need a <code>401</code> check if <code>client.js</code> didn't do it? Why
+don't <code>LoginPage</code> and <code>RegisterPage</code> count? (The next slide explains.)</p>
+</div>
+    
+  </main>
+</body>
+</html>

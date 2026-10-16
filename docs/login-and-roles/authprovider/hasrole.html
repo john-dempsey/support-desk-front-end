@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>hasRole(...roles) — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/login-and-roles/authprovider/logging-in-and-out.html">← Logging In and Out</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/login-and-roles/authprovider/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/login-and-roles/authprovider/what-every-component-gets.html">What Every Component Gets →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>hasRole(...roles)</h1>
+    <p class="lede">hasRole(&#39;agent&#39;, &#39;admin&#39;) is true for an agent or an admin, and false for anyone else, including nobody. It&#39;s the front-end&#39;s version of the back-end&#39;s authorize(...).</p>
+
+    
+
+    
+      <div class="slide-body"><p>Several components need to ask &quot;is this user one of these roles?&quot;.
+<code>AuthProvider</code> answers that question once, for all of them:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 4.12: checking the role (src/context/AuthProvider.jsx, excerpt)</span>
+<span class="hljs-comment">// The front-end&#x27;s version of the back-end&#x27;s authorize(&#x27;agent&#x27;, &#x27;admin&#x27;):</span>
+<span class="hljs-comment">// hasRole(&#x27;agent&#x27;, &#x27;admin&#x27;) is true for an agent or an admin.</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">hasRole</span>(<span class="hljs-params">...roles</span>) {
+  <span class="hljs-keyword">return</span> user !== <span class="hljs-literal">null</span> &amp;&amp; roles.<span class="hljs-title function_">includes</span>(user.<span class="hljs-property">role</span>);
+}
+</code></pre>
+<p>(It sits inside <code>AuthProvider</code>, so it's indented one step further in the
+file.)</p>
+<p>Put it next to the back-end's <code>authorize.js</code>:</p>
+<pre><code class="hljs language-js"><span class="hljs-keyword">export</span> <span class="hljs-title function_">default</span> (...allowedRoles) =&gt;
+  <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+    <span class="hljs-keyword">if</span> (!allowedRoles.<span class="hljs-title function_">includes</span>(req.<span class="hljs-property">user</span>.<span class="hljs-property">role</span>)) {
+      <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">ApiError</span>(<span class="hljs-number">403</span>, <span class="hljs-string">&#x27;You do not ...&#x27;</span>));
+    }
+    <span class="hljs-title function_">next</span>();
+  };
+</code></pre>
+<p>(The message is shortened, and a blank line left out.)</p>
+<h2><code>...roles</code></h2>
+<p>The <code>...</code> in a parameter list gathers <strong>all</strong> the arguments into one
+array, however many there are. It's called a <strong>rest parameter</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Call</th>
+<th><code>roles</code> is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>hasRole('admin')</code></td>
+<td><code>['admin']</code></td>
+</tr>
+<tr>
+<td><code>hasRole('agent', 'admin')</code></td>
+<td><code>['agent', 'admin']</code></td>
+</tr>
+</tbody>
+</table>
+<p>Then <code>roles.includes(user.role)</code> asks: is the user's role in that
+array? It's the same check as <code>authorize()</code>, with <code>user</code> in place of
+<code>req.user</code>.</p>
+<h2><code>user !== null</code> first</h2>
+<p>When nobody is logged in, <code>user</code> is <code>null</code>, and <code>null.role</code> would crash.
+<code>&amp;&amp;</code> stops at the first <code>false</code>, so with no user, <code>hasRole()</code> returns
+<code>false</code> without ever reading <code>user.role</code>.</p>
+<table>
+<thead>
+<tr>
+<th>User</th>
+<th><code>hasRole('customer')</code></th>
+<th><code>hasRole('agent', 'admin')</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>nobody</td>
+<td><code>false</code></td>
+<td><code>false</code></td>
+</tr>
+<tr>
+<td>Casey (customer)</td>
+<td><code>true</code></td>
+<td><code>false</code></td>
+</tr>
+<tr>
+<td>Alex (agent)</td>
+<td><code>false</code></td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td>Ada (admin)</td>
+<td><code>false</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table>
+<h2>Why a function</h2>
+<p>Each component could write <code>user &amp;&amp; user.role === 'admin'</code> itself. But
+<code>hasRole('agent', 'admin')</code> reads like the back-end's route, can't
+forget the <code>null</code> check, and means the same thing everywhere it's used.</p>
+<h2>Try it</h2>
+<p>Predict, then check by reading the code:</p>
+<ol>
+<li>What does <code>hasRole()</code> return, called with <strong>no</strong> arguments, for Ada?</li>
+<li>What does <code>hasRole('Admin')</code> (capital A) return for Ada? Where does
+the API decide how role names are spelled?</li>
+<li>A component needs to know if the user is <strong>not</strong> a customer. How
+would you write that with <code>hasRole()</code>?</li>
+</ol>
+</div>
+    
+  </main>
+</body>
+</html>

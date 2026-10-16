@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What Changes, and What Doesn&#39;t — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/login-and-roles/what-stage-4-adds/who-sees-what.html">← Who Sees What</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/login-and-roles/what-stage-4-adds/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/login-and-roles/logging-in-and-keeping-the-token/three-requests-about-who-you-are.html">Three Requests About Who You Are →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>What Changes, and What Doesn&#39;t</h1>
+    <p class="lede">Stage 4 adds a context folder, two pages and a ProtectedRoute, and changes the pages that show buttons by role. None of the ticket, comment or tag API modules change.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Here's every file in <code>src/</code> that Stage 4 touches, leaving out the tests
+(topic 10):</p>
+<table>
+<thead>
+<tr>
+<th>Folder</th>
+<th>New</th>
+<th>Changed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>api/</code></td>
+<td><code>auth.api.js</code>, <code>tokenStorage.js</code></td>
+<td><code>client.js</code>: <code>getToken()</code> (topic 02), and one addition (topic 09)</td>
+</tr>
+<tr>
+<td><code>context/</code></td>
+<td><code>authContext.js</code>, <code>AuthProvider.jsx</code></td>
+<td><code>README.md</code></td>
+</tr>
+<tr>
+<td><code>pages/</code></td>
+<td><code>LoginPage</code>, <code>RegisterPage</code></td>
+<td><code>TicketListPage</code>, <code>TicketDetailPage</code>, <code>HomePage</code>: what shows depends on the user</td>
+</tr>
+<tr>
+<td><code>components/</code></td>
+<td><code>ProtectedRoute</code></td>
+<td><code>NavBar</code>: links by role, the user's name, Log out. <code>CommentList</code>: Delete only where allowed</td>
+</tr>
+<tr>
+<td><code>utils/</code></td>
+<td><code>describeAuthError.js</code></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td><code>main.jsx</code>: wraps the app in <code>AuthProvider</code>. <code>App.jsx</code>: two routes, and <code>ProtectedRoute</code> around the others. <code>index.css</code>: the user's name in the header</td>
+</tr>
+</tbody>
+</table>
+<p><code>NewTicketPage</code>, <code>EditTicketPage</code> and <code>TagsPage</code> change only in their top
+comments.</p>
+<p>The <code>context/</code> folder has been in the project since Stage 0, holding
+only a <code>README.md</code> that said this stage would fill it.</p>
+<h2>What doesn't change</h2>
+<ul>
+<li><strong><code>tickets.api.js</code>, <code>comments.api.js</code>, <code>tags.api.js</code>, <code>users.api.js</code>.</strong>
+Not one line. None of them has ever handled the token: <code>client.js</code>
+adds it to every request (Stage 2, topic 02). So when the token starts
+coming from a login instead of <code>.env</code>, only <code>client.js</code> needs to know.</li>
+<li><strong>The Stage 3 forms</strong>: <code>TicketForm</code>, <code>CommentForm</code> and <code>TagForm</code>.</li>
+</ul>
+<h2><code>VITE_DEV_TOKEN</code> is gone</h2>
+<p>Nothing reads <code>VITE_DEV_TOKEN</code> any more, and <code>.env.example</code> now lists
+only <code>VITE_API_URL</code>. <strong>Delete the <code>VITE_DEV_TOKEN</code> line from your own
+<code>.env</code>.</strong> A token you don't need is just one more secret lying around.</p>
+<h2>Try it</h2>
+<p>Once you've got the <code>stage-04</code> code, list every file in <code>src/</code> that
+changed since the end of Stage 3:</p>
+<pre><code class="hljs language-bash">git diff --<span class="hljs-built_in">stat</span> stage-03 stage-04 -- src
+</code></pre>
+<p>Then check the claim about the API modules:</p>
+<pre><code class="hljs language-bash">git diff stage-03 stage-04 -- src/api/tickets.api.js
+</code></pre>
+<p>Leaving out the tests, which of <code>src/api/</code>'s Stage 3 files is the only
+one in the list? Why does it make sense that it's that one?</p>
+</div>
+    
+  </main>
+</body>
+</html>

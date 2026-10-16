@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Asking GET /auth/me — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/login-and-roles/checking-the-session/a-token-but-no-user.html">← A Token, but No User</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/login-and-roles/checking-the-session/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/login-and-roles/checking-the-session/why-app-waits.html">Why App Waits →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Asking GET /auth/me</h1>
+    <p class="lede">An effect runs once when the app starts. With a saved token, it asks who the token belongs to, and either sets the user or clears the token.</p>
+
+    
+
+    
+      <div class="slide-body"><pre><code class="hljs language-js"><span class="hljs-comment">// Figure 4.15: checking the session (src/context/AuthProvider.jsx,</span>
+<span class="hljs-comment">// excerpt)</span>
+<span class="hljs-comment">// When the app first loads, ask the API who the saved token belongs to.</span>
+<span class="hljs-title function_">useEffect</span>(<span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-keyword">if</span> (<span class="hljs-title function_">getSavedToken</span>() === <span class="hljs-literal">null</span>) {
+    <span class="hljs-keyword">return</span>;
+  }
+
+  <span class="hljs-keyword">let</span> ignore = <span class="hljs-literal">false</span>;
+
+  <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">checkSession</span>(<span class="hljs-params"></span>) {
+    <span class="hljs-keyword">try</span> {
+      <span class="hljs-keyword">const</span> currentUser = <span class="hljs-keyword">await</span> authApi.<span class="hljs-title function_">getCurrentUser</span>();
+      <span class="hljs-keyword">if</span> (!ignore) {
+        <span class="hljs-title function_">setUser</span>(currentUser);
+      }
+    } <span class="hljs-keyword">catch</span> {
+      <span class="hljs-comment">// Usually a 401: the token has expired, or its user is gone. ...</span>
+      <span class="hljs-keyword">if</span> (!ignore) {
+        <span class="hljs-title function_">clearSavedToken</span>();
+      }
+    } <span class="hljs-keyword">finally</span> {
+      <span class="hljs-keyword">if</span> (!ignore) {
+        <span class="hljs-title function_">setIsCheckingSession</span>(<span class="hljs-literal">false</span>);
+      }
+    }
+  }
+
+  <span class="hljs-title function_">checkSession</span>();
+
+  <span class="hljs-keyword">return</span> <span class="hljs-function">() =&gt;</span> {
+    ignore = <span class="hljs-literal">true</span>;
+  };
+}, []); <span class="hljs-comment">// [] = only once, when the app starts</span>
+</code></pre>
+<p>(Indented one step further in the file. The comment in <code>catch</code> is
+longer there.)</p>
+<p>It's the same shape as every page that loads data since Stage 2: an
+effect, an <code>async</code> function inside it, <code>try</code>/<code>catch</code>/<code>finally</code>, and the
+<code>ignore</code> flag. The differences:</p>
+<ul>
+<li><strong><code>[]</code></strong>: it runs once, when the app starts, not when something
+changes.</li>
+<li><strong>No token, no request.</strong> It returns straight away.
+<code>isCheckingSession</code> already started as <code>false</code>.</li>
+<li><strong>The answer sets the user</strong>, instead of a list of tickets.</li>
+</ul>
+<h2>Every failure means &quot;logged out&quot;</h2>
+<p>Whatever goes wrong, the <code>catch</code> does the same thing: forget the token.
+Usually it's a <code>401</code>: the token has expired, or the user it names no
+longer exists. If the API isn't running at all, the user is logged out
+too. That keeps the code short, and costs little: they can log in again,
+and the login page will say if the API can't be reached.</p>
+<p><code>finally</code> runs either way, so the app always stops waiting.</p>
+<h2>The whole picture</h2>
+<p><img src="/support-desk-front-end/assets/images/checking-the-session.svg" alt="Diagram: when the app starts, after a reload, in a new tab, or after typing a URL, AuthProvider asks whether there's a saved token in localStorage. If not, there's nothing to check: isCheckingSession is false, and the routes show straight away, with nobody logged in. If there is, isCheckingSession is true, and App shows &quot;Checking your session…&quot;. GET /auth/me is sent with the saved token. If the answer is 200, the token is good: setUser(currentUser), and the user is logged in, on the same page. If the answer is 401, or no answer comes, the token is no good: clearSavedToken(), and the user is logged out. Either way, finally, setIsCheckingSession(false), and App shows the routes."></p>
+<h2>Try it</h2>
+<p>Log in, go to a ticket's page, then open the <strong>Application</strong> tab and
+find <code>supportDeskToken</code>. Double-click its value, change any one letter,
+and press Enter. Reload the page.</p>
+<p>What does the <code>me</code> request in the Network tab get back? Where do you
+end up, and what's left in Local storage?</p>
+</div>
+    
+  </main>
+</body>
+</html>

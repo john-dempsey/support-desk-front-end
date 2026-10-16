@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Who Sees What — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/login-and-roles/what-stage-4-adds/only-with-a-login.html">← Only If Your API Has a Login</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/login-and-roles/what-stage-4-adds/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/login-and-roles/what-stage-4-adds/what-changes-and-what-doesnt.html">What Changes, and What Doesn&#39;t →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Who Sees What</h1>
+    <p class="lede">Each page and control now depends on who is logged in. The front-end makes the same decisions as the back-end&#39;s authenticate and authorize, for the user&#39;s sake.</p>
+
+    
+
+    
+      <div class="slide-body"><p>In Stage 3, everyone saw everything. In Stage 4, what you see depends on
+<strong>who you are</strong>:</p>
+<p><img src="/support-desk-front-end/assets/images/who-sees-what.svg" alt="Diagram: a grid with four columns, logged out, customer (Casey, Priya), agent (Alex) and admin (Ada), and one row per page or control. Home: everyone. Log in and Register: someone logged out; anyone logged in is sent to /tickets. The ticket list and a ticket's page: someone logged out is sent to /login; a customer sees their own tickets, an agent sees theirs plus the unassigned ones, and an admin sees every ticket. New ticket: customers only; agents and admins see Not available. Edit or delete a ticket, and Tags: agents and admins only; customers see Not available, and someone logged out is sent to /login. Delete a comment: customers and agents on their own comments, admins on any comment. Green cells can use it, blue cells are sent to another page, and grey cells can't use it. &quot;Not available&quot; is a message on the page; the API makes the same decisions for itself, whatever the page shows."></p>
+<h2>Three kinds of decision</h2>
+<ol>
+<li><strong>Logged in or not.</strong> The blue <code>→ /login</code> column is the front-end's
+version of the back-end's <code>authenticate.js</code>: no token, no ticket
+pages.</li>
+<li><strong>Which role.</strong> The grey &quot;Not available&quot; cells are its version of
+<code>authorize(...)</code>. Figure 4.1 shows how one is written.</li>
+<li><strong>Which tickets.</strong> &quot;Their own&quot; and &quot;theirs + unassigned&quot; aren't
+decided by the front-end at all. The API only sends each user the
+tickets they may see (Lesson 4, &quot;Role-Scoped Queries&quot;). The list page
+shows whatever comes back, exactly as in Stage 3.</li>
+</ol>
+<h2>A page for customers only</h2>
+<p>Here's the route for the new ticket page:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 4.1: a page only customers can open (src/App.jsx, excerpt)</span>
+&lt;<span class="hljs-title class_">Route</span>
+  path=<span class="hljs-string">&quot;/tickets/new&quot;</span>
+  element={
+    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">ProtectedRoute</span> <span class="hljs-attr">allowedRoles</span>=<span class="hljs-string">{[</span>&#x27;<span class="hljs-attr">customer</span>&#x27;]}&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">NewTicketPage</span> /&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">ProtectedRoute</span>&gt;</span></span>
+  }
+/&gt;
+</code></pre>
+<p>and here's the back-end route it matches, in <code>ticket.routes.js</code>:</p>
+<pre><code class="hljs language-js">router.<span class="hljs-title function_">post</span>(
+  <span class="hljs-string">&#x27;/&#x27;</span>,
+  <span class="hljs-title function_">authorize</span>(<span class="hljs-string">&#x27;customer&#x27;</span>),
+  <span class="hljs-title function_">validate</span>({ <span class="hljs-attr">body</span>: createTicketSchema }),
+  ticketController.<span class="hljs-property">createTicket</span>,
+);
+</code></pre>
+<p>Same rule, same words: <code>customer</code>. Topic 07 shows how <code>ProtectedRoute</code>
+works.</p>
+<h2>The back-end still decides</h2>
+<p>The front-end's checks are there so nobody is shown a page or a button
+that can only fail. They don't protect anything: the API checks every
+request itself, as it always has. The note under the grid says so.</p>
+<h2>Try it</h2>
+<p>Log in to the app as Casey, then as Alex, then as Ada, using <strong>Log in</strong>
+in the navigation bar (and <strong>Log out</strong> in between). Every seeded user's
+password is <code>password123</code>. For each one, check two rows of the grid
+against what you see. Then, as Casey, type <code>/tags</code> into the address
+bar yourself.</p>
+<p>The API allows only <strong>10 logins every 15 minutes</strong>. If the login page
+says &quot;Too many attempts&quot;, wait a few minutes.</p>
+</div>
+    
+  </main>
+</body>
+</html>

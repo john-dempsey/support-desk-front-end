@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Try It Yourself — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/login-and-roles/making-it-yours/your-stage-4-checklist.html">← Your Stage 4 Checklist</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/login-and-roles/making-it-yours/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Try It Yourself</h1>
+    <p class="lede">Challenges that use everything in this lesson. Run the tests after each one, and commit when they pass.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Each of these builds on something from this lesson. After each one, run
+<code>npm test</code> and <code>npm run lint</code>, and commit when both pass.</p>
+<h2>Warm-up</h2>
+<ol>
+<li><strong>Welcome back.</strong> On the home page, show &quot;Welcome back, Casey&quot; to a
+logged-in user. Which value from <code>useAuth()</code> do you need? Add a test
+with <code>renderWithProviders(&lt;HomePage /&gt;, { user: customerUser })</code>, and
+one for a visitor.</li>
+<li><strong>Show the password.</strong> Add a <strong>Show password</strong> checkbox under the
+password field on the login page, which switches the input's <code>type</code>
+between <code>password</code> and <code>text</code>. Where does its state belong? Make
+sure it has a <code>&lt;label&gt;</code>. Test it.</li>
+</ol>
+<h2>Build something</h2>
+<ol start="3">
+<li><strong>Assign to me.</strong> On an unassigned ticket's page, show an agent an
+<strong>Assign to me</strong> button, which sends <code>PATCH</code> with
+<code>{ &quot;assignedAgentId&quot;: &lt;their id&gt; }</code> and updates the page from what
+<code>updateTicket()</code> returns. Where does the agent's id come from? Who
+should see the button, and who shouldn't? Test both.</li>
+<li><strong>Edit your own comment.</strong> The API lets a comment's author (or an
+admin) change it with <code>PATCH /tickets/:ticketId/comments/:id</code>. Add
+<code>updateComment()</code>, and an <strong>Edit</strong> button on each comment the user
+may edit. Is the rule the same as <code>canDelete</code>? Could one function
+serve both? Test it as Casey and as Ada.</li>
+<li><strong>Your session has expired.</strong> When the session-expired handler logs
+someone out, the login page just appears, with no explanation. Make
+it say &quot;Your session has expired. Please log in again.&quot; Where should
+the &quot;it expired&quot; fact be kept, so <code>LoginPage</code> can read it? When
+should it be cleared? Make sure a wrong password <strong>doesn't</strong> show it.</li>
+</ol>
+<h2>Investigate</h2>
+<ol start="6">
+<li>
+<p><strong>Two tabs.</strong> Log in as Casey, and open the ticket list in two tabs.</p>
+<ul>
+<li>In the second tab, log out. Back in the first, which still shows
+Casey's name, click a ticket. What do you see, and what did the
+ticket request get back? Why wasn't the session-expired handler
+called?</li>
+<li>Log in as Casey in both tabs again. In the second, log out and log
+in as Alex. In the first, still saying &quot;Casey&quot;, click a ticket.
+Whose token was sent?</li>
+</ul>
+<p>Both tabs share one <code>localStorage</code>, but each has its own <code>user</code>
+state. The browser fires a <code>storage</code> event in the other tabs when
+<code>localStorage</code> changes. How could <code>AuthProvider</code> use it?</p>
+</li>
+<li>
+<p><strong>The rate limit.</strong> On the login page, count your attempts until
+&quot;Too many attempts&quot; appears. Do successful logins count? Check
+<code>RateLimit-Remaining</code> after each. Then find, in the back-end, where
+the limit of 10 is set.</p>
+</li>
+<li>
+<p><strong>What a new account can do.</strong> Register a new account. Decode its
+token in the Console (topic 02). What's its role? Find the line in
+the back-end that decided it.</p>
+</li>
+</ol>
+<h2>Commit</h2>
+<pre><code class="hljs language-bash">git add .
+git commit -m <span class="hljs-string">&quot;Stage 4: welcome back, assign to me, ...&quot;</span>
+</code></pre>
+<p>When your own case study's users can log in and register, stay logged
+in across a reload, see only the pages and buttons their role can use,
+and are logged out when their token expires, with tests for each, your
+front-end has caught up with your back-end's authentication.</p>
+</div>
+    
+  </main>
+</body>
+</html>

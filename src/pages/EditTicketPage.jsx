@@ -3,8 +3,9 @@
 // PATCH /tickets/:id. This is where a ticket's status is changed and where
 // it's assigned to an agent.
 //
-// Only agents and admins can change a ticket. Ada's admin token can, so
-// every control is shown for now. Stage 4 hides this page from customers.
+// Only agents and admins can change a ticket, so App.jsx's ProtectedRoute
+// only lets them reach this page. A customer's GET /users would get a 403
+// anyway.
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { getTicket, updateTicket } from '../api/tickets.api.js';
