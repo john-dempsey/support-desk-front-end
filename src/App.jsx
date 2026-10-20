@@ -17,6 +17,7 @@ import TicketDetailPage from './pages/TicketDetailPage.jsx';
 import NewTicketPage from './pages/NewTicketPage.jsx';
 import EditTicketPage from './pages/EditTicketPage.jsx';
 import TagsPage from './pages/TagsPage.jsx';
+import NotificationsPage from './pages/NotificationsPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 
 function App() {
@@ -58,6 +59,15 @@ function App() {
             element={
               <ProtectedRoute>
                 <TicketDetailPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/notifications"
+            element={
+              <ProtectedRoute>
+                <NotificationsPage />
               </ProtectedRoute>
             }
           />

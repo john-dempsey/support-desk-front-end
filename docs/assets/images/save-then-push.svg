@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 380" width="820" height="380" role="img" aria-labelledby="title desc" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <title id="title">Save, then push</title>
+  <desc id="desc">Two timelines side by side. On the left, the API's order, save then push: 1, the database channel saves the notification row; 2, the realtime channel pushes it; 3, Alex's browser asks GET /notifications?unread=true; 4, the answer includes the new row, so the count is right. On the right, the other order, push then save, which the API doesn't use: 1, the push goes out first; 2, Alex's browser asks straight away; 3, the answer doesn't include the row, because it isn't saved yet; 4, the row is saved, too late, and the count is one short until the next push.</desc>
+  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#1a1a1a"/></marker></defs>
+  <rect width="820" height="380" fill="#ffffff"/>
+  <text x="20" y="30" font-size="15" font-weight="700" fill="#116329">✓ Save, then push (the API's order)</text>
+  <text x="430" y="30" font-size="15" font-weight="700" fill="#cf222e">✗ Push, then save (not used)</text>
+  <rect x="20" y="48" width="370" height="50" rx="6" fill="#fff8c5" stroke="#7d4e00" stroke-width="1.5"/>
+  <text x="32" y="69" font-size="13" font-weight="700" fill="#1a1a1a">1. the database channel saves the row</text>
+  <rect x="20" y="120" width="370" height="50" rx="6" fill="#fff8c5" stroke="#7d4e00" stroke-width="1.5"/>
+  <text x="32" y="141" font-size="13" font-weight="700" fill="#1a1a1a">2. the realtime channel pushes it</text>
+  <rect x="20" y="192" width="370" height="50" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+  <text x="32" y="213" font-size="13" font-weight="700" fill="#1a1a1a">3. Alex's browser asks</text>
+  <text x="32" y="232" font-size="12" fill="#1a1a1a"><tspan font-family="ui-monospace, Consolas, monospace">GET /notifications?unread=true</tspan></text>
+  <rect x="20" y="264" width="370" height="50" rx="6" fill="#f6f8fa" stroke="#59636e" stroke-width="1.5"/>
+  <text x="32" y="285" font-size="13" font-weight="700" fill="#1a1a1a">4. the answer includes the new row</text>
+  <path d="M 60 98 V 116" fill="none" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <path d="M 60 170 V 188" fill="none" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <path d="M 60 242 V 260" fill="none" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="430" y="48" width="370" height="50" rx="6" fill="#fff8c5" stroke="#7d4e00" stroke-width="1.5"/>
+  <text x="442" y="69" font-size="13" font-weight="700" fill="#1a1a1a">1. the push goes out first</text>
+  <rect x="430" y="120" width="370" height="50" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+  <text x="442" y="141" font-size="13" font-weight="700" fill="#1a1a1a">2. Alex's browser asks straight away</text>
+  <text x="442" y="160" font-size="12" fill="#1a1a1a"><tspan font-family="ui-monospace, Consolas, monospace">GET /notifications?unread=true</tspan></text>
+  <rect x="430" y="192" width="370" height="50" rx="6" fill="#f6f8fa" stroke="#59636e" stroke-width="1.5"/>
+  <text x="442" y="213" font-size="13" font-weight="700" fill="#1a1a1a">3. the answer doesn't include the row</text>
+  <text x="442" y="232" font-size="12" fill="#1a1a1a">it isn't saved yet</text>
+  <rect x="430" y="264" width="370" height="50" rx="6" fill="#fff8c5" stroke="#7d4e00" stroke-width="1.5"/>
+  <text x="442" y="285" font-size="13" font-weight="700" fill="#1a1a1a">4. the row is saved: too late</text>
+  <path d="M 470 98 V 116" fill="none" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <path d="M 470 170 V 188" fill="none" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <path d="M 470 242 V 260" fill="none" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="20" y="346" font-size="14" font-weight="700" fill="#116329">The count is right.</text>
+  <text x="430" y="346" font-size="14" font-weight="700" fill="#cf222e">The count is one short, until the next push.</text>
+</svg>

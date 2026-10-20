@@ -11,8 +11,11 @@ import { getTickets } from '../api/tickets.api.js';
 import { renderWithProviders } from '../test/renderWithProviders.jsx';
 import { testTickets } from '../test/testTickets.js';
 import { customerUser } from '../test/testUsers.js';
+import { commentPush } from '../test/testNotifications.js';
+import { captureNotificationHandler } from '../test/fakeSocket.js';
 
 vi.mock('../api/tickets.api.js');
+vi.mock('../realtime/socket.js');
 
 // What getTickets() returns: the tickets, plus the API's `meta`.
 function ticketsResult(tickets, page = 1, totalPages = 1) {
@@ -106,5 +109,44 @@ describe('TicketListPage', () => {
     renderWithProviders(<TicketListPage />, { route: '/tickets' });
 
     expect(screen.queryByRole('link', { name: 'New ticket' })).not.toBeInTheDocument();
+  });
+
+  describe('when a notification arrives', () => {
+    it('says the tickets have changed', async () => {
+      getTickets.mockResolvedValue(ticketsResult(testTickets));
+      const socket = captureNotificationHandler();
+      renderWithProviders(<TicketListPage />, { route: '/tickets' });
+      await screen.findByRole('link', { name: 'Cannot log in' });
+
+      await socket.push(commentPush);
+
+      expect(screen.getByRole('status')).toHaveTextContent('The tickets have changed.');
+    });
+
+    it('says nothing when the ticket has been deleted', async () => {
+      getTickets.mockResolvedValue(ticketsResult(testTickets));
+      const socket = captureNotificationHandler();
+      renderWithProviders(<TicketListPage />, { route: '/tickets' });
+      await screen.findByRole('link', { name: 'Cannot log in' });
+
+      await socket.push({ ...commentPush, ticketId: null });
+
+      expect(screen.queryByText('The tickets have changed.')).not.toBeInTheDocument();
+    });
+
+    it('asks the API again, with the same query, when Reload is clicked', async () => {
+      getTickets.mockResolvedValue(ticketsResult(testTickets));
+      const socket = captureNotificationHandler();
+      renderWithProviders(<TicketListPage />, { route: '/tickets?status=open' });
+      await screen.findByRole('link', { name: 'Cannot log in' });
+      await socket.push(commentPush);
+
+      await userEvent.click(screen.getByRole('button', { name: 'Reload' }));
+
+      expect(getTickets).toHaveBeenCalledTimes(2);
+      expect(getTickets).toHaveBeenLastCalledWith('status=open');
+      expect(await screen.findByRole('link', { name: 'Cannot log in' })).toBeInTheDocument();
+      expect(screen.queryByText('The tickets have changed.')).not.toBeInTheDocument();
+    });
   });
 });

@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Five Requests to Open a Socket — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/notifications/telling-a-page-it-changed/the-list-and-who-sees-the-notice.html">← The List, and Who Sees the Notice</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/notifications/the-socket-in-devtools/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/notifications/the-socket-in-devtools/messages-on-the-websocket.html">Messages on the WebSocket →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Five Requests to Open a Socket</h1>
+    <p class="lede">Socket.IO starts with ordinary HTTP requests, then switches to a WebSocket. In Chrome, the token goes in one of the HTTP requests, before the switch.</p>
+
+    
+
+    
+      <div class="slide-body"><p>&quot;The socket&quot; sounds like one connection. In the <strong>Network</strong> tab it's
+several requests. Open the developer tools, choose the <strong>Network</strong> tab
+with <strong>All</strong> selected, type <code>socket.io</code> in the filter box, and log in
+as Alex. Five rows appear:</p>
+<table>
+<thead>
+<tr>
+<th>Row</th>
+<th>Type</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1, 2, 4, 5</td>
+<td><code>xhr</code></td>
+<td>ordinary HTTP requests to <code>/socket.io/?EIO=4&amp;transport=polling…</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>websocket</code></td>
+<td>the WebSocket, to <code>/socket.io/?EIO=4&amp;transport=websocket…</code></td>
+</tr>
+</tbody>
+</table>
+<h2>HTTP first, then a WebSocket</h2>
+<p>Socket.IO doesn't open a WebSocket straight away. It starts with
+ordinary HTTP requests, which work on any network, and uses them to
+agree a session with the server. Then it opens a WebSocket (row 3),
+checks that it works, and moves over to it. If a WebSocket can't be
+opened, say a firewall blocks it, Socket.IO carries on over HTTP, and
+your code doesn't notice. That fallback, and reconnecting by itself,
+are why the back-end chose Socket.IO over a bare WebSocket (Lesson 5,
+&quot;Socket.IO: a WebSocket Library&quot;).</p>
+<p>The <strong>Socket</strong> filter (next to <strong>Media</strong> and <strong>Manifest</strong>) shows only
+WebSockets: row 3, and one more for each later connection. It also
+shows a row named <code>?token=…</code>. That one isn't the app's: it's Vite's own
+WebSocket, which <code>npm run dev</code> uses to update the page when you save a
+file, and its &quot;token&quot; is Vite's, not your login token.</p>
+<h2>Where the token went</h2>
+<p><code>socket.js</code> sends <code>authenticate</code> as soon as the <code>connect</code> event fires.
+In Chrome, <code>connect</code> fires before the move to the WebSocket has
+finished, so the token goes in an HTTP request: row 5, a <code>POST</code>. Click
+it and open <strong>Payload</strong>:</p>
+<pre><code class="hljs">42[&quot;authenticate&quot;,&quot;eyJhbGciOiJIUzI1NiIs…&quot;]
+</code></pre>
+<p>That's Socket.IO's own format, with the token cut short here:</p>
+<ul>
+<li><code>4</code>: a message (rather than, say, a ping)</li>
+<li><code>2</code>: an event, followed by its name and data as a JSON array</li>
+</ul>
+<p>So <code>socket.emit('authenticate', token)</code> becomes
+<code>42[&quot;authenticate&quot;, token]</code>. The server reads it back as the
+<code>authenticate</code> event, whichever way it arrived.</p>
+<h2>Try it</h2>
+<p>Log in as Alex with the Network tab open as above.</p>
+<ol>
+<li>Click row 1 and open its <strong>Response</strong>. Can you find a <code>sid</code> (session
+ID)? Do rows 2, 4 and 5 send it back in their URLs?</li>
+<li>Find the <code>authenticate</code> message in row 5's <strong>Payload</strong>. Compare the
+token in it with the one in <strong>Application</strong> → <strong>Local storage</strong>.
+Which line of <code>socket.js</code> put it there?</li>
+</ol>
+</div>
+    
+  </main>
+</body>
+</html>

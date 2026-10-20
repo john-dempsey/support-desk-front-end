@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Server Side, Briefly — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/notifications/the-unread-count-shared/the-count-on-every-page.html">← The Count on Every Page</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/notifications/connecting-a-socket/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/notifications/connecting-a-socket/one-shared-socket.html">One Shared Socket →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>The Server Side, Briefly</h1>
+    <p class="lede">You built the other end in the back-end: a socket says who it is by sending its token, joins its user&#39;s room, and receives notification.created.</p>
+
+    
+
+    
+      <div class="slide-body"><p>You wrote the server's half of this in the back-end, so here's just
+what the browser has to do to fit it. This is the API's
+<code>config/socket.js</code> since Lesson 8, &quot;The New Socket Contract&quot;:</p>
+<pre><code class="hljs language-js">io.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;connection&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">socket</span>) =&gt;</span> {
+  socket.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;authenticate&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">token</span>) =&gt;</span> {
+    <span class="hljs-keyword">try</span> {
+      <span class="hljs-keyword">const</span> { sub } = <span class="hljs-title function_">verifyToken</span>(token);
+      socket.<span class="hljs-title function_">join</span>(<span class="hljs-string">`user:<span class="hljs-subst">${sub}</span>`</span>);
+    } <span class="hljs-keyword">catch</span> {
+      socket.<span class="hljs-title function_">disconnect</span>();
+    }
+  });
+});
+</code></pre>
+<h2>The contract</h2>
+<table>
+<thead>
+<tr>
+<th>The server…</th>
+<th>So the browser must…</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>doesn't know who a new connection belongs to</td>
+<td>send <code>authenticate</code> with its token, after connecting</td>
+</tr>
+<tr>
+<td>puts a verified socket in one room, <code>user:&lt;id&gt;</code></td>
+<td>(nothing: it only ever hears about its own user)</td>
+</tr>
+<tr>
+<td>disconnects a socket with a bad token</td>
+<td>log in again; the next connection sends a good one</td>
+</tr>
+<tr>
+<td>pushes one event, <code>notification.created</code>, with the saved notification</td>
+<td>listen for that event name</td>
+</tr>
+</tbody>
+</table>
+<p>There's no <code>Authorization</code> header on a socket (Lesson 5,
+&quot;Authenticating a Socket with the Existing JWT&quot;), so the token goes in
+a message instead. It's the same token <code>client.js</code> sends with every
+HTTP request, from the same place: <code>getSavedToken()</code>.</p>
+<h2>Rooms belong to a connection</h2>
+<p><code>socket.join()</code> puts <strong>this connection</strong> in a room. If the connection
+drops and a new one is made, the server sees a brand-new socket, in no
+rooms at all. That one fact shapes the next two slides.</p>
+<h2>The browser's half</h2>
+<p>The front-end's side lives in one new file, <code>src/realtime/socket.js</code>,
+with three functions:</p>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>connectSocket()</code></td>
+<td>connects, and sends <code>authenticate</code> with the saved token on every connect</td>
+</tr>
+<tr>
+<td><code>disconnectSocket()</code></td>
+<td>disconnects, on logout</td>
+</tr>
+<tr>
+<td><code>onNotification(handler)</code></td>
+<td>calls <code>handler</code> with each push; returns a function that stops it</td>
+</tr>
+</tbody>
+</table>
+<p>Nothing else in the app imports <code>socket.io-client</code>, the same way
+nothing but <code>client.js</code> calls <code>fetch()</code>.</p>
+<h2>Try it</h2>
+<p>In the back-end, open <code>src/notifications/channels/realtime.channel.js</code>.
+Find the line that pushes. What is the event called, and which room is
+it sent to? Where does that room's user ID come from?</p>
+</div>
+    
+  </main>
+</body>
+</html>

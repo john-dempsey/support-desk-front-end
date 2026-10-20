@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Connecting a Socket — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/notifications/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Connecting a Socket</h1>
+    <p class="lede">One shared Socket.IO connection, opened when someone logs in: it tells the server whose it is on every connect, lets components listen for pushes, and closes on logout.</p>
+
+    
+      <ul class="listing">
+        
+          <li>
+            <a href="/support-desk-front-end/notifications/connecting-a-socket/the-server-side-briefly.html">The Server Side, Briefly</a>
+            <p>You built the other end in the back-end: a socket says who it is by sending its token, joins its user&#39;s room, and receives notification.created.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/notifications/connecting-a-socket/one-shared-socket.html">One Shared Socket</a>
+            <p>socket.js creates the socket once, when it&#39;s first imported, and every part of the app shares it. autoConnect: false waits until someone has logged in.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/notifications/connecting-a-socket/telling-the-server-who-you-are.html">Telling the Server Who You Are, Every Time</a>
+            <p>sendToken() is a connect handler, so it runs on the first connection and on every automatic reconnection, when the server has forgotten the socket&#39;s room.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/notifications/connecting-a-socket/listening-and-stopping.html">Listening, and Stopping</a>
+            <p>onNotification() adds a handler for notification.created, and gives back the function that removes it: exactly what an effect&#39;s cleanup needs.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/notifications/connecting-a-socket/opening-the-socket-at-login.html">Opening the Socket at Login</a>
+            <p>The provider&#39;s effect gains four lines: connect when a user logs in, re-fetch the count on each push, and stop listening and disconnect in the cleanup.</p>
+          </li>
+        
+      </ul>
+    
+
+    
+  </main>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Real Providers in App.test — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/notifications/testing-stage-5/testing-the-notice.html">← Testing the Notice</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/notifications/testing-stage-5/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/notifications/testing-stage-5/running-everything.html">Running Everything →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>The Real Providers in App.test</h1>
+    <p class="lede">App.test.jsx&#39;s whole-visit test now runs the real NotificationsProvider too, so socket.js and the notifications API are faked, and onNotification has to return something.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Stage 4's last <code>App.test.jsx</code> test follows a whole visit through the
+real <code>AuthProvider</code> (Stage 4, topic 10). <code>NavBar</code> now needs
+<code>useNotifications()</code>, so that test needs the real
+<code>NotificationsProvider</code> as well:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 5.28: two real providers, and nothing that connects</span>
+<span class="hljs-comment">// (src/App.test.jsx, excerpts)</span>
+vi.<span class="hljs-title function_">mock</span>(<span class="hljs-string">&#x27;./api/notifications.api.js&#x27;</span>);
+<span class="hljs-comment">// The real providers below would open a socket to the API, so it&#x27;s faked.</span>
+vi.<span class="hljs-title function_">mock</span>(<span class="hljs-string">&#x27;./realtime/socket.js&#x27;</span>);
+
+<span class="hljs-comment">// ... in the whole-visit test:</span>
+getUnreadNotifications.<span class="hljs-title function_">mockResolvedValue</span>([]);
+<span class="hljs-comment">// onNotification() returns a &quot;stop listening&quot; function.</span>
+onNotification.<span class="hljs-title function_">mockReturnValue</span>(vi.<span class="hljs-title function_">fn</span>());
+<span class="hljs-title function_">render</span>(
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">MemoryRouter</span> <span class="hljs-attr">initialEntries</span>=<span class="hljs-string">{[</span>&#x27;/<span class="hljs-attr">login</span>&#x27;]}&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">AuthProvider</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">NotificationsProvider</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">App</span> /&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">NotificationsProvider</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">AuthProvider</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">MemoryRouter</span>&gt;</span></span>,
+);
+</code></pre>
+<p>The provider order is <code>main.jsx</code>'s (topic 03): <code>NotificationsProvider</code>
+inside <code>AuthProvider</code>.</p>
+<h2>Real providers, fake edges</h2>
+<p>Everything React does here is real: logging in sets the user, the
+provider's effect runs, the count loads, logging out runs the cleanup.
+Only the <strong>edges</strong> are faked, where the app would reach outside itself:
+the API modules and the socket. That's the same line every test in
+this app draws.</p>
+<h2>Why <code>mockReturnValue(vi.fn())</code>?</h2>
+<p>A faked <code>onNotification</code> returns <code>undefined</code>. Most tests don't mind.
+But this test logs out, and logging out runs the provider's cleanup,
+which calls <code>stopListening()</code>. Calling <code>undefined</code> throws. So the test
+gives <code>onNotification</code> a function to return.</p>
+<p>The other <code>App.test.jsx</code> tests use <code>renderWithProviders</code>, which has a
+fake notifications value, <code>unreadCount</code> 0 unless a test says otherwise.
+<code>NavBar.test.jsx</code> uses that option to check the link says &quot;(3 unread)&quot;.</p>
+<h2>Try it</h2>
+<p>In <code>App.test.jsx</code>, comment out the <code>onNotification.mockReturnValue(...)</code>
+line in the whole-visit test, and run <code>npm test</code>. What's the error, and
+at which line of <code>NotificationsProvider.jsx</code>? Then explain why the
+other eleven <code>App.test.jsx</code> tests don't need that line. Put it back.</p>
+</div>
+    
+  </main>
+</body>
+</html>

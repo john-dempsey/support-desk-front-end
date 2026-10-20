@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A Second Context — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/notifications/loading-and-marking-read/marking-one-as-read.html">← Marking One as Read</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/notifications/the-unread-count-shared/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/notifications/the-unread-count-shared/the-count-comes-from-the-api.html">The Count Comes From the API →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>A Second Context</h1>
+    <p class="lede">The unread count is shown in the navigation bar, but changed by the notifications page. Like the logged-in user, it&#39;s shared through a context, in the same two files.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The navigation bar shows &quot;Notifications (3 unread)&quot; on every page. Who
+needs that number?</p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Needs</th>
+<th>For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>NavBar</code></td>
+<td><code>unreadCount</code></td>
+<td>the &quot;(3 unread)&quot; next to the link</td>
+</tr>
+<tr>
+<td><code>NotificationsPage</code></td>
+<td><code>refreshUnreadCount()</code></td>
+<td>after <strong>Mark as read</strong>, one fewer is unread</td>
+</tr>
+</tbody>
+</table>
+<p>Two components, a long way apart: <code>NavBar</code> is rendered by <code>App</code> above
+<code>&lt;Routes&gt;</code>, and <code>NotificationsPage</code> is several levels down, inside a
+route. One <strong>shows</strong> the number and the other <strong>changes</strong> it.</p>
+<h2>The same answer as the user</h2>
+<p>That's the problem Stage 4 met with the logged-in user (topic 03, &quot;Who
+Needs the User?&quot;). Holding the count in <code>App</code> and passing it down as
+props would mean prop drilling again. So the count gets its own
+context, in the same two files:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 5.7: the count&#x27;s context and its hook</span>
+<span class="hljs-comment">// (src/context/notificationsContext.js, excerpt)</span>
+<span class="hljs-keyword">import</span> { createContext, useContext } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;react&#x27;</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> <span class="hljs-title class_">NotificationsContext</span> = <span class="hljs-title function_">createContext</span>(<span class="hljs-literal">null</span>);
+
+<span class="hljs-comment">// The one way components get the value:</span>
+<span class="hljs-comment">//   const { unreadCount, refreshUnreadCount } = useNotifications();</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">useNotifications</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">useContext</span>(<span class="hljs-title class_">NotificationsContext</span>);
+}
+</code></pre>
+<p>Line for line, it's <code>authContext.js</code> with different names. The second
+file, <code>NotificationsProvider.jsx</code>, holds the count and fills the
+context, as <code>AuthProvider</code> does for the user.</p>
+<h2>Why not put it in AuthProvider?</h2>
+<p><code>AuthProvider</code> already shares a value with the whole app, so the count
+could have been one more thing in it. But it's a different job: who is
+logged in, versus what they haven't read yet. One job per file, as in
+the back-end. It also keeps Stage 4 complete without notifications: a
+student whose API has none simply doesn't add the second provider.</p>
+<h2>Shared state is still rare</h2>
+<p>The app now has two contexts, and that's all it needs. The ticket
+list, the ticket, its comments and the tags are each used by one page,
+so they stay in that page's <code>useState</code>. A context is for what many
+components across the app need at once.</p>
+<h2>Try it</h2>
+<p>Compare the two context files line by line:</p>
+<pre><code class="hljs language-bash">diff src/context/authContext.js src/context/notificationsContext.js
+</code></pre>
+<p>Apart from the top comment, which lines differ? Then answer: if a
+third kind of app-wide data came along, what would its two files be
+called, and what would its hook be called?</p>
+</div>
+    
+  </main>
+</body>
+</html>

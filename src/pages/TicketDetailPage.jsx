@@ -10,16 +10,21 @@
 // Delete for agents and admins, and a comment's Delete for its author or
 // an admin. That's for the user's sake: the API still checks every
 // request, whatever the page shows.
+//
+// Since Stage 5 it listens for notifications about this ticket (a new
+// comment, a status change, ...) and offers to reload when one arrives.
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { deleteTicket, getTicket } from '../api/tickets.api.js';
 import { createComment, deleteComment, getComments } from '../api/comments.api.js';
 import { useAuth } from '../context/authContext.js';
+import { onNotification } from '../realtime/socket.js';
 import StatusBadge from '../components/StatusBadge.jsx';
 import CommentList from '../components/CommentList.jsx';
 import CommentForm from '../components/CommentForm.jsx';
 import Loading from '../components/Loading.jsx';
 import ErrorMessage from '../components/ErrorMessage.jsx';
+import RefreshNotice from '../components/RefreshNotice.jsx';
 import { formatDate } from '../utils/formatDate.js';
 
 function TicketDetailPage() {
@@ -35,6 +40,11 @@ function TicketDetailPage() {
   // error is the whole error object, because CommentForm needs its details.
   const [deleteErrorMessage, setDeleteErrorMessage] = useState('');
   const [commentError, setCommentError] = useState(null);
+  // True once a notification says this ticket has changed.
+  const [hasChanged, setHasChanged] = useState(false);
+  // How many times Reload has been clicked. Its only job is to be in the
+  // fetch effect's dependency list: adding 1 makes the effect run again.
+  const [reloadCount, setReloadCount] = useState(0);
 
   useEffect(() => {
     // The same `ignore` flag as TicketListPage, for the same reason: a
@@ -88,11 +98,39 @@ function TicketDetailPage() {
       setIsLoading(true);
       setDeleteErrorMessage('');
       setCommentError(null);
+      setHasChanged(false);
     };
     // ticketId is listed because the effect uses it: if the URL changes to
     // a different ticket while this page is showing, the effect runs again
-    // and loads that ticket instead.
+    // and loads that ticket instead. reloadCount is listed so that Reload
+    // can run it again too.
+  }, [ticketId, reloadCount]);
+
+  // Listen for notifications about this ticket while the page is open.
+  // Only users the API tells about a change hear about it: e.g. the
+  // assigned agent when the customer comments, or the customer when the
+  // status changes. Anyone else (an admin, say) sees no notice.
+  useEffect(() => {
+    function handleNotification(notification) {
+      // ticketId in the URL is a string ("2"); the notification's is a
+      // number (2).
+      const isAboutThisTicket = notification.ticketId === Number(ticketId);
+      // A customer who has just created a ticket lands on its page, and
+      // their own "Your ticket was created" arrives there. The ticket
+      // hasn't changed since it loaded, so that one is ignored.
+      const isNewTicket = notification.type === 'ticket.created';
+      if (isAboutThisTicket && !isNewTicket) {
+        setHasChanged(true);
+      }
+    }
+
+    const stopListening = onNotification(handleNotification);
+    return stopListening;
   }, [ticketId]);
+
+  function handleReload() {
+    setReloadCount(reloadCount + 1);
+  }
 
   async function handleDeleteTicket() {
     // window.confirm() shows the browser's own OK/Cancel box, and returns
@@ -190,6 +228,9 @@ function TicketDetailPage() {
       <p>
         <Link to="/tickets">Back to all tickets</Link>
       </p>
+      {hasChanged && (
+        <RefreshNotice message="This ticket has changed." onReload={handleReload} />
+      )}
       <h1>{ticket.subject}</h1>
       <p>
         <StatusBadge status={ticket.status} />

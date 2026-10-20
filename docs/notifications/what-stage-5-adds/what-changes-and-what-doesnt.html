@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What Changes, and What Doesn&#39;t — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/notifications/what-stage-5-adds/two-channels.html">← Two Channels</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/notifications/what-stage-5-adds/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/notifications/loading-and-marking-read/three-requests-about-notifications.html">Three Requests About Notifications →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>What Changes, and What Doesn&#39;t</h1>
+    <p class="lede">Stage 5 adds a notifications page, a second context, a realtime folder and a notice component. client.js and the other API modules don&#39;t change.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Here's every file in <code>src/</code> that Stage 5 touches, leaving out the tests
+(topic 08):</p>
+<table>
+<thead>
+<tr>
+<th>Folder</th>
+<th>New</th>
+<th>Changed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>api/</code></td>
+<td><code>notifications.api.js</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>context/</code></td>
+<td><code>notificationsContext.js</code>, <code>NotificationsProvider.jsx</code></td>
+<td><code>README.md</code></td>
+</tr>
+<tr>
+<td><code>realtime/</code></td>
+<td><code>socket.js</code> (a new folder)</td>
+<td></td>
+</tr>
+<tr>
+<td><code>pages/</code></td>
+<td><code>NotificationsPage</code></td>
+<td><code>TicketListPage</code>, <code>TicketDetailPage</code>: the &quot;this has changed&quot; notice</td>
+</tr>
+<tr>
+<td><code>components/</code></td>
+<td><code>NotificationList</code>, <code>RefreshNotice</code></td>
+<td><code>NavBar</code>: the Notifications link and unread count</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td><code>main.jsx</code>: wraps the app in <code>NotificationsProvider</code>. <code>App.jsx</code>: one route. <code>index.css</code>: notification styles</td>
+</tr>
+</tbody>
+</table>
+<p><code>package.json</code> gains one library, <code>socket.io-client</code>: the client half of
+Socket.IO. You've met it already: Lesson 5 named it as the package this
+front-end would use, and Lesson 8's <code>watch-notifications.js</code> script used
+it to print Alex's pushes.</p>
+<h2>One new route</h2>
+<p>The notifications page is for anyone logged in, whatever their role:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 5.1: the notifications page&#x27;s route (src/App.jsx, excerpt)</span>
+&lt;<span class="hljs-title class_">Route</span>
+  path=<span class="hljs-string">&quot;/notifications&quot;</span>
+  element={
+    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">ProtectedRoute</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">NotificationsPage</span> /&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">ProtectedRoute</span>&gt;</span></span>
+  }
+/&gt;
+</code></pre>
+<p>There's no <code>allowedRoles</code>, like the ticket list's route. The API's
+<code>GET /notifications</code> has no <code>authorize(...)</code> either: every user may
+read their own.</p>
+<h2>What doesn't change</h2>
+<ul>
+<li><strong><code>client.js</code>.</strong> Not one line. <code>notifications.api.js</code> calls
+<code>apiRequest()</code> like every other API file, and gets the token, the
+JSON and the error shape for free.</li>
+<li><strong><code>tickets.api.js</code>, <code>comments.api.js</code>, <code>tags.api.js</code>, <code>users.api.js</code>,
+<code>auth.api.js</code>.</strong></li>
+<li><strong><code>AuthProvider</code>.</strong> The new provider reads the user with <code>useAuth()</code>,
+like any other component.</li>
+</ul>
+<h2>Try it</h2>
+<p>Once you've got the <code>stage-05</code> code, list every file in <code>src/</code> that
+changed since the end of Stage 4:</p>
+<pre><code class="hljs language-bash">git diff --<span class="hljs-built_in">stat</span> stage-04 stage-05 -- src
+</code></pre>
+<p>Then check the claim about <code>client.js</code>:</p>
+<pre><code class="hljs language-bash">git diff stage-04 stage-05 -- src/api/client.js
+</code></pre>
+<p>Why does it make sense that a whole new kind of data needs no change
+to <code>client.js</code>?</p>
+</div>
+    
+  </main>
+</body>
+</html>

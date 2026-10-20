@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Your Stage 5 Checklist — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/notifications/making-it-yours/tracing-a-push.html">← Tracing a Push</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/notifications/making-it-yours/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/notifications/making-it-yours/try-it-yourself.html">Try It Yourself →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Your Stage 5 Checklist</h1>
+    <p class="lede">The same steps for your own case study: history over REST first, then a socket, the count, live updates and a notice on the pages that show the records.</p>
+
+    
+
+    
+      <div class="slide-body"><p><strong>Only if your API has notifications</strong> (and a login). If it doesn't,
+your app is complete at Stage 4, or at Stage 3 (topic 01).</p>
+<p>Here's how to add Stage 5 to your own front-end, in the order this
+lesson did it: everything that works over REST first, then the socket
+on top. The examples use a booking system; swap in your own names. Run
+<code>npm test</code> and try the app in the browser after <strong>every</strong> step, and
+commit when both work.</p>
+<h2>0. Check your API</h2>
+<p>In your REST client, and in your back-end's code, find out:</p>
+<ul>
+<li>the route for <strong>a user's own notifications</strong>, and what each one
+looks like. Is there a &quot;read&quot; field like <code>readAt</code>? A link to the
+record it's about, like <code>ticketId</code>?</li>
+<li>the route to <strong>mark one as read</strong>, if there is one.</li>
+<li>whether you can ask for <strong>unread only</strong>. If not, count them in the
+browser: <code>notifications.filter((n) =&gt; n.readAt === null).length</code>.</li>
+<li>what your socket expects: the name of its &quot;who are you&quot; event
+(<code>authenticate</code> here), and the <strong>name of the event</strong> it pushes.</li>
+<li>what a push <strong>carries</strong>. If it's the saved notification, as in
+Lesson 8, you can add it to the list. If it's something else (say,
+the record that changed, as Lesson 5's pushes were), use the push
+only as a nudge, and load the list again.</li>
+</ul>
+<h2>1. History over REST</h2>
+<p><code>notifications.api.js</code> with your routes (Figure 5.2). A
+<code>NotificationsPage</code> at <code>/notifications</code>, behind <code>ProtectedRoute</code>, and a
+<code>NotificationList</code> (Figures 5.1, 5.3 to 5.5). Mark as read with <code>map()</code>
+(Figure 5.6).</p>
+<h2>2. The count</h2>
+<p><code>notificationsContext.js</code> (Figure 5.7) and <code>NotificationsProvider.jsx</code>
+with the REST-only effect (Figures 5.8 and 5.9), inside <code>AuthProvider</code>
+in <code>main.jsx</code> (Figure 5.11). The count in <code>NavBar</code>, in words, in an
+<code>aria-live</code> region (Figure 5.10). <strong>Stop here and check:</strong> this much
+works with no socket at all.</p>
+<h2>3. The socket</h2>
+<p><code>npm install socket.io-client</code>. <code>realtime/socket.js</code> (Figures 5.12 to
+5.14), with your event names. Then the socket lines in the provider's
+effect (Figure 5.15).</p>
+<h2>4. Live updates</h2>
+<p>The push handler on <code>NotificationsPage</code>, with the function form
+(Figure 5.16), and the function form in <code>handleMarkRead</code> (Figure 5.17).</p>
+<h2>5. A notice where the records are shown</h2>
+<p><code>RefreshNotice</code> (Figure 5.18). On your detail page, a listener that
+checks the notification is about <strong>this</strong> record (Figure 5.19), and a
+<code>reloadCount</code> for Reload (Figure 5.20). On your list page, any record
+(Figure 5.21). Decide which types to ignore: is there one the user
+causes themselves, like <code>ticket.created</code>?</p>
+<h2>6. Tests</h2>
+<ul>
+<li><code>notifications.api.test.js</code> and <code>RefreshNotice.test.jsx</code>, as in
+earlier stages.</li>
+<li><code>socket.test.js</code> with the fake socket (Figures 5.22 and 5.23).</li>
+<li><code>NotificationsProvider.test.jsx</code>, logging out with <code>rerender</code>
+(Figure 5.24).</li>
+<li><code>fakeSocket.js</code> (Figure 5.25), then push tests for the page, with two
+pushes in a row (Figure 5.26), and for each notice (Figure 5.27).</li>
+<li><code>App.test.jsx</code>: fake <code>socket.js</code>, and give <code>onNotification</code> a return
+value (Figure 5.28).</li>
+</ul>
+</div>
+    
+  </main>
+</body>
+</html>

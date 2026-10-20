@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Count Again, After the Save — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/notifications/when-a-notification-arrives/from-caseys-click-to-alexs-count.html">← From Casey&#39;s Click to Alex&#39;s Count</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/notifications/when-a-notification-arrives/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/notifications/when-a-notification-arrives/the-page-listens-too.html">The Page Listens Too →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Count Again, After the Save</h1>
+    <p class="lede">Re-fetching the count picks up everything that changed, not just the push. It only works because the API saves the notification before it pushes it.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The provider's handler (Figure 5.15) is one line, <code>loadUnreadCount()</code>.
+Adding 1 to the count would have been one line too. Why ask the API?</p>
+<h2>Counting again catches more than the push</h2>
+<p>Asking the API gets the whole truth, every time:</p>
+<ul>
+<li><strong>Notifications that were never pushed.</strong> An SLA breach is saved by
+the worker, which has no socket (topic 01). Adding 1 per push would
+never count it. Counting again picks it up at the next push.</li>
+<li><strong>Changes made somewhere else.</strong> If Alex marks a notification read in
+another tab, this tab's count is out of date. The next push corrects
+it.</li>
+<li><strong>Nothing to get wrong.</strong> &quot;Add 1&quot; has to be right on every push,
+forever. &quot;Ask the API&quot; is right whenever it's asked.</li>
+</ul>
+<p>The cost is one small request per push. A push only arrives when
+something happens to this user, so that's a handful of requests an
+hour, not one a second.</p>
+<h2>Why the new one is always in the answer</h2>
+<p>Re-fetching only works if the notification is <strong>already saved</strong> when
+the browser asks. The API makes sure of that, in <code>notify.js</code>:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Database first: the realtime channel pushes the saved row, so it can&#x27;t</span>
+<span class="hljs-comment">// run until the row exists and has an id.</span>
+</code></pre>
+<p><img src="/support-desk-front-end/assets/images/save-then-push.svg" alt="Diagram: two timelines side by side. On the left, the API's order, save then push: 1, the database channel saves the notification row; 2, the realtime channel pushes it; 3, Alex's browser asks GET /notifications?unread=true; 4, the answer includes the new row, so the count is right. On the right, the other order, push then save, which the API doesn't use: 1, the push goes out first; 2, Alex's browser asks straight away; 3, the answer doesn't include the row, because it isn't saved yet; 4, the row is saved, too late, and the count is one short until the next push."></p>
+<p>Lesson 8 made that choice so the push could carry the saved row, with
+its <code>id</code> (&quot;Why the Database Goes First&quot;). It also means the front-end
+can trust that whatever it hears about is already in the database.</p>
+<h2>Try it</h2>
+<ol>
+<li>As Alex, open <strong>Notifications</strong> and note the count. In your REST
+client, as Alex, mark one notification as read. Alex's count in the
+browser hasn't changed. Now, as Casey, comment on ticket 1. What
+does Alex's count do, and why is it not just &quot;one more&quot;?</li>
+<li>In the back-end's <code>notify.js</code>, find <code>sendToUser()</code>. What happens to
+the push if the database channel fails?</li>
+</ol>
+</div>
+    
+  </main>
+</body>
+</html>

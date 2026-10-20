@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Testing the Notice — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/notifications/testing-stage-5/testing-the-function-form.html">← Testing the Function Form</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/notifications/testing-stage-5/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/notifications/testing-stage-5/the-real-providers-in-app-test.html">The Real Providers in App.test →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Testing the Notice</h1>
+    <p class="lede">The ticket page tests push notifications about this ticket, another ticket, and a new ticket, and check the notice appears only for the first. Reload is a click.</p>
+
+    
+
+    
+      <div class="slide-body"><p><code>TicketDetailPage.test.jsx</code> gains a group of tests for the notice. They
+share a helper that opens ticket 1 as Alex, ready to push:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 5.27: the notice, and when it doesn&#x27;t appear</span>
+<span class="hljs-comment">// (src/pages/TicketDetailPage.test.jsx, excerpts)</span>
+<span class="hljs-comment">// Alex is looking at ticket 1, which is assigned to them.</span>
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">renderTicketForAlex</span>(<span class="hljs-params"></span>) {
+  getTicket.<span class="hljs-title function_">mockResolvedValue</span>(ticketAssignedToAlex);
+  <span class="hljs-keyword">const</span> socket = <span class="hljs-title function_">captureNotificationHandler</span>();
+  <span class="hljs-title function_">renderWithProviders</span>(<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">TicketDetailPage</span> /&gt;</span></span>, {
+    <span class="hljs-attr">route</span>: <span class="hljs-string">&#x27;/tickets/1&#x27;</span>,
+    <span class="hljs-attr">path</span>: <span class="hljs-variable constant_">DETAIL_PATH</span>,
+    <span class="hljs-attr">user</span>: agentUser,
+  });
+  <span class="hljs-keyword">await</span> screen.<span class="hljs-title function_">findByRole</span>(<span class="hljs-string">&#x27;heading&#x27;</span>, { <span class="hljs-attr">level</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Cannot log in&#x27;</span> });
+  <span class="hljs-keyword">return</span> socket;
+}
+
+<span class="hljs-comment">// ... the first test in the group, then:</span>
+<span class="hljs-title function_">it</span>(<span class="hljs-string">&#x27;says nothing for a notification about another ticket&#x27;</span>, <span class="hljs-title function_">async</span> () =&gt; {
+  <span class="hljs-keyword">const</span> socket = <span class="hljs-keyword">await</span> <span class="hljs-title function_">renderTicketForAlex</span>();
+
+  <span class="hljs-keyword">await</span> socket.<span class="hljs-title function_">push</span>({ ...commentPush, <span class="hljs-attr">ticketId</span>: <span class="hljs-number">2</span> });
+
+  <span class="hljs-title function_">expect</span>(screen.<span class="hljs-title function_">queryByText</span>(<span class="hljs-string">&#x27;This ticket has changed.&#x27;</span>))
+    .<span class="hljs-property">not</span>.<span class="hljs-title function_">toBeInTheDocument</span>();
+});
+</code></pre>
+<p>(The last <code>expect</code> is reflowed to fit.)</p>
+<h2>One notification, changed a little</h2>
+<p><code>{ ...commentPush, ticketId: 2 }</code> is the same object spread you've used
+for new arrays, applied to an object: every field of <code>commentPush</code>, with
+<code>ticketId</code> replaced. The &quot;ticket created&quot; test does the same with
+<code>type: 'ticket.created'</code>. Each test changes exactly the one thing it's
+about.</p>
+<h2>Something that doesn't happen</h2>
+<p>Two of the four tests check that the notice <strong>doesn't</strong> appear. They
+use <code>queryByText</code> and <code>.not.toBeInTheDocument()</code>, the same way Stage 4
+checked a customer sees no Edit button. A test that something doesn't
+happen is only worth having next to one that shows it <strong>does</strong> happen,
+for the right notification. The first test in the group does that.</p>
+<h2>Reload, and the list page</h2>
+<p>The Reload test pushes, clicks <strong>Reload</strong>, and checks the API was asked
+again (<code>getTicket</code> called twice) and the notice has gone.
+<code>TicketListPage.test.jsx</code> has the same three ideas: a notice, none for a
+deleted ticket (<code>ticketId: null</code>), and Reload asking again with the
+same query.</p>
+<p>The other tests in both files don't push anything. They don't call
+<code>captureNotificationHandler()</code>, so the faked <code>onNotification</code> returns
+nothing, and the effect's cleanup is simply <code>undefined</code>: nothing to
+stop.</p>
+<h2>Try it</h2>
+<p>In <code>TicketDetailPage.jsx</code>, remove <code>&amp;&amp; !isNewTicket</code> from the handler's
+<code>if</code>. Run <code>npm test</code>: which test fails? Now put it back and remove
+<code>Number()</code> instead. Which tests fail this time, and why does the
+&quot;another ticket&quot; test still pass? Put it back.</p>
+</div>
+    
+  </main>
+</body>
+</html>

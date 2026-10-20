@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Socket in DevTools — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/notifications/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>The Socket in DevTools</h1>
+    <p class="lede">Watching Socket.IO in the browser&#39;s Network tab: the requests that open it, the messages on the WebSocket, and what happens when the connection ends.</p>
+
+    
+      <ul class="listing">
+        
+          <li>
+            <a href="/support-desk-front-end/notifications/the-socket-in-devtools/five-requests-to-open-a-socket.html">Five Requests to Open a Socket</a>
+            <p>Socket.IO starts with ordinary HTTP requests, then switches to a WebSocket. In Chrome, the token goes in one of the HTTP requests, before the switch.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/notifications/the-socket-in-devtools/messages-on-the-websocket.html">Messages on the WebSocket</a>
+            <p>The WebSocket row&#39;s Messages list the switch-over, the pings that keep it alive, and each push. A push is followed straight away by the HTTP request that counts again.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/notifications/the-socket-in-devtools/when-the-connection-ends.html">When the Connection Ends</a>
+            <p>Restart the API and the socket reconnects and sends the token again by itself. Log out and it closes. A bad token makes the server close it, and it stays closed.</p>
+          </li>
+        
+      </ul>
+    
+
+    
+  </main>
+</body>
+</html>

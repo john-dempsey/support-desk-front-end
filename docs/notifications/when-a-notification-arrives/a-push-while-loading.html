@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A Push While the List Is Loading — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/notifications/when-a-notification-arrives/back-to-mark-as-read.html">← Back to Mark as Read</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/notifications/when-a-notification-arrives/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/notifications/telling-a-page-it-changed/a-notice-with-a-button.html">A Notice With a Button →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>A Push While the List Is Loading</h1>
+    <p class="lede">If a push arrives before the list has loaded, the handler leaves the list as null: the load that&#39;s on its way will almost always include the new notification anyway.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Figure 5.16 has one more case to explain:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-keyword">if</span> (currentNotifications === <span class="hljs-literal">null</span>) {
+  <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;
+}
+</code></pre>
+<p><code>null</code> means &quot;not loaded yet&quot; (Figure 5.3). A push can arrive in that
+moment: Alex opens <strong>Notifications</strong> just as Casey comments. What should
+the handler do?</p>
+<h2>Leave it alone</h2>
+<p>Returning <code>null</code> keeps the page in its loading state, so the request
+that's on its way can fill the list as normal. Making a list of one
+instead, <code>[newNotification]</code>, would show a single notification, then
+have it replaced by the whole list a moment later.</p>
+<p>Usually, nothing is lost. The API saves the notification before
+pushing it (slide 02), so the list request, if the API answers it
+after the save, already includes the new one.</p>
+<h2>The one gap</h2>
+<p>If the API answered the list request in the instant <strong>before</strong> the save,
+the answer doesn't include the new notification, and the push that
+announced it was ignored. That notification is missing from the page
+until it's next opened. It's still saved, and still counted in the
+navigation bar.</p>
+<p>That needs a request and a save to land within milliseconds of each
+other, so it's very rare, and it fixes itself next time. The code's
+comment says so. A page that had to be exact would need more: for
+example, loading the list again after a push that arrived mid-load.</p>
+<h2>Two things that look alike</h2>
+<table>
+<thead>
+<tr>
+<th><code>null</code> means</th>
+<th><code>[]</code> means</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>not loaded yet</td>
+<td>loaded, and there are none</td>
+</tr>
+<tr>
+<td>a push leaves it as it is</td>
+<td>a push makes a list of one</td>
+</tr>
+</tbody>
+</table>
+<p>That's why the page starts with <code>null</code> (topic 02), and why the handler
+has to check for it.</p>
+<h2>Try it</h2>
+<ol>
+<li>Read the test <code>'ignores a push that arrives while the list is still loading'</code> in <code>NotificationsPage.test.jsx</code>. How does it keep the page
+loading while it pushes? (Topic 08 explains the parts you haven't
+met yet.)</li>
+<li>Explain, in two sentences, why the page can trust a loaded list to
+include every notification pushed <strong>before</strong> it was loaded, but not
+one pushed <strong>during</strong> the load.</li>
+</ol>
+</div>
+    
+  </main>
+</body>
+</html>

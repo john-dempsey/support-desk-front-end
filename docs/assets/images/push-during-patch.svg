@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 450" width="820" height="450" role="img" aria-labelledby="title desc" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <title id="title">A push during the PATCH</title>
+  <desc id="desc">A timeline of three moments. At 0 milliseconds, Alex clicks Mark as read on notification 7. handleMarkRead starts, with notifications as 7 and 6, the list on screen, and sends the PATCH. At 10 milliseconds, while the PATCH is on its way, a push arrives with notification 8, and the push handler makes the list 8, 7, 6. At 50 milliseconds, the PATCH answers. With the plain form, handleMarkRead maps over 7 and 6, the list from 0 milliseconds, and sets the list to 7, now read, and 6: notification 8 has vanished from the screen, although it's saved in the API. With the function form, React passes in the current list, 8, 7 and 6, and the result is 8, 7 now read, and 6.</desc>
+  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#1a1a1a"/></marker></defs>
+  <rect width="820" height="450" fill="#ffffff"/>
+  <line x1="70" y1="40" x2="70" y2="240" stroke="#59636e" stroke-width="2"/>
+  <text x="20" y="56" font-size="14" font-weight="700" fill="#1a1a1a">0 ms</text>
+  <text x="96" y="50" font-size="13" fill="#1a1a1a">Alex clicks <tspan font-weight="700">Mark as read</tspan> on #7. <tspan font-family="ui-monospace, Consolas, monospace">handleMarkRead</tspan> starts, sends the PATCH,</text>
+  <text x="96" y="70" font-size="13" fill="#1a1a1a">and waits. Its <tspan font-family="ui-monospace, Consolas, monospace">notifications</tspan> is the list on screen:</text>
+  <rect x="96" y="82" width="52" height="30" rx="4" fill="#ddf4ff" stroke="#0550ae" stroke-width="1.5"/><text x="122" y="102" text-anchor="middle" font-size="13" font-weight="700" fill="#1a1a1a">#7</text>
+  <rect x="154" y="82" width="52" height="30" rx="4" fill="#f6f8fa" stroke="#59636e" stroke-width="1.5"/><text x="180" y="102" text-anchor="middle" font-size="13" font-weight="700" fill="#1a1a1a">#6</text>
+  <text x="20" y="152" font-size="14" font-weight="700" fill="#1a1a1a">10 ms</text>
+  <text x="96" y="146" font-size="13" fill="#1a1a1a">A push arrives with #8. The push handler (function form) makes the list</text>
+  <rect x="96" y="158" width="52" height="30" rx="4" fill="#ddf4ff" stroke="#0550ae" stroke-width="1.5"/><text x="122" y="178" text-anchor="middle" font-size="13" font-weight="700" fill="#1a1a1a">#8</text>
+  <rect x="154" y="158" width="52" height="30" rx="4" fill="#ddf4ff" stroke="#0550ae" stroke-width="1.5"/><text x="180" y="178" text-anchor="middle" font-size="13" font-weight="700" fill="#1a1a1a">#7</text>
+  <rect x="212" y="158" width="52" height="30" rx="4" fill="#f6f8fa" stroke="#59636e" stroke-width="1.5"/><text x="238" y="178" text-anchor="middle" font-size="13" font-weight="700" fill="#1a1a1a">#6</text>
+  <text x="20" y="224" font-size="14" font-weight="700" fill="#1a1a1a">50 ms</text>
+  <text x="96" y="224" font-size="13" fill="#1a1a1a">The PATCH answers: #7 now has <tspan font-family="ui-monospace, Consolas, monospace">readAt</tspan>. <tspan font-family="ui-monospace, Consolas, monospace">handleMarkRead</tspan> carries on.</text>
+  <rect x="20" y="250" width="380" height="182" rx="6" fill="#ffebe9" stroke="#cf222e" stroke-width="1.5"/>
+  <text x="34" y="274" font-size="14" font-weight="700" fill="#cf222e">✗ The plain form</text>
+  <text x="34" y="296" font-size="12" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">notifications.map(...)</text>
+  <text x="34" y="320" font-size="13" fill="#1a1a1a">maps over the list from 0 ms:</text>
+  <rect x="250" y="302" width="52" height="30" rx="4" fill="#ddf4ff" stroke="#0550ae" stroke-width="1.5"/><text x="276" y="322" text-anchor="middle" font-size="13" font-weight="700" fill="#1a1a1a">#7</text>
+  <rect x="308" y="302" width="52" height="30" rx="4" fill="#f6f8fa" stroke="#59636e" stroke-width="1.5"/><text x="334" y="322" text-anchor="middle" font-size="13" font-weight="700" fill="#1a1a1a">#6</text>
+  <text x="34" y="358" font-size="13" fill="#1a1a1a">the new list is</text>
+  <rect x="140" y="340" width="52" height="30" rx="4" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/><text x="166" y="360" text-anchor="middle" font-size="13" font-weight="700" fill="#1a1a1a">#7</text>
+  <rect x="198" y="340" width="52" height="30" rx="4" fill="#f6f8fa" stroke="#59636e" stroke-width="1.5"/><text x="224" y="360" text-anchor="middle" font-size="13" font-weight="700" fill="#1a1a1a">#6</text>
+  <text x="34" y="400" font-size="13" font-weight="700" fill="#cf222e">#8 has vanished from the screen,</text>
+  <text x="34" y="416" font-size="13" fill="#1a1a1a">though it's saved in the API</text>
+  <rect x="420" y="250" width="380" height="182" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+  <text x="434" y="274" font-size="14" font-weight="700" fill="#116329">✓ The function form</text>
+  <text x="434" y="296" font-size="12" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">currentNotifications.map(...)</text>
+  <text x="434" y="320" font-size="13" fill="#1a1a1a">React passes the list now:</text>
+  <rect x="610" y="302" width="52" height="30" rx="4" fill="#ddf4ff" stroke="#0550ae" stroke-width="1.5"/><text x="636" y="322" text-anchor="middle" font-size="13" font-weight="700" fill="#1a1a1a">#8</text>
+  <rect x="668" y="302" width="52" height="30" rx="4" fill="#ddf4ff" stroke="#0550ae" stroke-width="1.5"/><text x="694" y="322" text-anchor="middle" font-size="13" font-weight="700" fill="#1a1a1a">#7</text>
+  <rect x="726" y="302" width="52" height="30" rx="4" fill="#f6f8fa" stroke="#59636e" stroke-width="1.5"/><text x="752" y="322" text-anchor="middle" font-size="13" font-weight="700" fill="#1a1a1a">#6</text>
+  <text x="434" y="358" font-size="13" fill="#1a1a1a">the new list is</text>
+  <rect x="540" y="340" width="52" height="30" rx="4" fill="#ddf4ff" stroke="#0550ae" stroke-width="1.5"/><text x="566" y="360" text-anchor="middle" font-size="13" font-weight="700" fill="#1a1a1a">#8</text>
+  <rect x="598" y="340" width="52" height="30" rx="4" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/><text x="624" y="360" text-anchor="middle" font-size="13" font-weight="700" fill="#1a1a1a">#7</text>
+  <rect x="656" y="340" width="52" height="30" rx="4" fill="#f6f8fa" stroke="#59636e" stroke-width="1.5"/><text x="682" y="360" text-anchor="middle" font-size="13" font-weight="700" fill="#1a1a1a">#6</text>
+  <text x="434" y="400" font-size="13" font-weight="700" fill="#116329">#7 is read, and #8 is still there</text>
+</svg>

@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 560" width="820" height="560" role="img" aria-labelledby="title desc" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <title id="title">Authenticate on every connect</title>
+  <desc id="desc">A timeline for Alex's socket, with the browser on the left and the server on the right. 1: connectSocket() calls socket.connect(), and the server has a new connection, A, in no rooms. 2: the connect event fires, sendToken() sends authenticate with the token, and the server joins connection A to Alex's room, user: followed by Alex's id. 3: a push, notification.created, arrives. Then the API restarts: connection A and its room are gone. 4: Socket.IO reconnects by itself, and the server has a brand-new connection, B, in no rooms. 5: the connect event fires again, so sendToken() sends authenticate again, and the server joins connection B to Alex's room. 6: the next push arrives. Underneath: if the token were only sent on the first connect, step 5 would never happen, connection B would stay in no rooms, and every later push would be lost, with no error anywhere.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#1a1a1a"/>
+    </marker>
+  </defs>
+  <rect width="820" height="560" fill="#ffffff"/>
+  <text x="20" y="28" font-size="15" font-weight="700" fill="#1a1a1a">The browser (socket.js)</text>
+  <text x="520" y="28" font-size="15" font-weight="700" fill="#1a1a1a">The server (config/socket.js)</text>
+  <rect x="20" y="44" width="280" height="48" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/><text x="34" y="64" font-size="13" fill="#1a1a1a">1. <tspan font-family="ui-monospace, Consolas, monospace">connectSocket()</tspan></text><text x="34" y="82" font-size="12" fill="#3d444d">calls socket.connect()</text>
+  <line x1="302" y1="68" x2="516" y2="68" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/><text x="410" y="61" text-anchor="middle" font-size="12" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">connect</text>
+  <rect x="520" y="44" width="280" height="48" rx="6" fill="#f6f8fa" stroke="#59636e" stroke-width="1.5"/><text x="534" y="64" font-size="13" fill="#1a1a1a">a new connection, A</text><text x="534" y="82" font-size="12" fill="#3d444d">in no rooms</text>
+  <rect x="20" y="104" width="280" height="48" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/><text x="34" y="124" font-size="13" fill="#1a1a1a">2. the <tspan font-family="ui-monospace, Consolas, monospace">connect</tspan> event fires</text><text x="34" y="142" font-size="12" fill="#3d444d">sendToken()</text>
+  <line x1="302" y1="128" x2="516" y2="128" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/><text x="410" y="121" text-anchor="middle" font-size="12" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">authenticate, token</text>
+  <rect x="520" y="104" width="280" height="48" rx="6" fill="#f6f8fa" stroke="#59636e" stroke-width="1.5"/><text x="534" y="124" font-size="13" fill="#1a1a1a">A joins Alex's room</text><text x="534" y="142" font-size="12" fill="#3d444d">user:&lt;Alex's id&gt;</text>
+  <rect x="20" y="164" width="280" height="48" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/><text x="34" y="184" font-size="13" fill="#1a1a1a">3. the push arrives</text><text x="34" y="202" font-size="12" fill="#3d444d">handlers are called</text>
+  <line x1="518" y1="188" x2="304" y2="188" stroke="#116329" stroke-width="2" marker-end="url(#arrow)"/><text x="410" y="181" text-anchor="middle" font-size="12" font-weight="700" fill="#116329" font-family="ui-monospace, Consolas, monospace">notification.created</text>
+  <rect x="520" y="164" width="280" height="48" rx="6" fill="#f6f8fa" stroke="#59636e" stroke-width="1.5"/><text x="534" y="184" font-size="13" fill="#1a1a1a">pushes to Alex's room</text><text x="534" y="202" font-size="12" fill="#3d444d">after saving the row</text>
+  <line x1="20" y1="236" x2="800" y2="236" stroke="#cf222e" stroke-width="2" stroke-dasharray="6 4"/>
+  <text x="410" y="258" text-anchor="middle" font-size="13" font-weight="700" fill="#cf222e">The API restarts: connection A, and its room, are gone</text>
+  <rect x="20" y="274" width="280" height="48" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/><text x="34" y="294" font-size="13" fill="#1a1a1a">4. Socket.IO reconnects by itself</text><text x="34" y="312" font-size="12" fill="#3d444d">no code of ours runs this</text>
+  <line x1="302" y1="298" x2="516" y2="298" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/><text x="410" y="291" text-anchor="middle" font-size="12" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">connect</text>
+  <rect x="520" y="274" width="280" height="48" rx="6" fill="#f6f8fa" stroke="#59636e" stroke-width="1.5"/><text x="534" y="294" font-size="13" fill="#1a1a1a">a brand-new connection, B</text><text x="534" y="312" font-size="12" fill="#3d444d">in no rooms</text>
+  <rect x="20" y="334" width="280" height="48" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/><text x="34" y="354" font-size="13" fill="#1a1a1a">5. <tspan font-family="ui-monospace, Consolas, monospace">connect</tspan> fires again</text><text x="34" y="372" font-size="12" fill="#3d444d">sendToken() runs again</text>
+  <line x1="302" y1="358" x2="516" y2="358" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/><text x="410" y="351" text-anchor="middle" font-size="12" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">authenticate, token</text>
+  <rect x="520" y="334" width="280" height="48" rx="6" fill="#f6f8fa" stroke="#59636e" stroke-width="1.5"/><text x="534" y="354" font-size="13" fill="#1a1a1a">B joins Alex's room</text><text x="534" y="372" font-size="12" fill="#3d444d">user:&lt;Alex's id&gt;</text>
+  <rect x="20" y="394" width="280" height="48" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/><text x="34" y="414" font-size="13" fill="#1a1a1a">6. the next push arrives</text><text x="34" y="432" font-size="12" fill="#3d444d"></text>
+  <line x1="518" y1="418" x2="304" y2="418" stroke="#116329" stroke-width="2" marker-end="url(#arrow)"/><text x="410" y="411" text-anchor="middle" font-size="12" font-weight="700" fill="#116329" font-family="ui-monospace, Consolas, monospace">notification.created</text>
+  <rect x="520" y="394" width="280" height="48" rx="6" fill="#f6f8fa" stroke="#59636e" stroke-width="1.5"/><text x="534" y="414" font-size="13" fill="#1a1a1a">pushes to Alex's room</text><text x="534" y="432" font-size="12" fill="#3d444d"></text>
+  <rect x="20" y="466" width="780" height="72" rx="8" fill="#ffebe9" stroke="#cf222e" stroke-width="1.5"/>
+  <text x="36" y="492" font-size="14" font-weight="700" fill="#cf222e">✗ If the token were only sent on the first connect</text>
+  <text x="36" y="514" font-size="13" fill="#1a1a1a">step 5 would never happen. Connection B would stay in no rooms, and every later push</text>
+  <text x="36" y="530" font-size="13" fill="#1a1a1a">would be lost, with no error anywhere.</text>
+</svg>

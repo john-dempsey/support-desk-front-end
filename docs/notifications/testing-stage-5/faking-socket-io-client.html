@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Faking socket.io-client — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/notifications/testing-stage-5/what-stage-5-tests.html">← What Stage 5 Tests</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/notifications/testing-stage-5/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/notifications/testing-stage-5/a-connect-a-reconnect-a-push.html">A Connect, a Reconnect, a Push →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Faking socket.io-client</h1>
+    <p class="lede">socket.test.js replaces the library with a small fake socket whose on and off really keep handlers, so a test can fire a connect or a push itself.</p>
+
+    
+
+    
+      <div class="slide-body"><p><code>socket.js</code> calls <code>io()</code> once, when it's first imported, and uses what
+comes back. To test it without a server, the test makes <code>io()</code> return a
+fake:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 5.22: a fake socket (src/realtime/socket.test.js, excerpt)</span>
+<span class="hljs-comment">// vi.hoisted() makes fakeSocket exist before vi.mock() below runs, which</span>
+<span class="hljs-comment">// Vitest moves to the top of the file.</span>
+<span class="hljs-keyword">const</span> fakeSocket = vi.<span class="hljs-title function_">hoisted</span>(<span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-keyword">const</span> handlers = {};
+  <span class="hljs-keyword">return</span> {
+    <span class="hljs-comment">// `on` and `off` really store and remove handlers, so the fake works</span>
+    <span class="hljs-comment">// like the real thing.</span>
+    <span class="hljs-title function_">on</span>(<span class="hljs-params">eventName, handler</span>) {
+      handlers[eventName] = handlers[eventName] || [];
+      handlers[eventName].<span class="hljs-title function_">push</span>(handler);
+    },
+    <span class="hljs-title function_">off</span>(<span class="hljs-params">eventName, handler</span>) {
+      handlers[eventName] = (handlers[eventName] || []).<span class="hljs-title function_">filter</span>(
+        <span class="hljs-function">(<span class="hljs-params">storedHandler</span>) =&gt;</span> storedHandler !== handler,
+      );
+    },
+    <span class="hljs-comment">// Calls every handler for an event, as the real socket would when the</span>
+    <span class="hljs-comment">// event happens.</span>
+    <span class="hljs-title function_">fire</span>(<span class="hljs-params">eventName, payload</span>) {
+      <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> handler <span class="hljs-keyword">of</span> handlers[eventName] || []) {
+        <span class="hljs-title function_">handler</span>(payload);
+      }
+    },
+    <span class="hljs-attr">emit</span>: vi.<span class="hljs-title function_">fn</span>(),
+    <span class="hljs-attr">connect</span>: vi.<span class="hljs-title function_">fn</span>(),
+    <span class="hljs-attr">disconnect</span>: vi.<span class="hljs-title function_">fn</span>(),
+  };
+});
+
+vi.<span class="hljs-title function_">mock</span>(<span class="hljs-string">&#x27;socket.io-client&#x27;</span>, <span class="hljs-function">() =&gt;</span> ({
+  <span class="hljs-attr">io</span>: <span class="hljs-function">() =&gt;</span> fakeSocket,
+}));
+</code></pre>
+<h2><code>vi.mock()</code> with a factory</h2>
+<p>Until now, <code>vi.mock(path)</code> has replaced every export of a module with a
+<code>vi.fn()</code> that returns nothing. That's no good here: <code>socket.js</code> needs a
+socket whose <code>on</code> and <code>off</code> actually remember handlers. So this
+<code>vi.mock()</code> has a second argument, a <strong>factory</strong>: a function that
+returns the fake module. Its <code>io</code> returns <code>fakeSocket</code>.</p>
+<h2>Half real, half fake</h2>
+<ul>
+<li><strong><code>on</code>, <code>off</code> and <code>fire</code> are real code.</strong> They keep a list of
+handlers per event name, just like the real socket. <code>fire()</code> is the
+test's addition: it plays the server, calling every handler for an
+event.</li>
+<li><strong><code>emit</code>, <code>connect</code> and <code>disconnect</code> are <code>vi.fn()</code>.</strong> The test only
+needs to know they were called, and with what.</li>
+</ul>
+<h2><code>vi.hoisted()</code></h2>
+<p>Vitest moves every <code>vi.mock()</code> call to the top of the file, above the
+imports, so the fake is in place before <code>socket.js</code> is imported and
+calls <code>io()</code>. An ordinary <code>const fakeSocket</code> further down wouldn't
+exist yet at that point. <code>vi.hoisted()</code> moves its code to the top too,
+so <code>fakeSocket</code> is ready when the factory needs it.</p>
+<h2>Try it</h2>
+<p>Make the fake's <code>off</code> do nothing: replace the whole <code>off(...) { ... }</code>
+method with <code>off() {},</code> and run <code>npx vitest run src/realtime</code>. Four
+tests fail. Three of them test <code>off</code> one way or another, but one,
+&quot;sends the token again after a reconnect&quot;, never calls <code>off</code> itself.
+Why does it fail too? (Hint: there's one <code>fakeSocket</code> for the whole
+file, and every test ends with <code>disconnectSocket()</code>.) Put <code>off</code> back.</p>
+</div>
+    
+  </main>
+</body>
+</html>

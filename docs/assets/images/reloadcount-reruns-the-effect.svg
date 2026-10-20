@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 500" width="820" height="500" role="img" aria-labelledby="title desc" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <title id="title">reloadCount runs the effect again</title>
+  <desc id="desc">A cycle of five steps. 1, the user clicks Reload: handleReload() calls setReloadCount(reloadCount + 1), so reloadCount goes from 0 to 1. 2, the page re-renders, and React sees that the dependency list, ticketId and reloadCount, has changed. 3, the old run's cleanup: ignore becomes true, the ticket and comments are cleared, isLoading becomes true, and hasChanged becomes false, so the notice goes. The page shows Loading the ticket, and CommentForm isn't on the screen, so anything typed in it is lost. 4, the effect runs again: getTicket() and getComments(), the same as when the page opened. 5, the answers arrive, and the page shows the latest ticket and comments. The number in reloadCount itself is never shown or used for anything else.</desc>
+  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#1a1a1a"/></marker></defs>
+  <rect width="820" height="500" fill="#ffffff"/>
+  <rect x="20" y="20" width="370" height="76" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+  <text x="34" y="44" font-size="14" font-weight="700" fill="#1a1a1a">1. The user clicks Reload</text>
+  <text x="34" y="66" font-size="12" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">setReloadCount(reloadCount + 1)</text>
+  <text x="34" y="84" font-size="12" fill="#3d444d"><tspan font-family="ui-monospace, Consolas, monospace">reloadCount</tspan>: 0 → 1</text>
+  <path d="M 390 58 H 426" fill="none" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="430" y="20" width="370" height="76" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+  <text x="444" y="44" font-size="14" font-weight="700" fill="#1a1a1a">2. The page re-renders</text>
+  <text x="444" y="66" font-size="12" fill="#1a1a1a">React compares the dependency list:</text>
+  <text x="444" y="84" font-size="12" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">[ticketId, reloadCount]</text>
+  <text x="640" y="84" font-size="12" font-weight="700" fill="#1a1a1a">changed</text>
+  <path d="M 615 96 V 126" fill="none" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="430" y="130" width="370" height="150" rx="6" fill="#fff8c5" stroke="#7d4e00" stroke-width="1.5"/>
+  <text x="444" y="154" font-size="14" font-weight="700" fill="#1a1a1a">3. The old run's cleanup</text>
+  <text x="444" y="176" font-size="12" fill="#1a1a1a"><tspan font-family="ui-monospace, Consolas, monospace">ignore = true</tspan>; ticket and comments cleared;</text>
+  <text x="444" y="194" font-size="12" fill="#1a1a1a"><tspan font-family="ui-monospace, Consolas, monospace">isLoading</tspan> true; <tspan font-family="ui-monospace, Consolas, monospace">hasChanged</tspan> false (the notice goes)</text>
+  <text x="444" y="222" font-size="12" fill="#1a1a1a">The page shows "Loading the ticket…" instead</text>
+  <text x="444" y="240" font-size="12" fill="#1a1a1a">of the ticket, so <tspan font-family="ui-monospace, Consolas, monospace">CommentForm</tspan> is taken off</text>
+  <text x="444" y="258" font-size="12" font-weight="700" fill="#cf222e">the screen: anything typed in it is lost</text>
+  <path d="M 615 280 V 310" fill="none" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="430" y="314" width="370" height="76" rx="6" fill="#fff8c5" stroke="#7d4e00" stroke-width="1.5"/>
+  <text x="444" y="338" font-size="14" font-weight="700" fill="#1a1a1a">4. The effect runs again</text>
+  <text x="444" y="360" font-size="12" fill="#1a1a1a"><tspan font-family="ui-monospace, Consolas, monospace">getTicket()</tspan> and <tspan font-family="ui-monospace, Consolas, monospace">getComments()</tspan>,</text>
+  <text x="444" y="378" font-size="12" fill="#1a1a1a">exactly as when the page opened</text>
+  <path d="M 430 352 H 394" fill="none" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="20" y="314" width="370" height="76" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+  <text x="34" y="338" font-size="14" font-weight="700" fill="#1a1a1a">5. The answers arrive</text>
+  <text x="34" y="360" font-size="12" fill="#1a1a1a">the page shows the latest ticket</text>
+  <text x="34" y="378" font-size="12" fill="#1a1a1a">and comments; no notice</text>
+  <text x="20" y="440" font-size="13" fill="#1a1a1a"><tspan font-family="ui-monospace, Consolas, monospace">reloadCount</tspan>'s value is never shown or used: it only has to be <tspan font-weight="700">different</tspan>,</text>
+  <text x="20" y="462" font-size="13" fill="#1a1a1a">so that React runs the effect again.</text>
+</svg>

@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Count Comes From the API — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/notifications/the-unread-count-shared/a-second-context.html">← A Second Context</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/notifications/the-unread-count-shared/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/notifications/the-unread-count-shared/loading-the-count-when-the-user-changes.html">Loading the Count When the User Changes →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>The Count Comes From the API</h1>
+    <p class="lede">The provider never adds or subtracts: it asks the API for the unread list and counts it. A failure leaves the last number showing, because the count is extra information.</p>
+
+    
+
+    
+      <div class="slide-body"><p><code>NotificationsProvider</code> holds one piece of state, and one way to get it
+right:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 5.8: where the count comes from</span>
+<span class="hljs-comment">// (src/context/NotificationsProvider.jsx, excerpt)</span>
+<span class="hljs-comment">// The API is the truth: the count is always the length of the user&#x27;s</span>
+<span class="hljs-comment">// unread list, never a number this file adds to or takes away from.</span>
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">fetchUnreadCount</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> unreadNotifications = <span class="hljs-keyword">await</span> <span class="hljs-title function_">getUnreadNotifications</span>();
+  <span class="hljs-keyword">return</span> unreadNotifications.<span class="hljs-property">length</span>;
+}
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">NotificationsProvider</span>(<span class="hljs-params">{ children }</span>) {
+  <span class="hljs-keyword">const</span> { user } = <span class="hljs-title function_">useAuth</span>();
+  <span class="hljs-keyword">const</span> [unreadCount, setUnreadCount] = <span class="hljs-title function_">useState</span>(<span class="hljs-number">0</span>);
+
+  <span class="hljs-comment">// ... the effect that loads the count (next slide) ...</span>
+
+  <span class="hljs-comment">// For pages that change what&#x27;s unread, e.g. NotificationsPage after</span>
+  <span class="hljs-comment">// &quot;Mark as read&quot;.</span>
+  <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">refreshUnreadCount</span>(<span class="hljs-params"></span>) {
+    <span class="hljs-keyword">try</span> {
+      <span class="hljs-keyword">const</span> count = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetchUnreadCount</span>();
+      <span class="hljs-title function_">setUnreadCount</span>(count);
+    } <span class="hljs-keyword">catch</span> {
+      <span class="hljs-comment">// As above: keep the last number showing.</span>
+    }
+  }
+
+  <span class="hljs-keyword">const</span> notificationsValue = { unreadCount, refreshUnreadCount };
+
+  <span class="hljs-keyword">return</span> (
+    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">NotificationsContext</span> <span class="hljs-attr">value</span>=<span class="hljs-string">{notificationsValue}</span>&gt;</span>
+      {children}
+    <span class="hljs-tag">&lt;/<span class="hljs-name">NotificationsContext</span>&gt;</span></span>
+  );
+}
+</code></pre>
+<p>(The <code>return</code> is reflowed to fit.)</p>
+<h2>Count, don't calculate</h2>
+<p>After <strong>Mark as read</strong>, the page could have told the provider &quot;take one
+away&quot;. It doesn't: it asks the provider to fetch the count again. One
+extra small request buys something worth having: every time the number
+changes, it's set to what the API says. Adding and taking away would
+need every change to be counted exactly once, forever; one missed or
+doubled step and the number would stay wrong until the next reload.</p>
+<p><code>fetchUnreadCount()</code> sits outside the component, because it uses
+nothing from inside it: no state, no props. It's an ordinary function,
+like <code>formatDate()</code>.</p>
+<h2>A <code>catch</code> with nothing in it</h2>
+<p>Every page so far shows the user an error when a request fails. This
+<code>catch</code> deliberately shows nothing. Why the difference?</p>
+<ul>
+<li>The count is <strong>extra information</strong> in the corner of every page. If
+the API is down, the page the user is looking at already says so, in
+its own error message. A second error in the navigation bar would say
+the same thing again, on every page.</li>
+<li>Keeping the last number is a reasonable thing to show. It may be a
+little out of date; it isn't wrong.</li>
+<li>One error still matters: a <code>401</code> means the session has ended.
+<code>client.js</code> handles that before the <code>catch</code> ever sees it, and logs the
+user out (Stage 4, topic 09).</li>
+</ul>
+<p>The comment in Figure 5.8 says &quot;As above&quot;, pointing at the same
+decision in the effect, where it's explained in full. An empty <code>catch</code>
+always deserves a comment saying why it's empty.</p>
+<h2>Try it</h2>
+<p>Log in as Alex and open <strong>Notifications</strong>. In the browser's developer
+tools, <strong>Network</strong> tab, right-click any request to
+<code>notifications?unread=true</code> and choose <strong>Block request URL</strong>. Now click
+<strong>Mark as read</strong> on a notification. What happens to the item, and to
+the count? Why? Unblock the URL afterwards (right-click it again).</p>
+</div>
+    
+  </main>
+</body>
+</html>

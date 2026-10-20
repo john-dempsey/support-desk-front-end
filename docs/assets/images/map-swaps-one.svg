@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 340" width="760" height="340" role="img" aria-labelledby="title desc" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <title id="title">map() swaps one item</title>
+  <desc id="desc">On the left, the notifications array before: notification 8, unread; notification 7, unread; notification 6, read. In the middle, map() asks of each item whether its id is the updated notification's id, 7. For 8, no, so keep it as it was. For 7, yes, so use updatedNotification instead, which has readAt set. For 6, no, keep it. On the right, the new array: 8 unread, 7 now read, 6 read. The same length and the same order; only item 7 is a different object. The old array is never changed, so React sees a new array and re-renders.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#1a1a1a"/>
+    </marker>
+  </defs>
+  <rect width="760" height="340" fill="#ffffff"/>
+  <text x="20" y="34" font-size="14" font-weight="700" fill="#1a1a1a"><tspan font-family="ui-monospace, Consolas, monospace">notifications</tspan> (before)</text>
+  <text x="380" y="34" text-anchor="middle" font-size="14" font-weight="700" fill="#1a1a1a">is its id <tspan font-family="ui-monospace, Consolas, monospace">updatedNotification.id</tspan> (7)?</text>
+  <text x="560" y="34" font-size="14" font-weight="700" fill="#1a1a1a">the new array</text>
+  <rect x="20" y="56" width="180" height="48" rx="6" fill="#ddf4ff" stroke="#0550ae" stroke-width="1.5"/>
+  <text x="34" y="78" font-size="14" font-weight="700" fill="#1a1a1a">#8</text>
+  <text x="34" y="96" font-size="12" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">readAt: null</text>
+  <rect x="20" y="126" width="180" height="48" rx="6" fill="#ddf4ff" stroke="#0550ae" stroke-width="1.5"/>
+  <text x="34" y="148" font-size="14" font-weight="700" fill="#1a1a1a">#7</text>
+  <text x="34" y="166" font-size="12" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">readAt: null</text>
+  <rect x="20" y="196" width="180" height="48" rx="6" fill="#f6f8fa" stroke="#59636e" stroke-width="1.5"/>
+  <text x="34" y="218" font-size="14" font-weight="700" fill="#1a1a1a">#6</text>
+  <text x="34" y="236" font-size="12" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">readAt: "…10:30…"</text>
+  <line x1="204" y1="80" x2="552" y2="80" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="380" y="72" text-anchor="middle" font-size="13" fill="#1a1a1a">no: keep it as it was</text>
+  <line x1="204" y1="150" x2="552" y2="150" stroke="#116329" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="380" y="142" text-anchor="middle" font-size="13" font-weight="700" fill="#116329">yes: use <tspan font-family="ui-monospace, Consolas, monospace">updatedNotification</tspan></text>
+  <line x1="204" y1="220" x2="552" y2="220" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="380" y="212" text-anchor="middle" font-size="13" fill="#1a1a1a">no: keep it as it was</text>
+  <rect x="560" y="56" width="180" height="48" rx="6" fill="#ddf4ff" stroke="#0550ae" stroke-width="1.5"/>
+  <text x="574" y="78" font-size="14" font-weight="700" fill="#1a1a1a">#8</text>
+  <text x="574" y="96" font-size="12" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">readAt: null</text>
+  <rect x="560" y="126" width="180" height="48" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="2"/>
+  <text x="574" y="148" font-size="14" font-weight="700" fill="#1a1a1a">#7 <tspan font-weight="400" font-size="12" fill="#116329">from the API</tspan></text>
+  <text x="574" y="166" font-size="12" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">readAt: "…12:00…"</text>
+  <rect x="560" y="196" width="180" height="48" rx="6" fill="#f6f8fa" stroke="#59636e" stroke-width="1.5"/>
+  <text x="574" y="218" font-size="14" font-weight="700" fill="#1a1a1a">#6</text>
+  <text x="574" y="236" font-size="12" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">readAt: "…10:30…"</text>
+  <text x="380" y="288" text-anchor="middle" font-size="14" fill="#1a1a1a">The same length, the same order: only #7 is a different object.</text>
+  <text x="380" y="314" text-anchor="middle" font-size="14" fill="#1a1a1a">The old array is never changed, so React sees a new array and re-renders.</text>
+</svg>

@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pushing in a Test — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/notifications/testing-stage-5/testing-the-provider.html">← Testing the Provider</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/notifications/testing-stage-5/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/notifications/testing-stage-5/testing-the-function-form.html">Testing the Function Form →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Pushing in a Test</h1>
+    <p class="lede">captureNotificationHandler() keeps the handler a component passes to onNotification(), and push() calls it inside act(), as if the server had sent something.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The provider and the pages all call <code>onNotification(handler)</code>. With
+<code>socket.js</code> faked, nothing will ever call that handler, unless the test
+does. A small shared helper keeps it:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 5.25: playing the server in a page test</span>
+<span class="hljs-comment">// (src/test/fakeSocket.js, excerpt)</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">captureNotificationHandler</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">let</span> savedHandler = <span class="hljs-literal">null</span>;
+
+  onNotification.<span class="hljs-title function_">mockImplementation</span>(<span class="hljs-function">(<span class="hljs-params">handler</span>) =&gt;</span> {
+    savedHandler = handler;
+    <span class="hljs-comment">// The real onNotification() returns a &quot;stop listening&quot; function.</span>
+    <span class="hljs-keyword">return</span> vi.<span class="hljs-title function_">fn</span>();
+  });
+
+  <span class="hljs-keyword">return</span> {
+    <span class="hljs-comment">// act() tells React a change is coming from outside (here, the</span>
+    <span class="hljs-comment">// &quot;socket&quot;), and waits for the screen to update before the test goes</span>
+    <span class="hljs-comment">// on to check it.</span>
+    <span class="hljs-keyword">async</span> <span class="hljs-title function_">push</span>(<span class="hljs-params">notification</span>) {
+      <span class="hljs-keyword">if</span> (savedHandler === <span class="hljs-literal">null</span>) {
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(
+          <span class="hljs-string">&#x27;Nothing is listening: render the component first.&#x27;</span>,
+        );
+      }
+      <span class="hljs-keyword">await</span> <span class="hljs-title function_">act</span>(<span class="hljs-title function_">async</span> () =&gt; {
+        <span class="hljs-title function_">savedHandler</span>(notification);
+      });
+    },
+  };
+}
+</code></pre>
+<p>(The <code>throw</code> line is reflowed to fit.)</p>
+<h2>How it's used</h2>
+<pre><code class="hljs language-js"><span class="hljs-keyword">const</span> socket = <span class="hljs-title function_">captureNotificationHandler</span>();   <span class="hljs-comment">// before rendering</span>
+<span class="hljs-title function_">renderPage</span>();                                  <span class="hljs-comment">// the page calls</span>
+                                               <span class="hljs-comment">//   onNotification()</span>
+<span class="hljs-keyword">await</span> socket.<span class="hljs-title function_">push</span>(commentPush);                <span class="hljs-comment">// &quot;the server&quot; pushes</span>
+</code></pre>
+<p><code>mockImplementation()</code> gives the fake <code>onNotification</code> some code to run.
+When the page's effect calls it, it saves the handler, and <code>push()</code>
+calls that handler later with whatever notification the test chooses.</p>
+<h2><code>act()</code></h2>
+<p>When a user clicks, <code>userEvent</code> tells React, and React updates the
+screen before the test checks it. A push isn't a click: it's ordinary
+code calling the handler, and React doesn't know a test is waiting.
+<code>act()</code> is React Testing Library's way of saying &quot;a change is coming
+from outside; finish updating before you go on&quot;. Without it, the test
+checks the screen before the new notification is on it.</p>
+<p>Every push in a test goes through <code>push()</code>, so <code>act()</code> is written once,
+here.</p>
+<h2>Try it</h2>
+<p>In <code>fakeSocket.js</code>, replace the three lines of <code>await act(...)</code> with
+just <code>savedHandler(notification);</code>. Run <code>npm test</code>. Six push tests
+fail: what does the first failure say it found? One push test still
+passes, in <code>NotificationsProvider.test.jsx</code>. Look at how that test checks the screen after its push: why does it
+get away without <code>act()</code>? Put
+<code>act()</code> back.</p>
+</div>
+    
+  </main>
+</body>
+</html>

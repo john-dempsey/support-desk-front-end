@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A Notice With a Button — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/notifications/when-a-notification-arrives/a-push-while-loading.html">← A Push While the List Is Loading</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/notifications/telling-a-page-it-changed/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/notifications/telling-a-page-it-changed/is-it-about-this-ticket.html">Is It About This Ticket? →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>A Notice With a Button</h1>
+    <p class="lede">RefreshNotice is a message and a Reload button, in a polite live region. The ticket pages show it when the data on screen may be out of date.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Alex has ticket 1 open. Casey comments on it, and Alex's count goes up,
+but the comment isn't on Alex's screen: the page loaded the comments
+when it opened, and hasn't asked since. It should at least say so.</p>
+<p>That's the job of one small new component:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 5.18: a message, and a button to load again</span>
+<span class="hljs-comment">// (src/components/RefreshNotice.jsx, excerpt)</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">RefreshNotice</span>(<span class="hljs-params">{ message, onReload }</span>) {
+  <span class="hljs-keyword">return</span> (
+    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">role</span>=<span class="hljs-string">&quot;status&quot;</span> <span class="hljs-attr">className</span>=<span class="hljs-string">&quot;refresh-notice&quot;</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>{message}<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;button&quot;</span> <span class="hljs-attr">onClick</span>=<span class="hljs-string">{onReload}</span>&gt;</span>
+        Reload
+      <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+  );
+}
+</code></pre>
+<p>It knows nothing about tickets or notifications. It shows whatever
+<code>message</code> it's given, and calls <code>onReload</code> when the button is clicked,
+the same &quot;display, and call back&quot; shape as <code>CommentList</code> or
+<code>NotificationList</code>. Both ticket pages use it, with their own message:</p>
+<table>
+<thead>
+<tr>
+<th>Page</th>
+<th>Message</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>TicketDetailPage</code></td>
+<td>&quot;This ticket has changed.&quot;</td>
+</tr>
+<tr>
+<td><code>TicketListPage</code></td>
+<td>&quot;The tickets have changed.&quot;</td>
+</tr>
+</tbody>
+</table>
+<h2><code>role=&quot;status&quot;</code></h2>
+<p>The notice appears without the user doing anything, so a screen reader
+user needs to be told. <code>role=&quot;status&quot;</code> makes the <code>&lt;div&gt;</code> a polite live
+region, like <code>Loading</code> and the unread count (topic 03): the screen
+reader announces the message when it appears, without interrupting.</p>
+<h2>Asking, not doing</h2>
+<p>The notice <strong>offers</strong> to reload. It doesn't reload by itself. Slide 03
+explains why: reloading the page's data would throw away anything the
+user was halfway through typing.</p>
+<h2>Try it</h2>
+<p>Log in as Alex in one browser and Casey in the other. As Alex, open
+ticket 1. As Casey, comment on it. When the notice appears on Alex's
+page, find it in the developer tools' <strong>Elements</strong> tab. What role does
+it have, and where on the page is it? Then click <strong>Reload</strong>. Which
+comment is new, and what happened to the notice?</p>
+</div>
+    
+  </main>
+</body>
+</html>

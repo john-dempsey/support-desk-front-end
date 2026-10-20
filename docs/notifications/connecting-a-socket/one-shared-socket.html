@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>One Shared Socket — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/notifications/connecting-a-socket/the-server-side-briefly.html">← The Server Side, Briefly</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/notifications/connecting-a-socket/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/notifications/connecting-a-socket/telling-the-server-who-you-are.html">Telling the Server Who You Are, Every Time →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>One Shared Socket</h1>
+    <p class="lede">socket.js creates the socket once, when it&#39;s first imported, and every part of the app shares it. autoConnect: false waits until someone has logged in.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The top of <code>socket.js</code> creates the socket:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 5.12: one socket for the whole app</span>
+<span class="hljs-comment">// (src/realtime/socket.js, excerpt)</span>
+<span class="hljs-keyword">import</span> { io } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;socket.io-client&#x27;</span>;
+<span class="hljs-keyword">import</span> { getSavedToken } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;../api/tokenStorage.js&#x27;</span>;
+
+<span class="hljs-comment">// The same base URL as client.js: Socket.IO runs on the API&#x27;s own port.</span>
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">API_URL</span> = <span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">env</span>.<span class="hljs-property">VITE_API_URL</span> || <span class="hljs-string">&#x27;http://localhost:3000&#x27;</span>;
+
+<span class="hljs-comment">// autoConnect: false means &quot;don&#x27;t connect yet&quot;. There&#x27;s nobody to connect</span>
+<span class="hljs-comment">// for until a user has logged in, so connectSocket() does it then.</span>
+<span class="hljs-keyword">const</span> socket = <span class="hljs-title function_">io</span>(<span class="hljs-variable constant_">API_URL</span>, { <span class="hljs-attr">autoConnect</span>: <span class="hljs-literal">false</span> });
+</code></pre>
+<p><code>getSavedToken()</code> is for the next slide.</p>
+<h2><code>io()</code></h2>
+<p><code>io(url, options)</code> makes a socket object that knows where the server
+is. With <code>autoConnect: false</code> that's all it does: nothing is sent until
+something calls <code>socket.connect()</code>. Without it, every visitor to the
+login page would open a connection the server can't use, since they
+have no token to send yet.</p>
+<p>The URL is the API's own. The back-end attaches Socket.IO to the same
+HTTP server as its routes, in <code>server.js</code> (Lesson 5, &quot;Socket.IO: a
+WebSocket Library&quot;), so it answers on port 3000 too. The URL is read
+from <code>VITE_API_URL</code> the same way as in <code>client.js</code>, so changing <code>.env</code>
+moves both.</p>
+<h2>Once, when it's first imported</h2>
+<p>The code at the top level of a module runs <strong>once</strong>, the first time
+any file imports it. Every later <code>import</code> gets the same module, with the
+same <code>socket</code>. So however many components use these functions, the app
+has one connection. It's the back-end's <code>config/db.js</code> and
+<code>config/socket.js</code> idea, &quot;importing it is how you share it&quot;, in the
+browser.</p>
+<p><code>socket</code> isn't exported. Other files can only use the socket through
+<code>socket.js</code>'s three functions, so there's one place to look when
+something goes wrong with it.</p>
+<h2>Why not create it in a component?</h2>
+<p>A component's function runs every time it renders. A <code>const socket = io(...)</code> there would make a new socket object on every render, and each
+one could open its own connection. Module code doesn't re-run, so
+creating the socket here avoids the problem altogether.</p>
+<h2>Try it</h2>
+<p>In <code>socket.js</code>, temporarily change <code>autoConnect: false</code> to
+<code>autoConnect: true</code>. Log out, then reload the login page with the
+<strong>Network</strong> tab open, filtered to <code>socket.io</code>. What do you see, before
+anyone has logged in? Put it back.</p>
+</div>
+    
+  </main>
+</body>
+</html>

@@ -9,7 +9,13 @@ props through every level. Keep it for things that really are app-wide.
   token when the app starts, and provides `login()`, `register()`,
   `logout()` and `hasRole()`.
 
-They're two files because React's fast refresh (which keeps your page's
+- `notificationsContext.js`: the context for the unread notification
+  count, and `useNotifications()`.
+- `NotificationsProvider.jsx`: holds the count, opens the socket when
+  someone logs in and closes it when they log out. It sits inside
+  `AuthProvider`, because it needs to know who's logged in.
+
+Each context is two files because React's fast refresh (which keeps your page's
 state when you save a file in `npm run dev`) only works for files that
 export nothing but components.
 

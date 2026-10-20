@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Telling the Server Who You Are, Every Time — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/notifications/connecting-a-socket/one-shared-socket.html">← One Shared Socket</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/notifications/connecting-a-socket/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/notifications/connecting-a-socket/listening-and-stopping.html">Listening, and Stopping →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Telling the Server Who You Are, Every Time</h1>
+    <p class="lede">sendToken() is a connect handler, so it runs on the first connection and on every automatic reconnection, when the server has forgotten the socket&#39;s room.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Connecting, and saying who you are, are two separate steps:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 5.13: connecting and disconnecting</span>
+<span class="hljs-comment">// (src/realtime/socket.js, excerpt)</span>
+<span class="hljs-comment">// The server doesn&#x27;t know who a socket belongs to until it&#x27;s told, so the</span>
+<span class="hljs-comment">// token is sent on *every* connect. If the connection drops (the API</span>
+<span class="hljs-comment">// restarts, the Wi-Fi blinks), Socket.IO reconnects by itself, but the</span>
+<span class="hljs-comment">// server has forgotten the socket&#x27;s room, so it must be told again.</span>
+<span class="hljs-comment">// The token comes from the same place as client.js&#x27;s: the one saved at</span>
+<span class="hljs-comment">// login.</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">sendToken</span>(<span class="hljs-params"></span>) {
+  socket.<span class="hljs-title function_">emit</span>(<span class="hljs-string">&#x27;authenticate&#x27;</span>, <span class="hljs-title function_">getSavedToken</span>());
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">connectSocket</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-comment">// off() first, so connecting twice never sends the token twice.</span>
+  socket.<span class="hljs-title function_">off</span>(<span class="hljs-string">&#x27;connect&#x27;</span>, sendToken);
+  socket.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;connect&#x27;</span>, sendToken);
+  socket.<span class="hljs-title function_">connect</span>();
+}
+
+<span class="hljs-comment">// Called on logout: no more pushes for the user who has left.</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">disconnectSocket</span>(<span class="hljs-params"></span>) {
+  socket.<span class="hljs-title function_">off</span>(<span class="hljs-string">&#x27;connect&#x27;</span>, sendToken);
+  socket.<span class="hljs-title function_">disconnect</span>();
+}
+</code></pre>
+<h2><code>on</code>, <code>off</code> and <code>emit</code></h2>
+<p>These are the same three words as on the server:</p>
+<ul>
+<li><code>socket.on('connect', sendToken)</code>: when the <code>connect</code> event happens,
+call <code>sendToken</code>. Like <code>addEventListener('click', ...)</code> on a button.</li>
+<li><code>socket.off('connect', sendToken)</code>: stop calling it. It has to be the
+<strong>same function</strong>, which is why <code>sendToken</code> has a name rather than
+being written inline.</li>
+<li><code>socket.emit('authenticate', getSavedToken())</code>: send a message called
+<code>authenticate</code>, carrying the token, to the server.</li>
+</ul>
+<h2>Why &quot;every time&quot;?</h2>
+<p><code>connect</code> doesn't only happen once. Socket.IO <strong>reconnects by itself</strong>
+when a connection drops, and each reconnection fires <code>connect</code> again:</p>
+<p><img src="/support-desk-front-end/assets/images/authenticate-on-every-connect.svg" alt="Diagram: a timeline for Alex's socket. First, connectSocket() calls socket.connect(). The connect event fires, sendToken() sends authenticate, and the server joins this connection to Alex's room, user: followed by Alex's id. A push arrives. Then the API restarts, and the connection drops. On the server, the old connection and its room are gone. Socket.IO reconnects by itself, as a brand-new connection in no rooms. The connect event fires again, so sendToken() sends authenticate again, and the server joins the new connection to Alex's room. The next push arrives. Underneath, a crossed-out alternative: if the token were only sent on the first connect, the new connection would stay in no rooms, and every later push would be lost, with no error anywhere."></p>
+<p>Sending the token from a <code>connect</code> handler covers the first connection
+and every reconnection with one line.</p>
+<h2>The same token as <code>client.js</code></h2>
+<p><code>sendToken()</code> reads the token with <code>getSavedToken()</code> <strong>each time</strong> it
+runs, just as <code>client.js</code>'s <code>getToken()</code> does before every request. So
+nobody has to pass the token in, and a reconnection long after login
+still finds it in <code>localStorage</code>. As in Stage 4, no component handles
+the token: only the two files that send it (<code>client.js</code> and
+<code>socket.js</code>) read it, and only <code>AuthProvider</code> saves and clears it.</p>
+<h2><code>off</code> before <code>on</code></h2>
+<p>If <code>connectSocket()</code> were ever called twice, <code>on</code> alone would register
+<code>sendToken</code> twice, and every connection would send the token twice.
+Removing it first makes calling <code>connectSocket()</code> again harmless.
+<code>disconnectSocket()</code> removes it too, so nothing is sent for a user who
+has logged out.</p>
+<h2>Try it</h2>
+<p>You'll need two browsers (or one ordinary and one private window): log
+in as Alex in one and Casey in the other.</p>
+<ol>
+<li>In <code>socket.js</code>, change <code>socket.on('connect', sendToken)</code> to
+<code>socket.once('connect', sendToken)</code>: &quot;only the first time&quot;. Save, and
+reload Alex's page, so it starts with the changed code.</li>
+<li>Restart the API: <code>docker compose restart api</code> in the back-end's
+folder. Wait a few seconds.</li>
+<li>As Casey, comment on a ticket assigned to Alex. Does Alex's unread
+count go up? Reload Alex's page: does it now? Explain both.</li>
+</ol>
+<p>Put <code>on</code> back.</p>
+</div>
+    
+  </main>
+</body>
+</html>

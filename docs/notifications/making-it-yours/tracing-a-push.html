@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tracing a Push — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/notifications/testing-stage-5/running-everything.html">← Running Everything</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/notifications/making-it-yours/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/notifications/making-it-yours/your-stage-5-checklist.html">Your Stage 5 Checklist →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Tracing a Push</h1>
+    <p class="lede">Questions to practise the viva&#39;s trace with, now that some changes start on the server: the socket, the provider, the function form and the notice.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The viva's trace has been <strong>component → API module → HTTP request →
+state update → re-render</strong>, always starting with a click. Stage 5 adds
+traces that start somewhere else: on the <strong>server</strong>, with a push that
+arrives on a socket, which then leads to an ordinary HTTP request.</p>
+<h2>Write one yourself</h2>
+<p>Write the trace for <strong>a new notification appearing on Alex's
+Notifications page</strong> while it's open, as a numbered list, one line per
+step, with the file each step is in. Start with Casey clicking <strong>Add
+comment</strong>, and finish with the new item at the top of Alex's list. You
+should need about ten steps. Topic 05's diagram, &quot;From Casey's Click to
+Alex's Count&quot;, covers most of it; the last steps are topic 05's
+function form.</p>
+<h2>Questions to practise with</h2>
+<p>Answer these out loud, with the code open. Then try them again with it
+closed.</p>
+<ol>
+<li>What are the two channels notifications reach the browser by? What
+would each one miss on its own?</li>
+<li>Which file creates the socket, and when? Why isn't it created in a
+component?</li>
+<li>Where does the token sent over the socket come from? Which function
+reads it, and how often?</li>
+<li>Why is the token sent on <strong>every</strong> connect, not just the first?</li>
+<li>When a push arrives, the count goes up. Which function runs, and
+why doesn't it just add 1?</li>
+<li>Why can the provider trust the new notification to be in the
+<code>GET /notifications?unread=true</code> answer?</li>
+<li>Alex logs out. Name everything that happens to the socket, the
+listener and the count, and the file each happens in.</li>
+<li>In <code>NotificationsPage</code>'s push handler, why does <code>setNotifications()</code>
+get a function? What would <code>notifications</code> be inside the handler if
+it didn't?</li>
+<li>Why does <code>handleMarkRead</code> use the function form too?</li>
+<li>A push arrives while the list is still loading. What does the
+handler do, and why is that usually fine?</li>
+<li>How does <code>TicketDetailPage</code> decide a notification is about its
+ticket? Why <code>Number()</code>, and why is <code>ticket.created</code> ignored?</li>
+<li>Alex clicks <strong>Reload</strong>. Which state changes, which effect runs
+again, and why does the notice go away?</li>
+<li>Why doesn't the ticket page reload by itself when a notification
+arrives?</li>
+<li>Ada has ticket 1 open when Casey comments on it. What does Ada see,
+and why?</li>
+</ol>
+<h2>Try it</h2>
+<p>Pick two questions you couldn't answer with the code closed. Find the
+answers in the code, then explain each to someone else without
+looking.</p>
+</div>
+    
+  </main>
+</body>
+</html>

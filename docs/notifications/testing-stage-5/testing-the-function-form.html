@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Testing the Function Form — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/notifications/testing-stage-5/pushing-in-a-test.html">← Pushing in a Test</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/notifications/testing-stage-5/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/notifications/testing-stage-5/testing-the-notice.html">Testing the Notice →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Testing the Function Form</h1>
+    <p class="lede">Two pushes in a row prove the page adds to the list it has now, not the list it had when it opened. And a push during loading is tested with a promise the test resolves itself.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Topic 05's function form exists for one reason: the push handler must
+add to the list as it is <strong>now</strong>. One test pins that down:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 5.26: two pushes, both kept</span>
+<span class="hljs-comment">// (src/pages/NotificationsPage.test.jsx, excerpt)</span>
+<span class="hljs-title function_">it</span>(<span class="hljs-string">&#x27;keeps every pushed notification when several arrive&#x27;</span>, <span class="hljs-title function_">async</span> () =&gt; {
+  getNotifications.<span class="hljs-title function_">mockResolvedValue</span>([]);
+  <span class="hljs-keyword">const</span> socket = <span class="hljs-title function_">captureNotificationHandler</span>();
+  <span class="hljs-title function_">renderPage</span>();
+  <span class="hljs-keyword">await</span> screen.<span class="hljs-title function_">findByText</span>(<span class="hljs-string">&#x27;You have no notifications.&#x27;</span>);
+
+  <span class="hljs-keyword">await</span> socket.<span class="hljs-title function_">push</span>(unreadNotification);
+  <span class="hljs-keyword">await</span> socket.<span class="hljs-title function_">push</span>(commentPush);
+
+  <span class="hljs-comment">// Newest first: the second push is at the top, and the first is kept.</span>
+  <span class="hljs-keyword">const</span> items = screen.<span class="hljs-title function_">getAllByRole</span>(<span class="hljs-string">&#x27;listitem&#x27;</span>);
+  <span class="hljs-title function_">expect</span>(items).<span class="hljs-title function_">toHaveLength</span>(<span class="hljs-number">2</span>);
+  <span class="hljs-title function_">expect</span>(<span class="hljs-title function_">within</span>(items[<span class="hljs-number">0</span>]).<span class="hljs-title function_">getByText</span>(commentPush.<span class="hljs-property">message</span>))
+    .<span class="hljs-title function_">toBeInTheDocument</span>();
+  <span class="hljs-title function_">expect</span>(<span class="hljs-title function_">within</span>(items[<span class="hljs-number">1</span>]).<span class="hljs-title function_">getByText</span>(unreadNotification.<span class="hljs-property">message</span>))
+    .<span class="hljs-title function_">toBeInTheDocument</span>();
+});
+</code></pre>
+<p>(The two <code>within</code> lines are reflowed to fit.)</p>
+<h2>Why two pushes?</h2>
+<p>With one push, the plain form's mistake can hide: if the list it
+started from happened to be the right one, the result looks fine.
+The second push is the test: it only survives alongside the first if
+the handler builds on the list the first push left behind. And the
+list starts as <code>[]</code> here, so this test fails even if the handler
+forgot about <code>null</code> entirely.</p>
+<h2>A push while the page is loading</h2>
+<p>The other push test (topic 05, slide 06) needs the page to stay
+loading while it pushes. <code>mockReturnValue(new Promise(() =&gt; {}))</code> would
+keep it loading forever. This test needs to finish the load later, so
+it makes a promise whose <code>resolve</code> it keeps:</p>
+<pre><code class="hljs language-js"><span class="hljs-keyword">let</span> finishLoading;
+getNotifications.<span class="hljs-title function_">mockReturnValue</span>(
+  <span class="hljs-keyword">new</span> <span class="hljs-title class_">Promise</span>(<span class="hljs-function">(<span class="hljs-params">resolve</span>) =&gt;</span> {
+    finishLoading = resolve;
+  }),
+);
+</code></pre>
+<p>Then it pushes, and only then calls <code>finishLoading([...])</code>, inside
+<code>act()</code>, to play the API's answer arriving.</p>
+<h2>The gap</h2>
+<p>Topic 05's other function form, in <code>handleMarkRead</code>, isn't tested: no
+test pushes while a <code>PATCH</code> is on its way. Put the plain form back in
+<code>handleMarkRead</code> and every test still passes. Testing it would mean
+holding the <code>PATCH</code> open with a promise, as above, and pushing in the
+middle.</p>
+<h2>Try it</h2>
+<ol>
+<li>In <code>NotificationsPage.jsx</code>, change the push handler back to the
+plain form, <code>setNotifications([newNotification, ...notifications]);</code>,
+and run <code>npm test</code>. Which three tests fail? Put it back.</li>
+<li><strong>Challenge:</strong> write the missing test: mark a notification as read,
+push a new one before the <code>PATCH</code> answers, then let the <code>PATCH</code>
+answer. Check that both notifications are still in the list. Then
+check your test fails with the plain form in <code>handleMarkRead</code>.</li>
+</ol>
+</div>
+    
+  </main>
+</body>
+</html>

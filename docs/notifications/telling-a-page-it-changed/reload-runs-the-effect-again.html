@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reload Runs the Effect Again — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/notifications/telling-a-page-it-changed/is-it-about-this-ticket.html">← Is It About This Ticket?</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/notifications/telling-a-page-it-changed/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/notifications/telling-a-page-it-changed/the-list-and-who-sees-the-notice.html">The List, and Who Sees the Notice →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Reload Runs the Effect Again</h1>
+    <p class="lede">A reloadCount in the fetch effect&#39;s dependency list: adding 1 makes the effect run again. And why the page asks first, rather than reloading by itself.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The detail page already has an effect that loads the ticket and its
+comments (Stage 3). Reload needs to run it again. React has no &quot;run
+this effect now&quot; function, but an effect runs again whenever something
+in its dependency list changes. So the page adds something to change:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 5.20: Reload runs the fetch effect again</span>
+<span class="hljs-comment">// (src/pages/TicketDetailPage.jsx, excerpts)</span>
+<span class="hljs-comment">// How many times Reload has been clicked. Its only job is to be in the</span>
+<span class="hljs-comment">// fetch effect&#x27;s dependency list: adding 1 makes the effect run again.</span>
+<span class="hljs-keyword">const</span> [reloadCount, setReloadCount] = <span class="hljs-title function_">useState</span>(<span class="hljs-number">0</span>);
+
+<span class="hljs-comment">// ... the fetch effect, whose cleanup now also calls</span>
+<span class="hljs-comment">//     setHasChanged(false) ...</span>
+}, [ticketId, reloadCount]);
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">handleReload</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-title function_">setReloadCount</span>(reloadCount + <span class="hljs-number">1</span>);
+}
+
+<span class="hljs-comment">// ... and in the JSX, above the &lt;h1&gt;:</span>
+{hasChanged &amp;&amp; (
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">RefreshNotice</span>
+    <span class="hljs-attr">message</span>=<span class="hljs-string">&quot;This ticket has changed.&quot;</span>
+    <span class="hljs-attr">onReload</span>=<span class="hljs-string">{handleReload}</span>
+  /&gt;</span></span>
+)}
+</code></pre>
+<p>(Three excerpts, and the <code>&lt;RefreshNotice&gt;</code> line is reflowed to fit.)</p>
+<p><img src="/support-desk-front-end/assets/images/reloadcount-reruns-the-effect.svg" alt="Diagram: a cycle of five steps. 1, the user clicks Reload: handleReload() calls setReloadCount(reloadCount + 1), so reloadCount goes from 0 to 1. 2, the page re-renders, and React sees that the dependency list, ticketId and reloadCount, has changed. 3, the old run's cleanup: ignore becomes true, the ticket and comments are cleared, isLoading becomes true, and hasChanged becomes false, so the notice goes. The page shows Loading the ticket, and CommentForm isn't on the screen, so anything typed in it is lost. 4, the effect runs again: getTicket() and getComments(), the same as when the page opened. 5, the answers arrive, and the page shows the latest ticket and comments. The number in reloadCount itself is never shown or used for anything else."></p>
+<p><code>reloadCount</code>'s value doesn't matter, only that it's different. The
+cleanup already puts the page back to &quot;loading&quot; when the URL changes to
+another ticket (Stage 2), so a reload gets that for free, plus
+<code>setHasChanged(false)</code> to remove the notice.</p>
+<h2>Why not reload automatically?</h2>
+<p>The handler in Figure 5.19 could have bumped <code>reloadCount</code> itself. It
+doesn't, because of step 3 in the diagram. While the page is loading,
+it shows <code>Loading</code> <strong>instead of</strong> the ticket, so <code>CommentForm</code> is taken
+off the screen, and the text in it (its own state) goes with it.</p>
+<p>So if Alex were halfway through a reply when Casey's comment arrived,
+an automatic reload would wipe it. A notice can't do any harm: Alex
+finishes typing, posts the reply, and clicks <strong>Reload</strong> when it suits
+them.</p>
+<p>Reloading quietly, without losing anything, is possible, but it needs
+more code. It's a challenge at the end of this lesson.</p>
+<h2>Try it</h2>
+<p>With Alex on ticket 1 and Casey in the other browser:</p>
+<ol>
+<li>As Alex, start typing a comment, but don't post it. As Casey, comment
+on ticket 1. Is Alex's text still there when the notice appears?
+Now click <strong>Reload</strong>. What happened to the text, and which step of
+the diagram did it?</li>
+<li>In <code>TicketDetailPage.jsx</code>, remove <code>reloadCount</code> from the effect's
+dependency list (leaving <code>[ticketId]</code>). Save, reload, and repeat.
+What does <strong>Reload</strong> do now? Run <code>npm run lint</code>: does it notice?
+(The linter asks for every value an effect <strong>uses</strong>, and this effect
+never reads <code>reloadCount</code>.) Now run <code>npm test</code>: which test notices?
+Put it back.</li>
+</ol>
+</div>
+    
+  </main>
+</body>
+</html>

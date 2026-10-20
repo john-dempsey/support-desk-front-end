@@ -1,7 +1,7 @@
 // TicketDetailPage reads the ticket's ID from the URL with useParams(), so
 // each test passes both the URL to visit (`route`) and the route pattern
 // the page lives at in App.jsx (`path`). Both API modules the page uses
-// are faked, as in TicketListPage.test.jsx.
+// are faked, as in TicketListPage.test.jsx, and so is the socket.
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -13,9 +13,12 @@ import { renderWithProviders } from '../test/renderWithProviders.jsx';
 import { ticketAssignedToAlex, unassignedTicket } from '../test/testTickets.js';
 import { testComments } from '../test/testComments.js';
 import { agentUser, customerUser } from '../test/testUsers.js';
+import { commentPush } from '../test/testNotifications.js';
+import { captureNotificationHandler } from '../test/fakeSocket.js';
 
 vi.mock('../api/tickets.api.js');
 vi.mock('../api/comments.api.js');
+vi.mock('../realtime/socket.js');
 
 const DETAIL_PATH = '/tickets/:ticketId';
 
@@ -302,6 +305,58 @@ describe('TicketDetailPage', () => {
       expect(
         screen.queryByRole('button', { name: 'Delete comment by Alex Agent' }),
       ).not.toBeInTheDocument();
+    });
+  });
+
+  describe('when a notification arrives', () => {
+    // Alex is looking at ticket 1, which is assigned to them.
+    async function renderTicketForAlex() {
+      getTicket.mockResolvedValue(ticketAssignedToAlex);
+      const socket = captureNotificationHandler();
+      renderWithProviders(<TicketDetailPage />, {
+        route: '/tickets/1',
+        path: DETAIL_PATH,
+        user: agentUser,
+      });
+      await screen.findByRole('heading', { level: 1, name: 'Cannot log in' });
+      return socket;
+    }
+
+    it('says the ticket has changed when the notification is about it', async () => {
+      const socket = await renderTicketForAlex();
+
+      // Casey has commented on ticket 1.
+      await socket.push(commentPush);
+
+      expect(screen.getByRole('status')).toHaveTextContent('This ticket has changed.');
+    });
+
+    it('says nothing for a notification about another ticket', async () => {
+      const socket = await renderTicketForAlex();
+
+      await socket.push({ ...commentPush, ticketId: 2 });
+
+      expect(screen.queryByText('This ticket has changed.')).not.toBeInTheDocument();
+    });
+
+    it('says nothing for "ticket created", even about this ticket', async () => {
+      const socket = await renderTicketForAlex();
+
+      await socket.push({ ...commentPush, type: 'ticket.created' });
+
+      expect(screen.queryByText('This ticket has changed.')).not.toBeInTheDocument();
+    });
+
+    it('loads the ticket and comments again when Reload is clicked', async () => {
+      const socket = await renderTicketForAlex();
+      await socket.push(commentPush);
+      getComments.mockResolvedValue(testComments);
+
+      await userEvent.click(screen.getByRole('button', { name: 'Reload' }));
+
+      expect(await screen.findByText('Yes, it is not there either.')).toBeInTheDocument();
+      expect(getTicket).toHaveBeenCalledTimes(2);
+      expect(screen.queryByText('This ticket has changed.')).not.toBeInTheDocument();
     });
   });
 });

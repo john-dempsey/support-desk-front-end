@@ -6,8 +6,12 @@
 // Register; a logged-in user sees the tickets, their name and Log out;
 // and only agents and admins see Tags. Hiding a link is for the user's
 // sake: the API still refuses anyone who goes to /tags without the role.
+//
+// Since Stage 5 a logged-in user also sees Notifications, with how many
+// are unread.
 import { NavLink, useNavigate } from 'react-router';
 import { useAuth } from '../context/authContext.js';
+import { useNotifications } from '../context/notificationsContext.js';
 
 const APP_NAME = 'Support Desk';
 
@@ -20,6 +24,7 @@ const ROLE_LABELS = {
 
 function NavBar() {
   const { user, hasRole, logout } = useAuth();
+  const { unreadCount } = useNotifications();
   const navigate = useNavigate();
 
   function handleLogout() {
@@ -44,6 +49,20 @@ function NavBar() {
               {/* No `end` here, so "Tickets" stays active on a ticket's
                   own page (/tickets/2) as well as on /tickets. */}
               <NavLink to="/tickets">Tickets</NavLink>
+            </li>
+          )}
+          {user && (
+            <li>
+              <NavLink to="/notifications">
+                Notifications{' '}
+                {/* The count is words, not just a coloured dot, so it
+                    doesn't rely on colour or a number alone.
+                    aria-live="polite" makes a screen reader say it when
+                    it changes, once the reader has finished speaking. */}
+                <span className="unread-count" aria-live="polite">
+                  ({unreadCount} unread)
+                </span>
+              </NavLink>
             </li>
           )}
           {hasRole('agent', 'admin') && (

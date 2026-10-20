@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Listening, and Stopping — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/notifications/connecting-a-socket/telling-the-server-who-you-are.html">← Telling the Server Who You Are, Every Time</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/notifications/connecting-a-socket/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/notifications/connecting-a-socket/opening-the-socket-at-login.html">Opening the Socket at Login →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Listening, and Stopping</h1>
+    <p class="lede">onNotification() adds a handler for notification.created, and gives back the function that removes it: exactly what an effect&#39;s cleanup needs.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The last function lets a component hear about pushes:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 5.14: listening for notifications</span>
+<span class="hljs-comment">// (src/realtime/socket.js, excerpt)</span>
+<span class="hljs-comment">// Calls `handler` with each new notification as it arrives. Returns a</span>
+<span class="hljs-comment">// function that stops listening, for a component&#x27;s effect cleanup:</span>
+<span class="hljs-comment">//   const stopListening = onNotification(handleNotification);</span>
+<span class="hljs-comment">//   return stopListening;</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">onNotification</span>(<span class="hljs-params">handler</span>) {
+  socket.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;notification.created&#x27;</span>, handler);
+  <span class="hljs-keyword">return</span> <span class="hljs-function">() =&gt;</span> {
+    socket.<span class="hljs-title function_">off</span>(<span class="hljs-string">&#x27;notification.created&#x27;</span>, handler);
+  };
+}
+</code></pre>
+<p><code>socket.on('notification.created', handler)</code> asks the socket to call
+<code>handler</code> with the notification each time the server pushes one. A
+socket can have any number of handlers for the same event, and calls
+every one of them:</p>
+<p><img src="/support-desk-front-end/assets/images/who-is-listening.svg" alt="Diagram: in the middle, the shared socket, with a list of handlers for notification.created. On the left, a component's effect calls onNotification(handler), which adds its handler to the list and gives back stopListening. When the component's effect is cleaned up, it calls stopListening(), which takes that same handler off the list. On the right, a push arrives from the server: the socket calls every handler in the list, once each, with the notification. A component that has stopped listening isn't called."></p>
+<h2>A function that returns a function</h2>
+<p><code>onNotification()</code> returns an arrow function. That function remembers
+the <code>handler</code> it was created with, so calling it later removes exactly
+that handler and no other. Whoever started listening doesn't need to
+keep the handler, or know how the socket stores it: they keep the one
+function that undoes what they did.</p>
+<p>An effect's cleanup is exactly that kind of function, &quot;undo what this
+effect did&quot;. So a component can hand it straight back:</p>
+<pre><code class="hljs language-js"><span class="hljs-title function_">useEffect</span>(<span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-keyword">const</span> stopListening = <span class="hljs-title function_">onNotification</span>(handleNotification);
+  <span class="hljs-keyword">return</span> stopListening;
+}, []);
+</code></pre>
+<p>Compare it with the <code>ignore</code> flag in every fetching effect: there, the
+cleanup undoes &quot;a response might still arrive&quot;. Here it undoes &quot;I'm
+listening&quot;.</p>
+<h2>Why stop?</h2>
+<p>A handler that's never removed stays on the socket for as long as the
+app is open. Each time a page that listens opened, it would add
+another, so one push would run the code of every visit that page had
+ever had. The provider (next slide) and, later in this lesson, three
+pages listen, and all four stop when they're done.</p>
+<h2>Try it</h2>
+<p>Read Figure 5.14 and answer without running anything:</p>
+<ol>
+<li>Two components call <code>onNotification()</code> with different handlers, and
+one of them later calls its <code>stopListening()</code>. Which handler does the
+socket still call? How does the returned function know which one to
+remove?</li>
+<li>What would go wrong if <code>onNotification()</code> returned nothing, and
+components called <code>socket.off('notification.created')</code> themselves,
+with no handler? (Hint: without a handler, <code>off</code> removes every
+handler for that event.)</li>
+</ol>
+</div>
+    
+  </main>
+</body>
+</html>

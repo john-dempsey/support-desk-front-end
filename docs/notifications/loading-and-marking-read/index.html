@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Loading Notifications and Marking Them Read — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/notifications/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Loading Notifications and Marking Them Read</h1>
+    <p class="lede">The notifications API file, what a notification looks like, the page that loads the list, the component that shows it, and marking one as read with map().</p>
+
+    
+      <ul class="listing">
+        
+          <li>
+            <a href="/support-desk-front-end/notifications/loading-and-marking-read/three-requests-about-notifications.html">Three Requests About Notifications</a>
+            <p>notifications.api.js has one function per request: all of the user&#39;s notifications, only the unread ones, and marking one as read.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/notifications/loading-and-marking-read/what-a-notification-looks-like.html">What a Notification Looks Like</a>
+            <p>Six fields: what happened (type), a sentence for the user (message), which ticket it&#39;s about, whether it&#39;s been read, and when it happened.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/notifications/loading-and-marking-read/the-page-loads-the-list.html">The Page Loads the List</a>
+            <p>NotificationsPage loads the saved notifications when it opens, with the same state and effect as every page since Stage 2.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/notifications/loading-and-marking-read/showing-each-notification.html">Showing Each Notification</a>
+            <p>NotificationList shows each notification&#39;s message and date, says New in words for unread ones, and offers View ticket and Mark as read only where they make sense.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/notifications/loading-and-marking-read/marking-one-as-read.html">Marking One as Read</a>
+            <p>Mark as read sends a PATCH, then swaps the updated notification into the list with map(): a new array, the same length, with one item replaced.</p>
+          </li>
+        
+      </ul>
+    
+
+    
+  </main>
+</body>
+</html>

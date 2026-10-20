@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Is It About This Ticket? — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/notifications/telling-a-page-it-changed/a-notice-with-a-button.html">← A Notice With a Button</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/notifications/telling-a-page-it-changed/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/notifications/telling-a-page-it-changed/reload-runs-the-effect-again.html">Reload Runs the Effect Again →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Is It About This Ticket?</h1>
+    <p class="lede">The detail page listens for notifications, and shows the notice only for one about the ticket it&#39;s showing, and not for the customer&#39;s own &#39;ticket created&#39;.</p>
+
+    
+
+    
+      <div class="slide-body"><p><code>TicketDetailPage</code> listens while it's open, and decides whether each
+notification is about its ticket:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 5.19: listening for changes to this ticket</span>
+<span class="hljs-comment">// (src/pages/TicketDetailPage.jsx, excerpt)</span>
+<span class="hljs-title function_">useEffect</span>(<span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-keyword">function</span> <span class="hljs-title function_">handleNotification</span>(<span class="hljs-params">notification</span>) {
+    <span class="hljs-comment">// ticketId in the URL is a string (&quot;2&quot;); the notification&#x27;s is a</span>
+    <span class="hljs-comment">// number (2).</span>
+    <span class="hljs-keyword">const</span> isAboutThisTicket =
+      notification.<span class="hljs-property">ticketId</span> === <span class="hljs-title class_">Number</span>(ticketId);
+    <span class="hljs-comment">// A customer who has just created a ticket lands on its page, and</span>
+    <span class="hljs-comment">// their own &quot;Your ticket was created&quot; arrives there. The ticket</span>
+    <span class="hljs-comment">// hasn&#x27;t changed since it loaded, so that one is ignored.</span>
+    <span class="hljs-keyword">const</span> isNewTicket = notification.<span class="hljs-property">type</span> === <span class="hljs-string">&#x27;ticket.created&#x27;</span>;
+    <span class="hljs-keyword">if</span> (isAboutThisTicket &amp;&amp; !isNewTicket) {
+      <span class="hljs-title function_">setHasChanged</span>(<span class="hljs-literal">true</span>);
+    }
+  }
+
+  <span class="hljs-keyword">const</span> stopListening = <span class="hljs-title function_">onNotification</span>(handleNotification);
+  <span class="hljs-keyword">return</span> stopListening;
+}, [ticketId]);
+</code></pre>
+<p>(The <code>isAboutThisTicket</code> line is reflowed to fit.)</p>
+<h2>A string and a number</h2>
+<p><code>useParams()</code> gives <code>ticketId</code> as text from the URL: <code>&quot;1&quot;</code>. The
+notification's <code>ticketId</code> is a number from the JSON: <code>1</code>. <code>===</code> never
+calls a string and a number equal, so <code>&quot;1&quot; === 1</code> is <code>false</code>.
+<code>Number(ticketId)</code> turns the URL's text into a number first. It's the
+same conversion <code>EditTicketPage</code> does before sending an agent's ID
+(Stage 3, topic 05).</p>
+<h2>Why <code>ticket.created</code> is ignored</h2>
+<p>When Casey creates a ticket, <code>NewTicketPage</code> goes straight to the new
+ticket's page. The API tells Casey too (&quot;Your ticket … was created.&quot;),
+and that push arrives while Casey is on that very page. Without the
+check, a ticket Casey created a moment ago would say it &quot;has changed&quot;.</p>
+<h2><code>[ticketId]</code> this time</h2>
+<p>The handler reads <code>ticketId</code>, so the effect lists it. If the URL changes
+to another ticket while the page stays on screen, the cleanup stops the
+old handler, and a new one is registered that knows the new ID.</p>
+<p>This handler never reads state that it then changes: it just sets
+<code>hasChanged</code> to <code>true</code>. So it doesn't need the function form from
+topic 05. That's only for a new value worked out from the old one.</p>
+<h2>Try it</h2>
+<ol>
+<li>In Figure 5.19, remove <code>Number()</code> so the line compares
+<code>notification.ticketId === ticketId</code>. Reload Alex's page for ticket
+1, then have Casey comment on it. Does the notice appear? Put it
+back.</li>
+<li>As Casey, create a ticket, and watch its page after you land on it.
+Then remove <code>&amp;&amp; !isNewTicket</code> from the <code>if</code>, reload, and create
+another. What changes? Put it back.</li>
+</ol>
+</div>
+    
+  </main>
+</body>
+</html>

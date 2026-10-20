@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What a Notification Looks Like — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/notifications/loading-and-marking-read/three-requests-about-notifications.html">← Three Requests About Notifications</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/notifications/loading-and-marking-read/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/notifications/loading-and-marking-read/the-page-loads-the-list.html">The Page Loads the List →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>What a Notification Looks Like</h1>
+    <p class="lede">Six fields: what happened (type), a sentence for the user (message), which ticket it&#39;s about, whether it&#39;s been read, and when it happened.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Here's part of Casey's answer to <code>GET /notifications</code>:</p>
+<pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;data&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span>
+    <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;ticket.commented&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;message&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Alex Agent commented on \&quot;Cannot log in\&quot;.&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;ticketId&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;readAt&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">null</span></span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;createdAt&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2026-10-20T07:22:15.781Z&quot;</span>
+    <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;ticket.commented&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;message&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Admin Ada commented on \&quot;Cannot log in\&quot;.&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;ticketId&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;readAt&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2026-10-20T06:50:06.195Z&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;createdAt&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2026-10-20T06:49:49.184Z&quot;</span>
+    <span class="hljs-punctuation">}</span>
+  <span class="hljs-punctuation">]</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<p>The first hasn't been read yet; the second has.</p>
+<p>(Your <code>id</code>s, dates and list will be different.)</p>
+<h2>Each field</h2>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>What it holds</th>
+<th>What the page does with it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>the notification's own ID</td>
+<td>the <code>key</code>, and the ID for marking it read</td>
+</tr>
+<tr>
+<td><code>type</code></td>
+<td>what happened, e.g. <code>ticket.commented</code></td>
+<td>nothing on this page (topic 06 uses it)</td>
+</tr>
+<tr>
+<td><code>message</code></td>
+<td>a sentence written by the API, for people</td>
+<td>shows it as it is</td>
+</tr>
+<tr>
+<td><code>ticketId</code></td>
+<td>the ticket it's about, or <code>null</code> once that ticket is deleted</td>
+<td>a <strong>View ticket</strong> link, when it isn't <code>null</code></td>
+</tr>
+<tr>
+<td><code>readAt</code></td>
+<td><code>null</code> until it's read, then the time it was marked</td>
+<td><strong>unread</strong> when it's <code>null</code></td>
+</tr>
+<tr>
+<td><code>createdAt</code></td>
+<td>when it happened, as an ISO string</td>
+<td><code>formatDate()</code>, as for tickets</td>
+</tr>
+</tbody>
+</table>
+<p>There's no <code>isRead</code> field: <code>readAt</code> is <code>null</code> or a date, and that's
+enough to tell. The front-end works it out with
+<code>notification.readAt === null</code>.</p>
+<h2>The five types</h2>
+<table>
+<thead>
+<tr>
+<th><code>type</code></th>
+<th>Who's told</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ticket.created</code></td>
+<td>the customer, and every agent</td>
+</tr>
+<tr>
+<td><code>ticket.assigned</code></td>
+<td>the newly assigned agent</td>
+</tr>
+<tr>
+<td><code>ticket.commented</code></td>
+<td>the customer, the assigned agent, and anyone watching the ticket with comment notifications on, but never whoever wrote the comment</td>
+</tr>
+<tr>
+<td><code>ticket.status_changed</code></td>
+<td>the customer</td>
+</tr>
+<tr>
+<td><code>ticket.sla_breached</code></td>
+<td>the assigned agent, or every admin if nobody is assigned</td>
+</tr>
+</tbody>
+</table>
+<p>The API chooses who's told (Lesson 8, &quot;One Listener Decides Who&quot;). The
+front-end never decides who should know about what: it shows whatever
+comes back.</p>
+<h2>Try it</h2>
+<p>Log in to the app as Casey, open a ticket assigned to Alex, and add a
+comment. Then, in your REST client, send <code>GET /notifications</code> as Alex,
+then as Casey, then as Ada. Who got a new notification? Check it
+against the table.</p>
+</div>
+    
+  </main>
+</body>
+</html>

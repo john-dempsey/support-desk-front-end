@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Page Loads the List — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/notifications/loading-and-marking-read/what-a-notification-looks-like.html">← What a Notification Looks Like</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/notifications/loading-and-marking-read/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/notifications/loading-and-marking-read/showing-each-notification.html">Showing Each Notification →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>The Page Loads the List</h1>
+    <p class="lede">NotificationsPage loads the saved notifications when it opens, with the same state and effect as every page since Stage 2.</p>
+
+    
+
+    
+      <div class="slide-body"><p><code>NotificationsPage</code> is a page like <code>TagsPage</code>: it owns the list, loads
+it when it opens, and hands it to a component to display.</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 5.3: the page&#x27;s state and what it shows</span>
+<span class="hljs-comment">// (src/pages/NotificationsPage.jsx, excerpt)</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">NotificationsPage</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> { refreshUnreadCount } = <span class="hljs-title function_">useNotifications</span>();
+  <span class="hljs-comment">// null = not loaded yet, as in TicketListPage.</span>
+  <span class="hljs-keyword">const</span> [notifications, setNotifications] = <span class="hljs-title function_">useState</span>(<span class="hljs-literal">null</span>);
+  <span class="hljs-keyword">const</span> [errorMessage, setErrorMessage] = <span class="hljs-title function_">useState</span>(<span class="hljs-string">&#x27;&#x27;</span>);
+  <span class="hljs-keyword">const</span> [isLoading, setIsLoading] = <span class="hljs-title function_">useState</span>(<span class="hljs-literal">true</span>);
+  <span class="hljs-keyword">const</span> [markErrorMessage, setMarkErrorMessage] = <span class="hljs-title function_">useState</span>(<span class="hljs-string">&#x27;&#x27;</span>);
+
+  <span class="hljs-comment">// ... the effect that loads the list, and handleMarkRead ...</span>
+
+  <span class="hljs-keyword">return</span> (
+    <span class="language-xml"><span class="hljs-tag">&lt;&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>Notifications<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>
+      {isLoading &amp;&amp; <span class="hljs-tag">&lt;<span class="hljs-name">Loading</span> <span class="hljs-attr">message</span>=<span class="hljs-string">&quot;Loading notifications…&quot;</span> /&gt;</span>}
+      {errorMessage &amp;&amp; <span class="hljs-tag">&lt;<span class="hljs-name">ErrorMessage</span> <span class="hljs-attr">message</span>=<span class="hljs-string">{errorMessage}</span> /&gt;</span>}
+      {markErrorMessage &amp;&amp; <span class="hljs-tag">&lt;<span class="hljs-name">ErrorMessage</span> <span class="hljs-attr">message</span>=<span class="hljs-string">{markErrorMessage}</span> /&gt;</span>}
+      {notifications &amp;&amp; (
+        <span class="hljs-tag">&lt;<span class="hljs-name">NotificationList</span>
+          <span class="hljs-attr">notifications</span>=<span class="hljs-string">{notifications}</span>
+          <span class="hljs-attr">onMarkRead</span>=<span class="hljs-string">{handleMarkRead}</span>
+        /&gt;</span>
+      )}
+    <span class="hljs-tag">&lt;/&gt;</span></span>
+  );
+}
+</code></pre>
+<p>(The <code>&lt;NotificationList&gt;</code> line is reflowed to fit.)</p>
+<p><code>useNotifications()</code> and <code>refreshUnreadCount</code> are for the unread count
+in the navigation bar. The next topic is about them.</p>
+<h2>Nothing new in the effect</h2>
+<p>The effect that fills <code>notifications</code> has the same shape as
+<code>TagsPage</code>'s, with <code>getNotifications()</code> in place of <code>getTags()</code> and its
+own state names: an <code>ignore</code> flag, <code>try</code>/<code>catch</code>/<code>finally</code>, and <code>[]</code> so
+it runs once, when the page opens. Open both files side by side and
+compare them.</p>
+<h2>Four states, as always</h2>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>What shows</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>loading</td>
+<td>&quot;Loading notifications…&quot; in <code>role=&quot;status&quot;</code></td>
+</tr>
+<tr>
+<td>error</td>
+<td>the API's message in <code>role=&quot;alert&quot;</code></td>
+</tr>
+<tr>
+<td>empty</td>
+<td>&quot;You have no notifications.&quot; (from <code>NotificationList</code>)</td>
+</tr>
+<tr>
+<td>success</td>
+<td>the list</td>
+</tr>
+</tbody>
+</table>
+<p>The empty message is in <code>NotificationList</code>, like &quot;There are no tickets
+to show.&quot; in <code>TicketList</code>: whoever displays the list knows when there's
+nothing in it.</p>
+<h2>Try it</h2>
+<ol>
+<li>Log in to the app as Alex and click <strong>Notifications</strong>. Then log in
+as Ada. Whose list is longer, and why? (The previous slide's table
+has the answer.)</li>
+<li>With the app open on another page, stop the API:
+<code>docker compose stop api</code> in the back-end's folder. <strong>Don't reload
+the page</strong>: click <strong>Notifications</strong> in the navigation bar. What does
+the page say? Then start the API again with <code>docker compose start api</code>.</li>
+</ol>
+<p>Why not reload? Reloading starts the app again, which checks your
+session with <code>GET /auth/me</code>. With the API down, that fails, and you're
+logged out (Stage 4, topic 05).</p>
+</div>
+    
+  </main>
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Count on Every Page — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/notifications/the-unread-count-shared/loading-the-count-when-the-user-changes.html">← Loading the Count When the User Changes</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/notifications/the-unread-count-shared/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/notifications/connecting-a-socket/the-server-side-briefly.html">The Server Side, Briefly →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>The Count on Every Page</h1>
+    <p class="lede">NavBar shows the count in words, in a live region a screen reader announces. main.jsx puts NotificationsProvider inside AuthProvider, because it reads the user.</p>
+
+    
+
+    
+      <div class="slide-body"><p><code>NavBar</code> reads the count with <code>useNotifications()</code>, and shows it inside
+the Notifications link, for anyone logged in:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 5.10: the link and its count (src/components/NavBar.jsx,</span>
+<span class="hljs-comment">// excerpt)</span>
+{user &amp;&amp; (
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">li</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">NavLink</span> <span class="hljs-attr">to</span>=<span class="hljs-string">&quot;/notifications&quot;</span>&gt;</span>
+      Notifications{&#x27; &#x27;}
+      {/* The count is words, not just a coloured dot, so it
+          doesn&#x27;t rely on colour or a number alone.
+          aria-live=&quot;polite&quot; makes a screen reader say it when
+          it changes, once the reader has finished speaking. */}
+      <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">className</span>=<span class="hljs-string">&quot;unread-count&quot;</span> <span class="hljs-attr">aria-live</span>=<span class="hljs-string">&quot;polite&quot;</span>&gt;</span>
+        ({unreadCount} unread)
+      <span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">NavLink</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span></span>
+)}
+</code></pre>
+<p>Many apps show a red dot or a bare &quot;3&quot;. &quot;(3 unread)&quot; says what the
+number means, so it works for everyone, and the link's whole name is
+&quot;Notifications (3 unread)&quot;.</p>
+<h2><code>aria-live=&quot;polite&quot;</code></h2>
+<p>A screen reader reads a page once and moves on. If text changes later,
+it says nothing, unless that text is in a <strong>live region</strong>.
+<code>aria-live=&quot;polite&quot;</code> makes the <code>&lt;span&gt;</code> one: when the count changes,
+the screen reader announces it as soon as it has finished what it's
+saying. It's the same idea as <code>role=&quot;status&quot;</code> on <code>Loading</code>, which is a
+polite live region too.</p>
+<h2>Inside AuthProvider</h2>
+<p><code>main.jsx</code> now has three wrappers around <code>App</code>:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 5.11: the providers around the app (src/main.jsx, excerpt)</span>
+<span class="hljs-title function_">createRoot</span>(<span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;root&#x27;</span>)).<span class="hljs-title function_">render</span>(
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">StrictMode</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">BrowserRouter</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">AuthProvider</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">NotificationsProvider</span>&gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-name">App</span> /&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-name">NotificationsProvider</span>&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">AuthProvider</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">BrowserRouter</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">StrictMode</span>&gt;</span></span>,
+);
+</code></pre>
+<p><img src="/support-desk-front-end/assets/images/provider-nesting.svg" alt="Diagram: nested boxes. The outermost is BrowserRouter, then AuthProvider, which holds user, login and logout. Inside it is NotificationsProvider, which holds unreadCount and refreshUnreadCount, and reads user from AuthProvider with useAuth(), shown by an arrow going up. Inside that is App, which renders NavBar and the Routes. NavBar reads unreadCount with useNotifications(), and NotificationsPage, inside Routes, calls refreshUnreadCount(), both shown by arrows going up to NotificationsProvider. A note says NotificationsProvider must be inside AuthProvider, because useAuth() only finds a provider above it."></p>
+<p>Stage 4 said the order of providers only matters for a provider that
+uses another one: it has to be inside it (topic 04, &quot;Wrapping the
+App&quot;). This is that case. <code>NotificationsProvider</code> calls <code>useAuth()</code> to
+know whose count to load, so it must be inside <code>AuthProvider</code>.</p>
+<h2>Try it</h2>
+<ol>
+<li>In <code>main.jsx</code>, swap <code>&lt;AuthProvider&gt;</code> and <code>&lt;NotificationsProvider&gt;</code>
+(and their closing tags), so <code>NotificationsProvider</code> is on the
+outside. Save, and read the error in the browser's Console. Which
+line of <code>NotificationsProvider.jsx</code> does it point to, and why is
+<code>useAuth()</code> <code>null</code> there? Put them back.</li>
+<li>In the developer tools' <strong>Elements</strong> tab, select the Notifications
+link and open the <strong>Accessibility</strong> pane. What is the link's name?
+Mark a notification as read and look again.</li>
+</ol>
+</div>
+    
+  </main>
+</body>
+</html>

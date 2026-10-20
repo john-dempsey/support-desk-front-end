@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Back to Mark as Read — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/notifications/when-a-notification-arrives/the-function-form.html">← The Function Form</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/notifications/when-a-notification-arrives/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/notifications/when-a-notification-arrives/a-push-while-loading.html">A Push While the List Is Loading →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Back to Mark as Read</h1>
+    <p class="lede">handleMarkRead uses the list from the moment of the click. A push that lands while the PATCH is on its way would be lost, so it gets the function form too.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Topic 02's <code>handleMarkRead</code> (Figure 5.6) worked out the new list from
+<code>notifications</code>. In Part 1 that was safe: nothing else could change the
+list. Now a push can, and the <code>await</code> in the middle leaves room for one:</p>
+<p><img src="/support-desk-front-end/assets/images/push-during-patch.svg" alt="Diagram: a timeline of three moments. At 0 milliseconds, Alex clicks Mark as read on notification 7. handleMarkRead starts, with notifications as 7 and 6, the list on screen, and sends the PATCH. At 10 milliseconds, while the PATCH is on its way, a push arrives with notification 8, and the push handler makes the list 8, 7, 6. At 50 milliseconds, the PATCH answers. With the plain form, handleMarkRead maps over 7 and 6, the list from 0 milliseconds, and sets the list to 7, now read, and 6: notification 8 has vanished from the screen, although it's saved in the API. With the function form, React passes in the current list, 8, 7 and 6, and the result is 8, 7 now read, and 6."></p>
+<p><code>handleMarkRead</code> was created in the render Alex clicked in, so its
+<code>notifications</code> is the list at the moment of the click. The push
+happened after that. When the PATCH answers, <code>notifications.map(...)</code>
+builds the new list from the old one, and notification 8 is dropped
+from the screen. It isn't lost for good (it's saved, so it's back the
+next time the page opens), but the screen and the count no longer
+agree.</p>
+<h2>The final code</h2>
+<p>So, now that pushes exist, <code>handleMarkRead</code> uses the function form too:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 5.17: marking one as read, the final version</span>
+<span class="hljs-comment">// (src/pages/NotificationsPage.jsx, excerpt)</span>
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">handleMarkRead</span>(<span class="hljs-params">notificationToMark</span>) {
+  <span class="hljs-title function_">setMarkErrorMessage</span>(<span class="hljs-string">&#x27;&#x27;</span>);
+  <span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">const</span> updatedNotification = <span class="hljs-keyword">await</span> <span class="hljs-title function_">markNotificationRead</span>(
+      notificationToMark.<span class="hljs-property">id</span>,
+    );
+    <span class="hljs-comment">// The API sends back the notification with readAt filled in. map()</span>
+    <span class="hljs-comment">// makes a new array the same length, swapping in the updated one and</span>
+    <span class="hljs-comment">// keeping every other notification as it was. It&#x27;s the function form</span>
+    <span class="hljs-comment">// again, because a push may have added to the list while this</span>
+    <span class="hljs-comment">// request was on its way.</span>
+    <span class="hljs-title function_">setNotifications</span>(<span class="hljs-function">(<span class="hljs-params">currentNotifications</span>) =&gt;</span>
+      currentNotifications.<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">notification</span>) =&gt;</span>
+        notification.<span class="hljs-property">id</span> === updatedNotification.<span class="hljs-property">id</span>
+          ? updatedNotification
+          : notification,
+      ),
+    );
+    <span class="hljs-comment">// One fewer unread, so NavBar&#x27;s count needs updating too.</span>
+    <span class="hljs-title function_">refreshUnreadCount</span>();
+  } <span class="hljs-keyword">catch</span> (error) {
+    <span class="hljs-title function_">setMarkErrorMessage</span>(error.<span class="hljs-property">message</span>);
+  }
+}
+</code></pre>
+<p>(Reflowed to fit.) This is the <code>stage-05</code> code. Compared with Figure
+5.6, apart from the comment, only two things changed:
+<code>(currentNotifications) =&gt;</code> in front, and <code>currentNotifications.map</code>
+instead of <code>notifications.map</code>.</p>
+<h2>It's rare, and that's the point</h2>
+<p>The window is the few milliseconds a PATCH takes, so you're unlikely to
+see this happen by clicking. That's what makes it worth preventing in
+the code: a bug that happens once in a thousand clicks is very hard to
+find later.</p>
+<h2>Try it</h2>
+<p>Look back at Stage 3's <code>handleAddComment</code> in <code>TicketDetailPage.jsx</code>:
+<code>setComments([...comments, newComment])</code>, after an <code>await</code>. Could
+anything change <code>comments</code> while that request is on its way, in
+Stage 5's app? What would have to be added to the app before it needed
+the function form?</p>
+</div>
+    
+  </main>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>When the Connection Ends — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/notifications/the-socket-in-devtools/messages-on-the-websocket.html">← Messages on the WebSocket</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/notifications/the-socket-in-devtools/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/notifications/testing-stage-5/what-stage-5-tests.html">What Stage 5 Tests →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>When the Connection Ends</h1>
+    <p class="lede">Restart the API and the socket reconnects and sends the token again by itself. Log out and it closes. A bad token makes the server close it, and it stays closed.</p>
+
+    
+
+    
+      <div class="slide-body"><p>A socket stays open for as long as someone is logged in, so it meets
+things a single request never does. Three are worth watching in the
+<strong>Network</strong> tab (<strong>All</strong>, filtered to <code>socket.io</code>).</p>
+<h2>The API restarts</h2>
+<p>Run <code>docker compose restart api</code> in the back-end's folder. The
+WebSocket row stops, and a few seconds later a new set of rows appears:
+Socket.IO has reconnected <strong>by itself</strong>, with no code of ours involved.
+Look for <code>authenticate</code> again in the new rows. That's <code>sendToken()</code>
+running on the new <code>connect</code> event, so the new connection joins Alex's
+room (topic 04, slide 03). Have Casey comment: the push still arrives.</p>
+<h2>Logging out</h2>
+<p>Log out, then log in as someone else. <code>disconnectSocket()</code> closed the
+old connection when <code>user</code> became <code>null</code>, and the next login opened a
+new one, with the new user's token. Pushes for the old user can't reach
+this browser any more.</p>
+<h2>A token the server rejects</h2>
+<p>The server disconnects a socket whose token doesn't verify. Socket.IO
+treats that as deliberate: when <strong>the server</strong> closes the connection, it
+doesn't try to reconnect. So a bad token gives no pushes, and no flood
+of retries either.</p>
+<p>The app doesn't need to handle this on the socket. The same token is
+sent with every HTTP request, so the next request gets a <code>401</code>, and
+<code>client.js</code> logs the user out (Stage 4, topic 09). After the next
+login, a good token opens a new socket.</p>
+<h2>Try it</h2>
+<ol>
+<li>Restart the API while watching the Network tab, as above. How long
+does Socket.IO take to come back? Which request carries the token
+this time?</li>
+<li>Log in as Alex. In <strong>Application</strong> → <strong>Local storage</strong>, change one
+character of the saved token. <strong>Don't reload.</strong> Restart the API, and
+watch the rows: does the socket come back, and does it keep trying?
+Then click <strong>Tickets</strong>. What happens, and which file did it?</li>
+</ol>
+</div>
+    
+  </main>
+</body>
+</html>

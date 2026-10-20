@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Two Channels — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/notifications/what-stage-5-adds/only-with-notifications.html">← Only If Your API Has Notifications</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/notifications/what-stage-5-adds/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/notifications/what-stage-5-adds/what-changes-and-what-doesnt.html">What Changes, and What Doesn&#39;t →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Two Channels</h1>
+    <p class="lede">Notifications reach the browser two ways: the saved history over REST, and a live push over a socket. Each one on its own would miss something.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The API tells the front-end about notifications in two different ways,
+and Stage 5 uses both:</p>
+<p><img src="/support-desk-front-end/assets/images/two-channels.svg" alt="Diagram: the API in the middle, saving each notification as a row in the Notification table. On the left, channel 1, history over REST: when the page opens or the user logs in, the browser asks GET /notifications, and the API answers with every saved row, including anything that happened while the user was away and every SLA breach. The browser asks, then the API answers. On the right, channel 2, live over Socket.IO: the browser keeps a socket open while the user is logged in, and the moment a new row is saved, the API pushes it as notification.created to that user only. The server sends without being asked. At the bottom, two warnings: a push is lost if the user isn't connected, since nothing is replayed later; and an SLA breach is never pushed, because the worker that finds it has no socket. So REST is the truth, and the socket is a nudge."></p>
+<h2>Why not just one?</h2>
+<p><strong>Only REST</strong> would work, but nothing would change on screen until the
+user reloaded the page or clicked a link. Asking the API every few
+seconds (&quot;polling&quot;) would fix that by flooding it with requests, almost
+all of them answered &quot;nothing new&quot; (Lesson 5, &quot;Real-Time Push with
+Socket.IO&quot;).</p>
+<p><strong>Only the socket</strong> would miss things. A push goes to whoever is
+connected <strong>at that moment</strong>, and nothing is replayed later. So
+anything that happens while the user is logged out, or while their
+laptop is closed, would never reach them. And SLA breaches would never
+arrive at all: they're found by the worker process (Lesson 6), which
+has no socket to push with.</p>
+<h2>REST is the truth, the socket is a nudge</h2>
+<p>So the saved rows are what the app believes. A push just means &quot;there's
+something new, go and look&quot;. You'll see that idea in every part of this
+stage: when a push arrives, the unread count is asked for again over
+REST, not worked out from the push.</p>
+<p>That's also why the stage is built in two parts:</p>
+<ol>
+<li><strong>History over REST</strong> (topics 02 and 03). This works with no socket
+at all.</li>
+<li><strong>Live updates over Socket.IO</strong> (topics 04 to 06), added on top.</li>
+</ol>
+<h2>Try it</h2>
+<p>In your REST client, log in as Alex and send <code>GET /notifications</code>.
+Look for a notification whose <code>type</code> is <code>ticket.sla_breached</code>. Which
+of the two channels is the only way Alex could ever see it, and why?</p>
+</div>
+    
+  </main>
+</body>
+</html>

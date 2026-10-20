@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Page Listens Too — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/notifications/when-a-notification-arrives/count-again-after-the-save.html">← Count Again, After the Save</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/notifications/when-a-notification-arrives/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/notifications/when-a-notification-arrives/the-function-form.html">The Function Form →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>The Page Listens Too</h1>
+    <p class="lede">NotificationsPage adds each push to the top of its list. The obvious way to write it uses the list from when the page opened, which is the wrong list.</p>
+
+    
+
+    
+      <div class="slide-body"><p>While <strong>Notifications</strong> is open, a new notification should appear at
+the top of the list. The page listens with <code>onNotification()</code>, in an
+effect that runs once, like the provider's. Here's the obvious way to
+write it, which <strong>isn't</strong> what the app does:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-title function_">useEffect</span>(<span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-keyword">function</span> <span class="hljs-title function_">handleNotification</span>(<span class="hljs-params">newNotification</span>) {
+    <span class="hljs-title function_">setNotifications</span>([newNotification, ...notifications]);
+  }
+
+  <span class="hljs-keyword">const</span> stopListening = <span class="hljs-title function_">onNotification</span>(handleNotification);
+  <span class="hljs-keyword">return</span> stopListening;
+}, []);
+</code></pre>
+<p><code>[newNotification, ...notifications]</code> is Stage 3's spread, with the new
+item at the front instead of the end. It looks right. Try it, and a
+push makes the Console say:</p>
+<pre><code class="hljs">Uncaught TypeError: notifications is not iterable
+</code></pre>
+<h2>Which <code>notifications</code>?</h2>
+<p>Every render of a component is a fresh call of its function, with its
+own <code>notifications</code> constant. A function created during a render, like
+<code>handleNotification</code>, can only see that render's <code>notifications</code>. It
+can't see later ones.</p>
+<p><img src="/support-desk-front-end/assets/images/old-list-current-list.svg" alt="Diagram: three moments in NotificationsPage. Render 1: the page opens, notifications is null. The effect runs, because it's the first render, and registers handleNotification, which can only see this render's notifications: null. Render 2: the list has loaded, and notifications is notification 6 and notification 5. The effect doesn't run again, because its dependency list is empty, so the socket still has the handler from render 1. A push arrives with notification 8. With the plain form, the handler builds 8 followed by the spread of null, which throws: notifications is not iterable. If the list had started as an empty array instead, the handler would build a list of just 8, and 6 and 5 would vanish from the screen. With the function form, React passes in the list as it is now, 6 and 5, and the handler returns 8, 6, 5."></p>
+<p>The effect runs once, after the first render, so the handler on the
+socket is the one from <strong>render 1</strong>, when the list was still <code>null</code>. By
+the time a push arrives the screen shows a loaded list, but the handler
+still sees <code>null</code>. JavaScript can't spread <code>null</code>, hence the error.</p>
+<p>It isn't only a <code>null</code> problem. If the list started as <code>[]</code>, there'd
+be no error, but the handler would build <code>[newNotification, ...[]]</code>:
+a list of one, and every loaded notification would vanish.</p>
+<h2>Why the other handlers didn't have this problem</h2>
+<p>Every event handler so far, such as <code>handleAddComment</code> on a button,
+was created in the render the user was looking at when they clicked,
+so it saw the list as it was on screen. This handler is different:
+it's created once and called much later, from outside React, whenever
+the server decides.</p>
+<h2>Try it</h2>
+<p>In <code>NotificationsPage.jsx</code>, replace the whole <code>setNotifications(...)</code>
+call inside <code>handleNotification</code> with the plain version:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-title function_">setNotifications</span>([newNotification, ...notifications]);
+</code></pre>
+<p>Save, then <strong>reload</strong> Alex's <strong>Notifications</strong> page. (Saving alone
+isn't enough: Vite's Fast Refresh keeps the page's state and re-runs
+its effects, so the handler would be made from a render where the list
+had already loaded.) With the Console open, have Casey comment on
+ticket 1. What does the Console say, and what happens to the list?
+Then change <code>useState(null)</code> to <code>useState([])</code>, reload, and try again.
+Put both back.</p>
+</div>
+    
+  </main>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Only If Your API Has Notifications — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/login-and-roles/making-it-yours/try-it-yourself.html">← Try It Yourself</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/notifications/what-stage-5-adds/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/notifications/what-stage-5-adds/two-channels.html">Two Channels →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Only If Your API Has Notifications</h1>
+    <p class="lede">Stage 5 needs an API that saves notifications and pushes them over Socket.IO, as well as a login. If yours doesn&#39;t, your app is already complete.</p>
+
+    
+
+    
+      <div class="slide-body"><p><strong>This stage needs an API with notifications</strong>: Step 5 of the back-end
+assignment, on top of Step 4's authentication. If your own API has no
+notifications, <strong>stop at Stage 4</strong> (or at Stage 3, if it has no login
+either). Your app is complete and working without this stage: nothing
+in Stages 1 to 4 depends on it.</p>
+<p>The Support Desk API has had notifications since Lesson 5, &quot;Events &amp;
+Notifications&quot;. These are the parts this stage uses:</p>
+<table>
+<thead>
+<tr>
+<th>Lesson</th>
+<th>What it gave the API</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>5, &quot;Real-Time Push with Socket.IO&quot;</td>
+<td>a Socket.IO server; a socket sends its token to say who it belongs to</td>
+</tr>
+<tr>
+<td>7, &quot;A User's Own Notifications&quot; and &quot;Idempotent Updates&quot;</td>
+<td><code>GET /notifications</code> and <code>PATCH /notifications/:id/read</code></td>
+</tr>
+<tr>
+<td>8, &quot;The New Socket Contract&quot;</td>
+<td>one push event, <code>notification.created</code>, sent only to the user it's for, after the notification is saved</td>
+</tr>
+</tbody>
+</table>
+<h2>What the user gets</h2>
+<ul>
+<li><strong>A notifications page</strong>: everything the API has told this user,
+newest first, each with a <strong>Mark as read</strong> button until it's read.</li>
+<li><strong>An unread count</strong> in the navigation bar, on every page.</li>
+<li><strong>Live updates.</strong> When something happens, the count goes up and the
+notifications page shows the new one, without a reload.</li>
+<li><strong>A &quot;this has changed&quot; notice</strong> on a ticket's page when a
+notification about that ticket arrives, with a <strong>Reload</strong> button.</li>
+</ul>
+<h2>Your own API</h2>
+<p>Your case-study API may name its events differently, or still push
+them the way Lesson 5 first did. That's fine. The pattern in this
+stage carries over: load the saved notifications over REST, open a
+socket after login, tell the server who you are each time it connects,
+and listen for the event your server sends.</p>
+<h2>Try it</h2>
+<p>Before you start, check your own API is ready. In your REST client,
+logged in as a user who should have notifications:</p>
+<ol>
+<li>Ask for that user's notifications. Do you get a list?</li>
+<li>Find the code in your back-end that pushes over Socket.IO. What is
+the event called, and who receives it?</li>
+</ol>
+<p>If you can answer both, your API is ready for Stage 5. Keep the event
+name: you'll need it in topic 04.</p>
+</div>
+    
+  </main>
+</body>
+</html>

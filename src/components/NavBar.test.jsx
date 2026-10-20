@@ -30,6 +30,21 @@ describe('NavBar', () => {
     expect(screen.getByRole('link', { name: 'Tags' })).toBeInTheDocument();
   });
 
+  it('shows a logged-in user how many notifications are unread', () => {
+    renderWithProviders(<NavBar />, { user: customerUser, unreadCount: 3 });
+
+    expect(screen.getByRole('link', { name: 'Notifications (3 unread)' })).toHaveAttribute(
+      'href',
+      '/notifications',
+    );
+  });
+
+  it("doesn't offer a visitor notifications", () => {
+    renderWithProviders(<NavBar />, { user: null });
+
+    expect(screen.queryByRole('link', { name: /Notifications/ })).not.toBeInTheDocument();
+  });
+
   it('logs out when Log out is clicked', async () => {
     const { auth } = renderWithProviders(<NavBar />, { user: customerUser });
 

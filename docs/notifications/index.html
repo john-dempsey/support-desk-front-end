@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Notifications — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Notifications</h1>
+    <p class="lede">Users see what the API has told them: a list of their notifications and an unread count, loaded over REST, then kept up to date live over Socket.IO.</p>
+
+    
+      <ul class="listing">
+        
+          <li>
+            <a href="/support-desk-front-end/notifications/what-stage-5-adds/index.html">What Stage 5 Adds</a>
+            <p>Who this stage is for, why it uses two channels (REST and a socket), and which files change, before any of the code.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/notifications/loading-and-marking-read/index.html">Loading Notifications and Marking Them Read</a>
+            <p>The notifications API file, what a notification looks like, the page that loads the list, the component that shows it, and marking one as read with map().</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/notifications/the-unread-count-shared/index.html">The Unread Count, Shared</a>
+            <p>A second context holds how many notifications are unread, loads it from the API whenever the user changes, and shows it in the navigation bar on every page.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/notifications/connecting-a-socket/index.html">Connecting a Socket</a>
+            <p>One shared Socket.IO connection, opened when someone logs in: it tells the server whose it is on every connect, lets components listen for pushes, and closes on logout.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/notifications/when-a-notification-arrives/index.html">When a Notification Arrives</a>
+            <p>A push from Casey&#39;s click to Alex&#39;s count, why the count is fetched again, and the function form of a state update, which a handler that&#39;s registered once needs.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/notifications/telling-a-page-it-changed/index.html">Telling a Page It Changed</a>
+            <p>When a notification is about the ticket on screen, the page says so and offers a Reload button, rather than reloading by itself and losing what the user was typing.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/notifications/the-socket-in-devtools/index.html">The Socket in DevTools</a>
+            <p>Watching Socket.IO in the browser&#39;s Network tab: the requests that open it, the messages on the WebSocket, and what happens when the connection ends.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/notifications/testing-stage-5/index.html">Testing Stage 5</a>
+            <p>Testing code that waits for a server to speak first: a fake socket.io-client, a helper that pushes a notification in a test, and a test for each place that listens.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/notifications/making-it-yours/index.html">Making It Yours</a>
+            <p>Tracing a push through Stage 5, then adding notifications, live over a socket, to your own case study&#39;s front-end.</p>
+          </li>
+        
+      </ul>
+    
+
+    
+  </main>
+</body>
+</html>

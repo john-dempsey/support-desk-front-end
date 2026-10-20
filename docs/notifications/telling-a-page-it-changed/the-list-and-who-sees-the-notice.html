@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The List, and Who Sees the Notice — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/notifications/telling-a-page-it-changed/reload-runs-the-effect-again.html">← Reload Runs the Effect Again</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/notifications/telling-a-page-it-changed/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/notifications/the-socket-in-devtools/five-requests-to-open-a-socket.html">Five Requests to Open a Socket →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>The List, and Who Sees the Notice</h1>
+    <p class="lede">The list page shows a notice for any notification about a ticket. And only people the API tells see a notice at all: a notification isn&#39;t a &#39;something changed&#39; broadcast.</p>
+
+    
+
+    
+      <div class="slide-body"><p><code>TicketListPage</code> works the same way, with one difference in the
+handler:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 5.21: any ticket might be in the list</span>
+<span class="hljs-comment">// (src/pages/TicketListPage.jsx, excerpt)</span>
+<span class="hljs-comment">// Any notification about a ticket might mean the list is out of date: a</span>
+<span class="hljs-comment">// new ticket, a new status, a new agent. (One whose ticket has been</span>
+<span class="hljs-comment">// deleted has a ticketId of null, and there&#x27;s nothing to reload for.)</span>
+<span class="hljs-title function_">useEffect</span>(<span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-keyword">function</span> <span class="hljs-title function_">handleNotification</span>(<span class="hljs-params">notification</span>) {
+    <span class="hljs-keyword">if</span> (notification.<span class="hljs-property">ticketId</span> !== <span class="hljs-literal">null</span>) {
+      <span class="hljs-title function_">setHasChanged</span>(<span class="hljs-literal">true</span>);
+    }
+  }
+
+  <span class="hljs-keyword">const</span> stopListening = <span class="hljs-title function_">onNotification</span>(handleNotification);
+  <span class="hljs-keyword">return</span> stopListening;
+}, []);
+</code></pre>
+<p>The list doesn't check whether the ticket is on the current page of
+results. A new ticket could belong on page 1, and a status change
+could move a ticket in or out of a filter, so &quot;any ticket&quot; is the
+honest answer. The rest is Figure 5.20 again: a <code>reloadCount</code> in the
+fetch effect's list (<code>[queryString, reloadCount]</code>), and the same
+<code>RefreshNotice</code>.</p>
+<h2>Who sees a notice</h2>
+<p>A page only hears about a change if the API sends <strong>this user</strong> a
+notification about it. So, with ticket 1's page open in three
+browsers:</p>
+<p><img src="/support-desk-front-end/assets/images/who-sees-the-notice.svg" alt="Diagram: a grid. Rows are four changes to ticket 1, which is Casey's and assigned to Alex. Columns are who has ticket 1's page open: Casey, Alex and Ada. Casey comments: Alex sees the notice; Casey doesn't, because the author isn't told, and their own page already shows the comment; Ada doesn't, because admins aren't told about comments. Alex comments: Casey sees the notice; Alex and Ada don't. Alex changes the status: Casey sees the notice; Alex doesn't, because only the customer is told, and Alex's own save shows the change; Ada doesn't. Ada changes the status: Casey sees the notice; Alex and Ada don't. A note underneath: Ada's page never shows a notice, and neither does a page for an unassigned ticket that an agent is looking at, unless the agent is told for another reason."></p>
+<p>Whoever made the change already sees it on their own screen: their
+page updated from the API's response. Everyone else only finds out if
+the API tells them.</p>
+<h2>A notification isn't a live update</h2>
+<p>That's the limit of building this on notifications. A notification
+means &quot;<strong>you</strong> have something to read&quot;, and the API decides who that
+is. It was never meant to say &quot;the data on someone's screen has
+changed&quot;. Lesson 8 made the same point from the back-end's side (&quot;A
+Notification Isn't a Live Update&quot;): keeping every open screen up to
+date would need a different push, such as a room per ticket that every
+viewer of that ticket joins.</p>
+<p>For this app, telling the people who are told is enough: the customer
+hears about their ticket, and the assigned agent hears about the
+customer.</p>
+<h2>Try it</h2>
+<p>Log in as Casey, Alex and Ada (use a private window, and a second
+browser, so each has its own saved token), and open ticket 1 in all
+three. Try two rows of the grid. Do the notices match? Then, as Alex,
+open the ticket list and have Casey create a ticket. Which notice
+appears, and for which notification?</p>
+</div>
+    
+  </main>
+</body>
+</html>

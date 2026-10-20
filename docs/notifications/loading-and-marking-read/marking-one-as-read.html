@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Marking One as Read — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/notifications/loading-and-marking-read/showing-each-notification.html">← Showing Each Notification</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/notifications/loading-and-marking-read/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/notifications/the-unread-count-shared/a-second-context.html">A Second Context →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Marking One as Read</h1>
+    <p class="lede">Mark as read sends a PATCH, then swaps the updated notification into the list with map(): a new array, the same length, with one item replaced.</p>
+
+    
+
+    
+      <div class="slide-body"><p>When <strong>Mark as read</strong> is clicked, <code>NotificationList</code> calls the page's
+<code>handleMarkRead()</code> with that notification. Here's the first version of
+it, as it is in Part 1 of this stage:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 5.6: marking one notification as read, Part 1&#x27;s version</span>
+<span class="hljs-comment">// (src/pages/NotificationsPage.jsx, excerpt)</span>
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">handleMarkRead</span>(<span class="hljs-params">notificationToMark</span>) {
+  <span class="hljs-title function_">setMarkErrorMessage</span>(<span class="hljs-string">&#x27;&#x27;</span>);
+  <span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">const</span> updatedNotification = <span class="hljs-keyword">await</span> <span class="hljs-title function_">markNotificationRead</span>(
+      notificationToMark.<span class="hljs-property">id</span>,
+    );
+    <span class="hljs-comment">// The API sends back the notification with readAt filled in. map()</span>
+    <span class="hljs-comment">// makes a new array the same length, swapping in the updated one</span>
+    <span class="hljs-comment">// and keeping every other notification as it was.</span>
+    <span class="hljs-title function_">setNotifications</span>(
+      notifications.<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">notification</span>) =&gt;</span>
+        notification.<span class="hljs-property">id</span> === updatedNotification.<span class="hljs-property">id</span>
+          ? updatedNotification
+          : notification,
+      ),
+    );
+    <span class="hljs-comment">// One fewer unread, so NavBar&#x27;s count needs updating too.</span>
+    <span class="hljs-title function_">refreshUnreadCount</span>();
+  } <span class="hljs-keyword">catch</span> (error) {
+    <span class="hljs-title function_">setMarkErrorMessage</span>(error.<span class="hljs-property">message</span>);
+  }
+}
+</code></pre>
+<p>(Reflowed to fit. Topic 05 changes the <code>setNotifications()</code> call, for a
+reason that only exists once notifications arrive live, so the
+<code>stage-05</code> code doesn't look exactly like this.)</p>
+<h2>Update from the response</h2>
+<p>The API's answer is the notification as it's now saved, with <code>readAt</code>
+set. So the page swaps it into the list it already has, rather than
+loading every notification again: the same choice as adding a comment
+in Stage 3.</p>
+<h2>map() swaps one item</h2>
+<p>Stage 3 made new arrays two ways: <code>[...comments, newComment]</code> to add
+one, and <code>filter()</code> to remove one. <code>map()</code> is the third: <strong>change</strong> one.</p>
+<p><img src="/support-desk-front-end/assets/images/map-swaps-one.svg" alt="Diagram: on the left, the notifications array before, with three items: id 8 unread, id 7 unread, id 6 read. In the middle, map() asks of each item: is its id the updated one's id (7)? For 8, no, so keep it as it was. For 7, yes, so use updatedNotification instead, which has readAt set. For 6, no, keep it. On the right, a new array after, with three items: id 8 unread, id 7 now read, id 6 read. The same length and the same order; only item 7 is different. Underneath: the old array is never changed; React sees a new array and re-renders."></p>
+<p><code>map()</code> calls the arrow function once per notification and builds a
+new array from what it returns: the updated notification where the
+<code>id</code>s match, and the same object everywhere else. You've used <code>map()</code>
+since Stage 1, to turn tickets into rows. Here it turns notifications
+into notifications.</p>
+<table>
+<thead>
+<tr>
+<th>To…</th>
+<th>Make the new array with…</th>
+<th>Seen in</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>add one</td>
+<td><code>[...list, newItem]</code></td>
+<td>Stage 3, adding a comment</td>
+</tr>
+<tr>
+<td>remove one</td>
+<td><code>list.filter((item) =&gt; item.id !== removed.id)</code></td>
+<td>Stage 3, deleting a comment</td>
+</tr>
+<tr>
+<td>change one</td>
+<td><code>list.map((item) =&gt; item.id === updated.id ? updated : item)</code></td>
+<td>here</td>
+</tr>
+</tbody>
+</table>
+<h2>Then the count</h2>
+<p><code>refreshUnreadCount()</code> asks the API how many are unread now, so the
+count in the navigation bar goes down by one. The next topic is about
+that count.</p>
+<h2>Try it</h2>
+<ol>
+<li>Log in as Alex, open <strong>Notifications</strong>, and click <strong>Mark as read</strong>
+on one. Reload the page. Is it still read? Where was that saved?</li>
+<li>In your copy, comment out the whole <code>setNotifications(...)</code> call and
+save. Click <strong>Mark as read</strong> on another notification. What happens
+on the page, and what happens to the count in the navigation bar?
+Reload. Why do the two disagree until you do? Put the code back.</li>
+</ol>
+</div>
+    
+  </main>
+</body>
+</html>

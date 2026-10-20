@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>From Casey&#39;s Click to Alex&#39;s Count — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/notifications/connecting-a-socket/opening-the-socket-at-login.html">← Opening the Socket at Login</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/notifications/when-a-notification-arrives/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/notifications/when-a-notification-arrives/count-again-after-the-save.html">Count Again, After the Save →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>From Casey&#39;s Click to Alex&#39;s Count</h1>
+    <p class="lede">One comment, followed through two browsers and the API: saved, turned into a notification, pushed to Alex&#39;s socket, and counted again over REST.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Casey comments on ticket 1, which is assigned to Alex. Alex, logged in
+in another browser, sees &quot;Notifications (3 unread)&quot; become &quot;(4 unread)&quot;
+without touching anything. Here's every step in between:</p>
+<p><img src="/support-desk-front-end/assets/images/casey-to-alex.svg" alt="Diagram: three columns: Casey's browser on the left, the API in the middle, Alex's browser on the right. 1, in Casey's browser: Casey clicks Add comment; TicketDetailPage's handleAddComment() calls createComment(), which sends POST /tickets/1/comments. 2, in the API: comment.service.js saves the comment, works out who to tell (the customer and the assigned agent, minus the author: so just Alex), and emits ticket.commented. 3: notifications.listener.js calls notify() with Alex and a ticketCommented notification. 4: notify.js runs the database channel first, which saves a Notification row, then the realtime channel, which pushes that row as notification.created to Alex's room. 5, in Alex's browser: the shared socket receives notification.created and calls every handler. 6: NotificationsProvider's handler calls loadUnreadCount(), which sends GET /notifications?unread=true. 7, in the API: the answer is Alex's unread notifications, including the row saved in step 4. 8, in Alex's browser: setUnreadCount(4), and NavBar re-renders as Notifications (4 unread)."></p>
+<h2>Three programs, one click</h2>
+<ul>
+<li><strong>Casey's browser</strong> (steps 1 and 2's request) is Stage 3's comment
+form, unchanged. It knows nothing about notifications.</li>
+<li><strong>The API</strong> (steps 2 to 4 and 7) is what you built in Lessons 5 and
+8: a domain event, a listener, and <code>notify()</code> with its channels.</li>
+<li><strong>Alex's browser</strong> (steps 5, 6 and 8) is this stage: the socket from
+topic 04, and the count from topic 03.</li>
+</ul>
+<p>Nothing in Alex's browser asked for anything until step 6. The push
+arrived on its own, over a connection that had been open since Alex
+logged in.</p>
+<h2>The push is a nudge</h2>
+<p>Step 5 carries the whole notification: its message, its ticket, its
+<code>id</code>. The provider ignores all of that. It only needs to know that
+<em>something</em> happened, and then asks the API, in step 6, what's true
+now. That's &quot;REST is the truth, the socket is a nudge&quot; (topic 01),
+written as code.</p>
+<h2>Try it</h2>
+<p>Log in as Alex in one browser and Casey in the other (one of them in a
+private window), side by side. Open the <strong>Network</strong> tab in Alex's
+window, with the <strong>Fetch/XHR</strong> filter on.</p>
+<ol>
+<li>As Casey, comment on ticket 1. Watch Alex's count, and the requests
+in Alex's Network tab. Which step of the diagram is each request?</li>
+<li>As Alex, assign one of the unassigned tickets to Alex. Does Alex's
+own count go up? Who did the API decide to tell, and is that what
+you'd expect?</li>
+</ol>
+</div>
+    
+  </main>
+</body>
+</html>

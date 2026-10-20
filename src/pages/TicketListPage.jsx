@@ -9,15 +9,20 @@
 // so they survive a refresh, work with the Back button, and can be shared
 // as a link. useSearchParams() reads and changes that part of the URL:
 // the front-end's version of req.query in Express.
+//
+// Since Stage 5 it offers to reload when a notification about any ticket
+// arrives, since that ticket may be in the list.
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
 import { getTickets } from '../api/tickets.api.js';
 import { useAuth } from '../context/authContext.js';
+import { onNotification } from '../realtime/socket.js';
 import TicketList from '../components/TicketList.jsx';
 import TicketFilters from '../components/TicketFilters.jsx';
 import Pagination from '../components/Pagination.jsx';
 import Loading from '../components/Loading.jsx';
 import ErrorMessage from '../components/ErrorMessage.jsx';
+import RefreshNotice from '../components/RefreshNotice.jsx';
 
 function TicketListPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -30,6 +35,9 @@ function TicketListPage() {
   const [meta, setMeta] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  // The same as in TicketDetailPage: a notice, and a count for Reload.
+  const [hasChanged, setHasChanged] = useState(false);
+  const [reloadCount, setReloadCount] = useState(0);
 
   // e.g. "status=open&page=2", or '' for plain /tickets. The effect depends
   // on this string, so it runs again whenever the query in the URL changes.
@@ -72,8 +80,27 @@ function TicketListPage() {
       setMeta(null);
       setErrorMessage('');
       setIsLoading(true);
+      setHasChanged(false);
     };
-  }, [queryString]);
+  }, [queryString, reloadCount]);
+
+  // Any notification about a ticket might mean the list is out of date: a
+  // new ticket, a new status, a new agent. (One whose ticket has been
+  // deleted has a ticketId of null, and there's nothing to reload for.)
+  useEffect(() => {
+    function handleNotification(notification) {
+      if (notification.ticketId !== null) {
+        setHasChanged(true);
+      }
+    }
+
+    const stopListening = onNotification(handleNotification);
+    return stopListening;
+  }, []);
+
+  function handleReload() {
+    setReloadCount(reloadCount + 1);
+  }
 
   // Called by TicketFilters, e.g. handleFilterChange('status', 'open').
   function handleFilterChange(name, value) {
@@ -120,6 +147,9 @@ function TicketListPage() {
         onChange={handleFilterChange}
       />
 
+      {hasChanged && (
+        <RefreshNotice message="The tickets have changed." onReload={handleReload} />
+      )}
       {isLoading && <Loading message="Loading tickets…" />}
       {errorMessage && <ErrorMessage message={errorMessage} />}
       {tickets && <TicketList tickets={tickets} />}

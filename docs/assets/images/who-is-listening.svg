@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 300" width="820" height="300" role="img" aria-labelledby="title desc" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <title id="title">Who is listening</title>
+  <desc id="desc">In the middle, the shared socket, with a list of handlers for notification.created. On the left, a component's effect calls onNotification(handler), which adds its handler to the list and gives back stopListening. When the component's effect is cleaned up, it calls stopListening(), which takes that same handler off the list. On the right, a push arrives from the server: the socket calls every handler in the list, once each, with the notification. A component that has stopped listening isn't called.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#1a1a1a"/>
+    </marker>
+  </defs>
+  <rect width="820" height="300" fill="#ffffff"/>
+  <rect x="20" y="40" width="230" height="100" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+  <text x="34" y="64" font-size="14" font-weight="700" fill="#1a1a1a">A component's effect</text>
+  <text x="34" y="88" font-size="12" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">onNotification(handler)</text>
+  <text x="34" y="108" font-size="12" fill="#3d444d">adds its handler, and gets</text>
+  <text x="34" y="124" font-size="12" fill="#3d444d">back <tspan font-family="ui-monospace, Consolas, monospace">stopListening</tspan></text>
+  <rect x="20" y="180" width="230" height="100" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+  <text x="34" y="204" font-size="14" font-weight="700" fill="#1a1a1a">Its cleanup</text>
+  <text x="34" y="228" font-size="12" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">stopListening()</text>
+  <text x="34" y="248" font-size="12" fill="#3d444d">takes that same handler</text>
+  <text x="34" y="264" font-size="12" fill="#3d444d">off the list</text>
+  <rect x="300" y="30" width="250" height="226" rx="8" fill="#fff8c5" stroke="#7d4e00" stroke-width="1.5"/>
+  <text x="316" y="56" font-size="14" font-weight="700" fill="#1a1a1a">The shared socket</text>
+  <text x="316" y="78" font-size="12" fill="#3d444d">handlers for <tspan font-family="ui-monospace, Consolas, monospace">notification.created</tspan></text>
+  <rect x="316" y="94" width="218" height="40" rx="5" fill="#ffffff" stroke="#116329" stroke-width="1.5"/>
+  <text x="330" y="119" font-size="13" fill="#1a1a1a">the provider's handler</text>
+  <rect x="316" y="144" width="218" height="40" rx="5" fill="#ffffff" stroke="#116329" stroke-width="1.5"/>
+  <text x="330" y="169" font-size="13" fill="#1a1a1a">a page's handler</text>
+  <rect x="316" y="194" width="218" height="40" rx="5" fill="#ffffff" stroke="#59636e" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text x="330" y="219" font-size="13" fill="#59636e">removed: not called</text>
+  <line x1="252" y1="90" x2="312" y2="164" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="258" y="150" font-size="12" fill="#1a1a1a">adds</text>
+  <line x1="252" y1="230" x2="312" y2="216" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="258" y="252" font-size="12" fill="#1a1a1a">removes</text>
+  <rect x="600" y="40" width="200" height="80" rx="6" fill="#f6f8fa" stroke="#59636e" stroke-width="1.5"/>
+  <text x="614" y="64" font-size="14" font-weight="700" fill="#1a1a1a">The server</text>
+  <text x="614" y="86" font-size="12" fill="#3d444d">pushes</text>
+  <text x="614" y="104" font-size="12" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">notification.created</text>
+  <line x1="600" y1="100" x2="552" y2="100" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="600" y="170" font-size="13" fill="#1a1a1a">The socket calls <tspan font-weight="700">every</tspan></text>
+  <text x="600" y="190" font-size="13" fill="#1a1a1a">handler still on the list,</text>
+  <text x="600" y="210" font-size="13" fill="#1a1a1a">once each, with the</text>
+  <text x="600" y="230" font-size="13" fill="#1a1a1a">notification.</text>
+</svg>

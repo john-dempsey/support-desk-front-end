@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Messages on the WebSocket — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/notifications/the-socket-in-devtools/five-requests-to-open-a-socket.html">← Five Requests to Open a Socket</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/notifications/the-socket-in-devtools/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/notifications/the-socket-in-devtools/when-the-connection-ends.html">When the Connection Ends →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Messages on the WebSocket</h1>
+    <p class="lede">The WebSocket row&#39;s Messages list the switch-over, the pings that keep it alive, and each push. A push is followed straight away by the HTTP request that counts again.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Choose the <strong>Socket</strong> filter, click the newest <code>socket.io</code> row (not
+Vite's <code>?token=…</code> row), and open <strong>Messages</strong>. Each line is one message: a green up-arrow for one the
+browser sent, a red down-arrow for one the server sent.</p>
+<p><img src="/support-desk-front-end/assets/images/network-tab-socket.png" alt="Screenshot: Chrome's developer tools, Network tab, with the Socket filter on, logged in as Alex. The Name column lists three WebSockets: Vite's, named ?token= and a code, and two socket.io rows, the second of which is selected. Its Messages panel lists, top to bottom: 2probe sent (a green row with an up-arrow), 3probe received (a red down-arrow), 5 sent, then 2 received and 3 sent, twice; then a received message that starts with 42 and the event name notification.created, followed by the notification's data: id 19, type ticket.commented, and the message Casey Customer commented on…; then 2 received and 3 sent again. The push is selected, and the panel underneath shows it as a tree: item 0 is the event name, notification.created, and item 1 is the notification, with createdAt, id 19, message Casey Customer commented on &quot;Cannot log in&quot;., readAt null, ticketId 1 and type ticket.commented."></p>
+<h2>What each message is</h2>
+<table>
+<thead>
+<tr>
+<th>Message</th>
+<th>From</th>
+<th>Means</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>2probe</code></td>
+<td>browser</td>
+<td>&quot;does this WebSocket work?&quot;</td>
+</tr>
+<tr>
+<td><code>3probe</code></td>
+<td>server</td>
+<td>&quot;yes&quot;</td>
+</tr>
+<tr>
+<td><code>5</code></td>
+<td>browser</td>
+<td>&quot;switch to it&quot;: from now on, everything goes this way</td>
+</tr>
+<tr>
+<td><code>2</code> / <code>3</code></td>
+<td>server / browser</td>
+<td>a ping and its answer, about every 25 seconds, so both ends know the connection is still alive</td>
+</tr>
+<tr>
+<td><code>42[&quot;notification.created&quot;,{…}]</code></td>
+<td>server</td>
+<td>a push: the saved notification</td>
+</tr>
+</tbody>
+</table>
+<p>The first three are the switch-over from the previous slide. After
+that, the WebSocket is quiet, apart from the pings, until something
+happens to Alex.</p>
+<h2>A push, then a request</h2>
+<p>Have Casey comment on ticket 1. A <code>42[&quot;notification.created&quot;,{…}]</code>
+message arrives; click it to see the notification laid out as a tree,
+as at the bottom of the screenshot. It's exactly one item of
+<code>GET /notifications</code>: <code>id</code>, <code>type</code>, <code>message</code>, <code>ticketId</code>, <code>readAt</code> and
+<code>createdAt</code>. Now look at
+the request list (switch the filter to <strong>All</strong>): straight after the
+push, Alex's browser sends two HTTP requests, a preflight and
+<code>GET /notifications?unread=true</code>.</p>
+<p>That's the whole of &quot;REST is the truth, the socket is a nudge&quot; in two
+lines of the Network tab. The push says something happened, and the
+count is fetched over HTTP (topic 05, slide 02).</p>
+<h2>Try it</h2>
+<p>With Alex's WebSocket row open:</p>
+<ol>
+<li>Leave it for a minute. How often do <code>2</code> and <code>3</code> appear, and which
+end sends each?</li>
+<li>Have Casey comment on ticket 1. Compare the push's data with the
+newest item in Alex's <code>GET /notifications</code> response. Are they the
+same?</li>
+<li>Have Alex comment instead. Does anything arrive on Alex's own
+socket? Why not?</li>
+</ol>
+</div>
+    
+  </main>
+</body>
+</html>

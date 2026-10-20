@@ -317,3 +317,65 @@ select {
   flex-grow: 1;
   margin-bottom: 0;
 }
+
+/* ---- Notifications ---- */
+
+/* "(3 unread)" in NavBar. Muted on the header background is 5.7:1. */
+.unread-count {
+  color: var(--colour-muted);
+}
+
+.notification-list {
+  padding: 0;
+  list-style: none;
+}
+
+.notification {
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--colour-border);
+  border-radius: 0.375rem;
+}
+
+/* An unread notification has a thicker left edge as well as its "New"
+   label, so it doesn't rely on the border alone. */
+.notification-unread {
+  border-left: 4px solid var(--colour-link);
+}
+
+.notification-message {
+  margin-top: 0;
+}
+
+.notification-meta {
+  margin: 0;
+  color: var(--colour-muted);
+}
+
+/* White on --colour-link is 7.6:1. */
+.new-label {
+  padding: 0.125rem 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #ffffff;
+  background-color: var(--colour-link);
+  border-radius: 0.375rem;
+}
+
+/* ---- RefreshNotice ---- */
+
+.refresh-notice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+  background-color: var(--colour-header);
+  border: 1px solid var(--colour-muted);
+  border-radius: 0.375rem;
+}
+
+.refresh-notice p {
+  margin: 0;
+}

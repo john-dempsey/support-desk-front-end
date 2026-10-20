@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>When a Notification Arrives — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/notifications/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>When a Notification Arrives</h1>
+    <p class="lede">A push from Casey&#39;s click to Alex&#39;s count, why the count is fetched again, and the function form of a state update, which a handler that&#39;s registered once needs.</p>
+
+    
+      <ul class="listing">
+        
+          <li>
+            <a href="/support-desk-front-end/notifications/when-a-notification-arrives/from-caseys-click-to-alexs-count.html">From Casey&#39;s Click to Alex&#39;s Count</a>
+            <p>One comment, followed through two browsers and the API: saved, turned into a notification, pushed to Alex&#39;s socket, and counted again over REST.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/notifications/when-a-notification-arrives/count-again-after-the-save.html">Count Again, After the Save</a>
+            <p>Re-fetching the count picks up everything that changed, not just the push. It only works because the API saves the notification before it pushes it.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/notifications/when-a-notification-arrives/the-page-listens-too.html">The Page Listens Too</a>
+            <p>NotificationsPage adds each push to the top of its list. The obvious way to write it uses the list from when the page opened, which is the wrong list.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/notifications/when-a-notification-arrives/the-function-form.html">The Function Form</a>
+            <p>Give the setter a function instead of a value, and React calls it with the state as it is now. The handler no longer needs to see the list at all.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/notifications/when-a-notification-arrives/back-to-mark-as-read.html">Back to Mark as Read</a>
+            <p>handleMarkRead uses the list from the moment of the click. A push that lands while the PATCH is on its way would be lost, so it gets the function form too.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/notifications/when-a-notification-arrives/a-push-while-loading.html">A Push While the List Is Loading</a>
+            <p>If a push arrives before the list has loaded, the handler leaves the list as null: the load that&#39;s on its way will almost always include the new notification anyway.</p>
+          </li>
+        
+      </ul>
+    
+
+    
+  </main>
+</body>
+</html>

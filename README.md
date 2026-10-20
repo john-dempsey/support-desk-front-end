@@ -8,14 +8,25 @@ It started as a copy of the front-end starter (Stage 0). Each stage adds
 one thing, and the code is tagged at the end of each stage (`stage-00`,
 `stage-01`, ...), so you can look at, or go back to, any stage.
 
-## Where we are: Stage 4, Login and roles
+## Where we are: Stage 5, Notifications
 
-**This stage needs authentication in your back-end** (back-end Step 4).
-If your own API has no login, stop at Stage 3: your app is complete and
-working without this stage.
+**This stage needs notifications in your back-end** (back-end Step 5),
+as well as authentication. If your own API has no notifications, stop at
+Stage 4 (or Stage 3, with no login): your app is complete and working
+without this stage.
 
-The app has a login. Each user sees only what their role can use, and
-the stand-in `VITE_DEV_TOKEN` from Stages 2 and 3 is gone.
+The API tells users when something happens to their tickets: a new
+ticket, an assignment, a comment, a change of status. The app shows those
+notifications in two ways, because each one on its own would miss
+something:
+
+1. **History over REST.** `NotificationsPage` loads the saved list with
+   `GET /notifications`. That includes everything that happened while the
+   user was away.
+2. **Live over Socket.IO.** While the user is logged in, the app keeps a
+   socket open, and the API pushes each new notification the moment it's
+   saved. A push is lost if nobody's connected, which is why part 1 comes
+   first.
 
 | URL | Page | Who can open it |
 |---|---|---|
@@ -27,28 +38,29 @@ the stand-in `VITE_DEV_TOKEN` from Stages 2 and 3 is gone.
 | `/tickets/new` | `NewTicketPage` | customers |
 | `/tickets/:ticketId/edit` | `EditTicketPage` | agents and admins |
 | `/tags` | `TagsPage` | agents and admins |
+| `/notifications` | `NotificationsPage` | anyone logged in |
 | anything else | `NotFoundPage` | anyone |
 
 New in this stage:
 
-- **Logging in and out.** `LoginPage` and `RegisterPage` send the user's
-  details to the API, which answers with a token. Only the token is saved
-  (in `localStorage`, see `api/tokenStorage.js`), and `client.js` sends it
-  with every request.
-- **One place that knows who's logged in.** `AuthProvider` holds the user,
-  and any component reads it with `useAuth()`: React **Context**. When the
-  app starts with a saved token, it asks the API who the token belongs to
-  (`GET /auth/me`) and shows "Checking your session…" until it knows.
-- **Protected pages.** `ProtectedRoute` sends a visitor to the login page,
-  and tells a user whose role can't use a page that it isn't for them,
-  like the back-end's `authenticate` and `authorize(...)`.
-- **Controls by role.** Only customers see **New ticket**; only agents and
-  admins see **Edit**, **Delete** and **Tags**; and a comment's **Delete**
-  only shows for its author, or an admin. That's for the user's sake: the
-  API still checks every request.
-- **A session that ends.** If any request gets a `401` (the token has
-  expired, after a day), the user is logged out and sent to the login
-  page.
+- **A notifications page.** Each notification shows when it happened,
+  "New" if it hasn't been read, a **View ticket** link, and a **Mark as
+  read** button (`PATCH /notifications/:id/read`).
+- **An unread count in the navigation bar**, shared through a second
+  context: `NotificationsProvider`, read with `useNotifications()`.
+- **One shared socket** (`realtime/socket.js`). It connects when someone
+  logs in, tells the API whose socket it is (on every connect, so a
+  reconnect works too), and disconnects on logout.
+- **Live updates.** When a notification arrives, the count goes up, and
+  the notifications page adds it to the top of its list.
+- **"This has changed" notices.** If a notification is about the ticket
+  you're looking at (or any ticket, on the list page), the page offers a
+  **Reload** button. It doesn't reload by itself, because that would
+  throw away a comment you were halfway through typing.
+
+Pages only hear about changes the API tells *you* about. Alex (an agent)
+is told when Casey comments on Alex's ticket, so Alex's page shows the
+notice; Ada (an admin) isn't told, so Ada's doesn't.
 
 ## What you need
 
@@ -104,6 +116,21 @@ delete it: nothing reads it any more.
 | Invalid email or password | Check both: the API doesn't say which was wrong |
 | You're sent back to the login page | Your session ended: tokens last one day. Log in again |
 
+## Seeing notifications live
+
+Use two browsers side by side (or one normal window and one private
+window, so each has its own saved token): log in as Casey in one and
+Alex in the other.
+
+| Do this as | What the other one sees |
+|---|---|
+| Casey: create a ticket | Alex's count goes up; Alex's notifications page shows it at the top |
+| Alex: assign the ticket to Alex | Alex's own count goes up: the API tells the assigned agent, even when they did it |
+| Alex: change the ticket's status | Casey's page for that ticket says "This ticket has changed" |
+| Casey: comment on a ticket assigned to Alex | Alex's count goes up, and Alex's page for that ticket offers **Reload** |
+
+Admins hear about almost nothing, so log in as Ada and nothing arrives.
+
 ## How it's organised
 
 ```
@@ -121,14 +148,20 @@ src/
     comments.api.js     getComments(), createComment(), deleteComment()
     tags.api.js         getTags(), createTag(), updateTag(), deleteTag()
     users.api.js        getAgents(), for the "Assigned to" dropdown
+    notifications.api.js  getNotifications(), getUnreadNotifications(),
+                        markNotificationRead()
+  realtime/
+    socket.js           the one shared socket: connectSocket(),
+                        disconnectSocket(), onNotification()
   pages/                one component per URL: HomePage, LoginPage,
                         RegisterPage, TicketListPage, NewTicketPage,
                         TicketDetailPage, EditTicketPage, TagsPage,
-                        NotFoundPage
+                        NotificationsPage, NotFoundPage
   components/           reusable pieces: NavBar, TicketList, StatusBadge,
                         Loading, ErrorMessage, TicketForm, CommentList,
                         CommentForm, TagForm, TicketFilters, Pagination,
-                        FieldError, ProtectedRoute
+                        FieldError, ProtectedRoute, NotificationList,
+                        RefreshNotice
   utils/
     formatDate.js       ISO date string → readable date
     getFieldError.js    finds one field's message in a 400's details
@@ -137,14 +170,20 @@ src/
   context/
     authContext.js      the logged-in user's context, and useAuth()
     AuthProvider.jsx    holds the user; login(), register(), logout()
+    notificationsContext.js  the unread count's context, and
+                        useNotifications()
+    NotificationsProvider.jsx  holds the unread count; opens and closes
+                        the socket
   hooks/                your own custom hooks (Stage 6)
   test/
     setup.js            runs before the tests
     renderWithProviders.jsx   renders a component inside a router, with
-                        a fake logged-in user, for tests
+                        a fake logged-in user and unread count, for tests
+    fakeSocket.js       lets a test "push" a notification
     testTickets.js      tickets for the tests to "receive from the API"
     testComments.js     comments, likewise
     testUsers.js        a customer, an agent and an admin to log in as
+    testNotifications.js  notifications, read and unread
 ```
 
 It mirrors the layers you know from the back-end:
@@ -157,6 +196,7 @@ It mirrors the layers you know from the back-end:
 | `res.redirect()` / Laravel's `redirect()` | `navigate()`, from `useNavigate()` |
 | `middleware/authenticate.js` and `authorize(...)` | `components/ProtectedRoute.jsx`, with `allowedRoles` |
 | `req.user` | `useAuth().user` |
+| `config/socket.js`: one shared Socket.IO server | `realtime/socket.js`: one shared Socket.IO client |
 | controllers: handle a request, call a service | pages: hold the data, call an API function, decide what to show |
 | services: the only code that talks to the database | `api/*.api.js`: the only code that talks to the API |
 | `utils/response.js` + `errorHandler.js`: one response/error shape | `api/client.js`: reads that shape back |
@@ -175,8 +215,8 @@ npm test
 You should see:
 
 ```
- Test Files  24 passed (24)
-      Tests  122 passed (122)
+ Test Files  29 passed (29)
+      Tests  161 passed (161)
 ```
 
 Test files sit next to the file they test (`TicketList.jsx` →
@@ -206,6 +246,15 @@ Test files sit next to the file they test (`TicketList.jsx` →
 - `src/context/AuthProvider.test.jsx` tests the real `AuthProvider`, with
   `auth.api.js` faked: checking a saved token, logging in and out, and
   being logged out by a `401`.
+- `src/realtime/socket.test.js` replaces `socket.io-client` with a fake
+  socket, to check the token is sent on every connect.
+- The tests for `NotificationsPage` and the ticket pages fake the socket
+  module (`vi.mock('../realtime/socket.js')`), and use
+  `captureNotificationHandler()` (in `src/test/fakeSocket.js`) to "push" a
+  notification, as if the server had sent it.
+- `src/context/NotificationsProvider.test.jsx` tests the real provider:
+  the count, the socket opening and closing, and a push refreshing the
+  count.
 - `src/App.test.jsx` checks which page shows at which URL, and who is
   sent to the login page.
 - `src/api/client.test.js` replaces `fetch()` with a fake, to test the API
@@ -223,9 +272,9 @@ Find elements the way a user would: by role, label or text (`getByRole`,
    loading, error and "nothing here yet" states.
 3. **Full CRUD:** create, edit and delete tickets, comments, tags,
    filtering, sorting and pagination.
-4. **Login and roles** (you are here) *(needs authentication in the
+4. **Login and roles** *(needs authentication in the back-end)*.
+5. **Notifications** (you are here) *(needs notifications in the
    back-end)*.
-5. **Notifications** *(needs notifications in the back-end)*.
 6. **Hardening:** a `useFetch` hook, an error boundary, accessibility and
    a production build.
 
@@ -233,26 +282,27 @@ Find elements the way a user would: by role, label or text (`getByRole`,
 
 Run `npm test` after each change, and commit when it passes.
 
-1. Log in as each of the four seeded users in turn. Make a table of which
-   links and buttons each one sees. Then, as Casey, type
-   `/tickets/2/edit` into the address bar. What happens, and which file
-   decided?
-2. Log in, then open the browser's developer tools: **Application** →
-   **Local storage** → `http://localhost:5173`. What's saved? Delete it
-   and click a link. What happens? Now reload the page. Why is it
-   different?
-3. Log in, then edit the saved token in **Local storage** (change one
-   character) and reload. What do you see, briefly, and then? Which
-   request found the problem?
-4. As Casey, open a ticket and look at the comments. Which ones have a
-   **Delete** button, and why? Use a REST client to send the `DELETE`
-   for one that doesn't. What does the API answer?
-5. Log in with the wrong password eleven times. What does the login page
-   say on the eleventh, and which file chose those words?
-6. **Challenge:** after a `401`, the user lands on the login page with no
-   explanation. Make the login page say "Your session has ended. Please
-   log in again." when that's why they're there. (Hint: what could the
-   session-expired handler pass to the login page?)
-7. **Challenge:** let a comment's author **edit** it, as well as delete
-   it (`PATCH /tickets/:ticketId/comments/:id`), using the same
-   `canDelete` idea to decide who sees the button.
+1. Log in as Alex in one browser and Casey in another, and try each row
+   of "Seeing notifications live" above. Then log in as Ada and try them
+   again. Why does nothing arrive for Ada?
+2. Open the developer tools' **Network** tab and reload. Find the
+   socket's row, click it, then **Messages**. In the other browser, do
+   something that notifies this user, and watch the push arrive.
+3. With Alex's notifications page open, stop the API
+   (`docker compose stop api`), then start it again. Does a new
+   notification still arrive afterwards? Which lines in
+   `realtime/socket.js` make that work?
+4. Log out as Alex. As Casey, comment on a ticket assigned to Alex.
+   Then log back in as Alex. Is the notification there? Which of the two
+   channels found it?
+5. **Challenge:** add a **Mark all as read** button. There's no endpoint
+   for it, so send one `PATCH` for each unread notification.
+6. **Challenge:** show a short pop-up with the notification's message
+   when one arrives, wherever the user is in the app.
+7. **Challenge:** add an "Unread only" filter to the notifications page,
+   kept in the URL (`/notifications?unread=true`), using
+   `getUnreadNotifications()`.
+8. **Challenge:** refresh the unread count when the socket reconnects, to
+   catch anything that was pushed while it was down.
+9. **Challenge:** make the ticket pages refresh by themselves when they
+   change, without losing a comment that's being typed.

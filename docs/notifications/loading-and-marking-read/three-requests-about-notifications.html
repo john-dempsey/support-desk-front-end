@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Three Requests About Notifications — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/notifications/what-stage-5-adds/what-changes-and-what-doesnt.html">← What Changes, and What Doesn&#39;t</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/notifications/loading-and-marking-read/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/notifications/loading-and-marking-read/what-a-notification-looks-like.html">What a Notification Looks Like →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Three Requests About Notifications</h1>
+    <p class="lede">notifications.api.js has one function per request: all of the user&#39;s notifications, only the unread ones, and marking one as read.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The new API file follows the same three steps as every other one: call
+<code>apiRequest()</code>, wait, return what's in <code>data</code>.</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 5.2: listing notifications, and marking one as read</span>
+<span class="hljs-comment">// (src/api/notifications.api.js, excerpt)</span>
+<span class="hljs-comment">// GET /notifications: returns the user&#x27;s notifications, newest first.</span>
+<span class="hljs-comment">// Each is { id, type, message, ticketId, readAt, createdAt }; readAt is</span>
+<span class="hljs-comment">// null until it&#x27;s marked as read, and ticketId is null once its ticket has</span>
+<span class="hljs-comment">// been deleted. There&#x27;s no pagination, so no `meta`.</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">getNotifications</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> responseBody = <span class="hljs-keyword">await</span> <span class="hljs-title function_">apiRequest</span>(<span class="hljs-string">&#x27;/notifications&#x27;</span>);
+  <span class="hljs-keyword">return</span> responseBody.<span class="hljs-property">data</span>;
+}
+
+<span class="hljs-comment">// PATCH /notifications/:id/read: returns the notification, now with</span>
+<span class="hljs-comment">// readAt set. There&#x27;s no request body: the URL says it all.</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">markNotificationRead</span>(<span class="hljs-params">notificationId</span>) {
+  <span class="hljs-keyword">const</span> responseBody = <span class="hljs-keyword">await</span> <span class="hljs-title function_">apiRequest</span>(
+    <span class="hljs-string">`/notifications/<span class="hljs-subst">${notificationId}</span>/read`</span>,
+    { <span class="hljs-attr">method</span>: <span class="hljs-string">&#x27;PATCH&#x27;</span> },
+  );
+  <span class="hljs-keyword">return</span> responseBody.<span class="hljs-property">data</span>;
+}
+</code></pre>
+<p>(The <code>apiRequest()</code> call in <code>markNotificationRead()</code> is reflowed to fit.)</p>
+<p>The third function, <code>getUnreadNotifications()</code>, is the same as
+<code>getNotifications()</code> with <code>?unread=true</code> on the end of the path. The
+navigation bar's count uses it (topic 03).</p>
+<h2>What each one sends and gets back</h2>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Sends</th>
+<th>Answer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>getNotifications()</code></td>
+<td><code>GET /notifications</code></td>
+<td><code>200 { data: [ … ] }</code>, newest first</td>
+</tr>
+<tr>
+<td><code>getUnreadNotifications()</code></td>
+<td><code>GET /notifications?unread=true</code></td>
+<td>the same, only those with <code>readAt: null</code></td>
+</tr>
+<tr>
+<td><code>markNotificationRead(id)</code></td>
+<td><code>PATCH /notifications/:id/read</code>, no body</td>
+<td><code>200 { data: { … } }</code>, with <code>readAt</code> set</td>
+</tr>
+</tbody>
+</table>
+<h2>Only your own</h2>
+<p>There's no user ID anywhere in these requests. The API works out whose
+notifications to send from the token, exactly as it decides which
+tickets a customer sees. Another user's notification is a <code>404</code>, as if
+it didn't exist (Lesson 7, &quot;A User's Own Notifications&quot;).</p>
+<h2>A PATCH with no body</h2>
+<p>Every <code>PATCH</code> in Stage 3 sent a body: the fields to change. This one
+sends none, because there's only one thing it can change. The URL
+names it: <code>/read</code>. So <code>markNotificationRead()</code> passes <code>apiRequest()</code> a
+<code>method</code> and no <code>body</code>, and <code>client.js</code> sends no <code>Content-Type</code> header.</p>
+<h2>Try it</h2>
+<p>In your REST client, log in as Alex and send <code>GET /notifications</code>. Pick
+one notification's <code>id</code>. Then log in as Casey, and send
+<code>PATCH /notifications/&lt;that id&gt;/read</code> with Casey's token. What does the
+API answer, and why that status rather than <code>403</code>?</p>
+</div>
+    
+  </main>
+</body>
+</html>

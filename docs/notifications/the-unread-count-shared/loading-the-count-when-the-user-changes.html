@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Loading the Count When the User Changes — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/notifications/the-unread-count-shared/the-count-comes-from-the-api.html">← The Count Comes From the API</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/notifications/the-unread-count-shared/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/notifications/the-unread-count-shared/the-count-on-every-page.html">The Count on Every Page →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Loading the Count When the User Changes</h1>
+    <p class="lede">An effect that depends on [user] loads the count when someone logs in, and its cleanup forgets the count when they log out.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The provider loads the count in an effect. Here's Part 1's version of
+it, with REST only:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 5.9: loading the count when the user changes, Part 1&#x27;s</span>
+<span class="hljs-comment">// version (src/context/NotificationsProvider.jsx, excerpt)</span>
+<span class="hljs-title function_">useEffect</span>(<span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-comment">// Nobody logged in: no count to load.</span>
+  <span class="hljs-keyword">if</span> (user === <span class="hljs-literal">null</span>) {
+    <span class="hljs-keyword">return</span>;
+  }
+
+  <span class="hljs-comment">// The same `ignore` flag as the pages: after a logout, a late answer</span>
+  <span class="hljs-comment">// about the old user&#x27;s count must not be shown.</span>
+  <span class="hljs-keyword">let</span> ignore = <span class="hljs-literal">false</span>;
+
+  <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">loadUnreadCount</span>(<span class="hljs-params"></span>) {
+    <span class="hljs-keyword">try</span> {
+      <span class="hljs-keyword">const</span> count = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetchUnreadCount</span>();
+      <span class="hljs-keyword">if</span> (!ignore) {
+        <span class="hljs-title function_">setUnreadCount</span>(count);
+      }
+    } <span class="hljs-keyword">catch</span> {
+      <span class="hljs-comment">// The count is extra information in the corner of the screen, so</span>
+      <span class="hljs-comment">// a failure leaves the last number showing, rather than an error</span>
+      <span class="hljs-comment">// on every page. (A 401 still logs the user out, in client.js.)</span>
+    }
+  }
+
+  <span class="hljs-title function_">loadUnreadCount</span>();
+
+  <span class="hljs-comment">// When the user logs out (user becomes null) or changes: forget the</span>
+  <span class="hljs-comment">// old user&#x27;s count.</span>
+  <span class="hljs-keyword">return</span> <span class="hljs-function">() =&gt;</span> {
+    ignore = <span class="hljs-literal">true</span>;
+    <span class="hljs-title function_">setUnreadCount</span>(<span class="hljs-number">0</span>);
+  };
+}, [user]);
+</code></pre>
+<p>(Topic 04 adds four lines for the socket, so the <code>stage-05</code> code isn't
+exactly this.)</p>
+<h2><code>[user]</code>: the effect follows the login</h2>
+<p>Until now, an effect has run once (<code>[]</code>), or again when something in
+the URL changed (<code>[ticketId]</code>, <code>[queryString]</code>). This one depends on
+<strong>who is logged in</strong>. <code>user</code> comes from <code>useAuth()</code>, so whenever <code>AuthProvider</code> changes
+it, this effect runs again:</p>
+<p><img src="/support-desk-front-end/assets/images/the-count-follows-the-user.svg" alt="Diagram: five moments, top to bottom, each with what runs and the count afterwards. 1, the app starts and nobody is logged in: the effect runs, user is null, so it returns straight away; the count is 0. 2, Alex logs in: the effect runs again because user changed, and loadUnreadCount() asks GET /notifications?unread=true; the count is 3. 3, Alex clicks Mark as read: the page calls refreshUnreadCount(), and the count is 2; the effect doesn't run, because user hasn't changed. 4, Alex logs out: first the cleanup from Alex's run, which sets ignore to true and the count to 0; then the effect runs with user null and returns. The count is 0. 5, Casey logs in: the effect runs for Casey, and the count is 1."></p>
+<h2>The cleanup belongs to the old user</h2>
+<p>A cleanup runs just before the effect runs again, so it always belongs
+to the <strong>previous</strong> user. That makes it the right place to forget them:</p>
+<ul>
+<li><code>ignore = true</code>: if Alex's count is still on its way when Alex logs
+out, it's ignored when it lands. Without this, Alex's number could
+appear after Casey has logged in.</li>
+<li><code>setUnreadCount(0)</code>: Alex's count disappears when Alex does.</li>
+</ul>
+<p><code>user === null</code> is checked first because logging out runs the effect
+too. There's nothing to load for nobody, and no cleanup is needed, so
+it returns nothing.</p>
+<h2>Try it</h2>
+<p>Open the <strong>Network</strong> tab, choose <strong>Fetch/XHR</strong>, and type <code>unread</code> in
+its filter box, so only the count's requests show. Log in as Alex. How many requests are
+there? Log out, and log in as Casey. Now open <strong>Notifications</strong> and
+mark one as read. For each request in the list, say which line of
+which file sent it.</p>
+</div>
+    
+  </main>
+</body>
+</html>

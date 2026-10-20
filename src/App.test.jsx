@@ -8,11 +8,14 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import App from './App.jsx';
 import AuthProvider from './context/AuthProvider.jsx';
+import NotificationsProvider from './context/NotificationsProvider.jsx';
 import { login } from './api/auth.api.js';
 import { getTicket, getTickets } from './api/tickets.api.js';
 import { getComments } from './api/comments.api.js';
 import { getAgents } from './api/users.api.js';
 import { getTags } from './api/tags.api.js';
+import { getNotifications, getUnreadNotifications } from './api/notifications.api.js';
+import { onNotification } from './realtime/socket.js';
 import { renderWithProviders } from './test/renderWithProviders.jsx';
 import { testTickets, ticketAssignedToAlex } from './test/testTickets.js';
 import { adminUser, customerUser } from './test/testUsers.js';
@@ -22,6 +25,9 @@ vi.mock('./api/tickets.api.js');
 vi.mock('./api/comments.api.js');
 vi.mock('./api/users.api.js');
 vi.mock('./api/tags.api.js');
+vi.mock('./api/notifications.api.js');
+// The real providers below would open a socket to the API, so it's faked.
+vi.mock('./realtime/socket.js');
 
 // Ada, an admin, is logged in unless a test passes another user (or null).
 function renderAppAt(url, user) {
@@ -74,6 +80,16 @@ describe('App routes', () => {
     ).toBeInTheDocument();
   });
 
+  it('shows the notifications page at /notifications', () => {
+    getNotifications.mockReturnValue(new Promise(() => {}));
+
+    renderAppAt('/notifications');
+
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Notifications' }),
+    ).toBeInTheDocument();
+  });
+
   it('shows the tags page at /tags', () => {
     getTags.mockReturnValue(new Promise(() => {}));
 
@@ -120,10 +136,15 @@ describe('App routes', () => {
     login.mockResolvedValueOnce({ user: adminUser, token: 'ada-token' });
     login.mockResolvedValueOnce({ user: customerUser, token: 'casey-token' });
     getTickets.mockResolvedValue({ tickets: testTickets, meta: { page: 1, totalPages: 3 } });
+    getUnreadNotifications.mockResolvedValue([]);
+    // onNotification() returns a "stop listening" function.
+    onNotification.mockReturnValue(vi.fn());
     render(
       <MemoryRouter initialEntries={['/login']}>
         <AuthProvider>
-          <App />
+          <NotificationsProvider>
+            <App />
+          </NotificationsProvider>
         </AuthProvider>
       </MemoryRouter>,
     );

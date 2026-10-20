@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Function Form — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/notifications/when-a-notification-arrives/the-page-listens-too.html">← The Page Listens Too</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/notifications/when-a-notification-arrives/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/notifications/when-a-notification-arrives/back-to-mark-as-read.html">Back to Mark as Read →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>The Function Form</h1>
+    <p class="lede">Give the setter a function instead of a value, and React calls it with the state as it is now. The handler no longer needs to see the list at all.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Here's what the app really does:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 5.16: adding a pushed notification</span>
+<span class="hljs-comment">// (src/pages/NotificationsPage.jsx, excerpt)</span>
+<span class="hljs-comment">// 2. Add each pushed notification to the top of the list.</span>
+<span class="hljs-title function_">useEffect</span>(<span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-keyword">function</span> <span class="hljs-title function_">handleNotification</span>(<span class="hljs-params">newNotification</span>) {
+    <span class="hljs-comment">// This handler is registered once, when the page opens, so the</span>
+    <span class="hljs-comment">// `notifications` variable it can see is the list as it was then</span>
+    <span class="hljs-comment">// (null!). Passing setNotifications() a function instead lets React</span>
+    <span class="hljs-comment">// hand it the list as it is *now*, and the function returns the new</span>
+    <span class="hljs-comment">// list: the new notification, then all the current ones.</span>
+    <span class="hljs-title function_">setNotifications</span>(<span class="hljs-function">(<span class="hljs-params">currentNotifications</span>) =&gt;</span> {
+      <span class="hljs-comment">// Still loading: leave it. The API saved this notification before</span>
+      <span class="hljs-comment">// pushing it, so the list on its way almost always includes it.</span>
+      <span class="hljs-comment">// (Only if the API answered the list request in the moment before</span>
+      <span class="hljs-comment">// the save is it missing, until the page is next opened.)</span>
+      <span class="hljs-keyword">if</span> (currentNotifications === <span class="hljs-literal">null</span>) {
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;
+      }
+      <span class="hljs-keyword">return</span> [newNotification, ...currentNotifications];
+    });
+  }
+
+  <span class="hljs-keyword">const</span> stopListening = <span class="hljs-title function_">onNotification</span>(handleNotification);
+  <span class="hljs-comment">// Stop listening when the user leaves the page.</span>
+  <span class="hljs-keyword">return</span> stopListening;
+}, []);
+</code></pre>
+<h2>Two ways to call a setter</h2>
+<table>
+<thead>
+<tr>
+<th>You write</th>
+<th>React sets the state to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>setNotifications(newList)</code></td>
+<td><code>newList</code>, a value you worked out yourself</td>
+</tr>
+<tr>
+<td><code>setNotifications((current) =&gt; newList)</code></td>
+<td>whatever your function returns, after React calls it with the <strong>current</strong> state</td>
+</tr>
+</tbody>
+</table>
+<p>Every state setter accepts both. Until now the first was enough. The second is called the <strong>function form</strong>, or an
+<strong>updater function</strong>.</p>
+<p>In the function form, the handler never reads <code>notifications</code> at all.
+It says <em>how</em> to change the list (&quot;put this one in front&quot;), and React
+supplies the list to change, as it is at that moment, not as it was
+when the handler was made.</p>
+<h2>When to use it</h2>
+<p>Use the function form when the new state is <strong>worked out from the old
+state</strong>, and the code that does it might run <strong>later than the render it
+came from</strong>:</p>
+<ul>
+<li>a handler registered once, like this one, or a timer</li>
+<li>code after an <code>await</code>, if the state could change while waiting (the
+next slide)</li>
+</ul>
+<p>When neither is true, the plain form is fine, and it's what most of
+this app still uses. The function form would work there too, but the
+plain form is shorter and easier to read.</p>
+<p>The <code>null</code> check is for a push that arrives before the list has
+loaded. The last slide of this topic is about it.</p>
+<h2>Try it</h2>
+<p>Make the push handler show you both lists. Just inside
+<code>handleNotification</code>, add:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;handler sees&#x27;</span>, notifications);
+</code></pre>
+<p>and just inside the function passed to <code>setNotifications</code>, add:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;React passes&#x27;</span>, currentNotifications);
+</code></pre>
+<p>Reload Alex's <strong>Notifications</strong> page, so the handler is made in the
+page's first render, then have Casey comment on ticket 1. Compare
+the lines in the Console. (In development, &quot;React passes&quot; appears
+twice: <code>StrictMode</code> calls every updater function twice, to catch one
+that does more than return the new state.) Remove both lines when
+you're done.</p>
+</div>
+    
+  </main>
+</body>
+</html>

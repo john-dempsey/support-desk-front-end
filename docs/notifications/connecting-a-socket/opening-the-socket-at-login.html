@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Opening the Socket at Login — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/notifications/connecting-a-socket/listening-and-stopping.html">← Listening, and Stopping</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/notifications/connecting-a-socket/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/notifications/when-a-notification-arrives/from-caseys-click-to-alexs-count.html">From Casey&#39;s Click to Alex&#39;s Count →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Opening the Socket at Login</h1>
+    <p class="lede">The provider&#39;s effect gains four lines: connect when a user logs in, re-fetch the count on each push, and stop listening and disconnect in the cleanup.</p>
+
+    
+
+    
+      <div class="slide-body"><p><code>NotificationsProvider</code> already runs an effect whenever the user
+changes (topic 03). That's exactly when the socket should open and
+close, so Part 2 adds its lines to the same effect. Here's the rest of
+it, below the <code>loadUnreadCount()</code> function:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 5.15: the socket joins the effect</span>
+<span class="hljs-comment">// (src/context/NotificationsProvider.jsx, excerpt)</span>
+    <span class="hljs-comment">// 1. History over REST: everything not read yet, including what</span>
+    <span class="hljs-comment">//    arrived while the user was away.</span>
+    <span class="hljs-title function_">loadUnreadCount</span>();
+
+    <span class="hljs-comment">// 2. Live updates over the socket: each push means a new unread</span>
+    <span class="hljs-comment">//    notification. Asking the API again, instead of adding 1, keeps</span>
+    <span class="hljs-comment">//    the API as the truth. The API saves a notification before it</span>
+    <span class="hljs-comment">//    pushes it, so the new one is always in the answer.</span>
+    <span class="hljs-title function_">connectSocket</span>();
+    <span class="hljs-keyword">const</span> stopListening = <span class="hljs-title function_">onNotification</span>(<span class="hljs-function">() =&gt;</span> {
+      <span class="hljs-title function_">loadUnreadCount</span>();
+    });
+
+    <span class="hljs-comment">// When the user logs out (user becomes null) or changes: stop</span>
+    <span class="hljs-comment">// listening and close the socket, so nobody gets someone else&#x27;s</span>
+    <span class="hljs-comment">// pushes, and forget the old user&#x27;s count.</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-function">() =&gt;</span> {
+      ignore = <span class="hljs-literal">true</span>;
+      <span class="hljs-title function_">stopListening</span>();
+      <span class="hljs-title function_">disconnectSocket</span>();
+      <span class="hljs-title function_">setUnreadCount</span>(<span class="hljs-number">0</span>);
+    };
+  }, [user]);
+</code></pre>
+<p>This is the <code>stage-05</code> code. The top of the effect is as in Figure 5.9,
+and the <code>if (user === null)</code> comment now ends &quot;and no socket to open&quot;.</p>
+<h2>What the four new lines do</h2>
+<table>
+<thead>
+<tr>
+<th>Line</th>
+<th>When</th>
+<th>Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>connectSocket()</code></td>
+<td>someone logs in</td>
+<td>opens the socket; it sends the saved token on connect</td>
+</tr>
+<tr>
+<td><code>onNotification(() =&gt; { loadUnreadCount(); })</code></td>
+<td>each push</td>
+<td>asks the API for the count again</td>
+</tr>
+<tr>
+<td><code>stopListening()</code></td>
+<td>logout, or another user</td>
+<td>removes that handler</td>
+</tr>
+<tr>
+<td><code>disconnectSocket()</code></td>
+<td>logout, or another user</td>
+<td>closes the socket</td>
+</tr>
+</tbody>
+</table>
+<p><code>connectSocket()</code> needs no token passed in: <code>socket.js</code> reads the saved
+one itself (slide 03, &quot;Telling the Server Who You Are, Every Time&quot;).
+The provider only decides when.</p>
+<h2>A push means &quot;count again&quot;</h2>
+<p>When a push arrives, the handler calls <code>loadUnreadCount()</code>: the same
+function that loaded the count at login, with the same <code>ignore</code> check.
+It doesn't add 1. The next topic follows a push all the way from Casey's
+click to Alex's count, and shows why counting again is always right.</p>
+<h2>Logging out</h2>
+<p>Logging out sets <code>user</code> to <code>null</code>. React runs the cleanup from the
+logged-in run, which stops listening, closes the socket and sets the
+count to 0. Then the effect runs with <code>null</code>, and returns at once. The
+next user to log in gets a new connection, which sends their token.</p>
+<h2>Try it</h2>
+<p>Open the <strong>Network</strong> tab and choose the <strong>Socket</strong> filter. Log in as
+Alex: a row appears. Log out, then log in as Casey. How many rows are
+there now? Click the newest one and open its <strong>Messages</strong>. Which line
+of Figure 5.15 opened that connection, and which line closed the one
+before it?</p>
+</div>
+    
+  </main>
+</body>
+</html>
