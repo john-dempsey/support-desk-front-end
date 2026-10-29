@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 470" width="860" height="470" role="img" aria-labelledby="title desc" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <title id="title">Covered is not the same as tested</title>
+  <desc id="desc">A grid of two questions: did a test run the code (coverage), and does a test check what it does? Ran and checked: the goal, for example the ignore flag in useFetch, run and checked by its own test. Ran but not checked: coverage counts it, but nothing would notice if it broke, for example maxLength 200 on the ticket's subject, and StatusBadge's grey colour for an unknown status, which the test never sees. Not run, and worth a test: what this topic's 16 new tests filled in, for example TicketFilters' sort and order dropdowns, and register in AuthProvider. Not run, and that's fine: main.jsx, which only the browser runs, and the localhost:3000 fallback, since the tests always have a .env. Coverage can only see the bottom row. Telling the rows apart, and the columns, takes a person.</desc>
+  <rect width="860" height="470" fill="#ffffff"/>
+
+  <text x="250" y="30" font-size="15" font-weight="700" fill="#1a1a1a" text-anchor="middle">A test checks what it does</text>
+  <text x="640" y="30" font-size="15" font-weight="700" fill="#1a1a1a" text-anchor="middle">Nothing checks it</text>
+  <text x="30" y="140" font-size="15" font-weight="700" fill="#1a1a1a" transform="rotate(-90 30 140)" text-anchor="middle">A test ran it</text>
+  <text x="30" y="330" font-size="15" font-weight="700" fill="#1a1a1a" transform="rotate(-90 30 330)" text-anchor="middle">No test ran it</text>
+
+  <rect x="60" y="46" width="380" height="180" rx="8" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+  <text x="76" y="74" font-size="15" font-weight="700" fill="#116329">Covered and tested: the goal</text>
+  <text x="76" y="100" font-size="13" fill="#1a1a1a">The code ran, and a test would fail</text>
+  <text x="76" y="120" font-size="13" fill="#1a1a1a">if it did the wrong thing.</text>
+  <text x="76" y="152" font-size="13" fill="#3d444d">e.g. useFetch's ignore flag:</text>
+  <text x="76" y="172" font-size="13" fill="#3d444d">run, and checked by its own test</text>
+
+  <rect x="450" y="46" width="380" height="180" rx="8" fill="#fff8c5" stroke="#7d4e00" stroke-width="1.5"/>
+  <text x="466" y="74" font-size="15" font-weight="700" fill="#7d4e00">Covered, but not checked</text>
+  <text x="466" y="100" font-size="13" fill="#1a1a1a">Coverage counts it, but nothing</text>
+  <text x="466" y="120" font-size="13" fill="#1a1a1a">would notice if it broke.</text>
+  <text x="466" y="152" font-size="13" fill="#3d444d" font-family="ui-monospace, Consolas, monospace">maxLength={200}</text>
+  <text x="590" y="152" font-size="13" fill="#3d444d">on the subject</text>
+  <text x="466" y="174" font-size="13" fill="#3d444d">StatusBadge's grey for an unknown</text>
+  <text x="466" y="194" font-size="13" fill="#3d444d">status: the test only checks the text</text>
+
+  <rect x="60" y="236" width="380" height="180" rx="8" fill="#ffebe9" stroke="#cf222e" stroke-width="1.5"/>
+  <text x="76" y="264" font-size="15" font-weight="700" fill="#cf222e">Not run, and worth a test</text>
+  <text x="76" y="290" font-size="13" fill="#1a1a1a">What this topic's 16 new tests filled in.</text>
+  <text x="76" y="322" font-size="13" fill="#3d444d">e.g. TicketFilters' Sort by and Order;</text>
+  <text x="76" y="342" font-size="13" fill="#3d444d">register() in AuthProvider; a refused</text>
+  <text x="76" y="362" font-size="13" fill="#3d444d">tag delete</text>
+
+  <rect x="450" y="236" width="380" height="180" rx="8" fill="#f6f8fa" stroke="#59636e" stroke-width="1.5"/>
+  <text x="466" y="264" font-size="15" font-weight="700" fill="#1a1a1a">Not run, and that's fine</text>
+  <text x="466" y="290" font-size="13" fill="#1a1a1a">A test would cost more than it's worth,</text>
+  <text x="466" y="310" font-size="13" fill="#1a1a1a">or can't run it at all.</text>
+  <text x="466" y="342" font-size="13" fill="#3d444d">e.g. main.jsx: only the browser runs it;</text>
+  <text x="466" y="362" font-size="13" fill="#3d444d">the localhost:3000 fallback: the tests</text>
+  <text x="466" y="382" font-size="13" fill="#3d444d">always have a .env</text>
+
+  <text x="445" y="450" font-size="13" fill="#1a1a1a" text-anchor="middle">Coverage only shows the rows: which code ran. The columns, and which red is worth fixing, take a person.</text>
+</svg>

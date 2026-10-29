@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Two Requests, Two Hooks — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/moving-the-pages-onto-it/the-list-page-after.html">← The List Page, After</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/moving-the-pages-onto-it/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/moving-the-pages-onto-it/changing-the-data-afterwards.html">Changing the Data Afterwards →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Two Requests, Two Hooks</h1>
+    <p class="lede">A page that needs two things calls useFetch twice. Both requests still go at the same time.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The ticket's page needs two things: the ticket, and its comments. In
+Stage 5 it asked for both in one effect, with <code>Promise.all</code>. Now it
+calls the hook <strong>once for each request</strong>:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 6.12: two hooks (src/pages/TicketDetailPage.jsx, excerpt)</span>
+  <span class="hljs-comment">// One useFetch for each request. Both run when the page first renders,</span>
+  <span class="hljs-comment">// so the two requests are sent at the same time. useFetch loads again</span>
+  <span class="hljs-comment">// whenever ticketId changes, e.g. if the URL changes to another ticket.</span>
+  <span class="hljs-keyword">const</span> {
+    <span class="hljs-attr">data</span>: ticket,
+    <span class="hljs-attr">error</span>: ticketError,
+    <span class="hljs-attr">isLoading</span>: isTicketLoading,
+    <span class="hljs-attr">reload</span>: reloadTicket,
+  } = <span class="hljs-title function_">useFetch</span>(getTicket, ticketId);
+  <span class="hljs-keyword">const</span> {
+    <span class="hljs-attr">data</span>: comments,
+    <span class="hljs-attr">setData</span>: setComments,
+    <span class="hljs-attr">error</span>: commentsError,
+    <span class="hljs-attr">isLoading</span>: areCommentsLoading,
+    <span class="hljs-attr">reload</span>: reloadComments,
+  } = <span class="hljs-title function_">useFetch</span>(getComments, ticketId);
+</code></pre>
+<p>This is where renaming earns its keep: every value gets a name that
+says which request it belongs to.</p>
+<h2>Still at the same time</h2>
+<p>Each call to the hook has its own effect, and React runs <strong>all</strong> of a
+component's effects after the same render. So both requests leave
+together, as they did with <code>Promise.all</code>:</p>
+<p><img src="/support-desk-front-end/assets/images/two-hooks-two-requests.svg" alt="Diagram: TicketDetailPage calls useFetch twice in one render, once with getTicket and once with getComments, both with the ticket ID. Each call has its own effect, which runs after that render, so the two requests, GET /tickets/1 and GET /tickets/1/comments, both leave at 0 milliseconds in the Network tab; one finishes after 8 milliseconds and the other after 11. Neither waits for the other. Underneath, what the page shows: while isTicketLoading or areCommentsLoading is true, Loading the ticket; if ticketError or commentsError is set, whichever error there is; otherwise, the ticket and its comments together."></p>
+<p>The page then puts the two back together. It waits for <strong>both</strong>, and
+shows <strong>whichever</strong> error there is:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 6.13: waiting for both (src/pages/TicketDetailPage.jsx, excerpt)</span>
+  <span class="hljs-keyword">if</span> (isTicketLoading || areCommentsLoading) {
+    <span class="hljs-keyword">return</span> <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">Loading</span> <span class="hljs-attr">message</span>=<span class="hljs-string">&quot;Loading the ticket…&quot;</span> /&gt;</span></span>;
+  }
+  <span class="hljs-comment">// ...</span>
+  <span class="hljs-comment">// Either request may have failed: show whichever error there is.</span>
+  <span class="hljs-keyword">const</span> loadError = ticketError || commentsError;
+</code></pre>
+<p><code>EditTicketPage</code> does the same with the ticket and the list of agents.</p>
+<p><strong>Why not one hook for both?</strong> It would need a combined object, <code>{ ticket, comments }</code>. Then adding a comment would mean copying that
+object as well as the comments inside it. With two hooks, adding a
+comment changes <code>comments</code> and nothing else.</p>
+<h2>Try it</h2>
+<p>Log in, open a ticket with the Network tab showing (filter: Fetch/XHR),
+and look at the <strong>Waterfall</strong> column for the ticket and its comments.
+Do the two bars start at the same moment? (In development, StrictMode
+asks for each one twice, as Stage 0 explained, so you'll see four rows.)</p>
+</div>
+    
+  </main>
+</body>
+</html>

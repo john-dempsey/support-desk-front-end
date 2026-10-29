@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Running Everything — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/what-the-tests-miss/100-isnt-the-goal.html">← 100% Isn&#39;t the Goal</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/what-the-tests-miss/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/the-production-build/building-the-whole-app.html">Building the Whole App →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Running Everything</h1>
+    <p class="lede">199 tests in 32 files, coverage up from 96% to 99% of statements, lint clean: and five changes that each fail exactly one of the new tests.</p>
+
+    
+
+    
+      <div class="slide-body"><p>With topics 02 to 06 done, run the three checks together:</p>
+<pre><code class="hljs language-bash">npm <span class="hljs-built_in">test</span>
+npm run coverage
+npm run lint
+</code></pre>
+<p><code>npm test</code> ends with:</p>
+<pre><code class="hljs"> Test Files  32 passed (32)
+      Tests  199 passed (199)
+</code></pre>
+<p>That's Stage 5's 161 tests, unchanged, plus 38 new ones:</p>
+<table>
+<thead>
+<tr>
+<th>From</th>
+<th>New tests</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>topic 02: <code>useFetch.test.js</code></td>
+<td>6</td>
+</tr>
+<tr>
+<td>topic 04: the error boundary (4 in its own file, 1 in <code>App.test.jsx</code>)</td>
+<td>5</td>
+</tr>
+<tr>
+<td>topic 05: a title for each page, the caption, the skip link</td>
+<td>11</td>
+</tr>
+<tr>
+<td>topic 06: the gaps the report found</td>
+<td>16</td>
+</tr>
+</tbody>
+</table>
+<p><code>npm run coverage</code> shows the same 199 tests, then the table: 99.41% of
+statements (it was 96.25%), and every function. <code>npm run lint</code> ends
+with <code>Found 0 warnings and 0 errors.</code></p>
+<h2>Every new test can fail</h2>
+<p>A test that can't fail is worse than none: it says something is checked
+when it isn't. So each new test was checked by breaking the code it
+covers and watching it fail. Try five of them.</p>
+<h2>Try it</h2>
+<p>Make each change on its own, run <code>npm test</code>, note which test fails,
+then put it back:</p>
+<ol>
+<li><code>TicketFilters.jsx</code>: <code>onChange('sortBy', …)</code> → <code>onChange('sort', …)</code>.</li>
+<li><code>Pagination.jsx</code>: <code>onPageChange(page - 1)</code> →
+<code>onPageChange(page + 1)</code>.</li>
+<li><code>TicketListPage.jsx</code>, in <code>handleFilterChange</code>:
+<code>newSearchParams.delete(name);</code> → <code>newSearchParams.set(name, value);</code>.</li>
+<li><code>AuthProvider.jsx</code>, in <code>register()</code>: delete
+<code>saveToken(result.token);</code>.</li>
+<li><code>TagsPage.jsx</code>, in <code>handleDeleteTag</code>'s <code>catch</code>:
+<code>setDeleteErrorMessage(error.message);</code> → <code>console.log(error);</code>.</li>
+</ol>
+<p>Each one fails exactly one test, and none of them failed a test before
+Stage 6. For number 5, <code>npm run lint</code> still finds 0 warnings and 0
+errors: only the test notices that the user is never told.</p>
+</div>
+    
+  </main>
+</body>
+</html>

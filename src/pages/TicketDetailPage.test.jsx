@@ -85,6 +85,15 @@ describe('TicketDetailPage', () => {
     expect(screen.getByText('No comments yet.')).toBeInTheDocument();
   });
 
+  it("names the browser tab after the ticket's subject", async () => {
+    getTicket.mockResolvedValue(unassignedTicket);
+
+    renderPageAt('/tickets/2');
+
+    await screen.findByRole('heading', { level: 1, name: 'Invoice discrepancy' });
+    expect(document.title).toBe('Invoice discrepancy · Support Desk');
+  });
+
   it('shows "Ticket not found" when the API answers 404', async () => {
     getTicket.mockRejectedValue(createApiError(404, 'Ticket 999 not found'));
 
@@ -285,6 +294,31 @@ describe('TicketDetailPage', () => {
       expect(deleteComment).toHaveBeenCalledWith(1, 1);
       expect(screen.queryByText('Have you checked your spam folder?')).not.toBeInTheDocument();
       expect(screen.getAllByRole('listitem')).toHaveLength(1);
+    });
+
+    it('keeps a comment when the user cancels its Delete', async () => {
+      answerConfirmWith(false);
+      await renderTicketWithComments();
+
+      await userEvent.click(screen.getByRole('button', { name: 'Delete comment by Alex Agent' }));
+
+      expect(deleteComment).not.toHaveBeenCalled();
+      expect(screen.getByText('Have you checked your spam folder?')).toBeInTheDocument();
+    });
+
+    it("shows the API's message, and keeps the comment, when it refuses (403)", async () => {
+      answerConfirmWith(true);
+      deleteComment.mockRejectedValue(
+        createApiError(403, 'You can only modify your own comments'),
+      );
+      await renderTicketWithComments();
+
+      await userEvent.click(screen.getByRole('button', { name: 'Delete comment by Alex Agent' }));
+
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        'You can only modify your own comments',
+      );
+      expect(screen.getByText('Have you checked your spam folder?')).toBeInTheDocument();
     });
 
     it('only offers Delete on your own comments', async () => {

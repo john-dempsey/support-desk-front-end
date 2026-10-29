@@ -8,49 +8,28 @@
 //      was away, and SLA breaches, which the API never pushes.
 //   2. Live over Socket.IO: while the page is open, each new notification
 //      the API pushes is added to the top of the list.
+//
+// Since Stage 6 the useFetch hook does part 1's loading.
 import { useEffect, useState } from 'react';
 import { getNotifications, markNotificationRead } from '../api/notifications.api.js';
+import { useFetch } from '../hooks/useFetch.js';
 import { useNotifications } from '../context/notificationsContext.js';
 import { onNotification } from '../realtime/socket.js';
 import NotificationList from '../components/NotificationList.jsx';
 import Loading from '../components/Loading.jsx';
 import ErrorMessage from '../components/ErrorMessage.jsx';
+import PageTitle from '../components/PageTitle.jsx';
 
 function NotificationsPage() {
   const { refreshUnreadCount } = useNotifications();
-  // null = not loaded yet, as in TicketListPage.
-  const [notifications, setNotifications] = useState(null);
-  const [errorMessage, setErrorMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
-  const [markErrorMessage, setMarkErrorMessage] = useState('');
-
   // 1. Load the saved notifications once, when the page opens.
-  useEffect(() => {
-    let ignore = false;
-
-    async function loadNotifications() {
-      try {
-        const notificationsData = await getNotifications();
-        if (!ignore) {
-          setNotifications(notificationsData);
-        }
-      } catch (error) {
-        if (!ignore) {
-          setErrorMessage(error.message);
-        }
-      } finally {
-        if (!ignore) {
-          setIsLoading(false);
-        }
-      }
-    }
-
-    loadNotifications();
-
-    return () => {
-      ignore = true;
-    };
-  }, []);
+  const {
+    data: notifications,
+    setData: setNotifications,
+    error,
+    isLoading,
+  } = useFetch(getNotifications);
+  const [markErrorMessage, setMarkErrorMessage] = useState('');
 
   // 2. Add each pushed notification to the top of the list.
   useEffect(() => {
@@ -75,7 +54,10 @@ function NotificationsPage() {
     const stopListening = onNotification(handleNotification);
     // Stop listening when the user leaves the page.
     return stopListening;
-  }, []);
+    // setNotifications never changes (it's useFetch's own useState
+    // setter), so listing it doesn't make the effect run again. oxlint
+    // asks for it because it can't see inside our hook.
+  }, [setNotifications]);
 
   async function handleMarkRead(notificationToMark) {
     setMarkErrorMessage('');
@@ -100,9 +82,10 @@ function NotificationsPage() {
 
   return (
     <>
+      <PageTitle title="Notifications" />
       <h1>Notifications</h1>
       {isLoading && <Loading message="Loading notifications…" />}
-      {errorMessage && <ErrorMessage message={errorMessage} />}
+      {error && <ErrorMessage message={error.message} />}
       {markErrorMessage && <ErrorMessage message={markErrorMessage} />}
       {notifications && (
         <NotificationList notifications={notifications} onMarkRead={handleMarkRead} />

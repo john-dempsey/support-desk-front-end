@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>No New Features — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/notifications/making-it-yours/try-it-yourself.html">← Try It Yourself</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/what-stage-6-adds/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/what-stage-6-adds/which-parts-are-for-you.html">Which Parts Are for You →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>No New Features</h1>
+    <p class="lede">Stage 6 makes the app you already have easier to change, harder to break, and ready to run outside Vite, with the tests checking every step.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Stages 1 to 5 each gave the user something new: a list, a form, a
+login, a notification. <strong>Stage 6 doesn't.</strong> A user would only notice a
+few small things, such as each browser tab having its own title.</p>
+<p>Instead, this stage works on the app you already have. It has three
+aims:</p>
+<p><img src="/support-desk-front-end/assets/images/stage-6-at-a-glance.svg" alt="Diagram: Stage 6's three aims, each with its topics. Easier to change: topics 02 and 03, one useFetch hook instead of the same effect in five pages. Harder to break: topic 04, an error boundary; topic 05, an accessibility pass; topic 06, a coverage report. Ready to run outside Vite: topic 07, the production build; topic 08, nginx in Docker, which is optional; topic 09, pinning CORS, which is discussion only. Underneath all three: Stage 5's 161 tests check every change and still pass unchanged, and there are 199 by the end."></p>
+<ul>
+<li><strong>Easier to change.</strong> Since Stage 2, every page that loads data has
+had its own copy of the same effect, about 30 lines long. Topics 02 and 03 write
+it once, as a hook of our own.</li>
+<li><strong>Harder to break.</strong> A bug that crashes one page shouldn't blank the
+whole app (topic 04). Keyboard and screen reader users should be able
+to tell pages apart and skip the navigation (topic 05). And a
+coverage report shows which code no test has ever run (topic 06).</li>
+<li><strong>Ready to run outside Vite.</strong> <code>npm run dev</code> is a tool for
+developing. Topics 07 to 09 build the real thing, serve it the way a
+real website is served, and look at the one setting on the API that
+a real deployment would change.</li>
+</ul>
+<h2>The tests do the real work here</h2>
+<p>Changing code that already works is risky: it's easy to break something
+you weren't looking at. That's what the tests are for.</p>
+<p>At the end of Stage 5 the app had <strong>161 tests in 29 files</strong>. Every change
+in this stage is made with those tests running, and <strong>all 161 still pass
+at the end of Stage 6, without a single change to them</strong>. When a test
+does fail along the way, it points at the exact behaviour that broke,
+before a user ever sees it.</p>
+<p>The stage adds tests of its own as well: 199 by the end.</p>
+<h2>Try it</h2>
+<p>Before you start, run <code>npm test</code> on your own Stage 5 app (or Stage 3,
+if your API has no login), and write down the two numbers it prints:
+test files and tests. That's the safety net you'll be relying on for
+the rest of this stage.</p>
+</div>
+    
+  </main>
+</body>
+</html>

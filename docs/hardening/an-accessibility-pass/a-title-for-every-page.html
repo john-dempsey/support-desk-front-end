@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A Title for Every Page — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/an-accessibility-pass/what-was-already-there.html">← What Was Already There</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/an-accessibility-pass/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/an-accessibility-pass/a-skip-link.html">A Skip Link →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>A Title for Every Page</h1>
+    <p class="lede">React 19 lets any component render a &lt;title&gt;, and moves it into the page&#39;s &lt;head&gt;. A small PageTitle component gives every page its own.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The title is what you see in a browser tab, in the history and in a
+bookmark, and it's how screen reader users tell their tabs and windows
+apart. Until now it came from <code>index.html</code>, so every page said
+&quot;Support Desk&quot;.</p>
+<h2><code>&lt;title&gt;</code> in a component</h2>
+<p>React 19 has a feature that makes this easy: a component can render a
+<code>&lt;title&gt;</code> anywhere, and React <strong>moves it into the page's <code>&lt;head&gt;</code></strong>.
+When the component goes away, React takes the title out again. No
+effect, no library.</p>
+<p>The app wraps it in a tiny component:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 6.24: PageTitle (src/components/PageTitle.jsx, excerpt)</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">PageTitle</span>(<span class="hljs-params">{ title }</span>) {
+  <span class="hljs-comment">// &lt;title&gt; must have exactly one piece of text inside it. Written as</span>
+  <span class="hljs-comment">// &lt;title&gt;{title} · Support Desk&lt;/title&gt;, it would have two pieces and</span>
+  <span class="hljs-comment">// the tab would show no title at all, so the text is joined first.</span>
+  <span class="hljs-keyword">return</span> <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>{`${title} · Support Desk`}<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span></span>;
+}
+</code></pre>
+<p>Every page renders it next to its <code>&lt;h1&gt;</code>, with the same words:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 6.25: the ticket&#x27;s title (src/pages/TicketDetailPage.jsx, excerpt)</span>
+      &lt;<span class="hljs-title class_">PageTitle</span> title={ticket.<span class="hljs-property">subject</span>} /&gt;
+      <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>{ticket.subject}<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span></span>
+</code></pre>
+<p>So the tab says &quot;Cannot log in · Support Desk&quot; on that ticket, &quot;Tickets ·
+Support Desk&quot; on the list, and &quot;Something went wrong · Support Desk&quot; on
+the error boundary's fallback. Page first, app second, so the part that
+differs is what's read and seen first.</p>
+<h2>Why a component for one line</h2>
+<ul>
+<li><strong>The app's name is written once.</strong> Your own app changes it in one
+place.</li>
+<li><strong>The text has to be one string.</strong> <code>{title} · Support Desk</code> would be
+two pieces of text inside <code>&lt;title&gt;</code>, and React leaves the title
+<strong>empty</strong>, with no warning. The template literal (a back-tick string
+with <code>${...}</code>) joins them first. Putting that rule in one component
+means nobody else needs to remember it.</li>
+</ul>
+<h2>While a page is loading</h2>
+<p>The loading screens have no <code>&lt;h1&gt;</code> and no title, so the tab shows
+<code>index.html</code>'s plain &quot;Support Desk&quot; until the page appears. React's
+title goes in <strong>before</strong> <code>index.html</code>'s, and the browser uses the first
+one it finds.</p>
+<h2>Try it</h2>
+<p>Open three different pages, then look at your browser's history (Ctrl+H,
+or Cmd+Y on a Mac): can you tell them apart? Now break it on purpose: in
+<code>PageTitle.jsx</code>, change the <code>return</code> line to
+<code>return &lt;title&gt;{title} · Support Desk&lt;/title&gt;;</code> and reload. What does
+the tab show now? Is there a warning in the console? Put it back.</p>
+</div>
+    
+  </main>
+</body>
+</html>

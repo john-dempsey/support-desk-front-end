@@ -8,25 +8,15 @@ It started as a copy of the front-end starter (Stage 0). Each stage adds
 one thing, and the code is tagged at the end of each stage (`stage-00`,
 `stage-01`, ...), so you can look at, or go back to, any stage.
 
-## Where we are: Stage 5, Notifications
+## Where we are: Stage 6, Hardening
 
-**This stage needs notifications in your back-end** (back-end Step 5),
-as well as authentication. If your own API has no notifications, stop at
-Stage 4 (or Stage 3, with no login): your app is complete and working
-without this stage.
+Stage 6 adds **no new features**. It makes the app easier to change,
+harder to break, and ready to run outside Vite. Stage 5's 161 tests all
+pass unchanged after it, and it adds 38 more.
 
-The API tells users when something happens to their tickets: a new
-ticket, an assignment, a comment, a change of status. The app shows those
-notifications in two ways, because each one on its own would miss
-something:
-
-1. **History over REST.** `NotificationsPage` loads the saved list with
-   `GET /notifications`. That includes everything that happened while the
-   user was away.
-2. **Live over Socket.IO.** While the user is logged in, the app keeps a
-   socket open, and the API pushes each new notification the moment it's
-   saved. A push is lost if nobody's connected, which is why part 1 comes
-   first.
+**Most of it needs nothing from your back-end**, so it works on any app,
+even one that stopped at Stage 3 with no login. Only "Running it with
+nginx" needs Docker, and it's optional.
 
 | URL | Page | Who can open it |
 |---|---|---|
@@ -42,6 +32,45 @@ something:
 | anything else | `NotFoundPage` | anyone |
 
 New in this stage:
+
+- **One hook for loading data.** `useFetch(fetchFunction, argument)` in
+  `src/hooks/useFetch.js` holds the loading, error and data state, and
+  the effect with its `ignore` flag, that five pages used to repeat. Each
+  page now calls it once per request. Pass it the API function and its
+  argument (`useFetch(getTicket, ticketId)`), not a new arrow function:
+  a new arrow on every render would load the data again and again.
+- **An error boundary.** If a page crashes while it renders (a bug), the
+  page shows "Something went wrong" and the navigation bar keeps
+  working, instead of the whole app going blank. Going to another page
+  clears it.
+- **An accessibility pass.** Every page sets the browser tab's title
+  (`PageTitle`), a **Skip to main content** link is the first thing
+  the keyboard reaches, and the ticket table has a caption.
+- **A coverage report.** `npm run coverage` lists which lines no test
+  runs. The gaps it found now have tests.
+- **A production build, served by nginx.** A `Dockerfile` builds the app
+  and serves `dist/` with nginx on port 8080 (see below).
+
+## Notifications (Stage 5)
+
+**Stage 5 needs notifications in your back-end** (back-end Step 5), as
+well as authentication. If your own API has no notifications, skip it:
+your app is complete and working without it.
+
+The API tells users when something happens to their tickets: a new
+ticket, an assignment, a comment, a change of status. The app shows those
+notifications in two ways, because each one on its own would miss
+something:
+
+1. **History over REST.** `NotificationsPage` loads the saved list with
+   `GET /notifications`. That includes everything that happened while the
+   user was away.
+2. **Live over Socket.IO.** While the user is logged in, the app keeps a
+   socket open, and the API pushes each new notification the moment it's
+   saved. A push is lost if nobody's connected, which is why part 1 comes
+   first.
+
+What Stage 5 added:
 
 - **A notifications page.** Each notification shows when it happened,
   "New" if it hasn't been read, a **View ticket** link, and a **Mark as
@@ -83,12 +112,37 @@ Then open <http://localhost:5173> and log in (next section).
 | `npm run dev` | Starts the dev server. Saving a file updates the browser straight away |
 | `npm test` | Runs every test once |
 | `npm run test:watch` | Re-runs the tests every time you save a file. Press `q` to quit |
+| `npm run coverage` | Runs the tests and shows which lines they never ran. The full report is in `coverage/index.html` |
 | `npm run lint` | Checks the code for common mistakes |
 | `npm run build` | Builds the production version into `dist/` |
 | `npm run preview` | Serves the `dist/` build locally, to check it before you deploy |
 
 If you change `.env`, save it and Vite restarts itself (the terminal shows
-`.env changed, restarting server...`). Then reload the page.
+`.env changed, restarting server...`). Then reload the page. Comments in
+`.env` start with `#` (Docker Compose refuses any other kind).
+
+`npm run build` writes the API's address into the built JavaScript, so
+after changing `VITE_API_URL`, build again.
+
+## Running it with nginx (optional)
+
+This needs Docker, as in back-end Lesson 6. Start the API's stack first,
+then, in this folder:
+
+```bash
+docker compose up -d --build    # the built app on http://localhost:8080
+docker compose down             # stops it
+```
+
+The `Dockerfile` runs `npm ci` and `npm run build` in a Node image, then
+copies only `dist/` into an nginx image (`nginx.conf` has nginx's
+settings). The browser still calls the API on port 3000 itself, so the
+two stacks don't share a network. The image holds one build: after
+changing the code, `.env` or `nginx.conf`, run `docker compose up -d
+--build` again. Keep using `npm run dev` while you work.
+
+Port 8080 is a different origin from 5173, so it has its own saved
+token: log in again there.
 
 ## Logging in
 
@@ -161,7 +215,7 @@ src/
                         Loading, ErrorMessage, TicketForm, CommentList,
                         CommentForm, TagForm, TicketFilters, Pagination,
                         FieldError, ProtectedRoute, NotificationList,
-                        RefreshNotice
+                        RefreshNotice, ErrorBoundary, PageTitle
   utils/
     formatDate.js       ISO date string → readable date
     getFieldError.js    finds one field's message in a 400's details
@@ -174,7 +228,9 @@ src/
                         useNotifications()
     NotificationsProvider.jsx  holds the unread count; opens and closes
                         the socket
-  hooks/                your own custom hooks (Stage 6)
+  hooks/
+    useFetch.js         loads data from one src/api/ function, with
+                        loading, error and reload()
   test/
     setup.js            runs before the tests
     renderWithProviders.jsx   renders a component inside a router, with
@@ -184,6 +240,11 @@ src/
     testComments.js     comments, likewise
     testUsers.js        a customer, an agent and an admin to log in as
     testNotifications.js  notifications, read and unread
+Dockerfile              builds the app, then serves dist/ with nginx
+nginx.conf              nginx's settings: index.html for every URL,
+                        and a year's caching for the hashed files
+compose.yaml            runs that image on port 8080
+.dockerignore           what Docker never receives (.env, node_modules)
 ```
 
 It mirrors the layers you know from the back-end:
@@ -201,6 +262,7 @@ It mirrors the layers you know from the back-end:
 | services: the only code that talks to the database | `api/*.api.js`: the only code that talks to the API |
 | `utils/response.js` + `errorHandler.js`: one response/error shape | `api/client.js`: reads that shape back |
 | `middleware/notFound.js` | `pages/NotFoundPage.jsx` |
+| `middleware/errorHandler.js` / Laravel's error page | `components/ErrorBoundary.jsx`, for a page that crashes |
 
 **Pages** own the data and **components** just display what they're given as
 props. Neither calls `fetch()` directly: every request goes through a
@@ -215,8 +277,8 @@ npm test
 You should see:
 
 ```
- Test Files  29 passed (29)
-      Tests  161 passed (161)
+ Test Files  32 passed (32)
+      Tests  199 passed (199)
 ```
 
 Test files sit next to the file they test (`TicketList.jsx` →
@@ -262,6 +324,26 @@ Test files sit next to the file they test (`TicketList.jsx` →
   `apiRequest()` with a fake, to check each function asks for the right
   URL.
 
+- `src/hooks/useFetch.test.js` tests the hook on its own with
+  `renderHook()`, including a slow answer arriving after a newer one.
+- `src/components/ErrorBoundary.test.jsx` renders a page that throws on
+  purpose, and checks the fallback appears (and that the error's details
+  are left out of a production build).
+- Stage 6 also added tests for the gaps the coverage report found, such
+  as `src/components/TicketFilters.test.jsx`, and for each page's title,
+  the table's caption and the skip link.
+
+To see which lines the tests never run:
+
+```bash
+npm run coverage
+```
+
+The table after the tests lists every file in `src/` (except the test
+helpers in `src/test/`). Open `coverage/index.html` in a browser to see
+each file with the lines no test ran in red. A covered line isn't
+necessarily *checked*, so 100% isn't the goal.
+
 Find elements the way a user would: by role, label or text (`getByRole`,
 `getByLabelText`, `findByText`), not by CSS class.
 
@@ -273,36 +355,38 @@ Find elements the way a user would: by role, label or text (`getByRole`,
 3. **Full CRUD:** create, edit and delete tickets, comments, tags,
    filtering, sorting and pagination.
 4. **Login and roles** *(needs authentication in the back-end)*.
-5. **Notifications** (you are here) *(needs notifications in the
-   back-end)*.
-6. **Hardening:** a `useFetch` hook, an error boundary, accessibility and
-   a production build.
+5. **Notifications** *(needs notifications in the back-end)*.
+6. **Hardening** (you are here): a `useFetch` hook, an error boundary,
+   an accessibility pass, a coverage report, a production build and
+   nginx.
 
 ## Try it yourself
 
 Run `npm test` after each change, and commit when it passes.
 
-1. Log in as Alex in one browser and Casey in another, and try each row
-   of "Seeing notifications live" above. Then log in as Ada and try them
-   again. Why does nothing arrive for Ada?
-2. Open the developer tools' **Network** tab and reload. Find the
-   socket's row, click it, then **Messages**. In the other browser, do
-   something that notifies this user, and watch the push arrive.
-3. With Alex's notifications page open, stop the API
-   (`docker compose stop api`), then start it again. Does a new
-   notification still arrive afterwards? Which lines in
-   `realtime/socket.js` make that work?
-4. Log out as Alex. As Casey, comment on a ticket assigned to Alex.
-   Then log back in as Alex. Is the notification there? Which of the two
-   channels found it?
-5. **Challenge:** add a **Mark all as read** button. There's no endpoint
-   for it, so send one `PATCH` for each unread notification.
-6. **Challenge:** show a short pop-up with the notification's message
-   when one arrives, wherever the user is in the app.
-7. **Challenge:** add an "Unread only" filter to the notifications page,
-   kept in the URL (`/notifications?unread=true`), using
-   `getUnreadNotifications()`.
-8. **Challenge:** refresh the unread count when the socket reconnects, to
-   catch anything that was pushed while it was down.
-9. **Challenge:** make the ticket pages refresh by themselves when they
-   change, without losing a comment that's being typed.
+1. Open a page, then look for its `useFetch` call. What does it pass,
+   and what does it get back? Follow one request from the page into
+   `useFetch.js` and out to `src/api/`.
+2. In `TicketDetailPage.jsx`, show the agent's name with
+   `ticket.assignedAgent.name` (no check for `null`), and open an
+   unassigned ticket. What does the page show, and does the navigation
+   bar still work? Put it back.
+3. Press **Tab** once on any page, then **Enter**, then **Tab** again.
+   Where does the focus go, and why is that useful?
+4. Run `npm run coverage` and open `coverage/index.html`. Pick a file
+   that isn't at 100% and find the red lines. Would a test for them be
+   worth writing?
+5. Run `npm run build`, then search the `.js` file in `dist/assets/` for
+   `localhost:3000`. How many times is it there, and where does each
+   come from?
+6. With the nginx container running, reload `http://localhost:8080/tickets/3`.
+   Then put a `#` in front of the `try_files $uri /index.html;` line in
+   `nginx.conf`, run `docker compose up -d --build`, and reload again.
+   Put the line back and build again.
+7. **Challenge:** after each navigation, move the keyboard focus to the
+   new page's `<h1>`, so a screen reader announces the new page.
+8. **Challenge:** add a **Try again** button to the error boundary's
+   message.
+9. **Challenge:** on your own back-end, pin CORS to your front-end's
+   origins, then open the app from an origin that isn't on the list and
+   read the error in the console.

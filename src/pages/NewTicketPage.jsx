@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { createTicket } from '../api/tickets.api.js';
 import TicketForm from '../components/TicketForm.jsx';
+import PageTitle from '../components/PageTitle.jsx';
 
 function NewTicketPage() {
   const navigate = useNavigate();
@@ -33,6 +34,7 @@ function NewTicketPage() {
       <p>
         <Link to="/tickets">Back to all tickets</Link>
       </p>
+      <PageTitle title="New ticket" />
       <h1>New ticket</h1>
       <TicketForm submitLabel="Create ticket" onSubmit={handleCreate} error={saveError} />
     </>

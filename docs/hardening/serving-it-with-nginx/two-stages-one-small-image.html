@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Two Stages, One Small Image — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/serving-it-with-nginx/why-a-web-server.html">← Why a Web Server</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/serving-it-with-nginx/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/serving-it-with-nginx/the-apis-address-at-build-time.html">The API&#39;s Address, at Build Time →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Two Stages, One Small Image</h1>
+    <p class="lede">The first stage uses Node to build the app. The second is nginx with dist/ copied in, and nothing else.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The <code>Dockerfile</code> sits in the app's own folder, like the API's. It has
+two stages. The first is the build:</p>
+<pre><code class="hljs language-dockerfile"><span class="hljs-comment"># Figure 6.39: the build stage (Dockerfile, excerpt)</span>
+<span class="hljs-keyword">FROM</span> node:<span class="hljs-number">22</span>-alpine AS build
+<span class="hljs-keyword">WORKDIR</span><span class="language-bash"> /app</span>
+
+<span class="hljs-comment"># package files first, so Docker can reuse the `npm ci` layer when only</span>
+<span class="hljs-comment"># the code has changed.</span>
+<span class="hljs-keyword">COPY</span><span class="language-bash"> package.json package-lock.json ./</span>
+<span class="hljs-keyword">RUN</span><span class="language-bash"> npm ci</span>
+
+<span class="hljs-keyword">COPY</span><span class="language-bash"> . .</span>
+
+<span class="hljs-comment"># VITE_* values are written into the JavaScript when it&#x27;s built, not read</span>
+<span class="hljs-comment"># when the app runs. So the API&#x27;s URL must be known now. .env isn&#x27;t copied</span>
+<span class="hljs-comment"># into the image (see .dockerignore), so compose.yaml passes it in as a</span>
+<span class="hljs-comment"># build argument instead, and RUN sees it as an environment variable. If</span>
+<span class="hljs-comment"># it&#x27;s empty, client.js falls back to its default, as in `npm run dev`.</span>
+<span class="hljs-keyword">ARG</span> VITE_API_URL
+<span class="hljs-keyword">RUN</span><span class="language-bash"> npm run build</span>
+</code></pre>
+<p>This is what you do by hand: <code>npm ci</code>, then <code>npm run build</code>, inside a
+Node container. (The next slide explains <code>ARG</code>.) The second stage
+takes only what that made:</p>
+<pre><code class="hljs language-dockerfile"><span class="hljs-comment"># Figure 6.40: the serve stage (Dockerfile, excerpt)</span>
+<span class="hljs-keyword">FROM</span> nginx:<span class="hljs-number">1.30</span>-alpine
+
+<span class="hljs-comment"># Our settings replace nginx&#x27;s default site (see nginx.conf for why).</span>
+<span class="hljs-keyword">COPY</span><span class="language-bash"> nginx.conf /etc/nginx/conf.d/default.conf</span>
+<span class="hljs-comment"># The only thing taken from the build stage.</span>
+<span class="hljs-keyword">COPY</span><span class="language-bash"> --from=build /app/dist /usr/share/nginx/html</span>
+
+<span class="hljs-keyword">EXPOSE</span> <span class="hljs-number">80</span>
+<span class="hljs-comment"># No CMD: the nginx image already starts nginx.</span>
+</code></pre>
+<p><code>/usr/share/nginx/html</code> is the folder the nginx image serves files
+from. The image you run is the <strong>last</strong> stage only: nothing from the
+first stage is in it except the <code>dist/</code> folder copied across.</p>
+<p><img src="/support-desk-front-end/assets/images/docker-two-stages.svg" alt="Diagram: two stages side by side. Stage 1, build, from node:22-alpine: package.json and package-lock.json, npm ci makes node_modules, the source is copied in, then npm run build makes dist. Only dist crosses an arrow, labelled COPY --from=build, to stage 2. Stage 2, from nginx:1.30-alpine: nginx.conf and dist in /usr/share/nginx/html. Under stage 1: left out of the final image, so Node, node_modules, the source code and the package files never reach the image you run. Under stage 2: the image that runs, about 93 MB, the size of nginx itself. For comparison, the API's image is 775 MB."></p>
+<h2>Compared with the API's Dockerfile</h2>
+<ul>
+<li><strong>Both have two stages</strong>, for different reasons. The API's second
+stage still needed Node and <code>node_modules</code> to run. Ours needs
+neither: the final image has no Node, no <code>node_modules</code> and no source
+code. It's 93 MB, about the size of nginx's own image; the API's is
+775 MB.</li>
+<li><strong>No <code>USER</code> line.</strong> Lesson 6 added <code>USER node</code> so the API doesn't run
+as root. The nginx image already takes care of this: its main
+process starts as root (so it can use port 80) and hands every
+request to <strong>worker</strong> processes that run as a user called <code>nginx</code>.</li>
+</ul>
+<h2>Try it</h2>
+<p>Open the API's <code>Dockerfile</code> (from Lesson 6) next to this one. Its last
+stage has <code>ENV NODE_ENV=production</code>, <code>npm prune</code>, <code>COPY src ./src</code> and
+a <code>CMD</code>. For each one, say why the front-end's last stage doesn't need
+it.</p>
+</div>
+    
+  </main>
+</body>
+</html>

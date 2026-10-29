@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 400" width="860" height="400" role="img" aria-labelledby="title desc" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <title id="title">A hook shares code, a context shares a value</title>
+  <desc id="desc">On the left, a custom hook shares code. TagsPage calls useFetch with getTags, and TicketListPage calls useFetch with getTickets. Both run the same code in useFetch.js, but each page gets its own data, error and isLoading. Adding a tag changes only TagsPage's data. On the right, a context shares a value. AuthProvider holds one user, and NavBar and TicketDetailPage both read that same user with useAuth. Logging out changes it for both.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#1a1a1a"/>
+    </marker>
+  </defs>
+  <rect width="860" height="400" fill="#ffffff"/>
+
+  <text x="20" y="30" font-size="16" font-weight="700" fill="#1a1a1a">A custom hook shares code</text>
+  <text x="470" y="30" font-size="16" font-weight="700" fill="#1a1a1a">A context shares a value</text>
+  <line x1="445" y1="20" x2="445" y2="380" stroke="#d1d9e0" stroke-width="1.5"/>
+
+  <!-- Left: the hook's code, used by two pages -->
+  <rect x="120" y="46" width="200" height="44" rx="6" fill="#f6f8fa" stroke="#59636e" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="220" y="66" font-size="13" font-weight="700" fill="#1a1a1a" text-anchor="middle" font-family="ui-monospace, Consolas, monospace">useFetch.js</text>
+  <text x="220" y="82" font-size="12" fill="#3d444d" text-anchor="middle">the code, written once</text>
+  <line x1="170" y1="92" x2="120" y2="130" stroke="#59636e" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arrow)"/>
+  <line x1="270" y1="92" x2="320" y2="130" stroke="#59636e" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arrow)"/>
+
+  <rect x="20" y="134" width="200" height="170" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+  <text x="34" y="158" font-size="14" font-weight="700" fill="#1a1a1a">TagsPage</text>
+  <text x="34" y="178" font-size="12" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">useFetch(getTags)</text>
+  <rect x="34" y="192" width="172" height="96" rx="6" fill="#ddf4ff" stroke="#0550ae" stroke-width="1.5"/>
+  <text x="46" y="212" font-size="12" font-weight="700" fill="#1a1a1a">its own state</text>
+  <text x="46" y="232" font-size="12" fill="#1a1a1a">data: the tags</text>
+  <text x="46" y="252" font-size="12" fill="#1a1a1a">error</text>
+  <text x="46" y="272" font-size="12" fill="#1a1a1a">isLoading</text>
+
+  <rect x="230" y="134" width="200" height="170" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+  <text x="244" y="158" font-size="14" font-weight="700" fill="#1a1a1a">TicketListPage</text>
+  <text x="244" y="178" font-size="12" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">useFetch(getTickets, …)</text>
+  <rect x="244" y="192" width="172" height="96" rx="6" fill="#ddf4ff" stroke="#0550ae" stroke-width="1.5"/>
+  <text x="256" y="212" font-size="12" font-weight="700" fill="#1a1a1a">its own state</text>
+  <text x="256" y="232" font-size="12" fill="#1a1a1a">data: the tickets</text>
+  <text x="256" y="252" font-size="12" fill="#1a1a1a">error</text>
+  <text x="256" y="272" font-size="12" fill="#1a1a1a">isLoading</text>
+
+  <text x="225" y="336" font-size="13" fill="#3d444d" text-anchor="middle">Adding a tag changes only TagsPage's data.</text>
+  <text x="225" y="356" font-size="13" fill="#3d444d" text-anchor="middle">Nothing is shared but the code.</text>
+
+  <!-- Right: one value read by two components -->
+  <rect x="560" y="46" width="200" height="100" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+  <text x="574" y="70" font-size="14" font-weight="700" fill="#1a1a1a">AuthProvider</text>
+  <rect x="574" y="82" width="172" height="48" rx="6" fill="#ddf4ff" stroke="#0550ae" stroke-width="1.5"/>
+  <text x="660" y="104" font-size="12" font-weight="700" fill="#1a1a1a" text-anchor="middle">one value</text>
+  <text x="660" y="122" font-size="12" fill="#1a1a1a" text-anchor="middle">user</text>
+  <line x1="620" y1="148" x2="560" y2="208" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="700" y1="148" x2="760" y2="208" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="470" y="212" width="170" height="70" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+  <text x="484" y="238" font-size="14" font-weight="700" fill="#1a1a1a">NavBar</text>
+  <text x="484" y="260" font-size="12" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">useAuth()</text>
+  <rect x="670" y="212" width="170" height="70" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+  <text x="684" y="238" font-size="14" font-weight="700" fill="#1a1a1a">TicketDetailPage</text>
+  <text x="684" y="260" font-size="12" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">useAuth()</text>
+
+  <text x="655" y="336" font-size="13" fill="#3d444d" text-anchor="middle">Both read the same user.</text>
+  <text x="655" y="356" font-size="13" fill="#3d444d" text-anchor="middle">Logging out changes it for both.</text>
+</svg>

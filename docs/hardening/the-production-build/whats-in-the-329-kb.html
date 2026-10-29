@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What&#39;s in the 329 kB — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/the-production-build/the-apis-address-is-built-in.html">← The API&#39;s Address Is Built In</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/the-production-build/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/the-production-build/production-isnt-development.html">Production Isn&#39;t Development →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>What&#39;s in the 329 kB</h1>
+    <p class="lede">Most of the built JavaScript is React. Our own code, every page and component from six stages, is less than a tenth of it.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The build's one <code>.js</code> file is 329 kB. How much of that did we write?</p>
+<p>The build can make a <strong>source map</strong> (<code>npx vite build --sourcemap</code>): a
+file that says which original file each part of the built code came
+from. Adding up the parts gives this:</p>
+<p><img src="/support-desk-front-end/assets/images/whats-in-the-bundle.svg" alt="Diagram: a bar for each part of the 329 kB JavaScript file, largest first. react-dom, 207 kB, 63 percent. Socket.IO, its five packages together, 41 kB, 13 percent. react-router, 39 kB, 12 percent. Our src folder, every page, component, hook and API file, 29 kB, 9 percent. react, 8 kB, 2.5 percent. scheduler, 4 kB, 1 percent. A note: react-dom is the part of React that updates the page in the browser."></p>
+<ul>
+<li><strong><code>react-dom</code></strong>, nearly two thirds of it, is the part of React that
+works out what changed and updates the page. <code>react</code> itself (hooks
+such as <code>useState</code>, and <code>createElement</code>) is small.</li>
+<li><strong>Socket.IO</strong> is five packages that work together: the client, the
+connection underneath it (<code>engine.io-client</code>), two message parsers and
+a small event emitter. Together they're about as big as React Router.</li>
+<li><strong>Our code</strong>, every page, component, hook and API file from Stages 1
+to 6, is 29 kB: 9%.</li>
+</ul>
+<p>The gzip column from the build is what users actually download: about
+102 kB, since the server compresses the file before sending it.</p>
+<h2>So is it too big?</h2>
+<p>For an app people log in to and use for a while, 102 kB once is fine.
+The browser keeps the file afterwards (topic 08 shows how long).</p>
+<p>Big apps <strong>split</strong> their JavaScript, so a page's code is only
+downloaded when someone visits that page. That's called <strong>lazy
+loading</strong>. Here it wouldn't save much: the pages are part of our 9%,
+and every page needs React.</p>
+<h2>Try it</h2>
+<p>Look at your own app's <code>package.json</code> <code>dependencies</code> and run
+<code>npm run build</code>. If your app has no Socket.IO, how much smaller would
+you expect its <code>.js</code> file to be than ours? Check the build's output.
+What's left once React and React Router are taken away?</p>
+</div>
+    
+  </main>
+</body>
+</html>

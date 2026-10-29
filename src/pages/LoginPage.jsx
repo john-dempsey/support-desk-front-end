@@ -6,6 +6,7 @@ import { Link, Navigate } from 'react-router';
 import { useAuth } from '../context/authContext.js';
 import ErrorMessage from '../components/ErrorMessage.jsx';
 import FieldError from '../components/FieldError.jsx';
+import PageTitle from '../components/PageTitle.jsx';
 import { getFieldError } from '../utils/getFieldError.js';
 import { describeAuthError } from '../utils/describeAuthError.js';
 
@@ -39,6 +40,7 @@ function LoginPage() {
 
   return (
     <>
+      <PageTitle title="Log in" />
       <h1>Log in</h1>
       <form className="form" onSubmit={handleSubmit}>
         {loginError && <ErrorMessage message={loginError.message} />}

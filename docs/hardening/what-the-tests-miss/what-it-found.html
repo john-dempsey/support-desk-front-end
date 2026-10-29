@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What It Found — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/what-the-tests-miss/the-html-report.html">← The HTML Report</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/what-the-tests-miss/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/what-the-tests-miss/two-of-the-new-tests.html">Two of the New Tests →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>What It Found</h1>
+    <p class="lede">The first report pointed at real behaviour that no test checked. Sixteen new tests fill those gaps.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The obvious place to add tests is the files with no test file of their
+own: <code>TicketForm</code>, <code>CommentForm</code>, <code>tokenStorage</code>, <code>NotFoundPage</code>. The
+report shows that's the wrong list. Those four were <strong>already at
+100%</strong>, because the page tests run them, and check what they do, every
+time.</p>
+<p>What the report found instead was behaviour <strong>no test had ever run</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Where</th>
+<th>What no test did</th>
+<th>New test</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>TicketFilters</code></td>
+<td>change Sort by or Order</td>
+<td>a new test file: each dropdown reports its own name</td>
+</tr>
+<tr>
+<td><code>Pagination</code></td>
+<td>click <strong>Previous</strong></td>
+<td>asks for the page before</td>
+</tr>
+<tr>
+<td><code>TicketListPage</code></td>
+<td>choose &quot;All statuses&quot; again</td>
+<td>leaves <code>status</code> out of the query</td>
+</tr>
+<tr>
+<td><code>TagsPage</code></td>
+<td>rename to a taken name; cancel a delete; a refused delete</td>
+<td>three tests</td>
+</tr>
+<tr>
+<td><code>TicketDetailPage</code></td>
+<td>cancel a comment's delete; a refused (403) one</td>
+<td>two tests</td>
+</tr>
+<tr>
+<td><code>EditTicketPage</code></td>
+<td>a save that fails</td>
+<td>stays on the form, shows the error</td>
+</tr>
+<tr>
+<td><code>AuthProvider</code></td>
+<td>call <code>register()</code></td>
+<td>saves the token, logs the user in</td>
+</tr>
+<tr>
+<td><code>RegisterPage</code></td>
+<td>open it while logged in</td>
+<td>sends the user to the tickets</td>
+</tr>
+<tr>
+<td><code>HomePage</code></td>
+<td>open it logged out</td>
+<td>shows Log in and Register</td>
+</tr>
+<tr>
+<td><code>App</code></td>
+<td>load with a saved token not yet checked</td>
+<td>shows &quot;Checking your session…&quot;</td>
+</tr>
+</tbody>
+</table>
+<p>That's 16 new tests: four in the new <code>TicketFilters.test.jsx</code>, and
+twelve added to existing files.</p>
+<h2>Gaps with consequences</h2>
+<p>Some of these are more than numbers. If someone renamed <code>'sortBy'</code> to
+<code>'sort'</code> in <code>TicketFilters</code>, the API would ignore the parameter, and the
+list would quietly stop sorting. Before, every test would still have
+passed. If <code>register()</code> stopped saving the token, a new user would be
+logged out by the next reload. Before, no test would have noticed. The
+report doesn't know which gaps matter, but it shows you where to look.</p>
+<h2>Choosing what to fill</h2>
+<p>Each row above is <strong>behaviour a user can see</strong>: a button, a message, a
+page. That's the test to write: not &quot;line 47 ran&quot;, but &quot;when the user
+does this, they see that&quot;. The coverage then follows.</p>
+<h2>Try it</h2>
+<p>Look at your own report again. Is there a component with no test file
+of its own that's still at 100%? Which page tests run it? Then find one
+gap that a user could actually hit, and write its test the way the
+table does: &quot;when the user … they should see …&quot;.</p>
+</div>
+    
+  </main>
+</body>
+</html>

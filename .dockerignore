@@ -1,0 +1,17 @@
+# What `docker compose build` doesn't send to Docker. node_modules and
+# dist are made fresh inside the image, and copying the ones on your
+# computer would only slow the build down (or mix them up).
+node_modules
+dist
+coverage
+
+# Never put secrets in an image: anyone with the image could read them.
+# The API's URL comes in as a build argument instead (see compose.yaml).
+.env
+.env.*
+!.env.example
+
+# Not needed to build the app.
+.git
+docs
+*.log

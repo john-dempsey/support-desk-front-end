@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A Hook That Holds State — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/a-hook-of-our-own/the-same-effect-five-times.html">← The Same Effect Five Times</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/a-hook-of-our-own/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/a-hook-of-our-own/the-hooks-state.html">The Hook&#39;s State →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>A Hook That Holds State</h1>
+    <p class="lede">useAuth() was a custom hook that shares one value. useFetch is a custom hook that calls useState, so every page that calls it gets its own.</p>
+
+    
+
+    
+      <div class="slide-body"><p>You met custom hooks in Stage 4: a function of your own whose name
+starts with <code>use</code> and which calls other hooks. <code>useAuth()</code> and
+<code>useNotifications()</code> are both one line, a call to <code>useContext()</code>.</p>
+<p><code>useFetch</code> is a custom hook too. It lives in <code>src/hooks/</code>, the folder
+Stage 0's <code>hooks/README.md</code> kept for it, and it's a named export, like
+the functions in <code>src/utils/</code>:</p>
+<pre><code class="hljs language-js"><span class="hljs-keyword">import</span> { useFetch } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;../hooks/useFetch.js&#x27;</span>;
+</code></pre>
+<h2>Its state belongs to whoever calls it</h2>
+<p>The difference is what's inside. <code>useFetch</code> calls <code>useState</code> and
+<code>useEffect</code>, and a hook called inside a hook <strong>belongs to the component
+that called it</strong>. React treats it as if those lines were written in the
+page itself.</p>
+<p>So every page that calls <code>useFetch</code> gets its own data, its own error
+and its own &quot;still loading?&quot;. Calling it twice gives two separate sets.
+Only the code is shared.</p>
+<p><img src="/support-desk-front-end/assets/images/each-caller-its-own-state.svg" alt="Diagram: on the left, a custom hook shares code. TagsPage calls useFetch with getTags, and TicketListPage calls useFetch with getTickets. Both run the code in useFetch.js, written once, but each page has its own state: its own data, error and isLoading. Adding a tag changes only TagsPage's data. On the right, a context shares a value. AuthProvider holds one user, and NavBar and TicketDetailPage both read that same user with useAuth. Logging out changes it for both."></p>
+<p>That's the opposite of a context. <code>useAuth()</code> hands every component the
+<strong>same</strong> user, which is why logging out updates the navigation bar and
+the page together. A hook like <code>useFetch</code> shares <strong>how</strong> to do
+something, not a value.</p>
+<p>If you've used a PHP trait in Laravel (<code>HasFactory</code>, <code>Notifiable</code>), it's
+a similar idea: every class that uses a trait gets the trait's methods,
+but each object still has its own properties.</p>
+<h2>Why the name must start with <code>use</code></h2>
+<p>React's rules for hooks (call them at the top of a component, never
+inside an <code>if</code>, a loop or a handler) apply inside a custom hook too. The
+linter can only check them if it knows a function is a hook, and the
+<code>use</code> at the start of the name is how it knows.</p>
+<h2>Try it</h2>
+<p>In <code>src/hooks/useFetch.js</code>, rename the function: change
+<code>export function useFetch(</code> to <code>export function fetchData(</code>. Don't
+change anything else, and don't open the app. Run:</p>
+<pre><code class="hljs language-bash">npm run lint
+</code></pre>
+<p>You get five errors that begin like this one (shortened here):</p>
+<pre><code class="hljs">× react-hooks(rules-of-hooks): React Hook &quot;useState&quot; is called in
+function &quot;fetchData&quot; that is neither a React function component nor a
+custom React Hook function.
+</code></pre>
+<p>Why five? Count the hooks that <code>useFetch</code> calls. Then change the name
+back, and run <code>npm run lint</code> again to check it's clean.</p>
+</div>
+    
+  </main>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>When a Page Crashes — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>When a Page Crashes</h1>
+    <p class="lede">A bug that throws while a page renders blanks the whole app. An error boundary, the app&#39;s one class, shows &#39;Something went wrong&#39; instead.</p>
+
+    
+      <ul class="listing">
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/when-a-page-crashes/a-crash-blanks-the-app.html">A Crash Blanks the App</a>
+            <p>Every failure so far was expected and handled in state. A bug that throws while rendering is different: React removes the whole app.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/when-a-page-crashes/the-one-class.html">The One Class</a>
+            <p>React has no hook for catching a crash, so ErrorBoundary is a class component: the only one in the app.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/when-a-page-crashes/where-it-goes.html">Where It Goes</a>
+            <p>The boundary wraps the routes, inside main and below NavBar, and a key tied to the path gives every page a fresh start.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/when-a-page-crashes/what-it-doesnt-catch.html">What It Doesn&#39;t Catch</a>
+            <p>A boundary only catches errors thrown while rendering. Event handlers and requests still need try/catch, and the details are for developers only.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/when-a-page-crashes/testing-the-boundary.html">Testing the Boundary</a>
+            <p>A component that always throws tests the fallback, a faked environment variable tests the production version, and an App test checks the key.</p>
+          </li>
+        
+      </ul>
+    
+
+    
+  </main>
+</body>
+</html>

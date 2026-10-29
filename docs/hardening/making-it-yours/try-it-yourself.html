@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Try It Yourself — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/making-it-yours/your-stage-6-checklist.html">← Your Stage 6 Checklist</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/making-it-yours/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Try It Yourself</h1>
+    <p class="lede">Challenges that use everything in this lesson. Run the tests after each one, and commit when they pass.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Each of these builds on something from this lesson. After each one, run
+<code>npm test</code> and <code>npm run lint</code>, and commit when both pass.</p>
+<h2>Warm-up</h2>
+<ol>
+<li><strong>Your own skip link.</strong> If you haven't yet, add topic 05's skip link
+to your own app (the template doesn't have one). Write the test that
+checks it's the first link on the page (Figure 6.32).</li>
+<li><strong>Two more tests.</strong> Two of the lines the coverage report still
+lists are worth a test. In <code>useFetch.js</code>, a stale <strong>error</strong> is
+ignored (the <code>if (!ignore)</code> around <code>setError</code>): test it the way
+Figures 6.7 and 6.8 test a stale answer. In <code>client.js</code>, the
+<code>return null</code> in <code>readJson()</code> runs when an answer's body isn't JSON
+(an HTML error page, say): test it with a stubbed <code>fetch</code>, as
+<code>client.test.js</code> does.
+Check each test fails when you remove the line it covers.</li>
+<li><strong><code>[]</code> instead of <code>null</code>.</strong> What would change if <code>useFetch</code> started
+<code>data</code> as <code>[]</code>? Which pages would show something different while
+loading, and which tests would notice? Compare Stage 2's exercise
+(topic 07) on <code>useState(null)</code>.</li>
+</ol>
+<h2>Build something</h2>
+<ol start="4">
+<li><strong>Focus after navigation.</strong> When the user follows a link, a screen
+reader user hears nothing about the new page. Move focus to the
+page's <code>&lt;h1&gt;</code> after each navigation. Which component knows the path
+has changed? (The <code>&lt;h1&gt;</code> needs <code>tabIndex={-1}</code> to be focusable.)
+How would you test it?</li>
+<li><strong>Try again.</strong> Add a <strong>Try again</strong> button to the error boundary's
+fallback that clears the error, so the page renders again without
+changing the path. When would trying again help, and when would it
+just crash again?</li>
+<li><strong>Report it.</strong> Add a <code>componentDidCatch(error, info)</code> method to
+<code>ErrorBoundary</code> that logs <code>info.componentStack</code>. What extra does it
+tell you? A real app would send this to an error-reporting service.</li>
+<li><strong>Automatic checks.</strong> Install <code>vitest-axe</code> and add an accessibility
+check to a few page tests. What does it find that topic 05 didn't?
+What did topic 05 find that it doesn't?</li>
+<li><strong>One file for both stacks.</strong> Docker Compose's <code>include:</code> can pull
+another <code>compose.yaml</code> into this one. Use it to start the API's
+stack and the front-end's with one command. What has to be true
+about where the two folders are?</li>
+</ol>
+<h2>Investigate</h2>
+<ol start="9">
+<li><strong>Two quick deletes.</strong> In <code>TagsPage</code>'s <code>handleDeleteTag</code>, replace
+the function form with the plain <code>setTags(tags.filter(…))</code>. Create
+two new tags (both seeded tags are in use). In the Network tab, set
+throttling to the slowest preset, so the API's answers take a while.
+Delete the first new tag, then the second before the first answer
+arrives. When both have answered, what does the list show? Reload:
+what does the API say? Why does the function form fix it? Put the
+function form back and turn throttling off.</li>
+<li><strong>Lazy loading.</strong> Our code is 9% of the bundle (topic 07). Read
+about React's <code>lazy()</code> and look at what it would split off. Is it
+worth it for this app? For what kind of app would it be?</li>
+</ol>
+<h2>Commit</h2>
+<pre><code class="hljs language-bash">git add .
+git commit -m <span class="hljs-string">&quot;Stage 6: hardening&quot;</span>
+</code></pre>
+<p>When your own case study's pages load their data through one hook, a
+crash shows a message instead of a blank page, every page has a title,
+the keyboard can skip the navigation, you know which code no test runs,
+and the built app works on its own, your front-end is finished.</p>
+</div>
+    
+  </main>
+</body>
+</html>

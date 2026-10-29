@@ -12,6 +12,7 @@
 // the requests with a REST client; the API checks every one of them.
 import { Link, Navigate } from 'react-router';
 import { useAuth } from '../context/authContext.js';
+import PageTitle from './PageTitle.jsx';
 
 function ProtectedRoute({ allowedRoles, children }) {
   const { user, hasRole } = useAuth();
@@ -25,6 +26,7 @@ function ProtectedRoute({ allowedRoles, children }) {
   if (allowedRoles && !hasRole(...allowedRoles)) {
     return (
       <>
+        <PageTitle title="Not available" />
         <h1>Not available</h1>
         <p>Your account can't use this page.</p>
         <p>

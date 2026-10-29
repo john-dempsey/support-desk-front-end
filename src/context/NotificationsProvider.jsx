@@ -33,7 +33,7 @@ function NotificationsProvider({ children }) {
       return;
     }
 
-    // The same `ignore` flag as the pages: after a logout, a late answer
+    // The same `ignore` flag as useFetch: after a logout, a late answer
     // about the old user's count must not be shown.
     let ignore = false;
 

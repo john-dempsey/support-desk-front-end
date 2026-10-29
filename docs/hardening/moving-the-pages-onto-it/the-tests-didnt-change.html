@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Tests Didn&#39;t Change — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/moving-the-pages-onto-it/not-every-effect-is-a-fetch.html">← Not Every Effect Is a Fetch</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/moving-the-pages-onto-it/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/when-a-page-crashes/a-crash-blanks-the-app.html">A Crash Blanks the App →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>The Tests Didn&#39;t Change</h1>
+    <p class="lede">Five pages were rewritten, and every one of their tests passed without being touched. That&#39;s what tests are for.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Five pages lost their effects, renamed their state and gained a hook.
+Their tests were <strong>not changed at all</strong>. Stage 5's 161 tests, run
+against the Stage 6 pages, all pass.</p>
+<p>That works because the page tests never looked inside the pages. Since
+Stage 2 they've faked the API module, rendered the page, and checked
+what a user would see:</p>
+<ul>
+<li>&quot;Loading tickets…&quot; appears, then the tickets;</li>
+<li>an error from the API appears as an alert;</li>
+<li>choosing a filter asks the API for the right query.</li>
+</ul>
+<p>None of that mentions <code>useState</code>, <code>useEffect</code> or <code>ignore</code>, so none of it
+cared how the page got its data. A test that checks <strong>behaviour, not
+code</strong>, keeps passing when the code is rewritten, and fails the moment
+the behaviour breaks. That's the safety net topic 01 promised.</p>
+<p>The test files did gain tests in Stage 6, for things later topics add.
+Of the lines already in them, the only ones changed are two <code>import</code>
+lines, each importing one more function for a new test.</p>
+<h2>The hook has its own tests too</h2>
+<p>The pages' tests check that each page works. <code>useFetch.test.js</code> (topic
+02) checks the hook on its own, including the <code>ignore</code> flag. Between
+them, a mistake in the hook would show up twice: once in its own test,
+and once in every page that uses it.</p>
+<h2>Try it</h2>
+<p>In <code>TicketListPage</code>, drop the query string from the hook call, so it
+reads <code>useFetch(getTickets)</code>. The page still loads tickets. Run
+<code>npm test</code>:</p>
+<ul>
+<li><strong>six</strong> tests fail: the list page's tests for the query, the filter,
+&quot;All statuses&quot;, Next and Reload, and one App test that logs two users
+in;</li>
+<li><code>npm run lint</code> warns that <code>queryString</code> is declared but never used.</li>
+</ul>
+<p>Read the first failure's message: what did the test expect <code>getTickets</code>
+to be called with? Put <code>queryString</code> back.</p>
+</div>
+    
+  </main>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 430" width="860" height="430" role="img" aria-labelledby="title desc" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <title id="title">What npm run build reads and writes</title>
+  <desc id="desc">On the left, the inputs: index.html, the files in src, the libraries in node_modules that src imports, and .env, which supplies VITE_API_URL. They go into vite build, which joins the modules, translates JSX, writes in the VITE_ values and minifies. On the right, dist: index.html, one JS file of 329 kB and one CSS file of 5 kB, plus favicon.svg copied from public. No src, no node_modules and no .env: just files a web server can send.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#1a1a1a"/>
+    </marker>
+  </defs>
+  <rect width="860" height="430" fill="#ffffff"/>
+
+  <text x="20" y="34" font-size="15" font-weight="700" fill="#1a1a1a">What it reads</text>
+
+  <rect x="20" y="50" width="280" height="44" rx="6" fill="#f6f8fa" stroke="#59636e" stroke-width="1.5"/>
+  <text x="34" y="77" font-size="13" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">index.html</text>
+
+  <rect x="20" y="104" width="280" height="92" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+  <text x="34" y="128" font-size="13" font-weight="700" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">src/</text>
+  <text x="34" y="150" font-size="12" fill="#3d444d">pages, components, hooks, api,</text>
+  <text x="34" y="168" font-size="12" fill="#3d444d">index.css, CSS Modules</text>
+  <text x="34" y="186" font-size="11" fill="#59636e">our code: 49 files, not the tests</text>
+
+  <rect x="20" y="206" width="280" height="88" rx="6" fill="#f6f8fa" stroke="#59636e" stroke-width="1.5"/>
+  <text x="34" y="230" font-size="13" font-weight="700" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">node_modules/</text>
+  <text x="34" y="252" font-size="12" fill="#3d444d">only what src imports: react,</text>
+  <text x="34" y="270" font-size="12" fill="#3d444d">react-dom, react-router,</text>
+  <text x="34" y="288" font-size="12" fill="#3d444d">socket.io-client</text>
+
+  <rect x="20" y="304" width="280" height="56" rx="6" fill="#ddf4ff" stroke="#0550ae" stroke-width="1.5"/>
+  <text x="34" y="327" font-size="13" font-weight="700" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">.env</text>
+  <text x="34" y="347" font-size="12" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">VITE_API_URL=http://localhost:3000</text>
+
+  <line x1="302" y1="72" x2="346" y2="190" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="302" y1="150" x2="346" y2="198" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="302" y1="250" x2="346" y2="214" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="302" y1="332" x2="346" y2="224" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="350" y="120" width="220" height="176" rx="6" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5"/>
+  <text x="460" y="148" font-size="15" font-weight="700" fill="#1a1a1a" text-anchor="middle" font-family="ui-monospace, Consolas, monospace">vite build</text>
+  <text x="364" y="178" font-size="12" fill="#3d444d">1. joins 167 modules</text>
+  <text x="380" y="196" font-size="12" fill="#3d444d">into one file</text>
+  <text x="364" y="218" font-size="12" fill="#3d444d">2. translates JSX</text>
+  <text x="364" y="240" font-size="12" fill="#3d444d">3. writes in VITE_ values</text>
+  <text x="364" y="262" font-size="12" fill="#3d444d">4. minifies: short names,</text>
+  <text x="380" y="280" font-size="12" fill="#3d444d">no spaces or comments</text>
+
+  <line x1="572" y1="208" x2="604" y2="208" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <text x="608" y="34" font-size="15" font-weight="700" fill="#1a1a1a">What it writes</text>
+  <rect x="608" y="50" width="232" height="254" rx="6" fill="#fff8c5" stroke="#7d4e00" stroke-width="1.5"/>
+  <text x="622" y="76" font-size="14" font-weight="700" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">dist/</text>
+  <rect x="620" y="90" width="208" height="36" rx="4" fill="#ffffff" stroke="#7d4e00"/>
+  <text x="630" y="113" font-size="12" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">index.html</text>
+  <text x="818" y="113" font-size="11" fill="#59636e" text-anchor="end">0.5 kB</text>
+  <rect x="620" y="134" width="208" height="52" rx="4" fill="#ffffff" stroke="#7d4e00"/>
+  <text x="630" y="155" font-size="12" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">assets/index-CPcL75JA.js</text>
+  <text x="630" y="175" font-size="11" fill="#59636e">329 kB: all the JavaScript</text>
+  <rect x="620" y="194" width="208" height="52" rx="4" fill="#ffffff" stroke="#7d4e00"/>
+  <text x="630" y="215" font-size="12" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">assets/index-DcoHriLX.css</text>
+  <text x="630" y="235" font-size="11" fill="#59636e">5 kB: every stylesheet</text>
+  <rect x="620" y="254" width="208" height="36" rx="4" fill="#ffffff" stroke="#7d4e00"/>
+  <text x="630" y="277" font-size="12" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">favicon.svg</text>
+  <text x="818" y="277" font-size="11" fill="#59636e" text-anchor="end">from public/</text>
+
+  <text x="608" y="330" font-size="12" fill="#3d444d">No src, no node_modules, no .env:</text>
+  <text x="608" y="348" font-size="12" fill="#3d444d">just files a web server can send.</text>
+
+  <rect x="20" y="380" width="820" height="34" rx="6" fill="#ddf4ff" stroke="#0550ae" stroke-width="1.5"/>
+  <text x="34" y="402" font-size="12" fill="#1a1a1a">.env is read once, here. The address ends up inside the .js file, so changing .env later means building again.</text>
+</svg>

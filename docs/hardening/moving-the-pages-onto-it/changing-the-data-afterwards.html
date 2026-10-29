@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Changing the Data Afterwards — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/moving-the-pages-onto-it/two-requests-two-hooks.html">← Two Requests, Two Hooks</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/moving-the-pages-onto-it/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/moving-the-pages-onto-it/what-stays-in-the-page.html">What Stays in the Page →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Changing the Data Afterwards</h1>
+    <p class="lede">After a create, a delete or a push, a page changes the loaded data with the setData the hook hands back, using the function form.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Loading is only half of what a page does with its data. After adding a
+comment, deleting a tag or receiving a push, the page changes what it
+loaded, without asking the API for everything again (Stage 3). Now the
+hook owns that state, so the page uses the setter the hook hands back,
+renamed to suit: <code>setComments</code>, <code>setTags</code>, <code>setNotifications</code>.</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 6.14: adding a comment (src/pages/TicketDetailPage.jsx, excerpt)</span>
+  <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">handleAddComment</span>(<span class="hljs-params">commentText</span>) {
+    <span class="hljs-title function_">setCommentError</span>(<span class="hljs-literal">null</span>);
+    <span class="hljs-keyword">try</span> {
+      <span class="hljs-keyword">const</span> newComment = <span class="hljs-keyword">await</span> <span class="hljs-title function_">createComment</span>(ticket.<span class="hljs-property">id</span>, commentText);
+      <span class="hljs-comment">// ...</span>
+      <span class="hljs-title function_">setComments</span>(<span class="hljs-function">(<span class="hljs-params">currentComments</span>) =&gt;</span> [...currentComments, newComment]);
+      <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+    } <span class="hljs-keyword">catch</span> (error) {
+      <span class="hljs-title function_">setCommentError</span>(error);
+      <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+    }
+  }
+</code></pre>
+<p>(A long comment above <code>setComments</code> is left out.) It's the same <code>[...]</code>
+as Stage 3: a new array with the comment on the end.</p>
+<h2>The function form, wherever there's an <code>await</code></h2>
+<p><code>setComments</code> runs <strong>after an <code>await</code></strong>, later than the render the
+handler was made in. Stage 5's rule says an update like that, worked out
+from the old state, uses the function form, so React hands it the list
+as it is <em>now</em>. Stage 6 applies that rule everywhere it fits:</p>
+<table>
+<thead>
+<tr>
+<th>Page</th>
+<th>Update</th>
+<th>Runs after</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>TicketDetailPage</code></td>
+<td>add a comment, delete a comment</td>
+<td><code>await createComment(…)</code>, <code>await deleteComment(…)</code></td>
+</tr>
+<tr>
+<td><code>TagsPage</code></td>
+<td>delete a tag</td>
+<td><code>await deleteTag(…)</code></td>
+</tr>
+<tr>
+<td><code>NotificationsPage</code></td>
+<td>a push, Mark as read</td>
+<td>a socket event; <code>await markNotificationRead(…)</code> (both since Stage 5)</td>
+</tr>
+</tbody>
+</table>
+<h2>One new item in a dependency list</h2>
+<p><code>NotificationsPage</code> listens for pushes in its own effect, which calls
+<code>setNotifications</code>. oxlint now asks for it in that effect's dependency
+list, <code>[setNotifications]</code>. It never asked for <code>setNotifications</code> when
+it came from <code>useState</code> in the page itself, because it knows React's
+setters never change. It can't see inside our hook, so it doesn't know
+this one never changes either. Listing it does no harm: it's the
+same function every render, so the effect still runs only once.</p>
+<h2>Try it</h2>
+<p>Before you try it, predict: two browser windows show the same ticket,
+logged in as the same user, and you add a comment in one. Will the
+other window show the new comment? Both pages call
+<code>useFetch(getComments, …)</code>. (Think back to topic 02: what does each
+caller of a hook share, and what doesn't it? And Stage 5: is the author
+of a comment sent a notification about it?) Then try it.</p>
+</div>
+    
+  </main>
+</body>
+</html>

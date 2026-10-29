@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Which Parts Are for You — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/what-stage-6-adds/no-new-features.html">← No New Features</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/what-stage-6-adds/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/what-stage-6-adds/what-changes-and-what-doesnt.html">What Changes, and What Doesn&#39;t →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Which Parts Are for You</h1>
+    <p class="lede">Most of Stage 6 needs nothing from your API, so it works on a Stage 3 app with no login. Only the nginx topic needs Docker.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Stages 4 and 5 each needed a step of the back-end assignment. <strong>Most of
+Stage 6 needs nothing from your API at all.</strong> It works on whatever app
+you have, even one that stopped at Stage 3 because its API has no login.</p>
+<table>
+<thead>
+<tr>
+<th>Topic</th>
+<th>What it needs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>02–03 One hook for loading data</td>
+<td>any page that loads data (Stage 2 on)</td>
+</tr>
+<tr>
+<td>04 An error boundary</td>
+<td>nothing</td>
+</tr>
+<tr>
+<td>05 An accessibility pass</td>
+<td>nothing</td>
+</tr>
+<tr>
+<td>06 Coverage</td>
+<td>your tests (Stage 2 on)</td>
+</tr>
+<tr>
+<td>07 The production build</td>
+<td>nothing</td>
+</tr>
+<tr>
+<td>08 nginx in Docker</td>
+<td>Docker, as in back-end Lesson 6. <strong>Optional</strong></td>
+</tr>
+<tr>
+<td>09 Pinning CORS</td>
+<td>your own back-end. <strong>Discussion</strong>, plus one Try it there</td>
+</tr>
+</tbody>
+</table>
+<h2>If your app stopped at Stage 3</h2>
+<p>Do topics 02 to 07 on your Stage 3 app. Everything they change is
+already there: pages that load data, a route table, a ticket list (or
+your own list), and tests.</p>
+<p>A few things in the Support Desk code only exist because of Stages 4
+and 5: the login and register pages, <code>ProtectedRoute</code> and the
+notifications page. When a slide changes one of those, skip that part.
+Nothing else depends on them.</p>
+<h2>If your app is your own case study</h2>
+<p>As in every stage, the Support Desk code shows the pattern, and your
+app applies it to its own pages. Your pages load different things and
+have different names, but they follow the same pattern that topic 02
+pulls out into a hook. So the hook itself carries over almost word for
+word.</p>
+<h2>Try it</h2>
+<p>Make a list of your own app's pages that load data from the API. For
+each one, write down the <code>src/api/</code> function it calls. Keep the list:
+topic 03 moves each of those pages onto the new hook.</p>
+</div>
+    
+  </main>
+</body>
+</html>

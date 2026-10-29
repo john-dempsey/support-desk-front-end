@@ -14,6 +14,12 @@ describe('HomePage', () => {
     ).toBeInTheDocument();
   });
 
+  it('names the browser tab after the page', () => {
+    renderWithProviders(<HomePage />);
+
+    expect(document.title).toBe('Home · Support Desk');
+  });
+
   it('links to the ticket list', () => {
     renderWithProviders(<HomePage />);
 
@@ -21,5 +27,16 @@ describe('HomePage', () => {
       'href',
       '/tickets',
     );
+  });
+
+  it('asks a visitor who is not logged in to log in or register', () => {
+    renderWithProviders(<HomePage />, { user: null });
+
+    expect(screen.getByRole('link', { name: 'Log in' })).toHaveAttribute('href', '/login');
+    expect(screen.getByRole('link', { name: 'create an account' })).toHaveAttribute(
+      'href',
+      '/register',
+    );
+    expect(screen.queryByRole('link', { name: 'View the tickets' })).not.toBeInTheDocument();
   });
 });

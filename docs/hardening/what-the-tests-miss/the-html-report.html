@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The HTML Report — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/what-the-tests-miss/reading-the-table.html">← Reading the Table</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/what-the-tests-miss/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/what-the-tests-miss/what-it-found.html">What It Found →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>The HTML Report</h1>
+    <p class="lede">coverage/index.html shows the same numbers as a web page, and every file&#39;s code with the lines no test ran marked in red.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The table in the terminal is one of several reports Vitest writes. The
+most useful is a small website in <code>coverage/</code>. Open
+<code>coverage/index.html</code> in your browser:</p>
+<p><img src="/support-desk-front-end/assets/images/coverage-html-index.png" alt="Screenshot: the coverage report's front page, All files. Totals at the top: Statements, Branches, Functions and Lines, each with a percentage and a count such as 506 out of 509. Below, a table with one row per folder of src: src, src/api, src/components, src/context, src/hooks, src/pages, src/realtime and src/utils, each with a bar and the four percentages. Most cells are green; a few, such as the Branches for src/context and src/realtime, are yellow."></p>
+<p>Click a folder, then a file, and you see its code, line by line:</p>
+<p><img src="/support-desk-front-end/assets/images/coverage-html-tagspage.png" alt="Screenshot: the coverage report for src/pages/TagsPage.jsx, reached through All files, then src/pages. At the top, the file's totals: 97.61% of statements, 41 of 42; 88.88% of branches, 16 of 18; 100% of functions; 97.5% of lines. Below, its first 47 lines of code, with line numbers down the left and, beside the lines that ran, how many times: 2x on lines 22 and 23, and 39x on line 31, which calls useFetch, and on the useState lines after it. On line 22, the if that checks for a 409 status has a black E marker in front of it. Line 25, return error, is highlighted in red."></p>
+<h2>What the marks mean</h2>
+<ul>
+<li><strong>A count, such as <code>2x</code> or <code>39x</code></strong>, beside a line: how many times the
+tests ran it. <code>39x</code> on line 31, which calls <code>useFetch</code>, is every render
+of the page in every test.</li>
+<li><strong>A red line</strong> never ran. In <code>TagsPage.jsx</code> that's line 25,
+<code>return error;</code>. It's the end of <code>describeTagError()</code>, for an error
+that isn't a 409, and no test sent the tags page any other error.</li>
+<li><strong>An <code>E</code></strong> in front of an <code>if</code> means its <em>else</em> path never ran (and
+an <strong><code>I</code></strong> would mean its <em>if</em> path never ran). Line 22 checks for a
+409, and every test that reached it had a 409, so the &quot;not a 409&quot; way
+never happened. That's the same gap as line 25, seen from the <code>if</code>.</li>
+<li><strong>Yellow</strong> in the folder table: a middling score, between red (low)
+and green (high).</li>
+</ul>
+<p>The report can be more useful than the table: you see the gap <strong>in
+its code</strong>, so you can see what sort of test would reach it.</p>
+<h2>Try it</h2>
+<p>Open your own report, find the file with the most red, and pick one red
+line. Write one sentence for a test that would run it: &quot;When the API
+answers … the page should show …&quot;. Don't write the test yet: the next
+slides show how the Support Desk app chose which gaps to fill.</p>
+</div>
+    
+  </main>
+</body>
+</html>

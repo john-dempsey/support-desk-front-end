@@ -6,56 +6,28 @@
 // Only agents and admins can change a ticket, so App.jsx's ProtectedRoute
 // only lets them reach this page. A customer's GET /users would get a 403
 // anyway.
-import { useEffect, useState } from 'react';
+//
+// Since Stage 6 the useFetch hook loads the ticket and the agents.
+import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { getTicket, updateTicket } from '../api/tickets.api.js';
 import { getAgents } from '../api/users.api.js';
+import { useFetch } from '../hooks/useFetch.js';
 import TicketForm from '../components/TicketForm.jsx';
 import Loading from '../components/Loading.jsx';
 import ErrorMessage from '../components/ErrorMessage.jsx';
+import PageTitle from '../components/PageTitle.jsx';
 
 function EditTicketPage() {
   const { ticketId } = useParams();
   const navigate = useNavigate();
-  const [ticket, setTicket] = useState(null);
-  const [agents, setAgents] = useState([]);
-  const [loadErrorMessage, setLoadErrorMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
+  // One useFetch for each request. Both run when the page first renders,
+  // so the two requests are still sent at the same time.
+  const { data: ticket, error: ticketError, isLoading: isTicketLoading } =
+    useFetch(getTicket, ticketId);
+  const { data: agents, error: agentsError, isLoading: areAgentsLoading } =
+    useFetch(getAgents);
   const [saveError, setSaveError] = useState(null);
-
-  useEffect(() => {
-    let ignore = false;
-
-    async function loadTicketAndAgents() {
-      try {
-        // The two requests don't depend on each other, so both are sent at
-        // once, and Promise.all() waits until both have answered: the same
-        // idea as Promise.all() in the back-end's ticket.service.js.
-        const [ticketData, agentsData] = await Promise.all([
-          getTicket(ticketId),
-          getAgents(),
-        ]);
-        if (!ignore) {
-          setTicket(ticketData);
-          setAgents(agentsData);
-        }
-      } catch (error) {
-        if (!ignore) {
-          setLoadErrorMessage(error.message);
-        }
-      } finally {
-        if (!ignore) {
-          setIsLoading(false);
-        }
-      }
-    }
-
-    loadTicketAndAgents();
-
-    return () => {
-      ignore = true;
-    };
-  }, [ticketId]);
 
   async function handleSave(changes) {
     setSaveError(null);
@@ -69,15 +41,18 @@ function EditTicketPage() {
     }
   }
 
-  if (isLoading) {
+  if (isTicketLoading || areAgentsLoading) {
     return <Loading message="Loading the ticket…" />;
   }
 
-  if (loadErrorMessage) {
+  // Either request may have failed: show whichever error there is.
+  const loadError = ticketError || agentsError;
+  if (loadError) {
     return (
       <>
+        <PageTitle title="Couldn't load the ticket" />
         <h1>Couldn't load the ticket</h1>
-        <ErrorMessage message={loadErrorMessage} />
+        <ErrorMessage message={loadError.message} />
         <p>
           <Link to="/tickets">Back to all tickets</Link>
         </p>
@@ -103,6 +78,7 @@ function EditTicketPage() {
       <p>
         <Link to={`/tickets/${ticketId}`}>Back to the ticket</Link>
       </p>
+      <PageTitle title="Edit ticket" />
       <h1>Edit ticket</h1>
       <TicketForm
         initialValues={initialValues}

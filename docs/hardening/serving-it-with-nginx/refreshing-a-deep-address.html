@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Refreshing a Deep Address — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/serving-it-with-nginx/starting-it.html">← Starting It</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/serving-it-with-nginx/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/serving-it-with-nginx/keeping-files-for-a-year.html">Keeping Files for a Year →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Refreshing a Deep Address</h1>
+    <p class="lede">nginx only sends files that exist. One line, try_files, tells it to send index.html instead, so React Router can show the page.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Topic 07 ended with a plain web server answering a reload of
+<code>/tickets/3</code> with a 404. nginx is a plain web server too: with no
+settings of our own, it does the same.</p>
+<p><img src="/support-desk-front-end/assets/images/nginx-404.png" alt="Screenshot: the browser at localhost:8080/tickets/3 after a reload, without try_files. A plain white page with the heading 404 Not Found, a line, and nginx/1.30.6 underneath. No navigation bar: the app never loaded."></p>
+<p>There's no file called <code>tickets/3</code> in <code>dist/</code>, so nginx says so. The
+app never loads, so React Router never gets to read the address. The
+<code>Dockerfile</code> copies our own settings over nginx's default site to fix
+that:</p>
+<pre><code class="hljs language-nginx"><span class="hljs-comment"># Figure 6.43: send index.html for every address (nginx.conf, excerpt)</span>
+<span class="hljs-section">server</span> {
+    <span class="hljs-attribute">listen</span> <span class="hljs-number">80</span>;
+    <span class="hljs-attribute">root</span> /usr/share/nginx/html;
+
+    <span class="hljs-comment"># Every URL that isn&#x27;t a real file gets index.html. There is no</span>
+    <span class="hljs-comment"># tickets/3 file in dist/: React Router reads the URL in the browser</span>
+    <span class="hljs-comment"># and shows the right page. Without this line, refreshing /tickets/3</span>
+    <span class="hljs-comment"># would get nginx&#x27;s own &quot;404 Not Found&quot;.</span>
+    <span class="hljs-section">location</span> / {
+        <span class="hljs-attribute">try_files</span> <span class="hljs-variable">$uri</span> /index.html;
+        <span class="hljs-comment"># Ask the server every time, so a new build is picked up at once.</span>
+        <span class="hljs-attribute">add_header</span> Cache-Control <span class="hljs-string">&quot;no-cache&quot;</span>;
+    }
+</code></pre>
+<ul>
+<li><strong><code>listen 80</code></strong> and <strong><code>root</code></strong>: answer on port 80 inside the
+container, with files from the folder the <code>Dockerfile</code> copied
+<code>dist/</code> into.</li>
+<li><strong><code>location /</code></strong> holds the rules for every address (the next slide
+adds a more specific one).</li>
+<li><strong><code>try_files $uri /index.html</code></strong>: try the address as a file (<code>$uri</code>
+is the address, such as <code>/favicon.svg</code>). If there's no such file,
+send <code>/index.html</code> instead.</li>
+</ul>
+<p>That's the same fallback the dev server and <code>npm run preview</code> always
+had. In a Laravel app, the web server's settings send every address to
+<code>public/index.php</code> in the same way, and Laravel's router takes over;
+here React Router does.</p>
+<h2>Try it</h2>
+<p>In <code>nginx.conf</code>, put a <code>#</code> in front of the <code>try_files $uri /index.html;</code>
+line. Run <code>docker compose up -d --build</code>, open
+<code>http://localhost:8080/tickets/3</code> and reload. Now click the address
+bar, go to <code>http://localhost:8080/</code> and click your way to a ticket: why
+does that work? Remove the <code>#</code> and build again.</p>
+</div>
+    
+  </main>
+</body>
+</html>

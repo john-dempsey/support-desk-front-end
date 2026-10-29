@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Serving It with nginx (Optional) — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Serving It with nginx (Optional)</h1>
+    <p class="lede">The built app in a container: a two-stage Dockerfile, nginx sending the files, try_files for deep URLs, and a year&#39;s caching for files whose names change.</p>
+
+    
+      <ul class="listing">
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/serving-it-with-nginx/why-a-web-server.html">Why a Web Server</a>
+            <p>The built app is just files, so it needs a web server, not Node. The browser fetches the files from nginx and talks to the API itself.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/serving-it-with-nginx/two-stages-one-small-image.html">Two Stages, One Small Image</a>
+            <p>The first stage uses Node to build the app. The second is nginx with dist/ copied in, and nothing else.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/serving-it-with-nginx/the-apis-address-at-build-time.html">The API&#39;s Address, at Build Time</a>
+            <p>.env stays out of the image, so compose.yaml reads it and hands the address to the build as a build argument.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/serving-it-with-nginx/starting-it.html">Starting It</a>
+            <p>One command builds the image and starts nginx on port 8080, next to the API&#39;s stack. Logging in, pushes and Reload all work from there.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/serving-it-with-nginx/refreshing-a-deep-address.html">Refreshing a Deep Address</a>
+            <p>nginx only sends files that exist. One line, try_files, tells it to send index.html instead, so React Router can show the page.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/serving-it-with-nginx/keeping-files-for-a-year.html">Keeping Files for a Year</a>
+            <p>A hashed file&#39;s contents never change, so the browser may keep it for a year. index.html is checked every time, so a new build is seen at once.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/serving-it-with-nginx/changing-it-later.html">Changing It Later</a>
+            <p>Everything in the image is fixed when it&#39;s built. A change to the code, .env or nginx.conf needs --build; npm run dev stays how you work.</p>
+          </li>
+        
+      </ul>
+    
+
+    
+  </main>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Preview, and Where It Stops — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/the-production-build/production-isnt-development.html">← Production Isn&#39;t Development</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/the-production-build/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/serving-it-with-nginx/why-a-web-server.html">Why a Web Server →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Preview, and Where It Stops</h1>
+    <p class="lede">npm run preview answers every address with index.html and tells the browser never to keep a file. A real web server does neither unless it&#39;s told to.</p>
+
+    
+
+    
+      <div class="slide-body"><p><code>npm run preview</code> is the quickest way to try the build, and Stage 0
+used it for that. But it's a tool for checking a build, not a web
+server for users, and two things it does are worth knowing before you
+pick a real one.</p>
+<h2>It answers every address with <code>index.html</code></h2>
+<p><code>/tickets/3</code> isn't a file in <code>dist/</code>. The preview server sends
+<code>index.html</code> instead, React Router reads the address, and the ticket's
+page appears. That's the <strong>fallback</strong> from Stage 0, and it's why a
+refresh on a deep address works.</p>
+<p>Preview does it for <strong>every</strong> address it has no file for. Even
+<code>/assets/missing.js</code>, which is clearly meant to be a file, gets
+<code>index.html</code>, and React shows &quot;Page not found&quot;.</p>
+<h2>It tells the browser not to keep anything</h2>
+<p>Every answer from preview, the hashed <code>.js</code> and <code>.css</code> files included,
+has this header:</p>
+<pre><code class="hljs">Cache-Control: no-cache
+</code></pre>
+<p>That tells the browser to check with the server before using a copy it
+already has. Fine while you're checking a build, but it hides the
+reason the file names have hashes in them. Topic 08 shows what a real
+server can do with those names.</p>
+<h2>A plain web server has no fallback</h2>
+<p>Any web server can send the files in <code>dist/</code>. But a plain one only
+sends files that exist. Python has one built in: serving <code>dist/</code> with
+it, <code>/</code> works and so does clicking around (React Router changes the
+address without asking the server). Reload on <code>/login</code> or <code>/tickets/3</code>,
+though, and the server looks for a file with that name, finds none,
+and answers:</p>
+<pre><code class="hljs">Error code: 404
+Message: File not found.
+</code></pre>
+<p>So whichever server you use must be told: &quot;if there's no such file,
+send <code>index.html</code>&quot;. That's the one line topic 08 adds to nginx.</p>
+<h2>Try it</h2>
+<ol>
+<li>With <code>npm run preview</code> running, open
+<code>http://localhost:4173/assets/missing.js</code>. Who answers: the server
+or React?</li>
+<li>In the Network tab, reload, click the <code>.js</code> file's row, and find
+<code>Cache-Control</code> under <strong>Response Headers</strong>.</li>
+<li>If you have Python 3, stop preview and run
+<code>python3 -m http.server 8765 -d dist</code> (on Windows, <code>python</code> or
+<code>py</code> instead of <code>python3</code>). Open <code>http://localhost:8765</code> and click
+<strong>Log in</strong>: the login page appears. Now reload. Stop the server with
+<strong>Ctrl+C</strong>.</li>
+</ol>
+</div>
+    
+  </main>
+</body>
+</html>

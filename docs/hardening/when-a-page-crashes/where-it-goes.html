@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Where It Goes — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/when-a-page-crashes/the-one-class.html">← The One Class</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/when-a-page-crashes/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/when-a-page-crashes/what-it-doesnt-catch.html">What It Doesn&#39;t Catch →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Where It Goes</h1>
+    <p class="lede">The boundary wraps the routes, inside main and below NavBar, and a key tied to the path gives every page a fresh start.</p>
+
+    
+
+    
+      <div class="slide-body"><p>A boundary catches crashes <strong>inside</strong> it, so where it goes decides what
+survives a crash. <code>App</code> puts it around the routes:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 6.20: the boundary (src/App.jsx, excerpt)</span>
+  <span class="hljs-keyword">const</span> location = <span class="hljs-title function_">useLocation</span>();
+  <span class="hljs-comment">// ...</span>
+      <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">NavBar</span> /&gt;</span></span>
+      <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">main</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;main-content&quot;</span> <span class="hljs-attr">className</span>=<span class="hljs-string">&quot;container&quot;</span>&gt;</span>
+        {/* NavBar is outside the boundary, so it still works after a crash.
+            key: React swaps in a new ErrorBoundary whenever the path
+            changes, so going to another page clears the error. Without it,
+            &quot;Something went wrong&quot; would stay on every page. */}
+        <span class="hljs-tag">&lt;<span class="hljs-name">ErrorBoundary</span> <span class="hljs-attr">key</span>=<span class="hljs-string">{location.pathname}</span>&gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-name">Routes</span>&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">Route</span> <span class="hljs-attr">path</span>=<span class="hljs-string">&quot;/&quot;</span> <span class="hljs-attr">element</span>=<span class="hljs-string">{</span>&lt;<span class="hljs-attr">HomePage</span> /&gt;</span>} /&gt;
+            {/* ... */}
+          <span class="hljs-tag">&lt;/<span class="hljs-name">Routes</span>&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-name">ErrorBoundary</span>&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">main</span>&gt;</span></span>
+</code></pre>
+<p>(The <code>id</code> on <code>&lt;main&gt;</code> is for later in this lesson.) <code>useLocation()</code>
+comes from React Router: it returns the current URL, and
+<code>location.pathname</code> is its path, such as <code>/tickets/2</code>.</p>
+<p><img src="/support-desk-front-end/assets/images/boundary-around-the-routes.svg" alt="Diagram: on the left, Stage 6 when a page crashes. App holds NavBar, then main. Inside main is the ErrorBoundary with its key set to the path, and everything inside the boundary is swapped for the fallback: Something went wrong, Sorry, this page stopped working, and a link, Go to the home page. NavBar is outside the boundary, so it still works. On the right, Stage 5 when a page crashes: a blank page. React removes the whole app, NavBar included, so there's nothing to click. Along the bottom: key equals location.pathname, so a new path means a new ErrorBoundary, which starts with no error."></p>
+<ul>
+<li><strong>Inside <code>&lt;main&gt;</code>, below <code>NavBar</code>.</strong> Only the page is swapped for the
+fallback. The navigation, the user's name and Log out all keep
+working, so the user can go somewhere else.</li>
+</ul>
+<h2>Why the <code>key</code></h2>
+<p>You met <code>key</code> in Stage 1, on list items: React uses it to tell
+components apart. When a component's <code>key</code> changes, React treats it as
+<strong>a different component</strong>: it throws the old one away, state and all,
+and makes a new one.</p>
+<p>Once the boundary has caught an error, its state says so, and it shows
+the fallback whatever its children are. Without a <code>key</code>, clicking
+<strong>Tickets</strong> would change the route inside, but the same boundary, with
+the same error, would still be showing &quot;Something went wrong&quot;. With
+<code>key={location.pathname}</code>, a new path means a new boundary, with
+<code>error: null</code>, so the next page appears as normal.</p>
+<h2>Everything inside starts afresh too</h2>
+<p>The new boundary brings new copies of everything inside it, including
+the page. So going from <code>/tickets/1</code> to <code>/tickets/2</code> now gives a brand
+new <code>TicketDetailPage</code>, with its notice and error messages back at
+their starting values. That's why topic 03 said the ticket's page
+&quot;starts afresh anyway&quot; when the URL moves to a different ticket.
+(Stage 2 showed React Router keeping the same page in that case. The
+boundary's <code>key</code> changes that, but <code>useFetch</code>'s <code>argument</code> still lists
+the ticket ID, so the page would still be right without it.)</p>
+<p>Only the <strong>path</strong> is in the key. A new filter on the list
+(<code>/tickets?status=open</code>) keeps the same path, the same boundary and the
+same page, which is why the list page resets its notice itself.</p>
+<h2>Try it</h2>
+<p>With the bug still in <code>TicketDetailPage</code>, open an unassigned ticket,
+then click <strong>Tickets</strong> in the navigation bar: the list appears. Now
+remove <code>key={location.pathname}</code> from the <code>&lt;ErrorBoundary&gt;</code> and reload.
+Open the unassigned ticket again and click <strong>Tickets</strong>. What do you see
+now, on the ticket list and every other page? Put the <code>key</code> back.</p>
+</div>
+    
+  </main>
+</body>
+</html>

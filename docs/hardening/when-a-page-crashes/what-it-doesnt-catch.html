@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What It Doesn&#39;t Catch — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/when-a-page-crashes/where-it-goes.html">← Where It Goes</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/when-a-page-crashes/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/when-a-page-crashes/testing-the-boundary.html">Testing the Boundary →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>What It Doesn&#39;t Catch</h1>
+    <p class="lede">A boundary only catches errors thrown while rendering. Event handlers and requests still need try/catch, and the details are for developers only.</p>
+
+    
+
+    
+      <div class="slide-body"><p>A boundary catches errors thrown <strong>while React is rendering</strong> the
+components inside it. It doesn't catch:</p>
+<ul>
+<li><strong>Errors in event handlers</strong>, such as a click. A handler runs after
+rendering has finished, when the user does something. If it throws,
+nothing on the screen is half-drawn, so React has nothing to replace.</li>
+<li><strong>Errors in <code>async</code> code</strong>, such as a failed request. The request
+finishes long after the render that started it.</li>
+</ul>
+<p>Neither needs a boundary. Every handler and every request in the app
+already has its own <code>try</code>/<code>catch</code>, which shows the user a message right
+where it belongs: next to the form, or in place of the list. The
+boundary is a safety net for the bugs that slip past those.</p>
+<h2>The details are for developers</h2>
+<p>The fallback has one more line, left out of Figure 6.19:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 6.21: development only (src/components/ErrorBoundary.jsx, excerpt)</span>
+        {<span class="hljs-comment">/* The error&#x27;s own message helps while developing, but means
+            nothing to a user, so the production build leaves it out. */</span>}
+        {<span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">env</span>.<span class="hljs-property">DEV</span> &amp;&amp;
+          <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Details (development only): {this.state.error.message}<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span></span>}
+</code></pre>
+<p>(The last line is split here to fit.) Vite sets <code>import.meta.env.DEV</code>
+to <code>true</code> under <code>npm run dev</code> and <code>false</code> in the production build, so
+&quot;Cannot read properties of null (reading 'name')&quot; helps you, and never
+puzzles a real user.</p>
+<h2>Who hears about the error</h2>
+<p>React itself logs every error a boundary catches, with
+<code>console.error</code>, so the boundary doesn't need to. A real app would also
+want to <strong>know</strong> when its users hit a bug. It would send the error to
+an error-reporting service from a method called <code>componentDidCatch</code>,
+which React calls after <code>getDerivedStateFromError</code>. This app has no
+such service, so it doesn't have the method.</p>
+<h2>Try it</h2>
+<p>First, <strong>remove the bug</strong>: put the assigned agent line in
+<code>TicketDetailPage</code> back to how it was.</p>
+<p>Now add this as the first line inside <code>handleDeleteTicket()</code>:</p>
+<pre><code class="hljs language-js"><span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&#x27;Broken on purpose&#x27;</span>);
+</code></pre>
+<p>Reload, log in as Ada, open a ticket and click <strong>Delete ticket</strong>.
+Nothing on the page changes (and nothing is deleted: the error comes
+before the confirm box). Where does the error show up? Why didn't the
+boundary catch it? Then remove the line.</p>
+</div>
+    
+  </main>
+</body>
+</html>

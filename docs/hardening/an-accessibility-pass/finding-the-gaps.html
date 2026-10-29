@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Finding the Gaps — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/when-a-page-crashes/testing-the-boundary.html">← Testing the Boundary</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/an-accessibility-pass/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/an-accessibility-pass/lighthouse-says-100.html">Lighthouse Says 100 →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Finding the Gaps</h1>
+    <p class="lede">Three ways to check an app&#39;s accessibility: the keyboard, Lighthouse and a screen reader. Together they found three gaps in the Support Desk app.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Stage 0 built the app to be accessible from the start, and every stage
+since has kept to it. An <strong>accessibility pass</strong> checks that it worked:
+you use the app the way people with different needs use it, and note
+anything that gets in their way.</p>
+<h2>Three ways to look</h2>
+<ol>
+<li><strong>The keyboard only.</strong> Put the mouse away and use <strong>Tab</strong>,
+<strong>Shift+Tab</strong>, <strong>Enter</strong> and <strong>Space</strong>. Can you reach every link,
+button and field? Can you always see where you are? Is the order
+sensible? Plenty of people never use a mouse: people who can't, and
+people who find the keyboard faster.</li>
+<li><strong>Lighthouse</strong>, built into Chrome's DevTools. It runs dozens of
+automatic checks on a page and gives it a score. It's quick, and it
+needs nothing installed.</li>
+<li><strong>A screen reader</strong> for a few minutes: NVDA (free) on Windows, or
+VoiceOver (built in) on a Mac. Close your eyes, or turn the screen
+off, and try to find a ticket. A few minutes of this teaches more
+than any checklist.</li>
+</ol>
+<h2>What they found</h2>
+<table>
+<thead>
+<tr>
+<th>Gap</th>
+<th>Who it affects</th>
+<th>WCAG</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Every page's title is &quot;Support Desk&quot;, so browser tabs, history and screen readers can't tell pages apart</td>
+<td>anyone with several tabs open; screen reader users, who hear the title first</td>
+<td>2.4.2 Page Titled</td>
+</tr>
+<tr>
+<td>No way to skip the navigation, so a keyboard user Tabs through it on every page</td>
+<td>keyboard users</td>
+<td>2.4.1 Bypass Blocks</td>
+</tr>
+<tr>
+<td>The ticket table has no name</td>
+<td>screen reader users, who can jump between tables by name</td>
+<td>1.3.1 Info and Relationships</td>
+</tr>
+</tbody>
+</table>
+<p>The numbers are WCAG's success criteria (Stage 0's &quot;Colour, Contrast and
+the Keyboard&quot; introduced WCAG). The rest of this topic fixes each gap in
+turn.</p>
+<p>One more gap was found and <strong>left as a challenge</strong>: after clicking a
+link, keyboard focus stays where it was, so a screen reader doesn't
+announce the new page. Fixing it touches every page, and it's in this
+lesson's &quot;Try it yourself&quot;.</p>
+<h2>Try it</h2>
+<p>Do the first check on your own app: keyboard only, for five minutes.
+Log in, open something, change something, and log out, without
+touching the mouse. Write down anything that was slow, confusing or
+impossible. Keep the list: the next slides may fix some of it.</p>
+</div>
+    
+  </main>
+</body>
+</html>

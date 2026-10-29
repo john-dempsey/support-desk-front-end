@@ -1,5 +1,7 @@
 node_modules
 dist
+# The report `npm run coverage` writes. Run it again to make a new one.
+coverage
 
 # Secrets — your real .env is never committed; .env.example is the template.
 .env

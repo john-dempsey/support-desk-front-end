@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What CORS Protects — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/pinning-cors/pinning-it.html">← Pinning It</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/pinning-cors/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/making-it-yours/tracing-stage-6.html">Tracing Stage 6 →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>What CORS Protects</h1>
+    <p class="lede">CORS is a rule the browser follows for web pages. curl, a REST client and a WebSocket ignore it, so the token and authorize() are still what protect the API.</p>
+
+    
+
+    
+      <div class="slide-body"><p>It's easy to think of pinned CORS as a lock on the API. It isn't. It's
+a rule that <strong>browsers</strong> follow, on behalf of the people using them.</p>
+<p><img src="/support-desk-front-end/assets/images/who-cors-protects.svg" alt="Diagram: the pinned API in the middle, allowing only localhost:5173 and localhost:8080. Four callers around it. Our own pages on 5173 and 8080: allowed, they read the answers. A page on another website, in a visitor's browser: the browser refuses to give it the answer; a request with a token is never sent, but a plain GET still reaches the API and runs. curl or a REST client: CORS doesn't apply, it gets every answer. A WebSocket opened by any page: CORS doesn't apply either, the socket opens. Along the bottom: what actually protects the data is the token, checked by authenticate and authorize on every request, and by the authenticate event on the socket."></p>
+<h2>What it doesn't stop</h2>
+<ul>
+<li><strong>Anything that isn't a browser.</strong> CORS headers are only read by
+browsers. <code>curl</code> and your REST client ignore them: against an API
+pinned to <code>5173</code>, <code>curl</code> still gets the full answer. Anyone can call
+the API that way, with or without your front-end.</li>
+<li><strong>The request itself, sometimes.</strong> A request that needs a preflight
+(one with a token, or a JSON body) is never sent. But a plain <code>GET</code>
+with no token isn't preflighted: it reaches the API, which runs it and
+answers, and only then does the browser refuse to hand the answer to
+the page.</li>
+<li><strong>The socket.</strong> CORS covers HTTP requests, not WebSockets. A page on
+any origin can open a WebSocket straight to Socket.IO, and it
+connects. What it can't do is join a user's room without that user's
+token: that's what the <code>authenticate</code> event checks (Stage 5).</li>
+</ul>
+<h2>What it does stop</h2>
+<p>Another website's page, opened in your user's browser, can't use your
+API from there and read the answers. That matters most when the browser
+sends something <strong>by itself</strong> with every request, such as a cookie.
+Stage 4 mentioned <code>httpOnly</code> cookies as the alternative to
+<code>localStorage</code>: an API that used them would rely on CORS (and the
+cookie's own settings) to stop other sites using a logged-in user's
+cookie. Our token is only sent because <code>client.js</code> adds it, and a page
+on another origin can't read our <code>localStorage</code>.</p>
+<h2>So what protects the data?</h2>
+<p>The same things as before: the token, checked by <code>authenticate</code> on
+every request, and <code>authorize()</code> checking the role. Pinning CORS is
+worth doing, because it's one less thing another website can do. But
+it adds to those checks. It doesn't replace any of them.</p>
+<h2>Try it</h2>
+<p>With your own back-end pinned to <code>http://localhost:5173</code>, run:</p>
+<pre><code class="hljs language-bash">curl -i -H <span class="hljs-string">&quot;Origin: http://evil.example&quot;</span> http://localhost:3000/tickets
+</code></pre>
+<p>(Use your own API's port and one of its routes.) What status comes
+back, and what does <code>Access-Control-Allow-Origin</code> say? Did CORS stop
+<code>curl</code> from reading it? What did stop it, if anything?</p>
+</div>
+    
+  </main>
+</body>
+</html>

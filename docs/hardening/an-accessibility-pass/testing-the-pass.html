@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Testing the Pass — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/an-accessibility-pass/a-caption-for-the-table.html">← A Caption for the Table</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/an-accessibility-pass/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/what-the-tests-miss/a-coverage-report.html">A Coverage Report →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Testing the Pass</h1>
+    <p class="lede">Each fix gets a test: document.title for the titles, the table&#39;s name for the caption, and the first link on the page for the skip link.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Each of the three fixes has a test, so it can't quietly disappear.</p>
+<h2>Titles: <code>document.title</code></h2>
+<p>React moves a page's <code>&lt;title&gt;</code> into <code>&lt;head&gt;</code> in the tests too (jsdom,
+Stage 0's pretend browser, has a <code>&lt;head&gt;</code>). So a test reads the title the
+same way the browser tab does, from <code>document.title</code>:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 6.30: a page&#x27;s title (src/pages/TicketListPage.test.jsx, excerpt)</span>
+  <span class="hljs-title function_">it</span>(<span class="hljs-string">&#x27;names the browser tab after the page&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
+    getTickets.<span class="hljs-title function_">mockReturnValue</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Promise</span>(<span class="hljs-function">() =&gt;</span> {}));
+
+    <span class="hljs-title function_">renderWithProviders</span>(<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">TicketListPage</span> /&gt;</span></span>, { <span class="hljs-attr">route</span>: <span class="hljs-string">&#x27;/tickets&#x27;</span> });
+
+    <span class="hljs-title function_">expect</span>(<span class="hljs-variable language_">document</span>.<span class="hljs-property">title</span>).<span class="hljs-title function_">toBe</span>(<span class="hljs-string">&#x27;Tickets · Support Desk&#x27;</span>);
+  });
+</code></pre>
+<p>Every page's test file has one of these. The ticket's page checks its
+title is the ticket's subject, and the error boundary's test checks
+&quot;Something went wrong · Support Desk&quot;.</p>
+<h2>The caption: the table's name</h2>
+<p>A caption gives the table an <strong>accessible name</strong>, and <code>getByRole</code> can
+search by name, as it has for buttons and links since Stage 0:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 6.31: the caption (src/components/TicketList.test.jsx, excerpt)</span>
+  <span class="hljs-title function_">it</span>(<span class="hljs-string">&#x27;names the table with a caption&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
+    <span class="hljs-title function_">renderWithProviders</span>(<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">TicketList</span> <span class="hljs-attr">tickets</span>=<span class="hljs-string">{testTickets}</span> /&gt;</span></span>);
+
+    <span class="hljs-title function_">expect</span>(screen.<span class="hljs-title function_">getByRole</span>(<span class="hljs-string">&#x27;table&#x27;</span>, { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Tickets&#x27;</span> }))
+      .<span class="hljs-title function_">toBeInTheDocument</span>();
+  });
+</code></pre>
+<p>(The <code>expect</code> is split here to fit.) The test finds the table the way a screen reader user would, by its
+name, which is the whole point of the caption.</p>
+<h2>The skip link: first, and pointing at <code>main</code></h2>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 6.32: the skip link (src/App.test.jsx, excerpt)</span>
+  <span class="hljs-title function_">it</span>(<span class="hljs-string">&#x27;starts every page with a link that skips to the main content&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
+    <span class="hljs-title function_">renderAppAt</span>(<span class="hljs-string">&#x27;/no-such-page&#x27;</span>);
+
+    <span class="hljs-keyword">const</span> skipLink = screen.<span class="hljs-title function_">getByRole</span>(<span class="hljs-string">&#x27;link&#x27;</span>, {
+      <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Skip to main content&#x27;</span>,
+    });
+    <span class="hljs-comment">// It&#x27;s the first link, so it&#x27;s the first thing Tab reaches.</span>
+    <span class="hljs-title function_">expect</span>(screen.<span class="hljs-title function_">getAllByRole</span>(<span class="hljs-string">&#x27;link&#x27;</span>)[<span class="hljs-number">0</span>]).<span class="hljs-title function_">toBe</span>(skipLink);
+    <span class="hljs-title function_">expect</span>(skipLink).<span class="hljs-title function_">toHaveAttribute</span>(<span class="hljs-string">&#x27;href&#x27;</span>, <span class="hljs-string">&#x27;#main-content&#x27;</span>);
+    <span class="hljs-title function_">expect</span>(screen.<span class="hljs-title function_">getByRole</span>(<span class="hljs-string">&#x27;main&#x27;</span>)).<span class="hljs-title function_">toHaveAttribute</span>(<span class="hljs-string">&#x27;id&#x27;</span>, <span class="hljs-string">&#x27;main-content&#x27;</span>);
+  });
+</code></pre>
+<p>(The <code>getByRole</code> line is split here to fit.) It checks three things
+that must all be true for the link to work: it comes first, it points
+at <code>#main-content</code>, and <code>&lt;main&gt;</code> has that <code>id</code>.
+What the test <strong>can't</strong> check is that the link slides into view on
+focus: jsdom doesn't lay out a page or apply CSS positions. That part
+needs the keyboard check from the start of this topic.</p>
+<h2>Try it</h2>
+<p>Make each change, run <code>npm test</code>, then put it back:</p>
+<ol>
+<li>In <code>App.jsx</code>, remove <code>id=&quot;main-content&quot;</code> from <code>&lt;main&gt;</code>.</li>
+<li>In <code>TicketList.jsx</code>, remove the <code>&lt;caption&gt;</code> line.</li>
+<li>In <code>TicketListPage.jsx</code>, remove <code>&lt;PageTitle title=&quot;Tickets&quot; /&gt;</code>.</li>
+</ol>
+<p>Each one fails exactly one test. Which one, and does its name tell you
+what broke?</p>
+</div>
+    
+  </main>
+</body>
+</html>

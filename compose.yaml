@@ -1,0 +1,23 @@
+# Stage 6 (optional): runs the built front-end in nginx on
+# http://localhost:8080. Start the API's own stack first (`docker compose
+# up -d` in the back-end's folder), then run `docker compose up -d --build`
+# here.
+#
+# The two stacks don't need to share a network: the browser calls the API
+# at http://localhost:3000 itself, and this container only sends the
+# browser the app's files.
+name: support-desk-front-end
+
+services:
+  web:
+    build:
+      context: .
+      args:
+        # Compose reads .env in this folder, so the image is built with the
+        # same API URL as `npm run dev` uses. With no .env, it's empty and
+        # client.js uses its default. Change it, and run `--build` again:
+        # it's baked in when the image is built.
+        VITE_API_URL: ${VITE_API_URL:-}
+    restart: unless-stopped
+    ports:
+      - '8080:80' # http://localhost:8080

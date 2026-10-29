@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 520" width="860" height="520" role="img" aria-labelledby="title desc" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <title id="title">The same effect five times</title>
+  <desc id="desc">On the left, Stage 5: five pages, TicketListPage, TicketDetailPage, EditTicketPage, TagsPage and NotificationsPage, each with its own copy of the same pattern: state for the data, an error and loading; a useEffect with an ignore flag; try, catch and finally; and a cleanup that resets the state. Only the request differs from page to page, shown in yellow: getTickets with the query string; getTicket and getComments; getTicket and getAgents; getTags; getNotifications. On the right, Stage 6: the pattern is written once, in useFetch.js, and each page only says what to load, in seven useFetch calls across the five pages.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#1a1a1a"/>
+    </marker>
+  </defs>
+  <rect width="860" height="520" fill="#ffffff"/>
+
+  <text x="20" y="30" font-size="16" font-weight="700" fill="#1a1a1a">Stage 5: the pattern in every page</text>
+  <text x="500" y="30" font-size="16" font-weight="700" fill="#1a1a1a">Stage 6: the pattern once</text>
+
+  <!-- Left: five pages -->
+  <g>
+    <rect x="20" y="46" width="428" height="84" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+    <text x="34" y="68" font-size="14" font-weight="700" fill="#1a1a1a">TicketListPage</text>
+    <text x="34" y="88" font-size="12" fill="#3d444d">state · useEffect with ignore · try / catch / finally · cleanup reset</text>
+    <rect x="34" y="98" width="230" height="22" rx="4" fill="#fff8c5" stroke="#7d4e00"/>
+    <text x="42" y="114" font-size="12" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">getTickets(queryString)</text>
+  </g>
+  <g>
+    <rect x="20" y="140" width="428" height="84" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+    <text x="34" y="162" font-size="14" font-weight="700" fill="#1a1a1a">TicketDetailPage</text>
+    <text x="34" y="182" font-size="12" fill="#3d444d">state · useEffect with ignore · try / catch / finally · cleanup reset</text>
+    <rect x="34" y="192" width="300" height="22" rx="4" fill="#fff8c5" stroke="#7d4e00"/>
+    <text x="42" y="208" font-size="12" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">getTicket(id) + getComments(id)</text>
+  </g>
+  <g>
+    <rect x="20" y="234" width="428" height="84" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+    <text x="34" y="256" font-size="14" font-weight="700" fill="#1a1a1a">EditTicketPage</text>
+    <text x="34" y="276" font-size="12" fill="#3d444d">state · useEffect with ignore · try / catch / finally</text>
+    <rect x="34" y="286" width="260" height="22" rx="4" fill="#fff8c5" stroke="#7d4e00"/>
+    <text x="42" y="302" font-size="12" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">getTicket(id) + getAgents()</text>
+  </g>
+  <g>
+    <rect x="20" y="328" width="428" height="84" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+    <text x="34" y="350" font-size="14" font-weight="700" fill="#1a1a1a">TagsPage</text>
+    <text x="34" y="370" font-size="12" fill="#3d444d">state · useEffect with ignore · try / catch / finally</text>
+    <rect x="34" y="380" width="90" height="22" rx="4" fill="#fff8c5" stroke="#7d4e00"/>
+    <text x="42" y="396" font-size="12" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">getTags()</text>
+  </g>
+  <g>
+    <rect x="20" y="422" width="428" height="84" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+    <text x="34" y="444" font-size="14" font-weight="700" fill="#1a1a1a">NotificationsPage</text>
+    <text x="34" y="464" font-size="12" fill="#3d444d">state · useEffect with ignore · try / catch / finally</text>
+    <rect x="34" y="474" width="150" height="22" rx="4" fill="#fff8c5" stroke="#7d4e00"/>
+    <text x="42" y="490" font-size="12" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">getNotifications()</text>
+  </g>
+
+  <line x1="452" y1="200" x2="492" y2="200" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Right: the hook once -->
+  <rect x="500" y="46" width="340" height="150" rx="6" fill="#ddf4ff" stroke="#0550ae" stroke-width="1.5"/>
+  <text x="514" y="70" font-size="14" font-weight="700" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">hooks/useFetch.js</text>
+  <text x="514" y="96" font-size="13" fill="#1a1a1a">state: data, error, isLoading</text>
+  <text x="514" y="118" font-size="13" fill="#1a1a1a">useEffect with an ignore flag</text>
+  <text x="514" y="140" font-size="13" fill="#1a1a1a">try / catch / finally</text>
+  <text x="514" y="162" font-size="13" fill="#1a1a1a">cleanup reset, and reload()</text>
+  <text x="514" y="184" font-size="12" fill="#3d444d">written once, tested once</text>
+
+  <text x="500" y="230" font-size="14" font-weight="700" fill="#1a1a1a">Each page only says what to load</text>
+  <g font-family="ui-monospace, Consolas, monospace" font-size="12" fill="#1a1a1a">
+    <rect x="500" y="242" width="340" height="30" rx="4" fill="#dafbe1" stroke="#116329"/>
+    <text x="510" y="262">useFetch(getTickets, queryString)</text>
+    <rect x="500" y="280" width="340" height="30" rx="4" fill="#dafbe1" stroke="#116329"/>
+    <text x="510" y="300">useFetch(getTicket, ticketId)</text>
+    <rect x="500" y="318" width="340" height="30" rx="4" fill="#dafbe1" stroke="#116329"/>
+    <text x="510" y="338">useFetch(getComments, ticketId)</text>
+    <rect x="500" y="356" width="340" height="30" rx="4" fill="#dafbe1" stroke="#116329"/>
+    <text x="510" y="376">useFetch(getTicket, ticketId)</text>
+    <rect x="500" y="394" width="340" height="30" rx="4" fill="#dafbe1" stroke="#116329"/>
+    <text x="510" y="414">useFetch(getAgents)</text>
+    <rect x="500" y="432" width="340" height="30" rx="4" fill="#dafbe1" stroke="#116329"/>
+    <text x="510" y="452">useFetch(getTags)</text>
+    <rect x="500" y="470" width="340" height="30" rx="4" fill="#dafbe1" stroke="#116329"/>
+    <text x="510" y="490">useFetch(getNotifications)</text>
+  </g>
+</svg>

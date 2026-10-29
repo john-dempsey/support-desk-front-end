@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A Skip Link — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/an-accessibility-pass/a-title-for-every-page.html">← A Title for Every Page</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/an-accessibility-pass/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/an-accessibility-pass/a-caption-for-the-table.html">A Caption for the Table →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>A Skip Link</h1>
+    <p class="lede">A link that&#39;s the first thing Tab reaches, hidden until it has focus, lets keyboard users jump past the navigation on every page.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Logged in as Ada, the header has five things to Tab through before the
+page's own content: Home, Tickets, Notifications, Tags and Log out. A
+keyboard user goes through them on <strong>every</strong> page. A <strong>skip link</strong> gives
+them a shortcut:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 6.26: the skip link (src/App.jsx, excerpt)</span>
+      {<span class="hljs-comment">/* The first thing a keyboard user reaches with Tab, so they can jump
+          past the navigation links on every page. It&#x27;s hidden until it has
+          focus (see .skip-link in index.css). */</span>}
+      &lt;a href=<span class="hljs-string">&quot;#main-content&quot;</span> className=<span class="hljs-string">&quot;skip-link&quot;</span>&gt;
+        <span class="hljs-title class_">Skip</span> to main content
+      &lt;/a&gt;
+      <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">NavBar</span> /&gt;</span></span>
+      <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">main</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;main-content&quot;</span> <span class="hljs-attr">className</span>=<span class="hljs-string">&quot;container&quot;</span>&gt;</span>
+</span></code></pre>
+<p>It's a plain <code>&lt;a&gt;</code>, not a React Router <code>&lt;Link&gt;</code>. <code>#main-content</code> isn't
+another page: it's the <code>id</code> of <code>&lt;main&gt;</code>, on this page. Following it moves
+the browser's place in the page to <code>&lt;main&gt;</code>, so the next Tab goes to the
+first thing inside it.</p>
+<p><img src="/support-desk-front-end/assets/images/skip-link-path.svg" alt="Diagram: the ticket list as Ada. The header has six Tab stops: 1, Skip to main content; 2, Home; 3, Tickets; 4, Notifications; 5, Tags; 6, Log out. Below it, main, with id main-content, where the 7th stop is the Status filter and the 8th is Sort by. Without the skip link, you Tab through all six header stops, and the 7th Tab reaches the first filter, on every page, with more Tabs as the navigation grows. With it: Tab, and Skip to main content slides into view; Enter, which jumps to main, and the address gains #main-content; Tab, and focus is on the Status filter."></p>
+<h2>Hidden until it's needed</h2>
+<p>A mouse user doesn't need the link, so it waits above the top of the
+screen and only slides in when it has focus:</p>
+<pre><code class="hljs language-css"><span class="hljs-comment">/* Figure 6.27: the skip link&#x27;s styles (src/index.css, excerpt) */</span>
+<span class="hljs-selector-class">.skip-link</span> {
+  <span class="hljs-attribute">position</span>: absolute;
+  <span class="hljs-attribute">top</span>: -<span class="hljs-number">10rem</span>;
+  <span class="hljs-attribute">left</span>: <span class="hljs-number">1rem</span>;
+  <span class="hljs-attribute">padding</span>: <span class="hljs-number">0.5rem</span> <span class="hljs-number">1rem</span>;
+  <span class="hljs-attribute">background-color</span>: <span class="hljs-built_in">var</span>(--colour-background);
+}
+
+<span class="hljs-selector-class">.skip-link</span><span class="hljs-selector-pseudo">:focus</span> {
+  <span class="hljs-attribute">top</span>: <span class="hljs-number">1rem</span>;
+}
+</code></pre>
+<p>It's moved off-screen, <strong>not</strong> hidden with <code>display: none</code>, because an
+element that isn't displayed can't have focus. Then Tab would skip the
+skip link.</p>
+<p>It's added in <code>App.jsx</code>, not in each page, so every page has it. It's
+not in the Stage 0 template, so <strong>add it to your own app</strong> (the
+checklist at the end of this lesson reminds you).</p>
+<h2>Try it</h2>
+<p>Open the ticket list, reload the page, and press <strong>Tab</strong> once. &quot;Skip
+to main content&quot; appears in the top-left corner. Press <strong>Enter</strong>: what
+changes in the address? Press <strong>Tab</strong> again: what has focus? Now reload
+and count the Tabs it takes to reach the same place without the skip
+link.</p>
+</div>
+    
+  </main>
+</body>
+</html>

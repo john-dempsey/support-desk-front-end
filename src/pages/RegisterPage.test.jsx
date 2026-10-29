@@ -2,8 +2,10 @@
 import { describe, expect, it } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { Route, Routes } from 'react-router';
 import RegisterPage from './RegisterPage.jsx';
 import { renderWithProviders } from '../test/renderWithProviders.jsx';
+import { customerUser } from '../test/testUsers.js';
 
 function renderRegisterPage() {
   return renderWithProviders(<RegisterPage />, { route: '/register', user: null });
@@ -23,6 +25,12 @@ describe('RegisterPage', () => {
     await fillInAndSubmit();
 
     expect(auth.register).toHaveBeenCalledWith('Sam Student', 'sam@example.com', 'password123');
+  });
+
+  it('names the browser tab after the page', () => {
+    renderRegisterPage();
+
+    expect(document.title).toBe('Create an account · Support Desk');
   });
 
   it("shows the API's validation details next to the right field", async () => {
@@ -51,5 +59,17 @@ describe('RegisterPage', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'An account with that email already exists',
     );
+  });
+
+  it('sends a logged-in user to the ticket list', () => {
+    renderWithProviders(
+      <Routes>
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/tickets" element={<h1>Ticket list</h1>} />
+      </Routes>,
+      { route: '/register', user: customerUser },
+    );
+
+    expect(screen.getByRole('heading', { name: 'Ticket list' })).toBeInTheDocument();
   });
 });

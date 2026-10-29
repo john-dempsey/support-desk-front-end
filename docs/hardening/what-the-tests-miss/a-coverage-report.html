@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A Coverage Report — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/an-accessibility-pass/testing-the-pass.html">← Testing the Pass</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/what-the-tests-miss/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/what-the-tests-miss/reading-the-table.html">Reading the Table →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>A Coverage Report</h1>
+    <p class="lede">Vitest can record every line the tests run. One dev dependency and one script give a report of what they never touch.</p>
+
+    
+
+    
+      <div class="slide-body"><p>By Stage 5 the app had 161 tests. They tell you what's checked. They
+don't tell you what <strong>isn't</strong>: a page, a button or an error message that
+no test has ever run. Guessing where those gaps are is slow, and you'll
+miss some.</p>
+<p>A <strong>coverage report</strong> answers it for you. While the tests run, Vitest
+records which lines of the app were run, and then lists every file with
+how much of it the tests reached.</p>
+<h2>Setting it up</h2>
+<p>Vitest needs one extra package to record coverage. It's a <strong>dev
+dependency</strong>, a tool for the tests that never reaches the browser, and
+its version must match Vitest's:</p>
+<pre><code class="hljs language-bash">npm install --save-dev @vitest/coverage-v8
+</code></pre>
+<p>(<code>v8</code> is the JavaScript engine inside Node and Chrome: it does the
+recording.) Then a script in <code>package.json</code>, next to <code>test</code>:</p>
+<pre><code class="hljs language-json"><span class="hljs-attr">&quot;coverage&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;vitest run --coverage&quot;</span>
+</code></pre>
+<p>The report is written to a <code>coverage/</code> folder, which is made fresh
+each time, so it's added to <code>.gitignore</code>, like <code>dist</code>.</p>
+<h2>Counting every file</h2>
+<p>By default, a file that no test imports doesn't appear in the report at
+all, which hides the biggest gap of all. So <code>vite.config.js</code> says which
+files to count:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 6.33: what to count (vite.config.js, excerpt)</span>
+    <span class="hljs-comment">// For `npm run coverage`: which lines of the app the tests ran.</span>
+    <span class="hljs-comment">// include lists every source file, so a file no test loads shows up</span>
+    <span class="hljs-comment">// at 0% instead of being left out. The test helpers in src/test are</span>
+    <span class="hljs-comment">// part of the tests, not the app, so they&#x27;re not counted.</span>
+    <span class="hljs-attr">coverage</span>: {
+      <span class="hljs-attr">include</span>: [<span class="hljs-string">&#x27;src/**/*.{js,jsx}&#x27;</span>],
+      <span class="hljs-attr">exclude</span>: [<span class="hljs-string">&#x27;src/test/**&#x27;</span>],
+    },
+</code></pre>
+<p>It goes inside the <code>test</code> section, next to <code>mockReset</code>. Test files
+themselves are never counted.</p>
+<h2>Try it</h2>
+<p>Add coverage to your own app: install the package, add the script and
+the <code>coverage</code> section, and add <code>coverage</code> to <code>.gitignore</code>. Then run:</p>
+<pre><code class="hljs language-bash">npm run coverage
+</code></pre>
+<p>The tests run as usual, and a table follows them. Does every file in
+your <code>src/</code> appear in it? Check <code>git status</code> doesn't list <code>coverage/</code>.</p>
+</div>
+    
+  </main>
+</body>
+</html>

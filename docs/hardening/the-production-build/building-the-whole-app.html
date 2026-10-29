@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Building the Whole App — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/what-the-tests-miss/running-everything.html">← Running Everything</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/the-production-build/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/the-production-build/the-apis-address-is-built-in.html">The API&#39;s Address Is Built In →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Building the Whole App</h1>
+    <p class="lede">Stage 0 built the starter. The finished app still builds to three files, and its index.html now points at them.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Stage 0 ran <code>npm run build</code> on the starter: one page that called
+<code>GET /welcome</code>. Six stages later the app has ten pages, a socket and
+a context for the logged-in user. It still builds the same way:</p>
+<pre><code class="hljs language-bash">npm run build
+</code></pre>
+<pre><code class="hljs">✓ 167 modules transformed.
+dist/index.html                   0.46 kB │ gzip:   0.30 kB
+dist/assets/index-DcoHriLX.css    4.77 kB │ gzip:   1.42 kB
+dist/assets/index-CPcL75JA.js   329.09 kB │ gzip: 102.15 kB
+✓ built in 212ms
+</code></pre>
+<p>(Your hashes and times will be different.) A <strong>module</strong> is one file
+that something imports: our <code>src/</code> files and every library file they
+pull in. All 167 of them end up in <strong>one</strong> JavaScript file and one CSS
+file. The starter's JavaScript was 260 kB, so the six stages added
+about 70 kB.</p>
+<p><img src="/support-desk-front-end/assets/images/build-pipeline.svg" alt="Diagram: what npm run build reads and what it writes. On the left, the inputs: index.html, the files in src (the components, pages, the api folder, index.css and the CSS Modules), the libraries in node_modules that src imports (react, react-dom, react-router, socket.io-client), and .env, which supplies VITE_API_URL. They go into vite build in the middle, which joins the files together, translates JSX, writes in the VITE_ values and minifies. On the right, dist: index.html, assets/index-CPcL75JA.js at 329 kB and assets/index-DcoHriLX.css at 5 kB, plus favicon.svg copied from public. A note under dist: no src, no node_modules and no .env, just files a web server can send."></p>
+<h2>The built <code>index.html</code></h2>
+<p>The <code>index.html</code> you edit points at <code>/src/main.jsx</code>, which only the dev
+server understands. The built one points at the two files the build
+made:</p>
+<pre><code class="hljs language-html"><span class="hljs-comment">&lt;!-- Figure 6.36: the built page (dist/index.html, reflowed) --&gt;</span>
+<span class="hljs-meta">&lt;!doctype <span class="hljs-keyword">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">html</span> <span class="hljs-attr">lang</span>=<span class="hljs-string">&quot;en&quot;</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">charset</span>=<span class="hljs-string">&quot;UTF-8&quot;</span> /&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;icon&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;image/svg+xml&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;/favicon.svg&quot;</span> /&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;viewport&quot;</span>
+          <span class="hljs-attr">content</span>=<span class="hljs-string">&quot;width=device-width, initial-scale=1.0&quot;</span> /&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>Support Desk<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">crossorigin</span>
+            <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;/assets/index-CPcL75JA.js&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">crossorigin</span>
+          <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;/assets/index-DcoHriLX.css&quot;</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;root&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>
+</code></pre>
+<p>Everything else is the same: the empty <code>&lt;div id=&quot;root&quot;&gt;</code> that React
+fills, and the <code>&lt;title&gt;</code> that topic 05's <code>PageTitle</code> goes in front of.
+The <code>favicon.svg</code> is copied across from <code>public/</code> unchanged.</p>
+<h2>Try it</h2>
+<p>Run <code>npm run build</code>. Open <code>dist/index.html</code> next to the <code>index.html</code> in
+the project's own folder. Which two lines are new, and which line has
+gone? Then run <code>npm run build</code> again without changing anything: do the
+file names change?</p>
+</div>
+    
+  </main>
+</body>
+</html>

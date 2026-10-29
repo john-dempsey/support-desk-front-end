@@ -25,5 +25,13 @@ export default defineConfig({
     unstubGlobals: true,
     unstubEnvs: true,
     mockReset: true,
+    // For `npm run coverage`: which lines of the app the tests ran.
+    // include lists every source file, so a file no test loads shows up
+    // at 0% instead of being left out. The test helpers in src/test are
+    // part of the tests, not the app, so they're not counted.
+    coverage: {
+      include: ['src/**/*.{js,jsx}'],
+      exclude: ['src/test/**'],
+    },
   },
 });

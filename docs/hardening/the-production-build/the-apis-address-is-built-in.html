@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The API&#39;s Address Is Built In — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/the-production-build/building-the-whole-app.html">← Building the Whole App</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/the-production-build/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/the-production-build/whats-in-the-329-kb.html">What&#39;s in the 329 kB →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>The API&#39;s Address Is Built In</h1>
+    <p class="lede">The build writes VITE_API_URL&#39;s value straight into the JavaScript, twice, and drops the fallback it no longer needs.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Stage 0 said <code>.env</code> is read <strong>when the app is built</strong>. Here's what that
+looks like in the finished app. Two files read the API's address, the
+client and the socket, and both look the same in <code>src/</code>:</p>
+<pre><code class="hljs language-js"><span class="hljs-keyword">const</span> <span class="hljs-variable constant_">API_URL</span> = <span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">env</span>.<span class="hljs-property">VITE_API_URL</span> || <span class="hljs-string">&#x27;http://localhost:3000&#x27;</span>;
+</code></pre>
+<p>Search the built <code>.js</code> file for <code>localhost:3000</code> and you find this:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 6.37: the API&#x27;s address, built in</span>
+<span class="hljs-comment">// (dist/assets/index-CPcL75JA.js, two excerpts, reflowed)</span>
+<span class="hljs-keyword">var</span> br=<span class="hljs-string">`http://localhost:3000`</span>;
+<span class="hljs-comment">// ...</span>
+<span class="hljs-keyword">var</span> ga=<span class="hljs-title function_">ha</span>(<span class="hljs-string">`http://localhost:3000`</span>,{<span class="hljs-attr">autoConnect</span>:!<span class="hljs-number">1</span>});
+</code></pre>
+<p>The first line is <code>client.js</code>'s <code>API_URL</code>. The second is <code>socket.js</code>'s
+<code>io(API_URL, { autoConnect: false })</code>. The minifier gave everything
+short names (<code>br</code>, <code>ga</code>, <code>ha</code>), and wrote <code>false</code> as <code>!1</code>, which is
+shorter and means the same.</p>
+<h2>What happened to the <code>||</code></h2>
+<p>The build did two things, one after the other:</p>
+<ol>
+<li>It replaced <code>import.meta.env.VITE_API_URL</code> with the value from
+<code>.env</code>, as text: <code>'http://localhost:3000' || 'http://localhost:3000'</code>.</li>
+<li>The minifier saw that the left side of <code>||</code> is a string that isn't
+empty, so it's always used. The right side can never run, so it was
+deleted.</li>
+</ol>
+<p>So there's no <code>import.meta.env</code> left in the built app, and nothing that
+reads <code>.env</code>. The address is now just a string in the code.</p>
+<h2>What that means</h2>
+<ul>
+<li><strong>Changing <code>.env</code> after a build does nothing</strong> to that build. The old
+address is in the <code>.js</code> file. You have to build again.</li>
+<li><strong>One build talks to one API.</strong> To run the same app against a test
+API and a live one, you build it twice, once with each address.</li>
+<li><strong>Vite also reads <code>VITE_</code> values from environment variables</strong>, not
+only from <code>.env</code>. Topic 08 uses that to pass the address to a build
+that has no <code>.env</code>.</li>
+</ul>
+<h2>Try it</h2>
+<ol>
+<li>Open <code>dist/assets/</code> and search the <code>.js</code> file for
+<code>localhost:3000</code>. How many times is it there? Search for
+<code>VITE_API_URL</code>: is it there at all?</li>
+<li>In <code>.env</code>, change the address to <code>http://api.example.test:9999</code>,
+then run <code>npm run build</code>. Search for the new address. Which of the
+two file names in <code>dist/assets/</code> changed, and why didn't the other?</li>
+<li>Put <code>.env</code> back and build again.</li>
+</ol>
+</div>
+    
+  </main>
+</body>
+</html>

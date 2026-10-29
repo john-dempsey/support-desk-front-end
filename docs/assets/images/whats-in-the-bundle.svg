@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 380" width="860" height="380" role="img" aria-labelledby="title desc" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <title id="title">What's in the 329 kB of JavaScript</title>
+  <desc id="desc">A bar for each part of the built JavaScript file, largest first. react-dom, 207 kB, 63 percent. Socket.IO, its five packages together, 41 kB, 13 percent. react-router, 39 kB, 12 percent. Our src folder, 29 kB, 9 percent. react, 8 kB, 2.5 percent. scheduler, 4 kB, 1 percent.</desc>
+  <rect width="860" height="380" fill="#ffffff"/>
+
+  <text x="20" y="34" font-size="15" font-weight="700" fill="#1a1a1a">What's in the 329 kB</text>
+  <text x="20" y="54" font-size="12" fill="#3d444d">dist/assets/index-CPcL75JA.js, measured with a source map, before gzip</text>
+
+  <!-- scale: 2.5 px per kB; bars start at x=200 -->
+  <line x1="200" y1="72" x2="200" y2="318" stroke="#d1d9e0" stroke-width="1"/>
+
+  <text x="188" y="98" font-size="13" fill="#1a1a1a" text-anchor="end" font-family="ui-monospace, Consolas, monospace">react-dom</text>
+  <rect x="200" y="80" width="518" height="26" rx="4" fill="#ddf4ff" stroke="#0550ae" stroke-width="1.5"/>
+  <text x="728" y="98" font-size="13" fill="#1a1a1a"><tspan font-weight="700">207 kB</tspan>  63%</text>
+
+  <text x="188" y="138" font-size="13" fill="#1a1a1a" text-anchor="end">Socket.IO (5 packages)</text>
+  <rect x="200" y="120" width="103" height="26" rx="4" fill="#ddf4ff" stroke="#0550ae" stroke-width="1.5"/>
+  <text x="313" y="138" font-size="13" fill="#1a1a1a"><tspan font-weight="700">41 kB</tspan>  13%</text>
+
+  <text x="188" y="178" font-size="13" fill="#1a1a1a" text-anchor="end" font-family="ui-monospace, Consolas, monospace">react-router</text>
+  <rect x="200" y="160" width="97" height="26" rx="4" fill="#ddf4ff" stroke="#0550ae" stroke-width="1.5"/>
+  <text x="307" y="178" font-size="13" fill="#1a1a1a"><tspan font-weight="700">39 kB</tspan>  12%</text>
+
+  <text x="188" y="218" font-size="13" font-weight="700" fill="#116329" text-anchor="end">our src/</text>
+  <rect x="200" y="200" width="72" height="26" rx="4" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+  <text x="282" y="218" font-size="13" fill="#1a1a1a"><tspan font-weight="700">29 kB</tspan>  9%: every page, component, hook and API file</text>
+
+  <text x="188" y="258" font-size="13" fill="#1a1a1a" text-anchor="end" font-family="ui-monospace, Consolas, monospace">react</text>
+  <rect x="200" y="240" width="20" height="26" rx="4" fill="#ddf4ff" stroke="#0550ae" stroke-width="1.5"/>
+  <text x="230" y="258" font-size="13" fill="#1a1a1a"><tspan font-weight="700">8 kB</tspan>  2.5%</text>
+
+  <text x="188" y="298" font-size="13" fill="#1a1a1a" text-anchor="end" font-family="ui-monospace, Consolas, monospace">scheduler</text>
+  <rect x="200" y="280" width="9" height="26" rx="3" fill="#ddf4ff" stroke="#0550ae" stroke-width="1.5"/>
+  <text x="219" y="298" font-size="13" fill="#1a1a1a"><tspan font-weight="700">4 kB</tspan>  1%</text>
+
+  <rect x="20" y="332" width="820" height="34" rx="6" fill="#f6f8fa" stroke="#59636e" stroke-width="1.5"/>
+  <text x="34" y="354" font-size="12" fill="#1a1a1a">react-dom is the part of React that updates the page. Compressed (gzip), the whole file is about 102 kB to download.</text>
+</svg>

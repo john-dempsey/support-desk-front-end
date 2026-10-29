@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What Was Already There — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/an-accessibility-pass/lighthouse-says-100.html">← Lighthouse Says 100</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/an-accessibility-pass/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/an-accessibility-pass/a-title-for-every-page.html">A Title for Every Page →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>What Was Already There</h1>
+    <p class="lede">Most of the app&#39;s accessibility was built in from Stage 0. A checklist of what&#39;s already in place, and where each part came from.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The pass found three gaps, and that's all, because most of the work was
+done as each stage was built. Here's what was already in place, as a
+checklist you can hold your own app against:</p>
+<table>
+<thead>
+<tr>
+<th>In place</th>
+<th>Since</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>&lt;html lang=&quot;en&quot;&gt;</code>, so a screen reader uses the right voice</td>
+<td>Stage 0</td>
+</tr>
+<tr>
+<td>Semantic HTML: <code>&lt;header&gt;</code>, <code>&lt;nav&gt;</code>, <code>&lt;main&gt;</code>, one <code>&lt;h1&gt;</code> per page, <code>&lt;button&gt;</code> for actions and <code>&lt;Link&gt;</code> for navigation</td>
+<td>Stage 0</td>
+</tr>
+<tr>
+<td>A clear focus outline on everything you can Tab to (<code>:focus-visible</code>)</td>
+<td>Stage 0</td>
+</tr>
+<tr>
+<td>Every colour pair passes WCAG AA contrast</td>
+<td>Stage 0, checked again each stage</td>
+</tr>
+<tr>
+<td>Loading messages in <code>role=&quot;status&quot;</code>, errors in <code>role=&quot;alert&quot;</code></td>
+<td>Stage 0</td>
+</tr>
+<tr>
+<td>Status shown in words as well as colour (<code>StatusBadge</code>)</td>
+<td>Stage 1</td>
+</tr>
+<tr>
+<td>Table headings with <code>scope=&quot;col&quot;</code></td>
+<td>Stage 1</td>
+</tr>
+<tr>
+<td>A <code>&lt;label&gt;</code> for every input</td>
+<td>Stage 3</td>
+</tr>
+<tr>
+<td>Field errors linked to their input (<code>aria-describedby</code>, <code>aria-invalid</code>)</td>
+<td>Stage 3</td>
+</tr>
+<tr>
+<td>Repeated buttons told apart for screen readers (&quot;Delete comment by Alex Agent&quot;)</td>
+<td>Stage 3 (and Stage 5's &quot;Mark as read&quot;)</td>
+</tr>
+<tr>
+<td>The unread count announced when it changes (<code>aria-live=&quot;polite&quot;</code>)</td>
+<td>Stage 5</td>
+</tr>
+</tbody>
+</table>
+<h2>Building it in is cheaper</h2>
+<p>Each line above cost a few characters when the component was written.
+Adding all of them to a finished app would mean revisiting every page.
+That's why Stage 0 called it &quot;accessible by default&quot;, and why an
+accessibility pass at the end should find little.</p>
+<p>It's also why the tests could check accessibility all along. Queries
+like <code>getByRole('button', { name: 'Delete comment by Alex Agent' })</code> and
+<code>getByLabelText('Subject')</code> only find what a screen reader can find. A
+button with no name, or an input with no label, fails the test.</p>
+<h2>Try it</h2>
+<p>Go down the table with your own app open. For each line, find one place
+in your code where it's true, or note that it's missing. Which line was
+the hardest to check by reading the code, and how else could you check
+it?</p>
+</div>
+    
+  </main>
+</body>
+</html>

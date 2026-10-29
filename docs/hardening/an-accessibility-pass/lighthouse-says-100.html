@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lighthouse Says 100 — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/an-accessibility-pass/finding-the-gaps.html">← Finding the Gaps</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/an-accessibility-pass/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/an-accessibility-pass/what-was-already-there.html">What Was Already There →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Lighthouse Says 100</h1>
+    <p class="lede">Lighthouse gave the app 100 for accessibility before this topic and after it. Automated checks only see some problems.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Here's Lighthouse's accessibility report for the ticket list at the end
+of Stage 5, before any of this topic's changes:</p>
+<p><img src="/support-desk-front-end/assets/images/network-tab-lighthouse-stage-05.png" alt="Screenshot: Chrome DevTools' Lighthouse tab for http://127.0.0.1:5173/tickets at the end of Stage 5. A green circle with the score 100, under the heading Accessibility, and the note that automatic detection can only detect a subset of issues, so manual testing is also encouraged. Below it, Additional items to manually check, 10 items, from Interactive controls are keyboard focusable to Custom controls have ARIA roles. Then Passed audits, 20, and Not applicable, 43."></p>
+<p><strong>100</strong>, with all three gaps from the last slide still there. And here
+it is after this topic:</p>
+<p><img src="/support-desk-front-end/assets/images/network-tab-lighthouse-stage-06.png" alt="Screenshot: the same Lighthouse report for the ticket list in Stage 6. The score is still 100, with the same 10 items to check manually, but now 21 passed audits and 42 not applicable."></p>
+<p>Still 100. The only difference is one check that moved from &quot;not
+applicable&quot; to &quot;passed&quot;:</p>
+<p><img src="/support-desk-front-end/assets/images/skip-links-are-focusable.png" alt="Screenshot: part of the Stage 6 report's list of passed audits, each with a green dot: Document has a title element, html element has a lang attribute, Links have a discernible name, Background and foreground colors have a sufficient contrast ratio, and others. One is opened: Skip links are focusable, with the note Including a skip link can help users skip to the main content to save time. Below it, Document has a main landmark. The report was made by Lighthouse 13.4.1."></p>
+<h2>Why it couldn't see the gaps</h2>
+<p>Each check answers one narrow question a program <strong>can</strong> answer:</p>
+<ul>
+<li><strong>&quot;Document has a <code>&lt;title&gt;</code> element.&quot;</strong> Stage 5 had one: &quot;Support
+Desk&quot;, on every page. Whether each page's title is <em>different</em>, and
+<em>says what the page is</em>, needs a person.</li>
+<li><strong>&quot;Skip links are focusable.&quot;</strong> Stage 5 had no skip link, so there
+was nothing to check: &quot;not applicable&quot;, not a failure. Only once there
+was one could Lighthouse check it.</li>
+<li><strong>A table caption</strong>: nothing in Lighthouse's report asks for one.</li>
+</ul>
+<p>That's what the report means by &quot;automatic detection can only detect a
+subset of issues&quot;. The ten <strong>&quot;additional items to manually check&quot;</strong> are
+Lighthouse listing what it can't judge: a logical Tab order, focus
+going to new content, and so on. They're the keyboard and screen reader
+checks from the last slide.</p>
+<p>So treat 100 as &quot;no problems a program can find&quot;, never as &quot;done&quot;.</p>
+<h2>Try it</h2>
+<p>Run Lighthouse on your own app: DevTools, the <strong>Lighthouse</strong> tab, tick
+only <strong>Accessibility</strong>, and <strong>Analyze page load</strong>. Note the score. Then
+open <strong>Additional items to manually check</strong> and try two of the ten
+items by hand, using the keyboard list you made on the last slide.</p>
+</div>
+    
+  </main>
+</body>
+</html>

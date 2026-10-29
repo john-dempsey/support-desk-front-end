@@ -22,6 +22,15 @@ describe('Pagination', () => {
     expect(handlePageChange).toHaveBeenCalledWith(3);
   });
 
+  it('asks for the previous page when Previous is clicked', async () => {
+    const handlePageChange = vi.fn();
+    render(<Pagination page={2} totalPages={5} onPageChange={handlePageChange} />);
+
+    await userEvent.click(screen.getByRole('button', { name: 'Previous' }));
+
+    expect(handlePageChange).toHaveBeenCalledWith(1);
+  });
+
   it('disables Previous on the first page and Next on the last', () => {
     render(<Pagination page={1} totalPages={2} onPageChange={vi.fn()} />);
 

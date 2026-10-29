@@ -35,6 +35,14 @@ describe('NotificationsPage', () => {
     expect(screen.getByRole('status')).toHaveTextContent('Loading notifications');
   });
 
+  it('names the browser tab after the page', () => {
+    getNotifications.mockReturnValue(new Promise(() => {}));
+
+    renderPage();
+
+    expect(document.title).toBe('Notifications · Support Desk');
+  });
+
   it("shows the API's error message when the request fails", async () => {
     getNotifications.mockRejectedValue(new Error("Can't reach the API"));
 

@@ -45,6 +45,16 @@ describe('TicketListPage', () => {
     expect(screen.queryByRole('status')).not.toBeInTheDocument();
   });
 
+  // React 19 moves the page's <title> into the document's <head>, so the
+  // test reads it from document.title, just as the browser tab does.
+  it('names the browser tab after the page', () => {
+    getTickets.mockReturnValue(new Promise(() => {}));
+
+    renderWithProviders(<TicketListPage />, { route: '/tickets' });
+
+    expect(document.title).toBe('Tickets · Support Desk');
+  });
+
   it('shows a message when the API sends no tickets', async () => {
     getTickets.mockResolvedValue(ticketsResult([], 1, 0));
 
@@ -80,6 +90,17 @@ describe('TicketListPage', () => {
     await userEvent.selectOptions(screen.getByLabelText('Status'), 'Open');
 
     expect(getTickets).toHaveBeenLastCalledWith('status=open');
+  });
+
+  it('leaves status out of the query when "All statuses" is chosen', async () => {
+    getTickets.mockResolvedValue(ticketsResult(testTickets));
+    renderWithProviders(<TicketListPage />, { route: '/tickets?status=open&sortBy=subject' });
+    await screen.findByRole('link', { name: 'Cannot log in' });
+
+    await userEvent.selectOptions(screen.getByLabelText('Status'), 'All statuses');
+
+    // Not "status=&sortBy=subject": the other choices stay as they were.
+    expect(getTickets).toHaveBeenLastCalledWith('sortBy=subject');
   });
 
   it('asks the API for the next page when Next is clicked', async () => {

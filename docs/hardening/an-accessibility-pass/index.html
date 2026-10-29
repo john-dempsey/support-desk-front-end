@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>An Accessibility Pass — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>An Accessibility Pass</h1>
+    <p class="lede">How to look for accessibility gaps, why an automated score isn&#39;t enough, and the three gaps this stage fills: page titles, a skip link and a table caption.</p>
+
+    
+      <ul class="listing">
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/an-accessibility-pass/finding-the-gaps.html">Finding the Gaps</a>
+            <p>Three ways to check an app&#39;s accessibility: the keyboard, Lighthouse and a screen reader. Together they found three gaps in the Support Desk app.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/an-accessibility-pass/lighthouse-says-100.html">Lighthouse Says 100</a>
+            <p>Lighthouse gave the app 100 for accessibility before this topic and after it. Automated checks only see some problems.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/an-accessibility-pass/what-was-already-there.html">What Was Already There</a>
+            <p>Most of the app&#39;s accessibility was built in from Stage 0. A checklist of what&#39;s already in place, and where each part came from.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/an-accessibility-pass/a-title-for-every-page.html">A Title for Every Page</a>
+            <p>React 19 lets any component render a &lt;title&gt;, and moves it into the page&#39;s &lt;head&gt;. A small PageTitle component gives every page its own.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/an-accessibility-pass/a-skip-link.html">A Skip Link</a>
+            <p>A link that&#39;s the first thing Tab reaches, hidden until it has focus, lets keyboard users jump past the navigation on every page.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/an-accessibility-pass/a-caption-for-the-table.html">A Caption for the Table</a>
+            <p>A &lt;caption&gt; gives the ticket table a name. It&#39;s hidden on screen, where the heading already says it, but not from screen readers.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/an-accessibility-pass/testing-the-pass.html">Testing the Pass</a>
+            <p>Each fix gets a test: document.title for the titles, the table&#39;s name for the caption, and the first link on the page for the skip link.</p>
+          </li>
+        
+      </ul>
+    
+
+    
+  </main>
+</body>
+</html>

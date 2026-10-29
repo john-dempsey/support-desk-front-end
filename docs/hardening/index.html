@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hardening — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Hardening</h1>
+    <p class="lede">No new features: one hook instead of five copies of the same effect, an error boundary, an accessibility pass, a coverage report, the production build, nginx, and CORS.</p>
+
+    
+      <ul class="listing">
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/what-stage-6-adds/index.html">What Stage 6 Adds</a>
+            <p>What a stage with no new features is for, which parts apply to your own app, and which files change, before any of the code.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/a-hook-of-our-own/index.html">A Hook of Our Own</a>
+            <p>The loading pattern every page has repeated since Stage 2, written once as a custom hook: useFetch.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/moving-the-pages-onto-it/index.html">Moving the Pages onto It</a>
+            <p>Each page that loads data swaps its own effect for useFetch, keeps what&#39;s really its own, and passes every test it passed before.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/when-a-page-crashes/index.html">When a Page Crashes</a>
+            <p>A bug that throws while a page renders blanks the whole app. An error boundary, the app&#39;s one class, shows &#39;Something went wrong&#39; instead.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/an-accessibility-pass/index.html">An Accessibility Pass</a>
+            <p>How to look for accessibility gaps, why an automated score isn&#39;t enough, and the three gaps this stage fills: page titles, a skip link and a table caption.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/what-the-tests-miss/index.html">What the Tests Miss</a>
+            <p>A coverage report shows which lines of the app no test has ever run. It found real gaps, and 16 new tests fill them, but 100% isn&#39;t the goal.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/the-production-build/index.html">The Production Build</a>
+            <p>What npm run build makes of the whole app: three files with the API&#39;s address written in, mostly React, and none of development&#39;s extra checks.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/serving-it-with-nginx/index.html">Serving It with nginx (Optional)</a>
+            <p>The built app in a container: a two-stage Dockerfile, nginx sending the files, try_files for deep URLs, and a year&#39;s caching for files whose names change.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/pinning-cors/index.html">Pinning CORS</a>
+            <p>The API lets every website call it from a browser. Listing the front-end&#39;s own origins is a back-end change: what it looks like, what the browser shows, and what it does and doesn&#39;t protect.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/making-it-yours/index.html">Making It Yours</a>
+            <p>Trace questions for Stage 6, a checklist for hardening your own case study&#39;s front-end, and challenges to finish the course with.</p>
+          </li>
+        
+      </ul>
+    
+
+    
+  </main>
+</body>
+</html>

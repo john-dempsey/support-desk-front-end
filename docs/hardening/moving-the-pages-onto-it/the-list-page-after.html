@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The List Page, After — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/moving-the-pages-onto-it/renaming-while-destructuring.html">← Renaming While Destructuring</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/moving-the-pages-onto-it/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/moving-the-pages-onto-it/two-requests-two-hooks.html">Two Requests, Two Hooks →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>The List Page, After</h1>
+    <p class="lede">TicketListPage&#39;s four pieces of state and its whole effect become one line. The rest of the page hardly changes.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Figure 6.1 showed the ticket list's state and effect in Stage 5. Here's
+the same part of the page now:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 6.10: loading the tickets (src/pages/TicketListPage.jsx, excerpt)</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">TicketListPage</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> [searchParams, setSearchParams] = <span class="hljs-title function_">useSearchParams</span>();
+  <span class="hljs-keyword">const</span> { hasRole } = <span class="hljs-title function_">useAuth</span>();
+  <span class="hljs-comment">// The same as in TicketDetailPage: true once a notification arrives.</span>
+  <span class="hljs-keyword">const</span> [hasChanged, setHasChanged] = <span class="hljs-title function_">useState</span>(<span class="hljs-literal">false</span>);
+
+  <span class="hljs-comment">// e.g. &quot;status=open&amp;page=2&quot;, or &#x27;&#x27; for plain /tickets. useFetch loads</span>
+  <span class="hljs-comment">// again whenever this string changes, so a new filter, order or page in</span>
+  <span class="hljs-comment">// the URL loads the matching tickets.</span>
+  <span class="hljs-keyword">const</span> queryString = searchParams.<span class="hljs-title function_">toString</span>();
+  <span class="hljs-comment">// getTickets() answers { tickets, meta }: one page of tickets, and the</span>
+  <span class="hljs-comment">// API&#x27;s { page, pageSize, total, totalPages } for Pagination.</span>
+  <span class="hljs-keyword">const</span> { <span class="hljs-attr">data</span>: ticketPage, error, isLoading, reload } =
+    <span class="hljs-title function_">useFetch</span>(getTickets, queryString);
+</code></pre>
+<p>(The last line is split in two here to fit.) Four <code>useState</code> lines,
+<code>reloadCount</code> and the whole <code>useEffect</code> have gone. The query string is
+the hook's <code>argument</code>, so a new filter or page in the URL loads again,
+just as <code>[queryString]</code> did.</p>
+<h2>One result, not two</h2>
+<p><code>getTickets()</code> answers with an object holding the tickets and the
+API's <code>meta</code> (Stage 3). The page used to split it into two pieces of
+state. Now the hook keeps the whole answer as <code>data</code>, which the page
+calls <code>ticketPage</code>, and the page reads the parts when it shows them:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 6.11: showing it (src/pages/TicketListPage.jsx, excerpt)</span>
+      {isLoading &amp;&amp; <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">Loading</span> <span class="hljs-attr">message</span>=<span class="hljs-string">&quot;Loading tickets…&quot;</span> /&gt;</span></span>}
+      {error &amp;&amp; <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">ErrorMessage</span> <span class="hljs-attr">message</span>=<span class="hljs-string">{error.message}</span> /&gt;</span></span>}
+      {ticketPage &amp;&amp; <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">TicketList</span> <span class="hljs-attr">tickets</span>=<span class="hljs-string">{ticketPage.tickets}</span> /&gt;</span></span>}
+      {ticketPage &amp;&amp; (
+        <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">Pagination</span>
+          <span class="hljs-attr">page</span>=<span class="hljs-string">{ticketPage.meta.page}</span>
+          <span class="hljs-attr">totalPages</span>=<span class="hljs-string">{ticketPage.meta.totalPages}</span>
+          <span class="hljs-attr">onPageChange</span>=<span class="hljs-string">{handlePageChange}</span>
+        /&gt;</span></span>
+      )}
+</code></pre>
+<p><code>error</code> is now the whole <code>Error</code>, so the page shows <code>error.message</code>.</p>
+<h2>Shorter, five times</h2>
+<table>
+<thead>
+<tr>
+<th>Page</th>
+<th>Stage 5</th>
+<th>Stage 6</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>TicketListPage</code></td>
+<td>167 lines</td>
+<td>131</td>
+</tr>
+<tr>
+<td><code>TicketDetailPage</code></td>
+<td>283</td>
+<td>251</td>
+</tr>
+<tr>
+<td><code>EditTicketPage</code></td>
+<td>118</td>
+<td>94</td>
+</tr>
+<tr>
+<td><code>TagsPage</code></td>
+<td>182</td>
+<td>165</td>
+</tr>
+<tr>
+<td><code>NotificationsPage</code></td>
+<td>114</td>
+<td>97</td>
+</tr>
+</tbody>
+</table>
+<p>That's 126 lines fewer in the pages, for one 76-line hook (about 40% of it
+comments). The Stage 6 counts include a few lines added later in
+this lesson, so the hook saved a little more than this.</p>
+<h2>Try it</h2>
+<p>See the whole change to the list page in one go:</p>
+<pre><code class="hljs language-bash">git diff stage-05 stage-06 -- src/pages/TicketListPage.jsx
+</code></pre>
+<p>The red lines are the ones the hook replaced. Which of them did the
+hook take over, and which went because the page no longer needs them at
+all? (Look for <code>setMeta</code>.)</p>
+</div>
+    
+  </main>
+</body>
+</html>

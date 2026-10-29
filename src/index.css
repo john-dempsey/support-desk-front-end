@@ -40,6 +40,32 @@ a {
   outline-offset: 2px;
 }
 
+/* Hides text on screen but leaves it for screen readers, e.g. a table's
+   caption when the page's heading already says what the table is.
+   (display: none would hide it from screen readers too.) */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* "Skip to main content" (in App.jsx). It sits above the top of the
+   screen until Tab gives it focus, then slides into view. */
+.skip-link {
+  position: absolute;
+  top: -10rem;
+  left: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: var(--colour-background);
+}
+
+.skip-link:focus {
+  top: 1rem;
+}
+
 .container {
   max-width: 60rem;
   margin: 0 auto;

@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 440" width="860" height="440" role="img" aria-labelledby="title desc" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <title id="title">Why an inline arrow loops</title>
+  <desc id="desc">On the left, a loop of four steps for useFetch with an inline arrow, an arrow function that calls getTicket. Step 1: the page renders, and the arrow is a brand-new function. Step 2: React compares the effect's dependencies with last time; the new function isn't the old one, so something changed. Step 3: the effect runs again: the cleanup resets to loading, and a request is sent. Step 4: the answer arrives and setData causes another render, which is step 1 again. It never stops: about 180 requests a second in a test with a 10 millisecond pretend answer, and the API allows 300 every 15 minutes. On the right, useFetch with getTicket and ticketId: getTicket is imported once, so it's the same function on every render, and ticketId is the same string, so nothing has changed, and the effect doesn't run again. One request.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#1a1a1a"/>
+    </marker>
+  </defs>
+  <rect width="860" height="440" fill="#ffffff"/>
+
+  <text x="20" y="30" font-size="16" font-weight="700" fill="#cf222e">Loops</text>
+  <text x="20" y="54" font-size="13" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">useFetch(() =&gt; getTicket(ticketId))</text>
+
+  <rect x="20" y="74" width="230" height="78" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+  <text x="34" y="98" font-size="14" font-weight="700" fill="#1a1a1a">1. The page renders</text>
+  <text x="34" y="120" font-size="12" fill="#3d444d">the arrow is a brand-new</text>
+  <text x="34" y="138" font-size="12" fill="#3d444d">function, made this render</text>
+
+  <rect x="290" y="74" width="230" height="78" rx="6" fill="#f6f8fa" stroke="#59636e" stroke-width="1.5"/>
+  <text x="304" y="98" font-size="14" font-weight="700" fill="#1a1a1a">2. React compares</text>
+  <text x="304" y="120" font-size="12" fill="#3d444d">new function ≠ last one,</text>
+  <text x="304" y="138" font-size="12" fill="#3d444d">so a dependency changed</text>
+
+  <rect x="290" y="216" width="230" height="78" rx="6" fill="#ddf4ff" stroke="#0550ae" stroke-width="1.5"/>
+  <text x="304" y="240" font-size="14" font-weight="700" fill="#1a1a1a">3. The effect runs again</text>
+  <text x="304" y="262" font-size="12" fill="#3d444d">cleanup resets to loading,</text>
+  <text x="304" y="280" font-size="12" fill="#3d444d">and a new request is sent</text>
+
+  <rect x="20" y="216" width="230" height="78" rx="6" fill="#fff8c5" stroke="#7d4e00" stroke-width="1.5"/>
+  <text x="34" y="240" font-size="14" font-weight="700" fill="#1a1a1a">4. The answer arrives</text>
+  <text x="34" y="262" font-size="12" fill="#3d444d">setData(result) means</text>
+  <text x="34" y="280" font-size="12" fill="#3d444d">another render</text>
+
+  <line x1="252" y1="113" x2="286" y2="113" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="405" y1="154" x2="405" y2="212" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="288" y1="255" x2="254" y2="255" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="135" y1="214" x2="135" y2="156" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="20" y="320" width="500" height="100" rx="6" fill="#ffebe9" stroke="#cf222e" stroke-width="1.5"/>
+  <text x="34" y="346" font-size="14" font-weight="700" fill="#1a1a1a">It never stops</text>
+  <text x="34" y="370" font-size="13" fill="#1a1a1a">About 180 requests a second, in a test with a pretend</text>
+  <text x="34" y="390" font-size="13" fill="#1a1a1a">answer that takes 10 ms. The API allows 300 requests</text>
+  <text x="34" y="410" font-size="13" fill="#1a1a1a">every 15 minutes: gone in under two seconds.</text>
+
+  <line x1="555" y1="20" x2="555" y2="420" stroke="#d1d9e0" stroke-width="1.5"/>
+
+  <text x="580" y="30" font-size="16" font-weight="700" fill="#116329">Stops</text>
+  <text x="580" y="54" font-size="13" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">useFetch(getTicket, ticketId)</text>
+
+  <rect x="580" y="74" width="260" height="98" rx="6" fill="#f6f8fa" stroke="#59636e" stroke-width="1.5"/>
+  <text x="594" y="98" font-size="14" font-weight="700" fill="#1a1a1a">React compares</text>
+  <text x="594" y="120" font-size="12" fill="#3d444d">getTicket: imported once, so the</text>
+  <text x="594" y="138" font-size="12" fill="#3d444d">same function every render</text>
+  <text x="594" y="158" font-size="12" fill="#3d444d">ticketId: the same string</text>
+
+  <rect x="580" y="216" width="260" height="78" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+  <text x="594" y="240" font-size="14" font-weight="700" fill="#1a1a1a">Nothing changed</text>
+  <text x="594" y="262" font-size="12" fill="#3d444d">the effect doesn't run again:</text>
+  <text x="594" y="280" font-size="12" fill="#3d444d">one request</text>
+  <line x1="710" y1="174" x2="710" y2="212" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+</svg>

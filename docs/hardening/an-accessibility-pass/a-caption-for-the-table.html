@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A Caption for the Table — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/an-accessibility-pass/a-skip-link.html">← A Skip Link</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/an-accessibility-pass/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/an-accessibility-pass/testing-the-pass.html">Testing the Pass →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>A Caption for the Table</h1>
+    <p class="lede">A &lt;caption&gt; gives the ticket table a name. It&#39;s hidden on screen, where the heading already says it, but not from screen readers.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Stage 1 made the ticket table readable cell by cell, with <code>scope=&quot;col&quot;</code>
+on its headings. But the table itself had no <strong>name</strong>. A screen reader
+user can list a page's tables, or jump from one to the next, and this one
+was just &quot;table&quot;.</p>
+<p>HTML's <code>&lt;caption&gt;</code> names a table, and it goes straight after <code>&lt;table&gt;</code>:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 6.28: the caption (src/components/TicketList.jsx, excerpt)</span>
+      &lt;table&gt;
+        {<span class="hljs-comment">/* A caption names the table, so a screen reader can say &quot;table,
+            Tickets&quot; and list it among the page&#x27;s tables. The &lt;h1&gt; already
+            says this on screen, so the caption is visually hidden. */</span>}
+        &lt;caption className=<span class="hljs-string">&quot;visually-hidden&quot;</span>&gt;<span class="hljs-title class_">Tickets</span>&lt;/caption&gt;
+        &lt;thead&gt;
+</code></pre>
+<h2>Hidden from the eye, not the ear</h2>
+<p>On screen, the page's <code>&lt;h1&gt;</code> already says &quot;Tickets&quot; right above the
+table, so showing a caption too would say it twice. So the caption gets
+a class that hides it <strong>on screen only</strong>:</p>
+<pre><code class="hljs language-css"><span class="hljs-comment">/* Figure 6.29: visually hidden (src/index.css, excerpt) */</span>
+<span class="hljs-selector-class">.visually-hidden</span> {
+  <span class="hljs-attribute">position</span>: absolute;
+  <span class="hljs-attribute">width</span>: <span class="hljs-number">1px</span>;
+  <span class="hljs-attribute">height</span>: <span class="hljs-number">1px</span>;
+  <span class="hljs-attribute">overflow</span>: hidden;
+  <span class="hljs-attribute">clip-path</span>: <span class="hljs-built_in">inset</span>(<span class="hljs-number">50%</span>);
+  <span class="hljs-attribute">white-space</span>: nowrap;
+}
+</code></pre>
+<p>It shrinks the caption to a single pixel and clips away even that
+(<code>clip-path</code>), and <code>position: absolute</code> takes it out of the layout, so
+nothing moves. But it's still on the page, so a screen reader still
+reads it. <code>display: none</code> would hide it from screen readers too, which
+is the opposite of what's wanted.</p>
+<p><code>.visually-hidden</code> is a common pattern, and you'll find it under that
+name (or <code>sr-only</code>, for &quot;screen reader only&quot;) in most CSS frameworks.
+It's useful anywhere a screen reader needs words that the screen
+already shows another way.</p>
+<h2>Try it</h2>
+<p>Open the ticket list, right-click the table and choose <strong>Inspect</strong>. In
+the Elements panel, select the <code>&lt;table&gt;</code> element, then open the
+<strong>Accessibility</strong> pane (next to Styles). What does it give as the
+table's <strong>Name</strong>? Now find the <code>&lt;caption&gt;</code> in the Elements panel,
+double-click its <code>class</code> attribute and delete <code>visually-hidden</code>. What
+appears on the page, and where?</p>
+</div>
+    
+  </main>
+</body>
+</html>

@@ -4,12 +4,14 @@
 // logged in to log in first.
 import { Link } from 'react-router';
 import { useAuth } from '../context/authContext.js';
+import PageTitle from '../components/PageTitle.jsx';
 
 function HomePage() {
   const { user } = useAuth();
 
   return (
     <>
+      <PageTitle title="Home" />
       <h1>Welcome to Support Desk</h1>
       <p>Report a problem, follow its progress, and see every ticket in one place.</p>
       {user ? (

@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What Changes, and What Doesn&#39;t — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/what-stage-6-adds/which-parts-are-for-you.html">← Which Parts Are for You</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/what-stage-6-adds/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/a-hook-of-our-own/the-same-effect-five-times.html">The Same Effect Five Times →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>What Changes, and What Doesn&#39;t</h1>
+    <p class="lede">Stage 6 adds a hook, two components and four files for Docker, and changes the pages. Nothing in src/api/ changes at all.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Here's every file Stage 6 touches, leaving out the tests (each topic
+ends with its own):</p>
+<table>
+<thead>
+<tr>
+<th>Where</th>
+<th>New</th>
+<th>Changed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>hooks/</code></td>
+<td><code>useFetch.js</code></td>
+<td><code>README.md</code></td>
+</tr>
+<tr>
+<td><code>components/</code></td>
+<td><code>ErrorBoundary.jsx</code>, <code>PageTitle.jsx</code></td>
+<td><code>TicketList.jsx</code>: a caption. <code>ProtectedRoute.jsx</code>: a title</td>
+</tr>
+<tr>
+<td><code>pages/</code></td>
+<td></td>
+<td>The five pages that load data move onto <code>useFetch</code>. Every page gets a title</td>
+</tr>
+<tr>
+<td><code>src/</code></td>
+<td></td>
+<td><code>App.jsx</code>: the error boundary and a skip link. <code>index.css</code>: two new classes</td>
+</tr>
+<tr>
+<td>the project's top folder</td>
+<td><code>Dockerfile</code>, <code>nginx.conf</code>, <code>.dockerignore</code>, <code>compose.yaml</code></td>
+<td><code>package.json</code>, <code>vite.config.js</code>, <code>.gitignore</code>: a coverage report</td>
+</tr>
+</tbody>
+</table>
+<p>(<code>NotificationsProvider.jsx</code> changes too, but only one comment.)</p>
+<p><code>package.json</code> gains one package, <code>@vitest/coverage-v8</code>, and it's a
+<strong>dev dependency</strong>: a tool for the tests, which never reaches the
+browser. The app itself gets no new libraries in this stage.</p>
+<h2>What doesn't change</h2>
+<ul>
+<li><strong>Everything in <code>src/api/</code>.</strong> Not one line. The pages still call
+<code>getTickets()</code>, <code>getTicket()</code> and the rest; only <em>how</em> a page waits
+for the answer changes.</li>
+<li><strong><code>main.jsx</code>, <code>AuthProvider</code>, both contexts and <code>realtime/socket.js</code>.</strong></li>
+<li><strong>The test helpers</strong> in <code>src/test/</code>: <code>renderWithProviders</code>, the test
+data and the fake socket.</li>
+</ul>
+<h2>Try it</h2>
+<p>Once you have the <code>stage-06</code> code, list every file in <code>src/</code> that
+changed since the end of Stage 5:</p>
+<pre><code class="hljs language-bash">git diff --<span class="hljs-built_in">stat</span> stage-05 stage-06 -- src
+</code></pre>
+<p>Then check the claim about <code>src/api/</code>:</p>
+<pre><code class="hljs language-bash">git diff stage-05 stage-06 -- src/api
+</code></pre>
+<p>It prints nothing at all. Why can the way every page loads its data
+change without any change to the files that send the requests?</p>
+</div>
+    
+  </main>
+</body>
+</html>

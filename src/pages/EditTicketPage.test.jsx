@@ -44,6 +44,16 @@ describe('EditTicketPage', () => {
     expect(screen.getByLabelText('Assigned to')).toHaveDisplayValue('Alex Agent');
   });
 
+  it('names the browser tab after the page', async () => {
+    getTicket.mockResolvedValue(ticketAssignedToAlex);
+    getAgents.mockResolvedValue(testAgents);
+
+    renderEditPageFor(1);
+
+    await screen.findByRole('heading', { level: 1, name: 'Edit ticket' });
+    expect(document.title).toBe('Edit ticket · Support Desk');
+  });
+
   it('sends the changes with PATCH, then shows the ticket', async () => {
     getTicket.mockResolvedValue(unassignedTicket);
     getAgents.mockResolvedValue(testAgents);
@@ -85,5 +95,19 @@ describe('EditTicketPage', () => {
     renderEditPageFor(999);
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Ticket 999 not found');
+  });
+
+  it('stays on the form and shows the error when saving fails', async () => {
+    getTicket.mockResolvedValue(unassignedTicket);
+    getAgents.mockResolvedValue(testAgents);
+    const networkError = new Error("Can't reach the API at http://localhost:3000");
+    networkError.status = 0;
+    updateTicket.mockRejectedValue(networkError);
+    renderEditPageFor(2);
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Save changes' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent("Can't reach the API");
+    expect(screen.getByRole('heading', { level: 1, name: 'Edit ticket' })).toBeInTheDocument();
   });
 });

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Changing It Later — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/serving-it-with-nginx/keeping-files-for-a-year.html">← Keeping Files for a Year</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/serving-it-with-nginx/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/pinning-cors/open-to-every-origin.html">Open to Every Origin →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Changing It Later</h1>
+    <p class="lede">Everything in the image is fixed when it&#39;s built. A change to the code, .env or nginx.conf needs --build; npm run dev stays how you work.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The image holds a finished build. Nothing in it watches your files, so
+nothing you change reaches port 8080 until the image is built again:</p>
+<table>
+<thead>
+<tr>
+<th>You change</th>
+<th>Port 5173 (<code>npm run dev</code>)</th>
+<th>Port 8080 (nginx)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>a component</td>
+<td>shows it as you save</td>
+<td><code>docker compose up -d --build</code></td>
+</tr>
+<tr>
+<td><code>.env</code>'s <code>VITE_API_URL</code></td>
+<td>Vite restarts by itself</td>
+<td><code>docker compose up -d --build</code></td>
+</tr>
+<tr>
+<td><code>nginx.conf</code></td>
+<td>(not used)</td>
+<td><code>docker compose up -d --build</code></td>
+</tr>
+<tr>
+<td>nothing</td>
+<td></td>
+<td><code>up -d</code> alone keeps the running container</td>
+</tr>
+</tbody>
+</table>
+<p>Without <code>--build</code>, <code>docker compose up -d</code> uses the image it already
+has, so the old build carries on. With <code>--build</code>, Docker reuses every
+step whose inputs haven't changed (Figure 6.39's comment on copying
+the package files first), so a rebuild after a code change skips
+<code>npm ci</code> and only runs <code>npm run build</code> again.</p>
+<h2>Which one to use</h2>
+<p><strong><code>npm run dev</code> stays how you work.</strong> It updates as you save, shows
+StrictMode's warnings and the error boundary's details, and runs no
+container. The nginx image is for checking the build the way users
+would get it, as <code>npm run preview</code> was, but with a real web server's
+rules: the <code>try_files</code> fallback, the caching headers and a real 404
+for a missing asset.</p>
+<p>It's also the step before putting the app online. A hosting service
+that runs containers could run this image as it is. Its address for
+the API would be the live API's, given to <code>--build</code> through <code>.env</code>.</p>
+<h2>Stopping it</h2>
+<pre><code class="hljs language-bash">docker compose down
+</code></pre>
+<p>in the app's folder stops and removes the container. The image stays,
+so the next <code>docker compose up -d</code> starts at once.</p>
+<h2>Try it</h2>
+<p>Change the text of the home page's <code>&lt;h1&gt;</code>, save, and look at ports
+5173 and 8080. Run <code>docker compose up -d --build</code> and look again. In
+its output, find the <code>npm ci</code> step: does it say <code>CACHED</code>? Then put
+the heading back and build once more.</p>
+</div>
+    
+  </main>
+</body>
+</html>

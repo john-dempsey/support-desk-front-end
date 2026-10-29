@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Production Build — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>The Production Build</h1>
+    <p class="lede">What npm run build makes of the whole app: three files with the API&#39;s address written in, mostly React, and none of development&#39;s extra checks.</p>
+
+    
+      <ul class="listing">
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/the-production-build/building-the-whole-app.html">Building the Whole App</a>
+            <p>Stage 0 built the starter. The finished app still builds to three files, and its index.html now points at them.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/the-production-build/the-apis-address-is-built-in.html">The API&#39;s Address Is Built In</a>
+            <p>The build writes VITE_API_URL&#39;s value straight into the JavaScript, twice, and drops the fallback it no longer needs.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/the-production-build/whats-in-the-329-kb.html">What&#39;s in the 329 kB</a>
+            <p>Most of the built JavaScript is React. Our own code, every page and component from six stages, is less than a tenth of it.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/the-production-build/production-isnt-development.html">Production Isn&#39;t Development</a>
+            <p>The built app sends each request once, has no component names, and leaves out everything marked as development only.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/the-production-build/preview-and-where-it-stops.html">Preview, and Where It Stops</a>
+            <p>npm run preview answers every address with index.html and tells the browser never to keep a file. A real web server does neither unless it&#39;s told to.</p>
+          </li>
+        
+      </ul>
+    
+
+    
+  </main>
+</body>
+</html>

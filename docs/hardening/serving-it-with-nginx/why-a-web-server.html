@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Why a Web Server — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/the-production-build/preview-and-where-it-stops.html">← Preview, and Where It Stops</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/serving-it-with-nginx/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/serving-it-with-nginx/two-stages-one-small-image.html">Two Stages, One Small Image →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Why a Web Server</h1>
+    <p class="lede">The built app is just files, so it needs a web server, not Node. The browser fetches the files from nginx and talks to the API itself.</p>
+
+    
+
+    
+      <div class="slide-body"><p><strong>This topic is optional.</strong> It needs Docker, as in back-end Lesson 6.
+If you don't have Docker, read it for the ideas and skip the Try its:
+nothing later in the course depends on it.</p>
+<p>Back-end Lesson 6 put the API in a container, to show what running it
+&quot;for real&quot; looks like. This topic does the same for the front-end. But
+the two are very different things to run.</p>
+<h2>The API is a program. The front-end is files.</h2>
+<p>The API container runs <code>node src/server.js</code>: a program that answers
+every request by running code and asking MySQL.</p>
+<p>After <code>npm run build</code>, the front-end is three files and an icon. No
+code runs on the server at all: every page is drawn by React <strong>in the
+browser</strong>. So the server only has to send files. That job needs no
+Node, just a <strong>web server</strong>. This topic uses <strong>nginx</strong> (said &quot;engine
+X&quot;), one of the most widely used.</p>
+<p><img src="/support-desk-front-end/assets/images/browser-nginx-api.svg" alt="Diagram: three boxes. On the left, the browser at localhost:8080, running React. Top right, a grey box for the front-end's container, nginx on port 8080, holding index.html, the JS and the CSS. Bottom right, a grey box for the API's containers on port 3000, api, worker and MySQL. Arrow 1, from the browser to nginx: GET /tickets/3, and nginx answers with index.html, then the JS and CSS. Arrow 2, from the browser to the API: GET /tickets/3 with the token, and the socket, answered with JSON. Between the two containers, a crossed-out line: they never talk to each other, so they need no shared network, and the API's address stays http://localhost:3000."></p>
+<h2>The two containers never talk</h2>
+<p>The browser makes two kinds of request:</p>
+<ol>
+<li><strong>For the app</strong>: <code>index.html</code>, the <code>.js</code> and the <code>.css</code>, from nginx
+on port 8080. Once they've arrived, nginx's job is done.</li>
+<li><strong>For the data</strong>: every API call and the socket, straight from the
+browser to the API on port 3000, as it always has been.</li>
+</ol>
+<p>So nginx never calls the API. Compare Lesson 6, where the <code>api</code>
+container reached MySQL as <code>mysql:3306</code>: there, one container really
+did talk to another, so they shared a Compose network. Here the API's
+address is the one <strong>the browser</strong> uses, so it stays
+<code>http://localhost:3000</code>, and the front-end's containers can run in a
+separate Compose stack from the API's.</p>
+<h2>Try it</h2>
+<p>Open the app on <code>http://localhost:5173</code> with the Network tab open, and
+reload. Hover over the <strong>Name</strong> of a few rows to see their full
+address. Which requests went to port 5173 and which to port 3000? With
+nginx, the first group will come from port 8080 instead, and the
+second won't change.</p>
+</div>
+    
+  </main>
+</body>
+</html>

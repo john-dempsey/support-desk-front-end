@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Effect Moves In — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/a-hook-of-our-own/the-hooks-state.html">← The Hook&#39;s State</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/a-hook-of-our-own/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/a-hook-of-our-own/what-it-hands-back.html">What It Hands Back →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>The Effect Moves In</h1>
+    <p class="lede">The hook&#39;s effect is the pages&#39; effect with general names. Its dependency list is a plain array, so the linter can still check it.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The effect is the one you've written since Stage 2, line for line. Only
+the names have changed:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 6.3: the request (src/hooks/useFetch.js, excerpt)</span>
+  <span class="hljs-title function_">useEffect</span>(<span class="hljs-function">() =&gt;</span> {
+    <span class="hljs-keyword">let</span> ignore = <span class="hljs-literal">false</span>;
+
+    <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">loadData</span>(<span class="hljs-params"></span>) {
+      <span class="hljs-keyword">try</span> {
+        <span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetchFunction</span>(argument);
+        <span class="hljs-keyword">if</span> (!ignore) {
+          <span class="hljs-title function_">setData</span>(result);
+        }
+      } <span class="hljs-keyword">catch</span> (caughtError) {
+        <span class="hljs-keyword">if</span> (!ignore) {
+          <span class="hljs-title function_">setError</span>(caughtError);
+        }
+      } <span class="hljs-keyword">finally</span> {
+        <span class="hljs-keyword">if</span> (!ignore) {
+          <span class="hljs-title function_">setIsLoading</span>(<span class="hljs-literal">false</span>);
+        }
+      }
+    }
+
+    <span class="hljs-title function_">loadData</span>();
+</code></pre>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 6.4: the cleanup (src/hooks/useFetch.js, excerpt)</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-function">() =&gt;</span> {
+      ignore = <span class="hljs-literal">true</span>;
+      <span class="hljs-title function_">setData</span>(<span class="hljs-literal">null</span>);
+      <span class="hljs-title function_">setError</span>(<span class="hljs-literal">null</span>);
+      <span class="hljs-title function_">setIsLoading</span>(<span class="hljs-literal">true</span>);
+    };
+  }, [fetchFunction, argument, reloadCount]);
+</code></pre>
+<p>The comments are left out of both figures. Put them next to Figure 6.1:</p>
+<table>
+<thead>
+<tr>
+<th>Stage 5's <code>TicketListPage</code></th>
+<th><code>useFetch</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>loadTickets()</code></td>
+<td><code>loadData()</code></td>
+</tr>
+<tr>
+<td><code>await getTickets(queryString)</code></td>
+<td><code>await fetchFunction(argument)</code></td>
+</tr>
+<tr>
+<td><code>setTickets(result.tickets)</code> and <code>setMeta(result.meta)</code></td>
+<td><code>setData(result)</code>: the whole result</td>
+</tr>
+<tr>
+<td><code>catch (error)</code>, then <code>setErrorMessage(error.message)</code></td>
+<td><code>catch (caughtError)</code>, then <code>setError(caughtError)</code></td>
+</tr>
+<tr>
+<td>the cleanup resets four pieces of state, and <code>hasChanged</code></td>
+<td>the cleanup resets three</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>catch</code> names its error <code>caughtError</code> because the hook already has
+a piece of state called <code>error</code>. Giving both the same name would hide
+the state inside the <code>catch</code> block, and be confusing to read.</p>
+<p><code>hasChanged</code> isn't in the hook's cleanup: it's the list page's own
+state, for its &quot;this has changed&quot; notice, so it stays in the page.</p>
+<h2>The dependency list</h2>
+<p><code>[fetchFunction, argument, reloadCount]</code> lists every value from outside
+the effect that it reads. It's a plain array, written out in full, so
+oxlint's <code>exhaustive-deps</code> rule (Stage 2) can check it, the same as in
+every page before.</p>
+<ul>
+<li>A new <code>argument</code> (another ticket, another query) runs the effect
+again, for the new data. That's <code>[ticketId]</code> and <code>[queryString]</code> from
+Stages 2 and 3.</li>
+<li>A new <code>reloadCount</code> runs it again for a Reload, as in Stage 5.</li>
+<li>A new <code>fetchFunction</code> would run it again too. In practice a page
+always passes the same one, as a later slide in this topic explains.</li>
+</ul>
+<h2>Try it</h2>
+<p>Take <code>argument</code> out of the dependency list, so it reads
+<code>[fetchFunction, reloadCount]</code>, and run <code>npm run lint</code>. The warning
+says:</p>
+<pre><code class="hljs">⚠ react-hooks(exhaustive-deps): React Hook useEffect has a missing
+dependency: &#x27;argument&#x27;
+</code></pre>
+<p>(It's one line, split here to fit, and the linter shows the line that
+uses <code>argument</code> underneath.) What would go wrong on the ticket page if
+you ignored it, and the URL changed from <code>/tickets/1</code> to <code>/tickets/2</code>
+while the page stayed open? Put <code>argument</code> back.</p>
+</div>
+    
+  </main>
+</body>
+</html>

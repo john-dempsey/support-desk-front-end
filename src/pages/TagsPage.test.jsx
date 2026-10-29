@@ -31,6 +31,14 @@ describe('TagsPage', () => {
     expect(screen.getByText('bug')).toBeInTheDocument();
   });
 
+  it('names the browser tab after the page', async () => {
+    getTags.mockResolvedValue(testTags);
+
+    await renderTagsPage();
+
+    expect(document.title).toBe('Tags · Support Desk');
+  });
+
   it('shows a message when there are no tags', async () => {
     getTags.mockResolvedValue([]);
 
@@ -110,5 +118,53 @@ describe('TagsPage', () => {
     const remainingItems = screen.getAllByRole('listitem');
     expect(remainingItems).toHaveLength(1);
     expect(within(remainingItems[0]).getByText('billing')).toBeInTheDocument();
+  });
+
+  it('keeps the rename form open when the new name is taken', async () => {
+    getTags.mockResolvedValue(testTags);
+    const conflictError = new Error('A record with that Tag_name_key already exists');
+    conflictError.status = 409;
+    updateTag.mockRejectedValue(conflictError);
+    await renderTagsPage();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Rename billing' }));
+    const nameInput = screen.getByLabelText('New name for "billing"');
+    await userEvent.clear(nameInput);
+    await userEvent.type(nameInput, 'bug');
+    await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'A tag with that name already exists.',
+    );
+    // The user can fix the name without typing it all again.
+    expect(screen.getByLabelText('New name for "billing"')).toHaveValue('bug');
+  });
+
+  it("doesn't delete a tag when the user cancels", async () => {
+    getTags.mockResolvedValue(testTags);
+    vi.spyOn(window, 'confirm').mockReturnValue(false);
+    await renderTagsPage();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Delete bug' }));
+
+    expect(deleteTag).not.toHaveBeenCalled();
+    expect(screen.getAllByRole('listitem')).toHaveLength(2);
+  });
+
+  it("shows the API's message, and keeps the tag, when it can't be deleted", async () => {
+    getTags.mockResolvedValue(testTags);
+    // A tag still used by a ticket can't be deleted.
+    const inUseError = new Error(
+      'This record cannot be deleted or changed because other records still depend on it',
+    );
+    inUseError.status = 409;
+    deleteTag.mockRejectedValue(inUseError);
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    await renderTagsPage();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Delete bug' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('cannot be deleted');
+    expect(screen.getAllByRole('listitem')).toHaveLength(2);
   });
 });

@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The API&#39;s Address, at Build Time — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/serving-it-with-nginx/two-stages-one-small-image.html">← Two Stages, One Small Image</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/serving-it-with-nginx/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/serving-it-with-nginx/starting-it.html">Starting It →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>The API&#39;s Address, at Build Time</h1>
+    <p class="lede">.env stays out of the image, so compose.yaml reads it and hands the address to the build as a build argument.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Topic 07 showed that the API's address is written into the JavaScript
+<strong>when it's built</strong>. In Docker, the build happens inside the image, so
+the address has to get in there somehow. But not by copying <code>.env</code>.</p>
+<h2>What stays out: <code>.dockerignore</code></h2>
+<p>As in Lesson 6, <code>.dockerignore</code> lists what Docker never receives, so no
+<code>COPY</code> can reach it:</p>
+<pre><code class="hljs"># Figure 6.41: what Docker never receives (.dockerignore, excerpt)
+node_modules
+dist
+coverage
+
+# Never put secrets in an image: anyone with the image could read them.
+# The API&#x27;s URL comes in as a build argument instead (see compose.yaml).
+.env
+.env.*
+!.env.example
+</code></pre>
+<p><code>node_modules</code> and <code>dist</code> are made fresh inside the image. <code>.env</code>
+stays out as a habit worth keeping. A front-end's <code>.env</code> should have
+no secrets, but in Stages 2 and 3 ours held a real token
+(<code>VITE_DEV_TOKEN</code>), and an image can be copied to anyone.</p>
+<h2>What goes in: a build argument</h2>
+<p>An <code>ARG</code> line in a <code>Dockerfile</code> declares a <strong>build argument</strong>: a value
+given to the build from outside. Figure 6.39 had <code>ARG VITE_API_URL</code>
+just before <code>RUN npm run build</code>, so the build sees it as an environment
+variable, and Vite reads <code>VITE_</code> values from environment variables as
+well as from <code>.env</code>. <code>compose.yaml</code> supplies the value:</p>
+<pre><code class="hljs language-yaml"><span class="hljs-comment"># Figure 6.42: the web service (compose.yaml, excerpt)</span>
+<span class="hljs-attr">name:</span> <span class="hljs-string">support-desk-front-end</span>
+
+<span class="hljs-attr">services:</span>
+  <span class="hljs-attr">web:</span>
+    <span class="hljs-attr">build:</span>
+      <span class="hljs-attr">context:</span> <span class="hljs-string">.</span>
+      <span class="hljs-attr">args:</span>
+        <span class="hljs-comment"># Compose reads .env in this folder, so the image is built with the</span>
+        <span class="hljs-comment"># same API URL as `npm run dev` uses. With no .env, it&#x27;s empty and</span>
+        <span class="hljs-comment"># client.js uses its default. Change it, and run `--build` again:</span>
+        <span class="hljs-comment"># it&#x27;s baked in when the image is built.</span>
+        <span class="hljs-attr">VITE_API_URL:</span> <span class="hljs-string">${VITE_API_URL:-}</span>
+    <span class="hljs-attr">restart:</span> <span class="hljs-string">unless-stopped</span>
+    <span class="hljs-attr">ports:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">&#x27;8080:80&#x27;</span> <span class="hljs-comment"># http://localhost:8080</span>
+</code></pre>
+<p>So <code>.env</code> is read on <strong>your</strong> computer, by Compose, and only the one
+value goes into the build. <code>${VITE_API_URL:-}</code> means &quot;the value, or
+empty if there isn't one&quot;. <code>'8080:80'</code> sends port 8080 on your computer
+to nginx's port 80, as Lesson 6's <code>'3000:3000'</code> did for the API. The
+<code>name</code> line names the stack, so the container is called
+<code>support-desk-front-end-web-1</code>.</p>
+<h2>Comments in <code>.env</code> start with <code>#</code></h2>
+<p>Vite is forgiving about <code>.env</code>: it skips any line it doesn't
+understand. Docker Compose isn't. A line such as <code>// casey</code> makes
+<strong>every</strong> <code>docker compose</code> command in that folder fail, even <code>ps</code>:</p>
+<pre><code class="hljs">unexpected character &quot;/&quot; in variable name
+</code></pre>
+<p>So comments in <code>.env</code> start with <code>#</code>, as in <code>.env.example</code>.</p>
+<h2>Try it</h2>
+<p>Run <code>docker compose config</code> in the app's folder. It prints
+<code>compose.yaml</code> with the values filled in. What does it show for
+<code>VITE_API_URL</code>? Where did that value come from?</p>
+</div>
+    
+  </main>
+</body>
+</html>

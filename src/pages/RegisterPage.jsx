@@ -7,6 +7,7 @@ import { Link, Navigate } from 'react-router';
 import { useAuth } from '../context/authContext.js';
 import ErrorMessage from '../components/ErrorMessage.jsx';
 import FieldError from '../components/FieldError.jsx';
+import PageTitle from '../components/PageTitle.jsx';
 import { getFieldError } from '../utils/getFieldError.js';
 import { describeAuthError } from '../utils/describeAuthError.js';
 
@@ -41,6 +42,7 @@ function RegisterPage() {
 
   return (
     <>
+      <PageTitle title="Create an account" />
       <h1>Create an account</h1>
       <form className="form" onSubmit={handleSubmit}>
         {registerError && <ErrorMessage message={registerError.message} />}

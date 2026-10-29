@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Starting It — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/serving-it-with-nginx/the-apis-address-at-build-time.html">← The API&#39;s Address, at Build Time</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/serving-it-with-nginx/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/serving-it-with-nginx/refreshing-a-deep-address.html">Refreshing a Deep Address →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Starting It</h1>
+    <p class="lede">One command builds the image and starts nginx on port 8080, next to the API&#39;s stack. Logging in, pushes and Reload all work from there.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The front-end's stack runs <strong>next to</strong> the API's, each started in its
+own folder. First the API, as in Lesson 6:</p>
+<pre><code class="hljs language-bash"><span class="hljs-comment"># in the back-end&#x27;s folder</span>
+docker compose up -d
+</code></pre>
+<p>Then the front-end, in the app's folder:</p>
+<pre><code class="hljs language-bash">docker compose up -d --build
+</code></pre>
+<p><code>--build</code> builds the image first: both stages, <code>npm ci</code> and
+<code>npm run build</code> included. The first time, Docker also downloads the
+<code>node</code> and <code>nginx</code> images, so it's slower than later builds. Then open
+<strong><code>http://localhost:8080</code></strong>.</p>
+<h2>The same app, from nginx</h2>
+<p>Log in and use it as usual. Everything works, because nothing in the
+app knows where its files came from:</p>
+<ul>
+<li><strong>Logging in</strong> calls <code>POST /auth/login</code> on port 3000, as before. The
+API allows requests from any origin (Lesson 6's <code>cors()</code>), so a page
+from port 8080 is allowed too.</li>
+<li><strong>Pushes</strong> arrive: the socket connects to port 3000 from the browser.</li>
+<li><strong>Reload</strong> on a &quot;this has changed&quot; notice fetches the list again.</li>
+</ul>
+<p><code>localStorage</code> belongs to one origin, and <code>localhost:8080</code> is a
+different origin from <code>localhost:5173</code>. So you log in separately on
+each, and logging out of one doesn't log you out of the other.</p>
+<h2>Looking inside</h2>
+<p>The container is called <code>support-desk-front-end-web-1</code>. Compose
+commands in the app's folder find it by its service name, <code>web</code>:</p>
+<pre><code class="hljs language-bash">docker compose ps
+docker compose <span class="hljs-built_in">exec</span> web <span class="hljs-built_in">ls</span> /usr/share/nginx/html
+docker compose <span class="hljs-built_in">exec</span> web ps -o user,args
+</code></pre>
+<p>The second shows what nginx serves: <code>index.html</code>, <code>favicon.svg</code>,
+<code>assets</code>, and a <code>50x.html</code> error page that comes with the nginx image.
+The third shows nginx's processes: one <code>master process</code> run by <code>root</code>,
+and several <code>worker process</code>es run by <code>nginx</code>.</p>
+<p>To stop it, run <code>docker compose down</code> in the app's folder. The API's
+stack keeps running.</p>
+<h2>Try it</h2>
+<p>Start the front-end's stack and log in on port 8080 as Alex. In
+another tab, open port 5173 (with <code>npm run dev</code> running) and log in as
+Ada: the two origins keep separate logins, so Alex stays logged in.
+As Ada, open an unassigned ticket, click <strong>Edit ticket</strong>, set
+<strong>Assigned to</strong> to Alex and save. What appears on Alex's page on 8080,
+without a reload? Click <strong>Reload</strong>. Then, as Ada, edit the ticket again
+and set <strong>Assigned to</strong> back to <strong>Unassigned</strong>.</p>
+</div>
+    
+  </main>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tracing Stage 6 — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/pinning-cors/what-cors-protects.html">← What CORS Protects</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/making-it-yours/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/making-it-yours/your-stage-6-checklist.html">Your Stage 6 Checklist →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Tracing Stage 6</h1>
+    <p class="lede">Questions to practise the viva&#39;s trace with, now that the fetching lives in a hook, crashes have a boundary, and the app can run from nginx.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The viva's trace is still <strong>component → API module → HTTP request →
+state update → re-render</strong>. Stage 6 moved one part of it: the state
+update now happens inside <code>useFetch</code>, so a trace through a page passes
+through the hook. And there are two new kinds of question: what happens
+when something goes <strong>wrong</strong>, and what happens <strong>before</strong> React runs
+at all.</p>
+<h2>Write one yourself</h2>
+<p>Write the trace for <strong>choosing &quot;Open&quot; in the Status filter on the
+ticket list</strong>, as a numbered list, one line per step, with the file
+each step is in. Start with the <code>onChange</code> in <code>TicketFilters</code>, and
+finish with the filtered tickets in the table. You should need about
+ten steps, and at least four of them are in <code>useFetch.js</code>. Topic 02's
+diagrams and topic 03's Figures 6.10 and 6.11 cover most of it.</p>
+<h2>Questions to practise with</h2>
+<p>Answer these out loud, with the code open. Then try them again with it
+closed.</p>
+<ol>
+<li>Name the five pages that use <code>useFetch</code>. Which two call it twice,
+and why two calls rather than one?</li>
+<li>Two pages call <code>useFetch</code> at the same time. Do they share <code>data</code>?
+Why not, when a context's value is shared?</li>
+<li>What are the three things in the effect's dependency list, and what
+makes each one change?</li>
+<li>Why does the page pass <code>getTicket, id</code> to the hook, and not
+<code>() =&gt; getTicket(id)</code>?</li>
+<li>A slow answer for ticket 1 arrives after the answer for ticket 2.
+Which line stops it from replacing ticket 2?</li>
+<li>What does <code>reload()</code> change, and why does that load the data again?</li>
+<li>After adding a comment, the page calls <code>setComments</code> with a
+function. Why a function, and why not reload the comments instead?</li>
+<li>Why does <code>TagsPage</code> keep its own <code>reloadTags()</code>?</li>
+<li>A page throws while rendering. Which method in <code>ErrorBoundary</code> runs
+first, and what does <code>render()</code> show? What does the user still see
+at the top of the page?</li>
+<li>The user then clicks <strong>Tickets</strong>. Why does the list appear, rather
+than &quot;Something went wrong&quot; again?</li>
+<li>Name two errors the boundary doesn't catch. What handles them
+instead?</li>
+<li>Where does the browser tab's title come from on the ticket's page?
+What does it say while the ticket is loading?</li>
+<li>You reload <code>http://localhost:8080/tickets/3</code>. Which program answers
+first, what does it send, and how does the ticket's page appear?</li>
+<li>You change <code>VITE_API_URL</code> in <code>.env</code>. What has to happen before the
+app on port 8080 uses the new address, and why?</li>
+</ol>
+<h2>Try it</h2>
+<p>Pick two questions you couldn't answer with the code closed. Find the
+answers in the code, then explain each to someone else without
+looking.</p>
+</div>
+    
+  </main>
+</body>
+</html>

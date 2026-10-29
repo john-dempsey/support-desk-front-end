@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>100% Isn&#39;t the Goal — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/what-the-tests-miss/two-of-the-new-tests.html">← Two of the New Tests</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/what-the-tests-miss/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/what-the-tests-miss/running-everything.html">Running Everything →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>100% Isn&#39;t the Goal</h1>
+    <p class="lede">After the new tests, a few red lines are left on purpose. And a line coverage calls &#39;covered&#39; can still be checked by nothing.</p>
+
+    
+
+    
+      <div class="slide-body"><p>After the 16 new tests, these are the only files under 100%:</p>
+<pre><code class="hljs">File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   99.41 |    93.33 |     100 |    99.4 |
+  main.jsx         |       0 |      100 |     100 |       0 | 16
+  client.js        |   96.87 |     90.9 |     100 |   96.87 | 65
+  StatusBadge.jsx  |     100 |       75 |     100 |     100 | 13
+  AuthProvider.jsx |     100 |       70 |     100 |     100 | 31-43
+  useFetch.js      |     100 |    83.33 |     100 |     100 | 47
+  TagsPage.jsx     |   97.61 |    88.88 |     100 |    97.5 | 25
+  socket.js        |     100 |       50 |     100 |     100 | 17
+</code></pre>
+<p>(Seven of the 13 files under 100%. Most of the others, such as
+<code>LoginPage</code> and <code>TicketForm</code>, are a field whose error no test shows.)
+Every function has run. The app <strong>could</strong> be pushed to 100%. It isn't,
+on purpose.</p>
+<h2>Some lines aren't worth a test</h2>
+<ul>
+<li><strong><code>main.jsx</code></strong> starts the app in the browser. Tests render components
+directly, so they never run it, and a test of it would test React.</li>
+<li><strong><code>socket.js</code> line 17</strong>, <code>VITE_API_URL || 'http://localhost:3000'</code>:
+the tests load your <code>.env</code>, so the fallback never runs.</li>
+<li><strong><code>AuthProvider</code> lines 31–43 and <code>useFetch</code> line 47</strong>: the <code>ignore</code>
+flag's other side, for an answer that arrives after it's no longer
+wanted. In <code>useFetch</code> it's a late <em>error</em>. Its late <em>answer</em> already
+has a test; a late error is a good challenge.</li>
+<li><strong><code>client.js</code> line 65</strong>: a response with no JSON body at all. It's in
+the Stage 0 template, so it's a challenge too.</li>
+</ul>
+<h2>Covered isn't the same as tested</h2>
+<p>Coverage only says a line <strong>ran</strong>. It can't say whether any test would
+notice if the line did the wrong thing:</p>
+<p><img src="/support-desk-front-end/assets/images/covered-is-not-tested.svg" alt="Diagram: a grid with two questions. Rows: a test ran it, or no test ran it. Columns: a test checks what it does, or nothing checks it. Ran and checked: the goal, for example useFetch's ignore flag. Ran but not checked: coverage counts it, but nothing would notice if it broke, for example maxLength 200 on the ticket's subject, and StatusBadge's grey for an unknown status, since the test only checks the text. Not run, and worth a test: what this topic's 16 new tests filled in, such as TicketFilters' Sort by and Order, register in AuthProvider, and a refused tag delete. Not run, and that's fine: main.jsx, which only the browser runs, and the localhost:3000 fallback, because the tests always have a .env. Coverage only shows the rows; the columns, and which red is worth fixing, take a person."></p>
+<ul>
+<li><strong><code>maxLength={200}</code></strong> on the ticket's subject ran in every test that
+showed the form: covered. No test types 201 characters, so deleting
+it would break nothing.</li>
+<li><strong><code>StatusBadge</code> line 13</strong>, <code>styles[status] || styles.unknown</code>, picks
+grey for a status it doesn't know. In tests, a CSS Module hands back a
+made-up class name for <strong>any</strong> name, even one that isn't in the file,
+so <code>styles.on_hold</code> is never empty and the <code>|| styles.unknown</code> side
+never runs. The test for an unknown status still passes, because it
+only checks the text.</li>
+</ul>
+<p>So use coverage to <strong>find</strong> gaps, never as the score to aim for. A team
+that must reach 100% writes tests that run lines without checking them,
+which raises the number and catches nothing.</p>
+<h2>Try it</h2>
+<p>In <code>src/components/TicketForm.jsx</code>, delete <code>maxLength={200}</code> and run
+<code>npm run coverage</code>. Does any test fail? Does the coverage for
+<code>TicketForm.jsx</code> change? Put it back. What test would notice?</p>
+</div>
+    
+  </main>
+</body>
+</html>

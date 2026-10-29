@@ -37,6 +37,14 @@ describe('TicketList', () => {
     expect(screen.getAllByRole('row')).toHaveLength(3);
   });
 
+  // The caption is visually hidden, but it's still the table's name, which
+  // is how a screen reader user (and getByRole) finds it.
+  it('names the table with a caption', () => {
+    renderWithProviders(<TicketList tickets={testTickets} />);
+
+    expect(screen.getByRole('table', { name: 'Tickets' })).toBeInTheDocument();
+  });
+
   it("links each ticket's subject to its detail page", () => {
     renderWithProviders(<TicketList tickets={testTickets} />);
 

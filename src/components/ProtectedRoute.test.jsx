@@ -36,6 +36,7 @@ describe('ProtectedRoute', () => {
     renderTagsRouteAs(customerUser);
 
     expect(screen.getByRole('heading', { name: 'Not available' })).toBeInTheDocument();
+    expect(document.title).toBe('Not available · Support Desk');
     expect(screen.queryByRole('heading', { name: 'Tags page' })).not.toBeInTheDocument();
   });
 

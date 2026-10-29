@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A Hook of Our Own — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>A Hook of Our Own</h1>
+    <p class="lede">The loading pattern every page has repeated since Stage 2, written once as a custom hook: useFetch.</p>
+
+    
+      <ul class="listing">
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/a-hook-of-our-own/the-same-effect-five-times.html">The Same Effect Five Times</a>
+            <p>Five pages each carry their own copy of the loading pattern from Stage 2. Only the request is different.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/a-hook-of-our-own/a-hook-that-holds-state.html">A Hook That Holds State</a>
+            <p>useAuth() was a custom hook that shares one value. useFetch is a custom hook that calls useState, so every page that calls it gets its own.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/a-hook-of-our-own/the-hooks-state.html">The Hook&#39;s State</a>
+            <p>useFetch takes an API function and the one value it needs, and holds the same state the pages held: the data, an error, and whether it&#39;s still loading.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/a-hook-of-our-own/the-effect-moves-in.html">The Effect Moves In</a>
+            <p>The hook&#39;s effect is the pages&#39; effect with general names. Its dependency list is a plain array, so the linter can still check it.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/a-hook-of-our-own/what-it-hands-back.html">What It Hands Back</a>
+            <p>useFetch returns an object of five values. A page takes the ones it needs, and can still change the data or ask again.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/a-hook-of-our-own/pass-the-function-not-an-arrow.html">Pass the Function, Not an Arrow</a>
+            <p>useFetch(getTicket, ticketId) loads once. useFetch(() =&gt; getTicket(ticketId)) loads forever, because an arrow written in a page is a new function on every render.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/a-hook-of-our-own/testing-the-hook.html">Testing the Hook</a>
+            <p>renderHook() runs a hook with no page around it, so the ignore flag finally gets a test of its own.</p>
+          </li>
+        
+      </ul>
+    
+
+    
+  </main>
+</body>
+</html>

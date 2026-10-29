@@ -7,7 +7,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import AuthProvider from './AuthProvider.jsx';
 import { useAuth } from './authContext.js';
-import { getCurrentUser, login } from '../api/auth.api.js';
+import { getCurrentUser, login, register } from '../api/auth.api.js';
 import { apiRequest } from '../api/client.js';
 import { getSavedToken, saveToken } from '../api/tokenStorage.js';
 import { customerUser } from '../test/testUsers.js';
@@ -26,6 +26,12 @@ function ShowAuth() {
       <p>{auth.user ? `Logged in as ${auth.user.name}` : 'Logged out'}</p>
       <button type="button" onClick={() => auth.login('casey@example.com', 'password123')}>
         Log in
+      </button>
+      <button
+        type="button"
+        onClick={() => auth.register('Casey Customer', 'casey@example.com', 'password123')}
+      >
+        Register
       </button>
       <button type="button" onClick={auth.logout}>
         Log out
@@ -78,6 +84,17 @@ describe('AuthProvider', () => {
 
     await userEvent.click(screen.getByRole('button', { name: 'Log in' }));
 
+    expect(await screen.findByText('Logged in as Casey Customer')).toBeInTheDocument();
+    expect(getSavedToken()).toBe('new-token');
+  });
+
+  it('register() saves the token and logs the new user in', async () => {
+    register.mockResolvedValue({ user: customerUser, token: 'new-token' });
+    renderAuthProvider();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Register' }));
+
+    expect(register).toHaveBeenCalledWith('Casey Customer', 'casey@example.com', 'password123');
     expect(await screen.findByText('Logged in as Casey Customer')).toBeInTheDocument();
     expect(getSavedToken()).toBe('new-token');
   });

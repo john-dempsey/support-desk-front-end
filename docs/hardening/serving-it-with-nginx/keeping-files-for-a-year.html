@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Keeping Files for a Year — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/serving-it-with-nginx/refreshing-a-deep-address.html">← Refreshing a Deep Address</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/serving-it-with-nginx/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/serving-it-with-nginx/changing-it-later.html">Changing It Later →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Keeping Files for a Year</h1>
+    <p class="lede">A hashed file&#39;s contents never change, so the browser may keep it for a year. index.html is checked every time, so a new build is seen at once.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Stage 0 said the hash in <code>index-CPcL75JA.js</code> lets browsers know when
+to download a new version. <code>npm run preview</code> couldn't show it: it tells
+the browser to check every file. nginx can do better, with a second
+<code>location</code> in the same <code>server</code>:</p>
+<pre><code class="hljs language-nginx"><span class="hljs-comment"># Figure 6.44: a year for the hashed files (nginx.conf, excerpt)</span>
+    <span class="hljs-comment"># The JS and CSS from `npm run build`. A file&#x27;s name has a hash in it</span>
+    <span class="hljs-comment"># that changes whenever the build&#x27;s content does, so a file with a</span>
+    <span class="hljs-comment"># given name never changes: the browser may keep it for a year.</span>
+    <span class="hljs-section">location</span> /assets/ {
+        <span class="hljs-attribute">add_header</span> Cache-Control <span class="hljs-string">&quot;public, max-age=31536000, immutable&quot;</span>;
+        <span class="hljs-comment"># A missing asset is a real 404, not index.html.</span>
+        <span class="hljs-attribute">try_files</span> <span class="hljs-variable">$uri</span> =<span class="hljs-number">404</span>;
+    }
+}
+</code></pre>
+<p>When more than one <code>location</code> matches the start of an address, nginx
+uses the longest. So addresses starting with <code>/assets/</code> get these
+rules, and everything else gets <code>location /</code>'s.</p>
+<ul>
+<li><strong><code>max-age=31536000</code></strong> is a year in seconds. <strong><code>immutable</code></strong> says the
+file will never change, so the browser doesn't even ask.</li>
+<li><strong><code>try_files $uri =404</code></strong>: a missing <code>.js</code> file is a real 404, not
+<code>index.html</code> pretending to be JavaScript.</li>
+</ul>
+<h2>Why it's safe</h2>
+<p><img src="/support-desk-front-end/assets/images/hashed-names-and-caching.svg" alt="Diagram: two visits, before and after a new build. Visit 1: the browser asks nginx for index.html, which is no-cache, so it always asks, and nginx answers 304 Not Modified; index.html names index-CPcL75JA.js, which the browser already has, so it uses its copy without asking. Then a new build. Visit 2: the browser asks for index.html again and gets the new one, which names index-CdEXSmY8.js. That's a name the browser has never seen, so it downloads it. The old file is never asked for again."></p>
+<p>The two rules work together. <code>index.html</code> is sent with <code>no-cache</code>, so
+the browser checks it on every visit (nginx answers <code>304 Not Modified</code>
+if it hasn't changed). A new build gives the <code>.js</code> a <strong>new name</strong>, and
+the new <code>index.html</code> points at it. The browser has never seen that
+name, so it downloads it. So users get a new build at once, and never
+download the same file twice.</p>
+<p><img src="/support-desk-front-end/assets/images/network-from-cache.png" alt="Screenshot: Chrome's Network tab after a reload of localhost:8080/tickets. The index-….js and index-….css rows say they came from the cache in the Size column, instead of a number of kilobytes."></p>
+<h2>Try it</h2>
+<p>Open <code>http://localhost:8080</code> with the Network tab open, and reload.
+What does the <strong>Size</strong> column say for the <code>.js</code> and <code>.css</code> rows? Click
+the <code>.js</code> row and find <code>Cache-Control</code> under <strong>Response Headers</strong>. Now
+right-click the reload button (only while the DevTools are open) and
+choose <strong>Empty cache and hard reload</strong>: what changes in the Size
+column? Reload once more.</p>
+</div>
+    
+  </main>
+</body>
+</html>

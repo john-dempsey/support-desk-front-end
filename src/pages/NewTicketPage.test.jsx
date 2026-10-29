@@ -45,6 +45,12 @@ describe('NewTicketPage', () => {
     ).toBeInTheDocument();
   });
 
+  it('names the browser tab after the page', () => {
+    renderNewTicketPage();
+
+    expect(document.title).toBe('New ticket · Support Desk');
+  });
+
   it("doesn't show the status or agent fields for a new ticket", () => {
     renderNewTicketPage();
 

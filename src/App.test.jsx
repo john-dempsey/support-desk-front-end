@@ -9,13 +9,14 @@ import { MemoryRouter } from 'react-router';
 import App from './App.jsx';
 import AuthProvider from './context/AuthProvider.jsx';
 import NotificationsProvider from './context/NotificationsProvider.jsx';
-import { login } from './api/auth.api.js';
+import { getCurrentUser, login } from './api/auth.api.js';
 import { getTicket, getTickets } from './api/tickets.api.js';
 import { getComments } from './api/comments.api.js';
 import { getAgents } from './api/users.api.js';
 import { getTags } from './api/tags.api.js';
 import { getNotifications, getUnreadNotifications } from './api/notifications.api.js';
 import { onNotification } from './realtime/socket.js';
+import { saveToken } from './api/tokenStorage.js';
 import { renderWithProviders } from './test/renderWithProviders.jsx';
 import { testTickets, ticketAssignedToAlex } from './test/testTickets.js';
 import { adminUser, customerUser } from './test/testUsers.js';
@@ -126,6 +127,53 @@ describe('App routes', () => {
     expect(screen.getByRole('link', { name: 'Home' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Tickets' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Tags' })).toBeInTheDocument();
+  });
+
+  // Uses the real AuthProvider, with a saved token that GET /auth/me never
+  // answers, so the check is still running when the test looks.
+  it('waits for a saved token to be checked before showing any page', () => {
+    saveToken('saved-token');
+    getCurrentUser.mockReturnValue(new Promise(() => {}));
+    render(
+      <MemoryRouter initialEntries={['/tickets']}>
+        <AuthProvider>
+          <App />
+        </AuthProvider>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole('status')).toHaveTextContent('Checking your session');
+    // Not sent to the login page while nobody knows yet who is logged in.
+    expect(screen.queryByRole('heading', { name: 'Log in' })).not.toBeInTheDocument();
+  });
+
+  it('starts every page with a link that skips to the main content', () => {
+    renderAppAt('/no-such-page');
+
+    const skipLink = screen.getByRole('link', { name: 'Skip to main content' });
+    // It's the first link, so it's the first thing Tab reaches.
+    expect(screen.getAllByRole('link')[0]).toBe(skipLink);
+    expect(skipLink).toHaveAttribute('href', '#main-content');
+    expect(screen.getByRole('main')).toHaveAttribute('id', 'main-content');
+  });
+
+  // A ticket with no customer makes TicketDetailPage crash when it reads
+  // ticket.customer.name: a stand-in for any bug in a page.
+  it('shows "Something went wrong" when a page crashes, and recovers on another page', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    getTicket.mockResolvedValue({ ...ticketAssignedToAlex, customer: null });
+    getComments.mockResolvedValue([]);
+    getTickets.mockResolvedValue({ tickets: testTickets, meta: { page: 1, totalPages: 1 } });
+
+    renderAppAt('/tickets/1');
+
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Something went wrong' }),
+    ).toBeInTheDocument();
+    // The navigation is outside the boundary, so it still works.
+    await userEvent.click(screen.getByRole('link', { name: 'Tickets' }));
+    expect(screen.getByRole('heading', { level: 1, name: 'Tickets' })).toBeInTheDocument();
+    expect(screen.queryByText('Something went wrong')).not.toBeInTheDocument();
   });
 
   // Logging out and in again starts the next user afresh: nothing from the

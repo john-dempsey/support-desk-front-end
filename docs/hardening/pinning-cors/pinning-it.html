@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pinning It — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/pinning-cors/open-to-every-origin.html">← Open to Every Origin</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/pinning-cors/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/pinning-cors/what-cors-protects.html">What CORS Protects →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Pinning It</h1>
+    <p class="lede">One setting lists the front-end&#39;s origins, and both CORS settings read it. Any other origin gets a console error, and the app says it can&#39;t reach the API.</p>
+
+    
+
+    
+      <div class="slide-body"><p>&quot;Pinning&quot; CORS means replacing <code>*</code> with the list of origins that are
+allowed. The list changes from one computer to another (a deployed app
+has its own address), so it belongs in the environment, like <code>PORT</code>.</p>
+<p>This is how you'd do it in <strong>your own</strong> back-end. It's a back-end
+change, so it isn't made to the Support Desk API in this course.</p>
+<h2>One setting</h2>
+<p>In <code>src/config/env.js</code>, one more line in the schema, with a default
+that works for <code>npm run dev</code>:</p>
+<pre><code class="hljs language-js">  <span class="hljs-attr">CORS_ORIGINS</span>: z.<span class="hljs-title function_">string</span>().<span class="hljs-title function_">min</span>(<span class="hljs-number">1</span>).<span class="hljs-title function_">default</span>(<span class="hljs-string">&#x27;http://localhost:5173&#x27;</span>),
+</code></pre>
+<p>Its value is a list with commas between the origins, in <code>.env</code>:</p>
+<pre><code class="hljs language-bash">CORS_ORIGINS=http://localhost:5173,http://localhost:4173,http://localhost:8080
+</code></pre>
+<h2>Both places read it</h2>
+<p><code>split(',')</code> turns the text into an array, and both <code>cors()</code> and
+Socket.IO accept an array of origins:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// src/app.js (with import env from &#x27;./config/env.js&#x27;; at the top)</span>
+app.<span class="hljs-title function_">use</span>(<span class="hljs-title function_">cors</span>({ <span class="hljs-attr">origin</span>: env.<span class="hljs-property">CORS_ORIGINS</span>.<span class="hljs-title function_">split</span>(<span class="hljs-string">&#x27;,&#x27;</span>) }));
+
+<span class="hljs-comment">// src/config/socket.js (with import env from &#x27;./env.js&#x27;;)</span>
+  io = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Server</span>(httpServer, {
+    <span class="hljs-attr">cors</span>: { <span class="hljs-attr">origin</span>: env.<span class="hljs-property">CORS_ORIGINS</span>.<span class="hljs-title function_">split</span>(<span class="hljs-string">&#x27;,&#x27;</span>) },
+  });
+</code></pre>
+<p>If your API runs in Docker, as in Lesson 6, the <code>api</code> service doesn't
+read <code>.env</code> by itself: add <code>CORS_ORIGINS</code> to its <code>environment</code> in
+<code>docker-compose.yml</code>, next to <code>PORT</code>, and rebuild.</p>
+<h2>What the browser shows</h2>
+<p>From an origin on the list, nothing changes. From any other origin, the
+answer to the preflight no longer allows it, so the browser never sends
+the real request. The console says, for an API pinned to
+<code>http://localhost:5173</code> alone (reflowed here):</p>
+<pre><code class="hljs">Access to fetch at &#x27;http://localhost:3000/auth/login&#x27; from origin
+&#x27;http://localhost:4173&#x27; has been blocked by CORS policy: Response to
+preflight request doesn&#x27;t pass access control check: The
+&#x27;Access-Control-Allow-Origin&#x27; header has a value
+&#x27;http://localhost:5173&#x27; that is not equal to the supplied origin.
+</code></pre>
+<p>(With a list, the end is different: &quot;No 'Access-Control-Allow-Origin'
+header is present on the requested resource.&quot;) And the page shows the
+message Stage 0 warned about:</p>
+<pre><code class="hljs">Can&#x27;t reach the API at http://localhost:3000 — is the back-end running?
+</code></pre>
+<p>The API <strong>is</strong> running. <code>fetch()</code> was refused by the browser, so to
+<code>client.js</code> it looks exactly like no API at all. That's why the console
+is the first place to look.</p>
+<h2>Try it</h2>
+<p>On your own back-end, pin CORS to <code>http://localhost:5173</code> only, and
+restart it. Check your app still works on port 5173. Then run
+<code>npm run build</code> and <code>npm run preview</code>, and try to log in on port 4173.
+Read the console error. Which request appears in your back-end's log,
+and which never arrives? Then add <code>http://localhost:4173</code> to the list
+and try again.</p>
+</div>
+    
+  </main>
+</body>
+</html>

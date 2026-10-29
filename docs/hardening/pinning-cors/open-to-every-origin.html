@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Open to Every Origin — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/serving-it-with-nginx/changing-it-later.html">← Changing It Later</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/pinning-cors/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/pinning-cors/pinning-it.html">Pinning It →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Open to Every Origin</h1>
+    <p class="lede">Two lines in the back-end let any website call the API from a browser. Their comments say to tighten them once the front-end&#39;s origins are known. Now they are.</p>
+
+    
+
+    
+      <div class="slide-body"><p><strong>This topic is mostly discussion.</strong> It's about a change to the
+<strong>back-end</strong>, and this course doesn't make it to the Support Desk API.
+The one Try it that changes anything is on your own back-end, on the
+next slide.</p>
+<h2>What you've seen so far</h2>
+<p>Stage 0 (&quot;CORS From the Other Side&quot;) showed why the API needs
+<code>app.use(cors())</code>: the front-end's page and the API are on <strong>different
+origins</strong>, so the browser only lets the page read an answer that says
+it may. Stage 2 (&quot;The Preflight&quot;) showed the browser asking first,
+with an <code>OPTIONS</code> request, before it sends a token. Every answer says
+the same thing:</p>
+<pre><code class="hljs">Access-Control-Allow-Origin: *
+</code></pre>
+<p><code>*</code> means <strong>any</strong> origin: any website, opened in anyone's browser, may
+call the API and read the answer.</p>
+<h2>Two places, not one</h2>
+<p>The API has a second, separate CORS setting. Socket.IO's first requests
+are ordinary HTTP requests (in Stage 5, four of the five requests it
+made at login were XHR), so the socket server has its own list, in
+<code>config/socket.js</code>:</p>
+<pre><code class="hljs language-js"><span class="hljs-attr">cors</span>: { <span class="hljs-attr">origin</span>: <span class="hljs-string">&#x27;*&#x27;</span> },
+</code></pre>
+<p>Both have the same comment in the back-end: wide open <strong>for now</strong>,
+because there was no front-end yet, and to be tightened &quot;once the React
+app's dev/prod origins are known&quot;.</p>
+<h2>They're known now</h2>
+<p>By this stage, the app runs on three origins:</p>
+<table>
+<thead>
+<tr>
+<th>Origin</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>http://localhost:5173</code></td>
+<td><code>npm run dev</code></td>
+</tr>
+<tr>
+<td><code>http://localhost:4173</code></td>
+<td><code>npm run preview</code> (topic 07)</td>
+</tr>
+<tr>
+<td><code>http://localhost:8080</code></td>
+<td>nginx in Docker (topic 08)</td>
+</tr>
+</tbody>
+</table>
+<p>A deployed app would add its real address, such as
+<code>https://support.example.com</code>. Every other origin, every other website,
+has no reason to call this API from a browser.</p>
+<h2>Try it</h2>
+<p>Open the app on port 8080 (or 4173) with the Network tab's filter on
+<strong>All</strong>, and log in. Click a <code>preflight</code> row. What does
+<code>Access-Control-Allow-Origin</code> say? Now open the back-end's <code>app.js</code> and
+<code>config/socket.js</code>, and find the two &quot;wide open for now&quot; comments.</p>
+</div>
+    
+  </main>
+</body>
+</html>

@@ -35,6 +35,12 @@ describe('LoginPage', () => {
     expect(auth.login).toHaveBeenCalledWith('casey@example.com', 'password123');
   });
 
+  it('names the browser tab after the page', () => {
+    renderLoginPage();
+
+    expect(document.title).toBe('Log in · Support Desk');
+  });
+
   it("shows the API's message for a wrong email or password", async () => {
     const { auth } = renderLoginPage();
     auth.login.mockRejectedValue(createApiError(401, 'Invalid email or password'));

@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A Crash Blanks the App — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/moving-the-pages-onto-it/the-tests-didnt-change.html">← The Tests Didn&#39;t Change</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/when-a-page-crashes/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/when-a-page-crashes/the-one-class.html">The One Class →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>A Crash Blanks the App</h1>
+    <p class="lede">Every failure so far was expected and handled in state. A bug that throws while rendering is different: React removes the whole app.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Since Stage 2, every page has handled the failures it <strong>expects</strong>: the
+API is down, the ticket isn't there, the name is taken. Each one is
+caught with <code>try</code>/<code>catch</code> and shown as a message.</p>
+<p>A <strong>bug</strong> is different. Suppose the ticket's page read the agent's name
+without checking there is one:</p>
+<pre><code class="hljs language-jsx">&lt;dd&gt;{ticket.<span class="hljs-property">assignedAgent</span>.<span class="hljs-property">name</span>}&lt;/dd&gt;
+</code></pre>
+<p>For an unassigned ticket, <code>assignedAgent</code> is <code>null</code>, and reading
+<code>.name</code> from <code>null</code> throws a <code>TypeError</code> <strong>while the page is
+rendering</strong>. There's no <code>try</code> around rendering, so nothing in the page
+can catch it.</p>
+<h2>What React does about it</h2>
+<p>In Stage 5, React's answer is to <strong>remove the whole app</strong>. Not just the
+ticket's page: the navigation bar too. The user is left with a blank
+white page and nothing to click. The console says:</p>
+<pre><code class="hljs">An error occurred in the &lt;TicketDetailPage&gt; component.
+Consider adding an error boundary to your tree to customize error
+handling behavior.
+</code></pre>
+<p>React does this because a component that crashed halfway through
+rendering might show something wrong, or half of something. React can't
+know which parts of the screen are still safe, so it shows none of them.</p>
+<p>An <strong>error boundary</strong> is the &quot;error boundary&quot; that message suggests: a
+component that catches a crash anywhere inside it and shows something
+else instead. It's the front-end's version of Laravel's exception
+handler: an uncaught exception in Laravel gets an error page, never a
+blank one.</p>
+<p><img src="/support-desk-front-end/assets/images/error-boundary-fallback.png" alt="Screenshot: the ticket's page in Stage 6 after the crash. The navigation bar is still at the top. Under it, the heading Something went wrong, a red message saying Sorry, this page stopped working. Try another page, or reload this one. Then Details (development only): Cannot read properties of null (reading 'name'), and a link, Go to the home page."></p>
+<h2>Try it</h2>
+<p>In <code>src/pages/TicketDetailPage.jsx</code>, find the line that shows the
+assigned agent, and change it to the buggy version above:</p>
+<pre><code class="hljs language-jsx">&lt;dd&gt;{ticket.<span class="hljs-property">assignedAgent</span>.<span class="hljs-property">name</span>}&lt;/dd&gt;
+</code></pre>
+<p>Reload the page, log in as Ada, and open an unassigned ticket (in the
+seed data, ticket 2 or 4). You should see the screenshot above. The
+console now says the error occurred in <code>&lt;TicketDetailPage&gt;</code>, and that
+&quot;React will try to recreate this component tree from scratch using the
+error boundary you provided, ErrorBoundary.&quot;</p>
+<p><strong>Leave the bug in for now:</strong> the next slides use it.</p>
+</div>
+    
+  </main>
+</body>
+</html>

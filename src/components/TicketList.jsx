@@ -18,6 +18,10 @@ function TicketList({ tickets }) {
     // instead of making the whole page wider than the screen.
     <div className="table-wrapper">
       <table>
+        {/* A caption names the table, so a screen reader can say "table,
+            Tickets" and list it among the page's tables. The <h1> already
+            says this on screen, so the caption is visually hidden. */}
+        <caption className="visually-hidden">Tickets</caption>
         <thead>
           <tr>
             <th scope="col">Subject</th>

@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Production Isn&#39;t Development — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/the-production-build/whats-in-the-329-kb.html">← What&#39;s in the 329 kB</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/the-production-build/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/the-production-build/preview-and-where-it-stops.html">Preview, and Where It Stops →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Production Isn&#39;t Development</h1>
+    <p class="lede">The built app sends each request once, has no component names, and leaves out everything marked as development only.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The built app looks the same as the one on port 5173. Underneath, three
+things are different, and each one comes from a choice made earlier in
+the course.</p>
+<h2>1. Each request goes once</h2>
+<p>In development, StrictMode runs every effect twice (Stage 0, topic 06),
+so the Network tab showed two <code>GET /tickets</code> for one visit. The build
+leaves StrictMode's checks out. Log in as Alex on the built app and the
+Network tab shows one of each: <code>POST /auth/login</code>, then one
+<code>GET /notifications?unread=true</code> and one <code>GET /tickets</code>.</p>
+<h2>2. No names</h2>
+<p>The minifier shortens names to make the file smaller. You saw <code>br</code> for
+<code>API_URL</code> in this topic. Component names go too: search the built file
+for <code>TicketDetailPage</code> and it's not there.</p>
+<h2>3. Nothing for development only</h2>
+<p>Topic 04's error boundary shows the error's message only in
+development (Figure 6.21):</p>
+<pre><code class="hljs language-jsx">{<span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">env</span>.<span class="hljs-property">DEV</span> &amp;&amp;
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Details (development only): {this.state.error.message}<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span></span>}
+</code></pre>
+<p>In a build, <code>import.meta.env.DEV</code> is <code>false</code>, so the build wrote in
+<code>false &amp;&amp; &lt;p&gt;…&lt;/p&gt;</code>. That's always <code>false</code>, so the minifier dropped the
+<code>&lt;p&gt;</code> and kept only the <code>false</code>. Here's the fallback in the built file:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure 6.38: the boundary&#x27;s fallback, built</span>
+<span class="hljs-comment">// (dist/assets/index-CPcL75JA.js, excerpt, reflowed, one message cut)</span>
+(<span class="hljs-number">0</span>,A.<span class="hljs-property">jsx</span>)(<span class="hljs-string">`h1`</span>,{<span class="hljs-attr">children</span>:<span class="hljs-string">`Something went wrong`</span>}),
+(<span class="hljs-number">0</span>,A.<span class="hljs-property">jsx</span>)(ar,{<span class="hljs-attr">message</span>:<span class="hljs-string">`Sorry, this page stopped working. …`</span>}),
+!<span class="hljs-number">1</span>,
+(<span class="hljs-number">0</span>,A.<span class="hljs-property">jsx</span>)(<span class="hljs-string">`p`</span>,{<span class="hljs-attr">children</span>:(<span class="hljs-number">0</span>,A.<span class="hljs-property">jsx</span>)(k,{<span class="hljs-attr">to</span>:<span class="hljs-string">`/`</span>,
+  <span class="hljs-attr">children</span>:<span class="hljs-string">`Go to the home page`</span>})})
+</code></pre>
+<p>Each <code>(0,A.jsx)(…)</code> is what one JSX tag became: a call to React's
+function for making an element (<code>ar</code> is <code>ErrorMessage</code>, <code>k</code> is <code>Link</code>).
+The <code>!1</code> is the <code>false</code>, and React shows nothing for <code>false</code>, so users
+never see a details paragraph. The words &quot;development only&quot; aren't in
+the file at all.</p>
+<p>(Since Stage 4, there's no token in the build either: <code>VITE_DEV_TOKEN</code>
+has gone, and a token only ever lives in the user's <code>localStorage</code>.)</p>
+<h2>Try it</h2>
+<p>Run <code>npm run build</code>, then <code>npm run preview</code>, and open
+<code>http://localhost:4173</code>. Open the Network tab, log in as Alex, and count
+the requests to <code>tickets</code>. (Login is limited to 10 tries in 15 minutes,
+so don't log in and out too often.) Then search the built <code>.js</code> file for
+<code>development only</code>, then for <code>Something went wrong</code>. Which do you find?</p>
+</div>
+    
+  </main>
+</body>
+</html>

@@ -13,10 +13,13 @@
 //
 // Since Stage 5 it listens for notifications about this ticket (a new
 // comment, a status change, ...) and offers to reload when one arrives.
+//
+// Since Stage 6 the useFetch hook loads the ticket and its comments.
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { deleteTicket, getTicket } from '../api/tickets.api.js';
 import { createComment, deleteComment, getComments } from '../api/comments.api.js';
+import { useFetch } from '../hooks/useFetch.js';
 import { useAuth } from '../context/authContext.js';
 import { onNotification } from '../realtime/socket.js';
 import StatusBadge from '../components/StatusBadge.jsx';
@@ -25,86 +28,35 @@ import CommentForm from '../components/CommentForm.jsx';
 import Loading from '../components/Loading.jsx';
 import ErrorMessage from '../components/ErrorMessage.jsx';
 import RefreshNotice from '../components/RefreshNotice.jsx';
+import PageTitle from '../components/PageTitle.jsx';
 import { formatDate } from '../utils/formatDate.js';
 
 function TicketDetailPage() {
   const { ticketId } = useParams();
   const navigate = useNavigate();
   const { user, hasRole } = useAuth();
-  const [ticket, setTicket] = useState(null);
-  const [comments, setComments] = useState([]);
-  const [errorMessage, setErrorMessage] = useState('');
-  const [isNotFound, setIsNotFound] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  // One useFetch for each request. Both run when the page first renders,
+  // so the two requests are sent at the same time. useFetch loads again
+  // whenever ticketId changes, e.g. if the URL changes to another ticket.
+  const {
+    data: ticket,
+    error: ticketError,
+    isLoading: isTicketLoading,
+    reload: reloadTicket,
+  } = useFetch(getTicket, ticketId);
+  const {
+    data: comments,
+    setData: setComments,
+    error: commentsError,
+    isLoading: areCommentsLoading,
+    reload: reloadComments,
+  } = useFetch(getComments, ticketId);
   // Errors from the buttons and forms, shown next to them. The comment
   // error is the whole error object, because CommentForm needs its details.
   const [deleteErrorMessage, setDeleteErrorMessage] = useState('');
   const [commentError, setCommentError] = useState(null);
   // True once a notification says this ticket has changed.
   const [hasChanged, setHasChanged] = useState(false);
-  // How many times Reload has been clicked. Its only job is to be in the
-  // fetch effect's dependency list: adding 1 makes the effect run again.
-  const [reloadCount, setReloadCount] = useState(0);
-
-  useEffect(() => {
-    // The same `ignore` flag as TicketListPage, for the same reason: a
-    // response that arrives after the page has gone must be ignored.
-    let ignore = false;
-
-    async function loadTicketAndComments() {
-      try {
-        // Both requests are sent at once; Promise.all() waits for both.
-        const [ticketData, commentsData] = await Promise.all([
-          getTicket(ticketId),
-          getComments(ticketId),
-        ]);
-        if (!ignore) {
-          setTicket(ticketData);
-          setComments(commentsData);
-        }
-      } catch (error) {
-        if (ignore) {
-          return;
-        }
-        // The page decides what each status means to the user. 404: there's
-        // no ticket with that ID. 400: the API's validation rejected the ID
-        // itself (e.g. /tickets/abc). Either way, there's no such ticket.
-        // Anything else (the API is down, a 500, ...) is a real error.
-        if (error.status === 404 || error.status === 400) {
-          setIsNotFound(true);
-        } else {
-          setErrorMessage(error.message);
-        }
-      } finally {
-        if (!ignore) {
-          setIsLoading(false);
-        }
-      }
-    }
-
-    loadTicketAndComments();
-
-    return () => {
-      ignore = true;
-      // If the URL has changed to another ticket, React keeps this page on
-      // the screen, so its state still describes the old ticket. Go back
-      // to "loading", so nothing from the old ticket (its details, its
-      // comments, a "not found" or an error) is shown while the new one
-      // loads.
-      setTicket(null);
-      setComments([]);
-      setErrorMessage('');
-      setIsNotFound(false);
-      setIsLoading(true);
-      setDeleteErrorMessage('');
-      setCommentError(null);
-      setHasChanged(false);
-    };
-    // ticketId is listed because the effect uses it: if the URL changes to
-    // a different ticket while this page is showing, the effect runs again
-    // and loads that ticket instead. reloadCount is listed so that Reload
-    // can run it again too.
-  }, [ticketId, reloadCount]);
 
   // Listen for notifications about this ticket while the page is open.
   // Only users the API tells about a change hear about it: e.g. the
@@ -129,7 +81,9 @@ function TicketDetailPage() {
   }, [ticketId]);
 
   function handleReload() {
-    setReloadCount(reloadCount + 1);
+    setHasChanged(false);
+    reloadTicket();
+    reloadComments();
   }
 
   async function handleDeleteTicket() {
@@ -161,8 +115,9 @@ function TicketDetailPage() {
       // comments always go at the end, so add it to the list we already
       // have instead of loading every comment again. A new array is made
       // with [...], never push(): React only re-renders when it's given a
-      // new array, not the same one changed.
-      setComments([...comments, newComment]);
+      // new array, not the same one changed. It's the function form, as
+      // in NotificationsPage, because this line runs after an await.
+      setComments((currentComments) => [...currentComments, newComment]);
       return true;
     } catch (error) {
       setCommentError(error);
@@ -189,19 +144,30 @@ function TicketDetailPage() {
       await deleteComment(ticket.id, commentToDelete.id);
       // A 204 sends nothing back, so remove the comment from our list here:
       // filter() makes a new array of every comment except that one.
-      setComments(comments.filter((comment) => comment.id !== commentToDelete.id));
+      setComments((currentComments) =>
+        currentComments.filter((comment) => comment.id !== commentToDelete.id),
+      );
     } catch (error) {
       setCommentError(error);
     }
   }
 
-  if (isLoading) {
+  if (isTicketLoading || areCommentsLoading) {
     return <Loading message="Loading the ticket…" />;
   }
+
+  // The page decides what each status means to the user. 404: there's no
+  // ticket with that ID. 400: the API's validation rejected the ID itself
+  // (e.g. /tickets/abc). Either way, there's no such ticket. Anything else
+  // (the API is down, a 500, ...) is a real error.
+  const isNotFound = ticketError && (ticketError.status === 404 || ticketError.status === 400);
+  // Either request may have failed: show whichever error there is.
+  const loadError = ticketError || commentsError;
 
   if (isNotFound) {
     return (
       <>
+        <PageTitle title="Ticket not found" />
         <h1>Ticket not found</h1>
         <p>There's no ticket with the ID "{ticketId}".</p>
         <p>
@@ -211,11 +177,12 @@ function TicketDetailPage() {
     );
   }
 
-  if (errorMessage) {
+  if (loadError) {
     return (
       <>
+        <PageTitle title="Couldn't load the ticket" />
         <h1>Couldn't load the ticket</h1>
-        <ErrorMessage message={errorMessage} />
+        <ErrorMessage message={loadError.message} />
         <p>
           <Link to="/tickets">Back to all tickets</Link>
         </p>
@@ -231,6 +198,7 @@ function TicketDetailPage() {
       {hasChanged && (
         <RefreshNotice message="This ticket has changed." onReload={handleReload} />
       )}
+      <PageTitle title={ticket.subject} />
       <h1>{ticket.subject}</h1>
       <p>
         <StatusBadge status={ticket.status} />

@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Your Stage 6 Checklist — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/making-it-yours/tracing-stage-6.html">← Tracing Stage 6</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/making-it-yours/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/making-it-yours/try-it-yourself.html">Try It Yourself →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Your Stage 6 Checklist</h1>
+    <p class="lede">The same hardening for your own case study: one hook for loading data, an error boundary, titles, a skip link and a caption, a coverage report, a build, and optionally nginx.</p>
+
+    
+
+    
+      <div class="slide-body"><p><strong>For every app</strong>, whatever stage it reached. Steps 1 to 6 need nothing
+from your API beyond what your pages already use (topic 01). Step 7
+needs Docker, and step 8 your own back-end.</p>
+<p>Do the steps in this order. Run <code>npm test</code> and <code>npm run lint</code>, and try
+the app in the browser after <strong>every</strong> step, and commit when all three
+are happy. Stage 6 adds no features, so nothing the user can do should
+change.</p>
+<h2>1. <code>useFetch</code></h2>
+<p>Copy <code>src/hooks/useFetch.js</code> (Figures 6.2 to 6.5); it has nothing
+Support Desk in it. Add its tests (Figures 6.6 to 6.8) <strong>before</strong> you
+move any page onto it, so you know the hook works on its own.</p>
+<h2>2. Your pages, one at a time</h2>
+<p>Use the list of pages you made in topic 01's Try it. For each page:
+replace its <code>useState</code> and fetch effect with one <code>useFetch</code> call per
+request (Figures 6.10 and 6.12), renaming <code>data</code> as you unpack it
+(Figure 6.9). Keep <code>setData</code> for changes after a create or delete, with
+the function form after an <code>await</code> (Figure 6.14). Run that page's tests
+before moving on to the next page: they should pass <strong>unchanged</strong>.</p>
+<h2>3. An error boundary</h2>
+<p><code>ErrorBoundary.jsx</code> (Figures 6.18, 6.19 and 6.21), around your
+<code>&lt;Routes&gt;</code>, inside <code>&lt;main&gt;</code>, with <code>key={location.pathname}</code>
+(Figure 6.20). Check it with a deliberate crash, then take the crash out.
+Tests: Figures 6.22 and 6.23.</p>
+<h2>4. The accessibility pass</h2>
+<ul>
+<li><code>PageTitle</code> (Figure 6.24) on every page, including the not-found
+page and each page's error states (Figure 6.25).</li>
+<li><strong>A skip link.</strong> The template doesn't have one: add the link to
+<code>App.jsx</code>, <code>id=&quot;main-content&quot;</code> to <code>&lt;main&gt;</code> (Figure 6.26), and its
+styles to <code>index.css</code> (Figure 6.27).</li>
+<li>A <code>&lt;caption&gt;</code> on every table, with <code>.visually-hidden</code> if it would
+repeat the heading (Figures 6.28 and 6.29).</li>
+<li>Tab through every page with the keyboard only.</li>
+<li>Tests: Figures 6.30 to 6.32.</li>
+</ul>
+<h2>5. Coverage</h2>
+<p><code>npm install --save-dev @vitest/coverage-v8</code>, the <code>coverage</code> script,
+<code>coverage</code> in <code>.gitignore</code>, and <code>include</code>/<code>exclude</code> in
+<code>vite.config.js</code> (Figure 6.33). Run <code>npm run coverage</code>. Look for whole
+files, or whole functions, that no test runs, and test those first.
+Remember that 100% isn't the goal.</p>
+<h2>6. The build</h2>
+<p><code>npm run build</code>, then <code>npm run preview</code>. Log in (if your app has a
+login), load every page, refresh on a deep URL, and check the console
+is empty. Search the built <code>.js</code> file for your API's address.</p>
+<h2>7. nginx (optional)</h2>
+<p>Copy <code>Dockerfile</code>, <code>nginx.conf</code>, <code>.dockerignore</code> and <code>compose.yaml</code>
+(Figures 6.39 to 6.44). Change the stack's <code>name</code> in <code>compose.yaml</code>,
+and the port if 8080 is taken. Make sure every comment in your <code>.env</code>
+starts with <code>#</code>. Run <code>docker compose up -d --build</code>, then check a
+refresh on a deep URL works.</p>
+<h2>8. CORS (your own back-end)</h2>
+<p>Pin both CORS settings to your front-end's origins (topic 09's
+snippets). Check each origin you use still works, and that one you
+haven't listed gets the console error.</p>
+</div>
+    
+  </main>
+</body>
+</html>

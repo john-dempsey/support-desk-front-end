@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 444" width="860" height="444" role="img" aria-labelledby="title desc" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <title id="title">The browser talks to nginx for files and to the API for data</title>
+  <desc id="desc">On the left, the browser at localhost:8080, running React. Top right, the front-end's container: nginx on port 8080, holding index.html, the JS and the CSS. Bottom right, the API's containers on port 3000: api, worker and MySQL. Arrow 1, browser to nginx: GET /tickets/3, answered with index.html, then the JS and CSS. Arrow 2, browser to API: GET /tickets/3 with the token, and the socket, answered with JSON. Between the two containers, a crossed-out link: they never talk, so they need no shared network, and the API's address stays http://localhost:3000.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#1a1a1a"/>
+    </marker>
+  </defs>
+  <rect width="860" height="444" fill="#ffffff"/>
+
+  <!-- browser -->
+  <rect x="20" y="60" width="230" height="280" rx="8" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+  <text x="34" y="88" font-size="15" font-weight="700" fill="#1a1a1a">The browser</text>
+  <text x="34" y="108" font-size="12" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">localhost:8080/tickets/3</text>
+  <rect x="34" y="124" width="202" height="62" rx="6" fill="#ffffff" stroke="#116329"/>
+  <text x="46" y="148" font-size="13" font-weight="700" fill="#1a1a1a">React</text>
+  <text x="46" y="168" font-size="12" fill="#3d444d">draws every page here</text>
+  <rect x="34" y="196" width="202" height="62" rx="6" fill="#ffffff" stroke="#116329"/>
+  <text x="46" y="220" font-size="13" font-weight="700" fill="#1a1a1a">client.js, socket.js</text>
+  <text x="46" y="240" font-size="12" fill="#3d444d">call the API themselves</text>
+  <text x="34" y="290" font-size="12" fill="#3d444d">The only one that talks</text>
+  <text x="34" y="308" font-size="12" fill="#3d444d">to both containers.</text>
+
+  <!-- nginx -->
+  <rect x="560" y="30" width="280" height="150" rx="8" fill="#f6f8fa" stroke="#59636e" stroke-width="1.5"/>
+  <text x="574" y="56" font-size="15" font-weight="700" fill="#1a1a1a">nginx: port 8080</text>
+  <text x="574" y="76" font-size="12" fill="#3d444d">the front-end's stack (compose.yaml)</text>
+  <rect x="574" y="90" width="252" height="74" rx="6" fill="#fff8c5" stroke="#7d4e00"/>
+  <text x="586" y="112" font-size="12" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">index.html</text>
+  <text x="586" y="132" font-size="12" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">assets/index-….js</text>
+  <text x="586" y="152" font-size="12" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">assets/index-….css</text>
+
+  <!-- API -->
+  <rect x="560" y="230" width="280" height="150" rx="8" fill="#f6f8fa" stroke="#59636e" stroke-width="1.5"/>
+  <text x="574" y="256" font-size="15" font-weight="700" fill="#1a1a1a">The API: port 3000</text>
+  <text x="574" y="276" font-size="12" fill="#3d444d">the back-end's stack (Lesson 6)</text>
+  <rect x="574" y="290" width="76" height="34" rx="6" fill="#ffffff" stroke="#59636e"/>
+  <text x="612" y="312" font-size="12" fill="#1a1a1a" text-anchor="middle">api</text>
+  <rect x="662" y="290" width="76" height="34" rx="6" fill="#ffffff" stroke="#59636e"/>
+  <text x="700" y="312" font-size="12" fill="#1a1a1a" text-anchor="middle">worker</text>
+  <rect x="750" y="290" width="76" height="34" rx="6" fill="#ffffff" stroke="#59636e"/>
+  <text x="788" y="312" font-size="12" fill="#1a1a1a" text-anchor="middle">MySQL</text>
+  <text x="574" y="356" font-size="12" fill="#3d444d">(and Redis, Mailpit)</text>
+
+  <!-- arrow 1: files -->
+  <line x1="252" y1="110" x2="556" y2="90" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="556" y1="128" x2="252" y2="148" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <circle cx="290" cy="80" r="12" fill="#0550ae"/>
+  <text x="290" y="85" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">1</text>
+  <text x="310" y="84" font-size="12" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">GET /tickets/3</text>
+  <text x="300" y="162" font-size="12" fill="#3d444d">index.html, then the JS and CSS</text>
+
+  <!-- arrow 2: data -->
+  <line x1="252" y1="232" x2="556" y2="282" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="556" y1="318" x2="252" y2="268" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <circle cx="290" cy="210" r="12" fill="#0550ae"/>
+  <text x="290" y="215" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">2</text>
+  <text x="310" y="214" font-size="12" fill="#1a1a1a" font-family="ui-monospace, Consolas, monospace">GET /tickets/3 + token</text>
+  <text x="310" y="232" font-size="12" fill="#3d444d">and the socket</text>
+  <text x="300" y="310" font-size="12" fill="#3d444d">JSON, and pushes</text>
+
+  <!-- no link between containers -->
+  <line x1="700" y1="184" x2="700" y2="226" stroke="#59636e" stroke-width="1.5" stroke-dasharray="4 4"/>
+  <line x1="688" y1="196" x2="712" y2="214" stroke="#a40e26" stroke-width="2.5"/>
+  <line x1="712" y1="196" x2="688" y2="214" stroke="#a40e26" stroke-width="2.5"/>
+  <text x="722" y="210" font-size="12" font-weight="700" fill="#1a1a1a">never talk</text>
+
+  <rect x="20" y="394" width="820" height="34" rx="6" fill="#ddf4ff" stroke="#0550ae" stroke-width="1.5"/>
+  <text x="34" y="416" font-size="12" fill="#1a1a1a">nginx never calls the API, so the stacks share no network, and the API's address stays <tspan font-family="ui-monospace, Consolas, monospace">http://localhost:3000</tspan>.</text>
+</svg>

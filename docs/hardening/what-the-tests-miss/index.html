@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What the Tests Miss — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>What the Tests Miss</h1>
+    <p class="lede">A coverage report shows which lines of the app no test has ever run. It found real gaps, and 16 new tests fill them, but 100% isn&#39;t the goal.</p>
+
+    
+      <ul class="listing">
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/what-the-tests-miss/a-coverage-report.html">A Coverage Report</a>
+            <p>Vitest can record every line the tests run. One dev dependency and one script give a report of what they never touch.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/what-the-tests-miss/reading-the-table.html">Reading the Table</a>
+            <p>Four percentages for each file, and the line numbers no test reached. What each column means, using the Support Desk app&#39;s first report.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/what-the-tests-miss/the-html-report.html">The HTML Report</a>
+            <p>coverage/index.html shows the same numbers as a web page, and every file&#39;s code with the lines no test ran marked in red.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/what-the-tests-miss/what-it-found.html">What It Found</a>
+            <p>The first report pointed at real behaviour that no test checked. Sixteen new tests fill those gaps.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/what-the-tests-miss/two-of-the-new-tests.html">Two of the New Tests</a>
+            <p>A component test for TicketFilters&#39; dropdowns, and an App test that uses the real AuthProvider to catch the session check in progress.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/what-the-tests-miss/100-isnt-the-goal.html">100% Isn&#39;t the Goal</a>
+            <p>After the new tests, a few red lines are left on purpose. And a line coverage calls &#39;covered&#39; can still be checked by nothing.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/hardening/what-the-tests-miss/running-everything.html">Running Everything</a>
+            <p>199 tests in 32 files, coverage up from 96% to 99% of statements, lint clean: and five changes that each fail exactly one of the new tests.</p>
+          </li>
+        
+      </ul>
+    
+
+    
+  </main>
+</body>
+</html>

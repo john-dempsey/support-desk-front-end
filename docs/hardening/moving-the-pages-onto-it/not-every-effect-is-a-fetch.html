@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Not Every Effect Is a Fetch — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/moving-the-pages-onto-it/what-stays-in-the-page.html">← What Stays in the Page</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/hardening/moving-the-pages-onto-it/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/hardening/moving-the-pages-onto-it/the-tests-didnt-change.html">The Tests Didn&#39;t Change →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Not Every Effect Is a Fetch</h1>
+    <p class="lede">AuthProvider and NotificationsProvider also have an ignore flag, but they aren&#39;t pages waiting for data, so they keep their own effects.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Topic 02 asked which two files with an <code>ignore</code> flag aren't pages. They
+are <strong><code>AuthProvider</code></strong> and <strong><code>NotificationsProvider</code></strong>. Both still have
+their own <code>useEffect</code>, and that's on purpose.</p>
+<p><code>useFetch</code> is for one situation: <strong>a page that waits for data</strong>, shows
+&quot;Loading…&quot; until it comes, then shows it or an error. The providers do
+something different:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>A page with <code>useFetch</code></th>
+<th><code>AuthProvider</code></th>
+<th><code>NotificationsProvider</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>When it asks</td>
+<td>when the page opens, or its argument changes</td>
+<td>once, when the app starts</td>
+<td>when <code>user</code> changes</td>
+</tr>
+<tr>
+<td>Sometimes doesn't ask at all</td>
+<td>no</td>
+<td>no saved token: nothing to check</td>
+<td>nobody logged in</td>
+</tr>
+<tr>
+<td>On a failure</td>
+<td>shows the error</td>
+<td>forgets the token: logged out</td>
+<td>keeps the last count, says nothing</td>
+</tr>
+<tr>
+<td>Also</td>
+<td></td>
+<td></td>
+<td>connects the socket, listens for pushes</td>
+</tr>
+<tr>
+<td>Who sees the result</td>
+<td>that page</td>
+<td>every component (a context)</td>
+<td>every component (a context)</td>
+</tr>
+</tbody>
+</table>
+<p>None of those fit the hook. It always asks, always keeps an <code>error</code> for
+the page to show, and its state belongs to one component. Bending it to
+cover the providers would mean options and <code>if</code>s for every difference,
+and a hook that's harder to read than the effects it replaced.</p>
+<p><strong>A custom hook is worth writing when the code really repeats.</strong> The
+five pages repeated the same thing exactly; the providers only look
+similar.</p>
+<h2>The pages keep some effects too</h2>
+<p><code>useFetch</code> only replaced the effects that load data. The effects that
+listen for pushes, in the two ticket pages and the notifications page
+(Stage 5), are still there. They don't fetch anything: they register a
+handler and return the &quot;stop listening&quot; function.</p>
+<h2>Try it</h2>
+<p>Count the <code>useEffect</code> calls left in <code>src/</code> (leaving out the tests):</p>
+<pre><code class="hljs language-bash">grep -rn <span class="hljs-string">&quot;useEffect(&quot;</span> src --include=*.jsx --include=*.js | grep -v <span class="hljs-built_in">test</span>
+</code></pre>
+<p>You get seven lines. For each one, say in a few words what it does.
+Which one loads the data for every page now? (Two of the seven are in
+<code>AuthProvider</code>: what does the second one do?)</p>
+</div>
+    
+  </main>
+</body>
+</html>

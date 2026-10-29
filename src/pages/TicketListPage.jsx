@@ -1,8 +1,7 @@
 // The page at /tickets. It loads the tickets from the API (GET /tickets)
-// and passes them down to TicketList, which does the displaying. It
-// follows the same pattern as Stage 0's HomePage: pieces of state (the
-// data, an error, and whether it's still loading) and one useEffect that
-// fills them.
+// and passes them down to TicketList, which does the displaying. Since
+// Stage 6 the useFetch hook does the loading: the state and the useEffect
+// that used to be written out here, following Stage 0's HomePage.
 //
 // Since Stage 3 the user can filter, sort and move between pages. Those
 // choices live in the URL (/tickets?status=open&page=2), not in useState,
@@ -15,6 +14,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
 import { getTickets } from '../api/tickets.api.js';
+import { useFetch } from '../hooks/useFetch.js';
 import { useAuth } from '../context/authContext.js';
 import { onNotification } from '../realtime/socket.js';
 import TicketList from '../components/TicketList.jsx';
@@ -23,66 +23,21 @@ import Pagination from '../components/Pagination.jsx';
 import Loading from '../components/Loading.jsx';
 import ErrorMessage from '../components/ErrorMessage.jsx';
 import RefreshNotice from '../components/RefreshNotice.jsx';
+import PageTitle from '../components/PageTitle.jsx';
 
 function TicketListPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { hasRole } = useAuth();
-  // null means "not loaded yet", which is different from [] ("loaded, and
-  // there are none"). TicketList is only shown once this isn't null, so it
-  // doesn't say "There are no tickets" while they're still on their way.
-  const [tickets, setTickets] = useState(null);
-  // The API's { page, pageSize, total, totalPages }, for Pagination.
-  const [meta, setMeta] = useState(null);
-  const [errorMessage, setErrorMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
-  // The same as in TicketDetailPage: a notice, and a count for Reload.
+  // The same as in TicketDetailPage: true once a notification arrives.
   const [hasChanged, setHasChanged] = useState(false);
-  const [reloadCount, setReloadCount] = useState(0);
 
-  // e.g. "status=open&page=2", or '' for plain /tickets. The effect depends
-  // on this string, so it runs again whenever the query in the URL changes.
+  // e.g. "status=open&page=2", or '' for plain /tickets. useFetch loads
+  // again whenever this string changes, so a new filter, order or page in
+  // the URL loads the matching tickets.
   const queryString = searchParams.toString();
-
-  useEffect(() => {
-    // If the query changes (or the user leaves the page) before this
-    // request finishes, the cleanup function below sets `ignore` to true.
-    // So a slow, out-of-date response can't replace the tickets of a newer
-    // one: e.g. after choosing "Open" and then quickly "Closed", the page
-    // can only ever show the closed tickets.
-    let ignore = false;
-
-    async function loadTickets() {
-      try {
-        const result = await getTickets(queryString);
-        if (!ignore) {
-          setTickets(result.tickets);
-          setMeta(result.meta);
-        }
-      } catch (error) {
-        if (!ignore) {
-          setErrorMessage(error.message);
-        }
-      } finally {
-        if (!ignore) {
-          setIsLoading(false);
-        }
-      }
-    }
-
-    loadTickets();
-
-    return () => {
-      ignore = true;
-      // As in TicketDetailPage: go back to "loading" while the tickets for
-      // the new query are on their way, so an old error or the old page of
-      // tickets isn't shown in the meantime.
-      setTickets(null);
-      setMeta(null);
-      setErrorMessage('');
-      setIsLoading(true);
-      setHasChanged(false);
-    };
-  }, [queryString, reloadCount]);
+  // getTickets() answers { tickets, meta }: one page of tickets, and the
+  // API's { page, pageSize, total, totalPages } for Pagination.
+  const { data: ticketPage, error, isLoading, reload } = useFetch(getTickets, queryString);
 
   // Any notification about a ticket might mean the list is out of date: a
   // new ticket, a new status, a new agent. (One whose ticket has been
@@ -99,7 +54,15 @@ function TicketListPage() {
   }, []);
 
   function handleReload() {
-    setReloadCount(reloadCount + 1);
+    setHasChanged(false);
+    reload();
+  }
+
+  // The new query loads fresh tickets, so any "have changed" notice is
+  // out of date too.
+  function changeSearchParams(newSearchParams) {
+    setHasChanged(false);
+    setSearchParams(newSearchParams);
   }
 
   // Called by TicketFilters, e.g. handleFilterChange('status', 'open').
@@ -116,17 +79,18 @@ function TicketListPage() {
     }
     // A different filter or order starts again from page 1.
     newSearchParams.delete('page');
-    setSearchParams(newSearchParams);
+    changeSearchParams(newSearchParams);
   }
 
   function handlePageChange(newPage) {
     const newSearchParams = new URLSearchParams(searchParams);
     newSearchParams.set('page', newPage);
-    setSearchParams(newSearchParams);
+    changeSearchParams(newSearchParams);
   }
 
   return (
     <>
+      <PageTitle title="Tickets" />
       <h1>Tickets</h1>
       {/* Only customers can report a problem (the API's
           authorize('customer')), so only they get the link. */}
@@ -151,12 +115,12 @@ function TicketListPage() {
         <RefreshNotice message="The tickets have changed." onReload={handleReload} />
       )}
       {isLoading && <Loading message="Loading tickets…" />}
-      {errorMessage && <ErrorMessage message={errorMessage} />}
-      {tickets && <TicketList tickets={tickets} />}
-      {meta && (
+      {error && <ErrorMessage message={error.message} />}
+      {ticketPage && <TicketList tickets={ticketPage.tickets} />}
+      {ticketPage && (
         <Pagination
-          page={meta.page}
-          totalPages={meta.totalPages}
+          page={ticketPage.meta.page}
+          totalPages={ticketPage.meta.totalPages}
           onPageChange={handlePageChange}
         />
       )}
