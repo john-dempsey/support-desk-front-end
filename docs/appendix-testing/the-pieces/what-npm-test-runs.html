@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What npm test Runs — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/appendix-testing/the-pieces/five-packages-one-job-each.html">← Five Packages, One Job Each</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/appendix-testing/the-pieces/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/appendix-testing/the-pieces/a-fresh-world-for-every-file.html">A Fresh World for Every File →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>What npm test Runs</h1>
+    <p class="lede">npm test runs vitest run, which finds every file named *.test.js or *.test.jsx by itself. Two options pick out some of them, and the exit code tells other tools whether everything passed.</p>
+
+    
+
+    
+      <div class="slide-body"><p><code>npm test</code> runs whatever <code>package.json</code>'s <code>&quot;test&quot;</code> script says, and the
+starter's says <code>vitest run</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Script</th>
+<th>Runs</th>
+<th>Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>npm test</code></td>
+<td><code>vitest run</code></td>
+<td>runs every test once, prints a summary, and stops</td>
+</tr>
+<tr>
+<td><code>npm run test:watch</code></td>
+<td><code>vitest</code></td>
+<td>runs them, then waits, and runs the affected tests again each time you save a file</td>
+</tr>
+</tbody>
+</table>
+<h2>Finding the tests</h2>
+<p>Nowhere in the project is there a list of test files. Vitest searches
+the whole project folder (skipping <code>node_modules</code>) for files whose names
+match this pattern:</p>
+<pre><code class="hljs">**/*.{test,spec}.?(c|m)[jt]s?(x)
+</code></pre>
+<p>In plain words: any folder, then any name ending in <code>.test</code> or <code>.spec</code>,
+then <code>.js</code>, <code>.jsx</code>, <code>.ts</code> or <code>.tsx</code> (<code>.cjs</code>/<code>.mjs</code> count too). So
+<code>HomePage.test.jsx</code> is found because of its name, not because of where
+it is. That's why test files can sit next to the file they test.</p>
+<h2>Running only some</h2>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Runs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>npx vitest run src/api</code></td>
+<td>only files whose path contains <code>src/api</code></td>
+</tr>
+<tr>
+<td><code>npx vitest run -t &quot;loading&quot;</code></td>
+<td>only tests whose <strong>name</strong> contains <code>loading</code></td>
+</tr>
+</tbody>
+</table>
+<p>The second one, on the starter, ends:</p>
+<pre><code class="hljs"> Test Files  1 passed | 2 skipped (3)
+      Tests  1 passed | 12 skipped (13)
+</code></pre>
+<p>Every file is still read (the next topic explains why it has to be),
+but only the one matching test runs.</p>
+<h2>Passing means exit code 0</h2>
+<p>When every test passes, <code>vitest run</code> ends with exit code <code>0</code>. When any
+test fails it ends with <code>1</code>. You don't see this, but other tools do: a
+GitHub Action, for example, marks the run as failed when a command
+exits with anything other than <code>0</code>.</p>
+<h2>Try it</h2>
+<ol>
+<li>Create an empty file, <code>src/scratch.test.js</code>, and run <code>npm test</code>. The
+run fails: <code>Error: No test suite found in file ...</code>. A file whose
+name matches the pattern must contain at least one test. Delete it.</li>
+<li>Run <code>npx vitest run -t &quot;error&quot;</code>. How many tests ran, and why those?
+(Read their names in the test files.)</li>
+<li>After a run, type <code>echo $?</code> (Git Bash, macOS or Linux) or
+<code>echo $LASTEXITCODE</code> (PowerShell) to see the exit code.</li>
+</ol>
+</div>
+    
+  </main>
+</body>
+</html>

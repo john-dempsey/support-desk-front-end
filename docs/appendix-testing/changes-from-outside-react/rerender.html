@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>rerender(): the Same Component, Updated — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/appendix-testing/changes-from-outside-react/a-mock-factory-step-by-step.html">← A Mock Factory, Step by Step</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/appendix-testing/changes-from-outside-react/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/appendix-testing/hooks-crashes-and-coverage/renderhook-by-hand.html">renderHook(), by Hand →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>rerender(): the Same Component, Updated</h1>
+    <p class="lede">rerender() draws new JSX in the same place, so React updates the components already there and runs their cleanups. Calling render() again adds a second, separate copy.</p>
+
+    
+
+    
+      <div class="slide-body"><p><code>NotificationsProvider.test.jsx</code> &quot;logs out&quot; by drawing the provider
+again with no user:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure A.27: logging out (src/context/NotificationsProvider.test.jsx,</span>
+<span class="hljs-comment">// excerpt)</span>
+<span class="hljs-keyword">const</span> { rerender } = <span class="hljs-title function_">render</span>(<span class="hljs-title function_">providersFor</span>(agentUser));
+<span class="hljs-keyword">await</span> screen.<span class="hljs-title function_">findByText</span>(<span class="hljs-string">&#x27;1 unread&#x27;</span>);
+
+<span class="hljs-title function_">rerender</span>(<span class="hljs-title function_">providersFor</span>(<span class="hljs-literal">null</span>));
+
+<span class="hljs-title function_">expect</span>(stopListening).<span class="hljs-title function_">toHaveBeenCalled</span>();
+<span class="hljs-title function_">expect</span>(disconnectSocket).<span class="hljs-title function_">toHaveBeenCalled</span>();
+<span class="hljs-title function_">expect</span>(screen.<span class="hljs-title function_">getByText</span>(<span class="hljs-string">&#x27;0 unread&#x27;</span>)).<span class="hljs-title function_">toBeInTheDocument</span>();
+</code></pre>
+<p>(Stage 5's version, the end of a test. It's indented one level further
+in the file.)</p>
+<h2>Same place or new place?</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><code>rerender(jsx)</code></th>
+<th><code>render(jsx)</code> again</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Where it draws</td>
+<td>into the <strong>same</strong> <code>&lt;div&gt;</code></td>
+<td>into a <strong>new</strong> <code>&lt;div&gt;</code></td>
+</tr>
+<tr>
+<td>What React does</td>
+<td>compares old and new, and <strong>updates</strong> the components already there</td>
+<td>starts a second, separate copy</td>
+</tr>
+<tr>
+<td>State</td>
+<td>kept</td>
+<td>the new copy starts fresh</td>
+</tr>
+<tr>
+<td>Effects</td>
+<td>cleanups run, then effects re-run, for any whose dependencies changed</td>
+<td>the first copy's effects are untouched</td>
+</tr>
+</tbody>
+</table>
+<p><code>rerender</code> is how a test plays &quot;the props changed&quot;: here, the <code>user</code>
+the provider reads went from Alex to <code>null</code>. That's exactly what
+happens in the app on logout, so the provider's effect cleanup runs:
+it stops listening and disconnects.</p>
+<p><code>render()</code> also returns <code>unmount()</code>, which removes what it drew and
+runs every cleanup, as when the user leaves the page.</p>
+<h2>Try it</h2>
+<p>In Figure A.27, change <code>rerender(</code> to <code>render(</code> and run the
+<code>NotificationsProvider</code> tests:</p>
+<pre><code class="hljs">AssertionError: expected &quot;vi.fn()&quot; to be called at least once
+</code></pre>
+<p>The first copy, still logged in as Alex, is on the page, and nothing
+told it to stop listening. How many &quot;unread&quot; counts are on the page now?
+(Add <code>screen.debug()</code>.) Change it back.</p>
+</div>
+    
+  </main>
+</body>
+</html>

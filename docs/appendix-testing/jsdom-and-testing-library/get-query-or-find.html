@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>getBy, queryBy or findBy — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/appendix-testing/jsdom-and-testing-library/how-a-query-finds-an-element.html">← How a Query Finds an Element</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/appendix-testing/jsdom-and-testing-library/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/appendix-testing/jsdom-and-testing-library/jest-dom-matchers.html">jest-dom: Checks for Elements →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>getBy, queryBy or findBy</h1>
+    <p class="lede">getBy throws when it finds nothing, queryBy returns null, and findBy keeps trying for up to a second. Forgetting to await findBy hands expect() a promise instead of an element.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Every query comes in three kinds. They search the same way; they differ
+in what happens when there's <strong>nothing</strong> to find yet:</p>
+<table>
+<thead>
+<tr>
+<th>Query</th>
+<th>Finds one</th>
+<th>Finds none</th>
+<th>Finds several</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>getBy...</code></td>
+<td>returns it</td>
+<td><strong>throws</strong> at once</td>
+<td>throws</td>
+</tr>
+<tr>
+<td><code>queryBy...</code></td>
+<td>returns it</td>
+<td>returns <strong><code>null</code></strong></td>
+<td>throws</td>
+</tr>
+<tr>
+<td><code>findBy...</code></td>
+<td>resolves with it</td>
+<td><strong>tries again</strong> until it finds one, or a second has passed, then rejects</td>
+<td>rejects</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><code>getBy</code> suits anything that's there as soon as <code>render</code> returns,
+such as the loading message in Figure A.9.</li>
+<li><code>queryBy</code> suits checking something is <strong>not</strong> there:
+<code>expect(screen.queryByRole('alert')).not.toBeInTheDocument()</code>.
+(<code>getBy</code> would throw before <code>expect</code> could check anything.)</li>
+<li><code>findBy</code> suits anything that appears <strong>later</strong>, such as text that
+arrives when a fake request resolves.</li>
+</ul>
+<h2>How findBy waits</h2>
+<p><code>findBy...</code> is <code>getBy...</code> run over and over. It tries straight away,
+then again every 50 milliseconds, and also whenever the page changes.
+As soon as one try finds the element, the promise resolves with it.
+After 1000 milliseconds of failing, it rejects with the last error.
+(Those numbers are Testing Library's defaults, in
+<code>@testing-library/dom</code>.)</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure A.11: waiting for the error (src/pages/HomePage.test.jsx, excerpt)</span>
+<span class="hljs-title function_">it</span>(<span class="hljs-string">&#x27;shows an error message when the API cannot be reached&#x27;</span>, <span class="hljs-title function_">async</span> () =&gt; {
+  getWelcome.<span class="hljs-title function_">mockRejectedValue</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&quot;Can&#x27;t reach the API&quot;</span>));
+
+  <span class="hljs-title function_">render</span>(<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">HomePage</span> /&gt;</span></span>);
+
+  <span class="hljs-title function_">expect</span>(<span class="hljs-keyword">await</span> screen.<span class="hljs-title function_">findByRole</span>(<span class="hljs-string">&#x27;alert&#x27;</span>)).<span class="hljs-title function_">toHaveTextContent</span>(
+    <span class="hljs-string">&quot;Can&#x27;t reach the API&quot;</span>,
+  );
+});
+</code></pre>
+<p>(Stage 0's version, indented one level further in the file, with the
+last statement on one line.)</p>
+<p>When <code>render</code> returns, the fake's promise hasn't rejected yet, so there
+is no alert. A few milliseconds later the page catches the error and
+shows it, and <code>findByRole</code> finds it on its next try.</p>
+<h2>Try it</h2>
+<p>Delete the <code>await</code> before <code>screen.findByText('Hello world!')</code> in the
+first <code>HomePage</code> test, and run <code>npx vitest run src/pages</code>:</p>
+<pre><code class="hljs">Error: expect(received).toBeInTheDocument()
+
+received value must be an HTMLElement or an SVGElement.
+Received has type:  Promise
+</code></pre>
+<p>Without <code>await</code>, <code>expect</code> was handed the promise, not the element. Put
+the <code>await</code> back. Then change <code>findByText</code> to <code>getByText</code>: what does
+the error say now, and why?</p>
+</div>
+    
+  </main>
+</body>
+</html>

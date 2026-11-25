@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A Pretend Page — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/appendix-testing/fakes/replacing-a-whole-module.html">← vi.mock(): Replacing a Whole Module</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/appendix-testing/jsdom-and-testing-library/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/appendix-testing/jsdom-and-testing-library/render-and-screen.html">render() and screen →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>A Pretend Page</h1>
+    <p class="lede">Node has no document or window. jsdom builds them in JavaScript, so React can create real elements in a test, though nothing is ever drawn.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Tests run in Node, not in a browser. Node can run JavaScript, but it has
+no <code>document</code>, no <code>window</code> and no HTML elements: those come from the
+browser. React needs them, because rendering a component means creating
+elements and putting them in the <code>document</code>.</p>
+<p><strong>jsdom</strong> builds them, in plain JavaScript. With
+<code>environment: 'jsdom'</code> in <code>vite.config.js</code>, every test file gets a
+pretend page before it starts (step 1 in topic 01's diagram):</p>
+<table>
+<thead>
+<tr>
+<th>jsdom does</th>
+<th>jsdom doesn't</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>document</code>, <code>window</code>, <code>localStorage</code></td>
+<td>open a window or draw anything</td>
+</tr>
+<tr>
+<td>create elements, set attributes and text</td>
+<td>work out sizes or positions on screen</td>
+</tr>
+<tr>
+<td>fire events (<code>click</code>, <code>input</code>, ...) and run their handlers</td>
+<td>load CSS layouts, images or fonts</td>
+</tr>
+</tbody>
+</table>
+<p>That's enough to test what a component <strong>shows</strong> and <strong>does</strong>, which is
+what the app's tests check. It's not enough to test how it <strong>looks</strong>:
+whether the badge is green, or a column fits on a phone. For that you
+still open a browser.</p>
+<h2>Try it</h2>
+<p>Add this line at the very top of <code>src/pages/HomePage.test.jsx</code>, above
+the imports:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// @vitest-environment node</span>
+</code></pre>
+<p>A comment in this form changes the environment for one file. Run
+<code>npx vitest run src/pages</code>. All three tests fail with:</p>
+<pre><code class="hljs">ReferenceError: document is not defined
+</code></pre>
+<p>Without jsdom, there's nowhere to put the page. Remove the line.</p>
+</div>
+    
+  </main>
+</body>
+</html>

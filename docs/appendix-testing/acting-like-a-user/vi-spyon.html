@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>vi.spyOn(): One Method on a Real Object — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/appendix-testing/acting-like-a-user/matching-part-of-a-value.html">← Matching Part of a Value</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/appendix-testing/acting-like-a-user/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/appendix-testing/acting-like-a-user/checks-for-form-controls.html">Checks for Form Controls →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>vi.spyOn(): One Method on a Real Object</h1>
+    <p class="lede">jsdom has no confirmation box: its window.confirm() complains and returns undefined. vi.spyOn swaps that one method for a fake, and mockReset makes it call the real one again.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The detail page asks <code>window.confirm('Delete this ticket?')</code> before it
+deletes anything (Stage 3, topic 06). In a browser that opens a box
+with OK and Cancel. jsdom draws nothing, so it can't. A throwaway test
+called it to see what happens:</p>
+<pre><code class="hljs">Not implemented: Window&#x27;s confirm() method
+</code></pre>
+<p>is printed, and <code>confirm()</code> returns <code>undefined</code>. The page treats that
+like Cancel.</p>
+<p>So the tests answer for the user:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure A.20: answering the box (src/pages/TicketDetailPage.test.jsx,</span>
+<span class="hljs-comment">// excerpt)</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">answerConfirmWith</span>(<span class="hljs-params">answer</span>) {
+  vi.<span class="hljs-title function_">spyOn</span>(<span class="hljs-variable language_">window</span>, <span class="hljs-string">&#x27;confirm&#x27;</span>).<span class="hljs-title function_">mockReturnValue</span>(answer);
+}
+</code></pre>
+<p>(Stage 3's version, without its comment.)</p>
+<h2>spyOn, stubGlobal or vi.fn?</h2>
+<p>All three make fakes. They differ in <strong>where</strong> the fake goes:</p>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Replaces</th>
+<th>Used for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>vi.fn()</code></td>
+<td>nothing: it's a new function you pass in or give to <code>vi.mock</code></td>
+<td>API functions, handlers</td>
+</tr>
+<tr>
+<td><code>vi.stubGlobal(name, fake)</code></td>
+<td>a global <strong>variable</strong></td>
+<td><code>fetch</code> (topic 04)</td>
+</tr>
+<tr>
+<td><code>vi.spyOn(object, 'method')</code></td>
+<td>one <strong>method</strong> of an object that already exists</td>
+<td><code>window.confirm</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>vi.spyOn</code> keeps the original method. Until it's told otherwise, the spy
+simply calls it, while recording every call like any <code>vi.fn()</code>. That's
+where the name comes from: it watches a real method. Here,
+<code>mockReturnValue(answer)</code> then tells it to answer instead.</p>
+<p>Before the next test, <code>mockReset</code> makes the spy call the real method
+again. (A throwaway test checked this in Vitest 5: the method is still a
+spy, but it gives the real answer.)</p>
+<h2>Try it</h2>
+<p>In <code>answerConfirmWith</code>, put <code>//</code> in front of the <code>vi.spyOn</code> line and run
+<code>npx vitest run src/pages/TicketDetailPage.test.jsx</code>. &quot;Not implemented&quot;
+is printed several times, and three tests fail. But &quot;does nothing when
+the user cancels&quot; still passes. Why? Is that test still checking what
+it says it checks? Remove the <code>//</code>.</p>
+</div>
+    
+  </main>
+</body>
+</html>

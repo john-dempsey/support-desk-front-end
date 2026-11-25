@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Running Them — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/appendix-testing/describe-it-and-expect-from-nothing/saving-tests.html">← Saving Tests: describe() and it()</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/appendix-testing/describe-it-and-expect-from-nothing/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/appendix-testing/describe-it-and-expect-from-nothing/the-real-thing.html">The Real Thing →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Running Them</h1>
+    <p class="lede">The runner calls each saved test inside try/catch. A test passes if its function finishes without throwing. That&#39;s the whole rule, in Vitest too.</p>
+
+    
+
+    
+      <div class="slide-body"><h2>Part 3: running the saved tests</h2>
+<pre><code class="hljs language-js"><span class="hljs-comment">// mini-runner.js, part 3: running the saved tests</span>
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">run</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">let</span> failed = <span class="hljs-number">0</span>;
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> test <span class="hljs-keyword">of</span> tests) {
+    <span class="hljs-keyword">try</span> {
+      <span class="hljs-keyword">await</span> test.<span class="hljs-title function_">testFunction</span>();
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`✓ <span class="hljs-subst">${test.name}</span>`</span>);
+    } <span class="hljs-keyword">catch</span> (error) {
+      failed = failed + <span class="hljs-number">1</span>;
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`✗ <span class="hljs-subst">${test.name}</span>\n    <span class="hljs-subst">${error.message}</span>`</span>);
+    }
+  }
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`<span class="hljs-subst">${tests.length - failed}</span> passed, <span class="hljs-subst">${failed}</span> failed`</span>);
+}
+</code></pre>
+<p>This is the whole idea of a test runner: <strong>a test passes if its function
+finishes without throwing.</strong> A failed <code>expect()</code> throws, so the <code>catch</code>
+reports it, and the loop goes on to the next test. One failing test
+never stops the others.</p>
+<p>The <code>await</code> is there for tests that have to wait for something, such as
+a request. Slide 05 comes back to it.</p>
+<h2>Part 4: the tests</h2>
+<pre><code class="hljs language-js"><span class="hljs-comment">// mini-runner.js, part 4: the tests</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">statusLabel</span>(<span class="hljs-params">status</span>) {
+  <span class="hljs-keyword">return</span> status.<span class="hljs-title function_">replace</span>(<span class="hljs-string">&#x27;_&#x27;</span>, <span class="hljs-string">&#x27; &#x27;</span>);
+}
+
+<span class="hljs-title function_">describe</span>(<span class="hljs-string">&#x27;statusLabel&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-title function_">it</span>(<span class="hljs-string">&#x27;turns in_progress into in progress&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
+    <span class="hljs-title function_">expect</span>(<span class="hljs-title function_">statusLabel</span>(<span class="hljs-string">&#x27;in_progress&#x27;</span>)).<span class="hljs-title function_">toBe</span>(<span class="hljs-string">&#x27;in progress&#x27;</span>);
+  });
+
+  <span class="hljs-title function_">it</span>(<span class="hljs-string">&#x27;replaces every underscore&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
+    <span class="hljs-title function_">expect</span>(<span class="hljs-title function_">statusLabel</span>(<span class="hljs-string">&#x27;waiting_on_customer&#x27;</span>)).<span class="hljs-title function_">toBe</span>(<span class="hljs-string">&#x27;waiting on customer&#x27;</span>);
+  });
+});
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`<span class="hljs-subst">${tests.length}</span> tests saved, none run yet`</span>);
+<span class="hljs-title function_">run</span>();
+</code></pre>
+<p>Running it with <code>node mini-runner.js</code> prints:</p>
+<pre><code class="hljs">2 tests saved, none run yet
+✓ statusLabel &gt; turns in_progress into in progress
+✗ statusLabel &gt; replaces every underscore
+    expected &#x27;waiting on_customer&#x27; to be &#x27;waiting on customer&#x27;
+1 passed, 1 failed
+</code></pre>
+<p>The first line proves the order: both tests were <strong>saved</strong> before either
+<strong>ran</strong>. And the second test has found a real bug. Given a string,
+<code>replace()</code> changes only the <strong>first</strong> match.</p>
+<h2>Try it</h2>
+<ol>
+<li>Put the four parts in one file, <code>mini-runner.js</code>, <strong>outside</strong> your
+project folder, and run <code>node mini-runner.js</code>.</li>
+<li>Fix the bug with <code>replaceAll('_', ' ')</code> and run it again: <code>2 passed, 0 failed</code>.</li>
+<li>Add a third test, outside the <code>describe()</code>. What name does it print?
+Was your prediction from the last slide right?</li>
+<li>Challenge: add a <code>toEqual(expected)</code> method to <code>expect()</code> that passes
+when <code>JSON.stringify(actual) === JSON.stringify(expected)</code>, and test
+it with two arrays.</li>
+</ol>
+</div>
+    
+  </main>
+</body>
+</html>

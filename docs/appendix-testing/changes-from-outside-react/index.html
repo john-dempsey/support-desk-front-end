@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Changes From Outside React — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/appendix-testing/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Changes From Outside React</h1>
+    <p class="lede">Needs Stage 5. What act() does and why you rarely see it, the order Vitest runs a file with a mock factory in, and why rerender() is not the same as rendering again.</p>
+
+    
+      <ul class="listing">
+        
+          <li>
+            <a href="/support-desk-front-end/appendix-testing/changes-from-outside-react/act-let-react-finish.html">act(): Let React Finish</a>
+            <p>A state update doesn&#39;t redraw the page straight away. act() runs some code, then makes React finish every redraw and effect it caused. Testing Library already does this for render, clicks and findBy.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/appendix-testing/changes-from-outside-react/a-mock-factory-step-by-step.html">A Mock Factory, Step by Step</a>
+            <p>With a factory, Vitest runs your function to build the fake module, at the moment something first imports it. That happens before the file&#39;s own lines, which is why the fake socket needs vi.hoisted().</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/appendix-testing/changes-from-outside-react/rerender.html">rerender(): the Same Component, Updated</a>
+            <p>rerender() draws new JSX in the same place, so React updates the components already there and runs their cleanups. Calling render() again adds a second, separate copy.</p>
+          </li>
+        
+      </ul>
+    
+
+    
+  </main>
+</body>
+</html>

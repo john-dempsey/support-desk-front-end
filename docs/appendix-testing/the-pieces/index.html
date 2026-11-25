@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Pieces, and What npm test Does — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/appendix-testing/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>The Pieces, and What npm test Does</h1>
+    <p class="lede">Needs Stage 0. Five packages, each with one job, and what happens between typing npm test and seeing &quot;13 passed&quot;.</p>
+
+    
+      <ul class="listing">
+        
+          <li>
+            <a href="/support-desk-front-end/appendix-testing/the-pieces/five-packages-one-job-each.html">Five Packages, One Job Each</a>
+            <p>Vitest runs the tests, jsdom pretends to be a browser, Testing Library puts components on the page and finds things there, jest-dom adds checks, and user-event clicks and types.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/appendix-testing/the-pieces/what-npm-test-runs.html">What npm test Runs</a>
+            <p>npm test runs vitest run, which finds every file named *.test.js or *.test.jsx by itself. Two options pick out some of them, and the exit code tells other tools whether everything passed.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/appendix-testing/the-pieces/a-fresh-world-for-every-file.html">A Fresh World for Every File</a>
+            <p>Each test file runs in a process of its own, with a new pretend page and its own copy of every module, so nothing one file does can reach another.</p>
+          </li>
+        
+      </ul>
+    
+
+    
+  </main>
+</body>
+</html>

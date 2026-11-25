@@ -1,7 +1,8 @@
 // Tests ErrorBoundary with a tiny component that always crashes. React
 // logs every error a boundary catches with console.error, so each test
 // that crashes on purpose silences it, to keep the test output readable.
-// (mockReset in vite.config.js puts console.error back afterwards.)
+// (mockReset in vite.config.js makes console.error print again before the
+// next test.)
 import { describe, expect, it, vi } from 'vitest';
 import { screen } from '@testing-library/react';
 import ErrorBoundary from './ErrorBoundary.jsx';

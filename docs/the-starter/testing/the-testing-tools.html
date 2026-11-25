@@ -86,9 +86,9 @@ left out:</p>
 <ul>
 <li><strong><code>environment: 'jsdom'</code></strong> gives every test the pretend browser.</li>
 <li><strong><code>setupFiles</code></strong> runs <code>setup.js</code> (below) before each test file.</li>
-<li><strong><code>unstubGlobals</code></strong> and <strong><code>mockReset</code></strong> undo every fake after each
-test, so one test can't leak into the next. The next two slides show
-the fakes they undo.</li>
+<li><strong><code>unstubGlobals</code></strong> and <strong><code>mockReset</code></strong> undo every fake before the
+next test starts, so one test can't leak into the next. The next two
+slides show the fakes they undo.</li>
 </ul>
 <pre><code class="hljs language-js"><span class="hljs-comment">// Figure 0.27: before every test file (src/test/setup.js)</span>
 <span class="hljs-keyword">import</span> { afterEach } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;vitest&#x27;</span>;

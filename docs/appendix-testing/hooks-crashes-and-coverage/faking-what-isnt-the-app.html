@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Faking What Isn&#39;t the App&#39;s — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/appendix-testing/hooks-crashes-and-coverage/what-waitfor-needs.html">← What waitFor() Needs From Its Check</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/appendix-testing/hooks-crashes-and-coverage/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/appendix-testing/hooks-crashes-and-coverage/how-coverage-is-counted.html">How Coverage Is Counted →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Faking What Isn&#39;t the App&#39;s</h1>
+    <p class="lede">ErrorBoundary&#39;s tests fake two things the app doesn&#39;t own: console.error, to keep the output quiet while still counting calls, and import.meta.env.DEV, to pretend to be the production build.</p>
+
+    
+
+    
+      <div class="slide-body"><pre><code class="hljs language-js"><span class="hljs-comment">// Figure A.29: two fakes (src/components/ErrorBoundary.test.jsx,</span>
+<span class="hljs-comment">// excerpt)</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">silenceConsoleErrors</span>(<span class="hljs-params"></span>) {
+  vi.<span class="hljs-title function_">spyOn</span>(<span class="hljs-variable language_">console</span>, <span class="hljs-string">&#x27;error&#x27;</span>).<span class="hljs-title function_">mockImplementation</span>(<span class="hljs-function">() =&gt;</span> {});
+}
+
+<span class="hljs-comment">// ... and, in the last test:</span>
+    <span class="hljs-comment">// Pretend this is the production build, where DEV is false.</span>
+    vi.<span class="hljs-title function_">stubEnv</span>(<span class="hljs-string">&#x27;DEV&#x27;</span>, <span class="hljs-literal">false</span>);
+</code></pre>
+<p>(Stage 6's version, two excerpts.)</p>
+<h2>A spy that says nothing</h2>
+<p>React logs every error a boundary catches with <code>console.error</code>
+(Stage 6, topic 04). That's useful in a browser and just noise in a
+test that crashes on purpose. The spy (topic 08) replaces <code>error</code> on
+the <code>console</code> object, and <code>mockImplementation(() =&gt; {})</code> makes it do
+nothing. But it's still a fake, so it still <strong>records</strong> each call, and
+the test can check React did report the crash:
+<code>expect(console.error).toHaveBeenCalled()</code>.</p>
+<h2>A different build, in one line</h2>
+<p><code>import.meta.env.DEV</code> is <code>true</code> in tests and <code>npm run dev</code>, and <code>false</code>
+in the production build. <code>ErrorBoundary</code> reads it <strong>while it renders</strong>,
+to decide whether to show the error's message:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure A.30: development only (src/components/ErrorBoundary.jsx,</span>
+<span class="hljs-comment">// excerpt)</span>
+{<span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">env</span>.<span class="hljs-property">DEV</span> &amp;&amp; (
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Details (development only): {this.state.error.message}<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span></span>
+)}
+</code></pre>
+<p>(One line in the file, reflowed here to fit, with brackets added.)</p>
+<p>Because it reads the value late, at render time, <code>vi.stubEnv('DEV', false)</code> before rendering is enough: the same reason it worked for
+<code>getToken()</code> in topic 07.</p>
+<h2>Try it</h2>
+<ol>
+<li>Make <code>silenceConsoleErrors</code> do nothing: add <code>return;</code> as its first
+line. Run <code>npx vitest run src/components/ErrorBoundary.test.jsx</code>.
+The output fills with <code>Error: Broken on purpose</code> and a long stack
+trace, and one test fails:
+<code>TypeError: [Function error] is not a spy or a call to a spy!</code>.
+Which line asked, and why can't it ask the real <code>console.error</code>?</li>
+<li>Put it back, then put <code>//</code> in front of the <code>vi.stubEnv</code> line. Which
+test fails, and what did it find? Remove the <code>//</code>.</li>
+</ol>
+</div>
+    
+  </main>
+</body>
+</html>

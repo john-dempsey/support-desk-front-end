@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>renderHook(), by Hand — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/appendix-testing/changes-from-outside-react/rerender.html">← rerender(): the Same Component, Updated</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/appendix-testing/hooks-crashes-and-coverage/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/appendix-testing/hooks-crashes-and-coverage/what-waitfor-needs.html">What waitFor() Needs From Its Check →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>renderHook(), by Hand</h1>
+    <p class="lede">A hook can only run inside a component, so renderHook() makes one: a component that calls the hook, saves what it returns in result.current, and draws nothing.</p>
+
+    
+
+    
+      <div class="slide-body"><p><code>useFetch</code> is a hook, and React only lets a hook run <strong>inside a
+component</strong>. To test it on its own, Stage 6 uses <code>renderHook()</code>:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure A.28: running a hook (src/hooks/useFetch.test.js, excerpt)</span>
+<span class="hljs-keyword">const</span> fetchTickets = vi.<span class="hljs-title function_">fn</span>().<span class="hljs-title function_">mockResolvedValue</span>([<span class="hljs-string">&#x27;first ticket&#x27;</span>]);
+
+<span class="hljs-keyword">const</span> { result } = <span class="hljs-title function_">renderHook</span>(<span class="hljs-function">() =&gt;</span>
+  <span class="hljs-title function_">useFetch</span>(fetchTickets, <span class="hljs-string">&#x27;status=open&#x27;</span>),
+);
+
+<span class="hljs-title function_">expect</span>(result.<span class="hljs-property">current</span>.<span class="hljs-property">isLoading</span>).<span class="hljs-title function_">toBe</span>(<span class="hljs-literal">true</span>);
+</code></pre>
+<p>(Stage 6's version, the start of the first test. The <code>renderHook</code> call
+is one line in the file, split here to fit.)</p>
+<h2>The same thing, by hand</h2>
+<p><code>renderHook</code> saves you writing this:</p>
+<pre><code class="hljs language-jsx"><span class="hljs-keyword">function</span> <span class="hljs-title function_">renderMyHook</span>(<span class="hljs-params">useTheHook</span>) {
+  <span class="hljs-keyword">const</span> result = { <span class="hljs-attr">current</span>: <span class="hljs-literal">null</span> };
+
+  <span class="hljs-keyword">function</span> <span class="hljs-title function_">TestComponent</span>(<span class="hljs-params"></span>) {
+    result.<span class="hljs-property">current</span> = <span class="hljs-title function_">useTheHook</span>();
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;
+  }
+
+  <span class="hljs-title function_">render</span>(<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">TestComponent</span> /&gt;</span></span>);
+  <span class="hljs-keyword">return</span> { result };
+}
+</code></pre>
+<ul>
+<li><code>TestComponent</code> is a component, so the hook is allowed to run in it.
+It draws nothing (<code>return null</code>): the hook's return value is all the
+test wants.</li>
+<li><strong>Every time it renders</strong>, it saves the hook's latest return value in
+<code>result.current</code>. When the fake answers and the hook's state changes,
+React renders <code>TestComponent</code> again, and <code>result.current</code> is updated.</li>
+<li>That's why the test reads <code>result.current.isLoading</code> each time,
+rather than saving <code>result.current</code> in a variable once: the variable
+would keep the <strong>first</strong> render's value.</li>
+</ul>
+<p><code>renderHook</code> also returns <code>rerender</code>, which renders <code>TestComponent</code>
+again with new props, as topic 10's did for a component. Stage 6's
+&quot;ignores a slow answer&quot; test (Figure 6.8) uses it to change the ticket
+ID.</p>
+<h2>Try it</h2>
+<p>Make a file <code>src/hooks/scratch.test.jsx</code> with <code>renderMyHook</code> above, and
+a copy of Figure A.28's test that uses <code>renderMyHook</code> instead of
+<code>renderHook</code>. End it with the same two lines as the real test:</p>
+<pre><code class="hljs language-js"><span class="hljs-keyword">await</span> <span class="hljs-title function_">waitFor</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-title function_">expect</span>(result.<span class="hljs-property">current</span>.<span class="hljs-property">isLoading</span>).<span class="hljs-title function_">toBe</span>(<span class="hljs-literal">false</span>));
+<span class="hljs-title function_">expect</span>(result.<span class="hljs-property">current</span>.<span class="hljs-property">data</span>).<span class="hljs-title function_">toEqual</span>([<span class="hljs-string">&#x27;first ticket&#x27;</span>]);
+</code></pre>
+<p>Import <code>render</code> and <code>waitFor</code> from Testing Library. Does it pass? Then
+change it to save <code>const first = result.current;</code> straight after
+rendering, and check <code>first.isLoading</code> at the end instead. What happens,
+and why? Delete the file.</p>
+</div>
+    
+  </main>
+</body>
+</html>

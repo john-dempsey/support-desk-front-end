@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rebuilding the Wrappers — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/appendix-testing/lists-and-wrappers/within.html">← within(): Queries Tied to an Element</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/appendix-testing/lists-and-wrappers/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/appendix-testing/waiting-for-the-page/why-the-answer-comes-later.html">Why the Answer Comes Later →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Rebuilding the Wrappers</h1>
+    <p class="lede">A &lt;Link&gt; reads its settings from the router wrapped around it. A test renders one component on its own, so it has to rebuild whatever main.jsx wraps around the app.</p>
+
+    
+
+    
+      <div class="slide-body"><p>In the app, <code>main.jsx</code> wraps everything in a <code>&lt;BrowserRouter&gt;</code>. Every
+<code>&lt;Link&gt;</code> and <code>useParams()</code> inside it reads from that router: where the
+app is, and how to build an address. A component wrapped around others
+to hand them something they need is called a <strong>provider</strong>.</p>
+<p>A test renders one component on its own. Nothing is wrapped around it
+unless the test does the wrapping. Without a router, a <code>&lt;Link&gt;</code> has
+nothing to read, and React stops with:</p>
+<pre><code class="hljs">Cannot destructure property &#x27;basename&#x27; of &#x27;React$1.useContext(...)&#x27;
+as it is null.
+</code></pre>
+<p>(one line in the terminal). <code>basename</code> is one of the router's settings,
+and <code>null</code> is what the <code>&lt;Link&gt;</code> got instead of a router.</p>
+<h2>MemoryRouter: the same job, without an address bar</h2>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure A.14: the wrapper (src/test/renderWithProviders.jsx, excerpt)</span>
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">render</span>(
+    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">MemoryRouter</span> <span class="hljs-attr">initialEntries</span>=<span class="hljs-string">{[route]}</span>&gt;</span>{content}<span class="hljs-tag">&lt;/<span class="hljs-name">MemoryRouter</span>&gt;</span></span>,
+  );
+</code></pre>
+<p>(Stage 1's version, split to fit.)</p>
+<p><code>MemoryRouter</code> provides exactly what <code>BrowserRouter</code> does. The only
+difference is where it keeps the address: in an array in memory, not in
+the browser's address bar, which jsdom doesn't have.
+<code>initialEntries</code> is that array's starting contents, like the browser's
+history. One entry means &quot;start here&quot;.</p>
+<h2>The rule for any provider</h2>
+<p>Look at what <code>main.jsx</code> wraps around <code>&lt;App /&gt;</code>. Anything a component
+under test reads from those wrappers must be rebuilt in the test. That's
+the job <code>renderWithProviders</code> was written for, so it's the one place to
+add to when <code>main.jsx</code> gains another provider.</p>
+<h2>Try it</h2>
+<p>To see a <code>&lt;Link&gt;</code> read from its router, render <code>TicketList</code> inside a
+router with a <code>basename</code> (a prefix for every address in the app):</p>
+<pre><code class="hljs language-jsx"><span class="hljs-title function_">render</span>(
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">MemoryRouter</span> <span class="hljs-attr">basename</span>=<span class="hljs-string">&quot;/app&quot;</span> <span class="hljs-attr">initialEntries</span>=<span class="hljs-string">{[</span>&#x27;/<span class="hljs-attr">app</span>&#x27;]}&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">TicketList</span> <span class="hljs-attr">tickets</span>=<span class="hljs-string">{testTickets}</span> /&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">MemoryRouter</span>&gt;</span></span>,
+);
+<span class="hljs-keyword">const</span> link = screen.<span class="hljs-title function_">getByRole</span>(<span class="hljs-string">&#x27;link&#x27;</span>, { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Printer on fire&#x27;</span> });
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(link.<span class="hljs-title function_">getAttribute</span>(<span class="hljs-string">&#x27;href&#x27;</span>));
+</code></pre>
+<p>(You'll need to import <code>render</code> and <code>MemoryRouter</code>.) It prints
+<code>/app/tickets/7</code>, though <code>TicketList</code> only says
+<code>to={`/tickets/${ticket.id}`}</code>. Where did <code>/app</code> come from? Remove the
+test.</p>
+</div>
+    
+  </main>
+</body>
+</html>

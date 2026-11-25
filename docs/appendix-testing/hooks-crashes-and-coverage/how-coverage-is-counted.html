@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How Coverage Is Counted — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/appendix-testing/hooks-crashes-and-coverage/faking-what-isnt-the-app.html">← Faking What Isn&#39;t the App&#39;s</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/appendix-testing/hooks-crashes-and-coverage/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/appendix-testing/quick-reference/vitest.html">Vitest at a Glance →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>How Coverage Is Counted</h1>
+    <p class="lede">Node&#39;s JavaScript engine counts how often each piece of code runs. The coverage report is those counts after the tests finish, mapped back to your source lines.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Stage 6's <code>npm run coverage</code> (Stage 6, topic 06) reports which lines no
+test ran. It doesn't guess from reading the tests. It <strong>counts</strong>.</p>
+<ol>
+<li>Node runs JavaScript with an engine called <strong>V8</strong> (the same one as
+Chrome). V8 can keep a count of how many times each function and
+each branch actually runs.</li>
+<li>With <code>--coverage</code>, Vitest switches that counting on in every test
+file's process, through <code>@vitest/coverage-v8</code>.</li>
+<li>The tests run as usual.</li>
+<li>Afterwards, the counts are collected and <strong>mapped back</strong> to your
+source files. That step matters, because V8 ran the code Vite
+produced from your JSX, not the <code>.jsx</code> file itself.</li>
+<li>Anything with a count of 0 is &quot;uncovered&quot;.</li>
+</ol>
+<p>So coverage only knows what <strong>ran</strong>, not what was <strong>checked</strong>. A line
+that runs during a test is covered even if no <code>expect</code> looks at what it
+did (Stage 6, topic 06, &quot;100% isn't the goal&quot;).</p>
+<h2>One test file, one covered file</h2>
+<p>Run coverage for a single test file:</p>
+<pre><code class="hljs language-bash">npx vitest run --coverage src/utils/formatDate.test.js
+</code></pre>
+<p>The table still lists every file (because of <code>include</code> in
+<code>vite.config.js</code>), but nearly all of it is 0%:</p>
+<pre><code class="hljs">File               | % Stmts | % Branch | % Funcs | % Lines |
+All files          |    0.98 |     0.78 |    0.63 |    0.99 |
+  client.js        |       0 |        0 |       0 |       0 |
+  useFetch.js      |       0 |        0 |       0 |       0 |
+  formatDate.js    |     100 |      100 |     100 |     100 |
+</code></pre>
+<p>(Three rows of the table, with the last column left out.) Only the code
+this test file ran was counted.</p>
+<h2>Try it</h2>
+<p>Run the command above, then the same with
+<code>src/api/client.test.js</code> instead. Is <code>client.js</code> at 100% now? Which
+other file gets some coverage too, and why? (Look at what <code>client.js</code>
+imports.) Then open <code>coverage/index.html</code> and find a line marked red in
+<code>client.js</code>. Delete the <code>coverage</code> folder afterwards (it's in
+<code>.gitignore</code>).</p>
+</div>
+    
+  </main>
+</body>
+</html>

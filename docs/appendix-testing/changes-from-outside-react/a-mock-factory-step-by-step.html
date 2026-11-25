@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A Mock Factory, Step by Step — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/appendix-testing/changes-from-outside-react/act-let-react-finish.html">← act(): Let React Finish</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/appendix-testing/changes-from-outside-react/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/appendix-testing/changes-from-outside-react/rerender.html">rerender(): the Same Component, Updated →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>A Mock Factory, Step by Step</h1>
+    <p class="lede">With a factory, Vitest runs your function to build the fake module, at the moment something first imports it. That happens before the file&#39;s own lines, which is why the fake socket needs vi.hoisted().</p>
+
+    
+
+    
+      <div class="slide-body"><p><code>socket.test.js</code> replaces the <code>socket.io-client</code> library with a
+<strong>factory</strong>: a function that builds the fake module by hand.</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure A.26: a factory (src/realtime/socket.test.js, excerpt)</span>
+<span class="hljs-keyword">const</span> fakeSocket = vi.<span class="hljs-title function_">hoisted</span>(<span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-comment">// ... on, off, fire, and vi.fn()s for emit, connect, disconnect</span>
+});
+
+vi.<span class="hljs-title function_">mock</span>(<span class="hljs-string">&#x27;socket.io-client&#x27;</span>, <span class="hljs-function">() =&gt;</span> ({
+  <span class="hljs-attr">io</span>: <span class="hljs-function">() =&gt;</span> fakeSocket,
+}));
+</code></pre>
+<p>(Stage 5's version, with <code>fakeSocket</code>'s body left out.)</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><code>vi.mock(path)</code></th>
+<th><code>vi.mock(path, factory)</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The fake module is</td>
+<td>built by Vitest from the real one's exports</td>
+<td>whatever the factory returns</td>
+</tr>
+<tr>
+<td>Each function is</td>
+<td>a <code>vi.fn()</code> returning <code>undefined</code></td>
+<td>whatever you write</td>
+</tr>
+<tr>
+<td>An export the factory leaves out</td>
+<td>(can't happen)</td>
+<td>is missing</td>
+</tr>
+</tbody>
+</table>
+<h2>The order things really run in</h2>
+<p>Vitest moves <code>vi.mock</code> and <code>vi.hoisted</code> above the imports (topic 04).
+So the file runs in this order:</p>
+<ol>
+<li><code>vi.hoisted(...)</code>: <code>fakeSocket</code> is built</li>
+<li><code>vi.mock(...)</code>: Vitest notes the factory, but doesn't run it yet</li>
+<li>the imports: <code>socket.js</code> is imported, and <strong>it</strong> imports
+<code>socket.io-client</code>. That's when the factory runs, and <code>socket.js</code>
+calls <code>io()</code> and gets <code>fakeSocket</code>.</li>
+<li>the rest of the file, from top to bottom</li>
+</ol>
+<p>Step 3 happens before any ordinary line of the test file. If
+<code>fakeSocket</code> were a plain <code>const</code>, it wouldn't exist yet when <code>io()</code>
+asks for it. <code>vi.hoisted</code> moves its code up to step 1.</p>
+<h2>Try it</h2>
+<ol>
+<li>Turn <code>vi.hoisted(() =&gt; { ... })</code> into a plain function call:
+<code>(() =&gt; { ... })()</code>. Run <code>npx vitest run src/realtime</code>:<pre><code class="hljs">ReferenceError: Cannot access &#x27;fakeSocket&#x27; before initialization
+ ❯ src/realtime/socket.js:21:16
+ ❯ src/realtime/socket.test.js:6:1
+</code></pre>
+Read the two lines under it from the bottom up: the test file's
+<strong>import</strong> (line 6) loaded <code>socket.js</code>, whose <code>io()</code> call (line 21)
+asked for <code>fakeSocket</code> too early. Put <code>vi.hoisted</code> back.</li>
+<li>Put <code>//</code> in front of <code>io: () =&gt; fakeSocket,</code>. What does Vitest say
+is missing? Remove the <code>//</code>.</li>
+</ol>
+</div>
+    
+  </main>
+</body>
+</html>

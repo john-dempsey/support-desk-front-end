@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A Fresh World for Every File — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/appendix-testing/the-pieces/what-npm-test-runs.html">← What npm test Runs</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/appendix-testing/the-pieces/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/appendix-testing/describe-it-and-expect-from-nothing/saving-tests.html">Saving Tests: describe() and it() →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>A Fresh World for Every File</h1>
+    <p class="lede">Each test file runs in a process of its own, with a new pretend page and its own copy of every module, so nothing one file does can reach another.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Once Vitest has its list of files, it doesn't run them one after
+another in a single program. It starts a <strong>separate process</strong> for each
+file (a separate running copy of Node) and runs them side by side:</p>
+<p><img src="/support-desk-front-end/assets/images/one-test-run.svg" alt="Diagram: what one npm test run does. At the top, npm test starts vitest run, which finds the three test files by their names. Each file then runs in a separate process, side by side: client.test.js with 7 tests, HomePage.test.jsx with 3, App.test.jsx with 3. In each process, five steps: build a new jsdom page, run setup.js, read the file to collect its tests, run the tests one at a time, and send the results back. At the bottom, Vitest combines the results and prints Test Files 3 passed, Tests 13 passed. A note: nothing is shared between files, each one has its own page and its own copy of every module, but tests in the same file do share them."></p>
+<p>Each process goes through the same five steps:</p>
+<ol>
+<li><strong>Build a new jsdom page</strong>, because <code>vite.config.js</code> says
+<code>environment: 'jsdom'</code>. This gives the file its own <code>document</code> and
+<code>window</code>.</li>
+<li><strong>Run <code>setup.js</code></strong>, because of <code>setupFiles</code>. (Topic 03 shows what it
+does.)</li>
+<li><strong>Read the test file.</strong> This doesn't run any tests yet: it
+<strong>collects</strong> them, as the next topic shows.</li>
+<li><strong>Run the collected tests</strong>, one at a time, in the order they appear
+in the file.</li>
+<li><strong>Send the results</strong> back to the first Vitest process, which waits
+for every file and prints the summary.</li>
+</ol>
+<h2>Why a fresh world?</h2>
+<p>Because nothing one file does can reach another. <code>client.test.js</code>
+replaces <code>fetch</code> with a fake. <code>HomePage.test.jsx</code> replaces a whole API
+module. Each runs with its own copy of every module and its own page,
+so the order the files run in never matters.</p>
+<p>Tests <strong>in the same file</strong> are different: they share one page and one
+copy of every module. Topic 03 shows how the starter stops one test
+leaving a mess for the next.</p>
+<h2>Where the time goes</h2>
+<p>The last line of a run says where the time went (shortened here):</p>
+<pre><code class="hljs">   Duration  1.99s (environment 65%, tests 12%, setup 12%, ...)
+</code></pre>
+<p><code>environment</code> is step 1: building jsdom pages. The tests themselves
+take a few milliseconds each. So a run takes about two seconds however
+fast your code is, and adding a test to an existing file costs far less
+than adding a new file.</p>
+<h2>Try it</h2>
+<p>Run <code>npx vitest run --reporter=verbose</code>. Each test is now listed on its
+own line with its full name, e.g.</p>
+<pre><code class="hljs"> ✓ src/api/client.test.js &gt; apiRequest &gt; returns null for 204 No Content 0ms
+</code></pre>
+<p>Run it twice more. Do the three files finish in the same order each
+time? Why doesn't it matter if they don't?</p>
+</div>
+    
+  </main>
+</body>
+</html>

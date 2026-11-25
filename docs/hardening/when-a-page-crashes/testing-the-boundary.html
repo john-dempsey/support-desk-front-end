@@ -50,8 +50,8 @@ component that does nothing but throw is enough:</p>
 <p>React logs every caught error with <code>console.error</code>, and a test that
 crashes on purpose would fill the output with red. <code>vi.spyOn()</code> swaps
 <code>console.error</code> for a fake that prints nothing (and <code>mockReset</code> in
-<code>vite.config.js</code> puts the real one back after each test). The test can
-still check it <strong>was</strong> called:</p>
+<code>vite.config.js</code> makes it call the real one again before the next
+test). The test can still check it <strong>was</strong> called:</p>
 <pre><code class="hljs language-jsx"><span class="hljs-comment">// Figure 6.23: a crash (src/components/ErrorBoundary.test.jsx, excerpt)</span>
   <span class="hljs-title function_">it</span>(<span class="hljs-string">&#x27;shows &quot;Something went wrong&quot; when the page crashes&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
     <span class="hljs-title function_">silenceConsoleErrors</span>();

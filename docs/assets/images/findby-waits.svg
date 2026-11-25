@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 420" width="860" height="420" role="img" aria-labelledby="title desc" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <title id="title">When the fake's answer arrives, and how findBy waits for it</title>
+  <desc id="desc">Two lanes, the test above and the page below, with time running left to right. 1: the test tells the fake getTicket to resolve with a ticket. 2: the test calls render; the page draws Loading the ticket, its effect calls getTicket and reaches await, which must wait for the current code to finish even though the promise has already resolved. 3: render returns, and the page still shows Loading, so getByRole for the heading would throw here. 4: the test reaches await findByRole; its first try finds nothing, and the test waits. 5: now the page's await finishes; it saves the ticket in state and React draws it. 6: the page changed, so findByRole tries again, finds the heading, and the test carries on. If nothing turns up, findBy keeps trying every 50 milliseconds and gives up after 1 second.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#1a1a1a"/>
+    </marker>
+  </defs>
+  <rect width="860" height="420" fill="#ffffff"/>
+
+  <text x="20" y="40" font-size="14" font-weight="700" fill="#1a1a1a">the test</text>
+  <text x="20" y="250" font-size="14" font-weight="700" fill="#1a1a1a">the page</text>
+  <line x1="20" y1="388" x2="836" y2="388" stroke="#59636e" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="836" y="408" font-size="11" fill="#59636e" text-anchor="end">time</text>
+
+  <g font-size="11" fill="#1a1a1a">
+    <rect x="20" y="54" width="120" height="96" rx="6" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5"/>
+    <text x="30" y="74" font-weight="700">1</text>
+    <text x="30" y="92" font-family="ui-monospace, Consolas, monospace">getTicket</text>
+    <text x="30" y="106" font-family="ui-monospace, Consolas, monospace">.mockResolved</text>
+    <text x="30" y="120" font-family="ui-monospace, Consolas, monospace">Value(ticket)</text>
+
+    <rect x="160" y="54" width="120" height="96" rx="6" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5"/>
+    <text x="170" y="74" font-weight="700">2</text>
+    <text x="170" y="92" font-family="ui-monospace, Consolas, monospace">render(...)</text>
+
+    <rect x="300" y="54" width="150" height="96" rx="6" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5"/>
+    <text x="310" y="74" font-weight="700">3  render returns</text>
+    <text x="310" y="94" fill="#3d444d">the page says</text>
+    <text x="310" y="110" fill="#3d444d">"Loading…": getBy</text>
+    <text x="310" y="126" fill="#3d444d">would throw here</text>
+
+    <rect x="470" y="54" width="150" height="96" rx="6" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5"/>
+    <text x="480" y="74" font-weight="700">4</text>
+    <text x="480" y="92" font-family="ui-monospace, Consolas, monospace">await findByRole</text>
+    <text x="480" y="112" fill="#3d444d">first try: not there.</text>
+    <text x="480" y="128" fill="#3d444d">The test waits.</text>
+
+    <rect x="690" y="54" width="146" height="96" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+    <text x="700" y="74" font-weight="700">6  found</text>
+    <text x="700" y="94" fill="#3d444d">the page changed,</text>
+    <text x="700" y="110" fill="#3d444d">so it tries again.</text>
+    <text x="700" y="126" fill="#3d444d">The test carries on.</text>
+
+    <rect x="160" y="262" width="290" height="100" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+    <text x="170" y="282" fill="#1a1a1a">draws "Loading the ticket…"; the effect calls</text>
+    <text x="170" y="300" font-family="ui-monospace, Consolas, monospace">await getTicket('2')</text>
+    <text x="170" y="320" fill="#3d444d">The promise has already resolved, but an</text>
+    <text x="170" y="336" fill="#3d444d">await still waits until the code that's</text>
+    <text x="170" y="352" fill="#3d444d">running now has finished.</text>
+
+    <rect x="490" y="262" width="250" height="100" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+    <text x="500" y="282" font-weight="700">5  the await finishes</text>
+    <text x="500" y="302" fill="#3d444d">The test is waiting, so the page's</text>
+    <text x="500" y="318" fill="#3d444d">code gets its turn: it saves the</text>
+    <text x="500" y="334" fill="#3d444d">ticket in state, and React draws</text>
+    <text x="500" y="350" fill="#3d444d">the heading.</text>
+  </g>
+
+  <line x1="220" y1="152" x2="220" y2="258" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="545" y1="152" x2="590" y2="258" stroke="#59636e" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arrow)"/>
+  <line x1="700" y1="262" x2="745" y2="154" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="724" y="214" font-size="11" fill="#3d444d">page changed</text>
+
+  <rect x="20" y="266" width="130" height="70" rx="6" fill="#ddf4ff" stroke="#0550ae" stroke-width="1.5"/>
+  <text x="30" y="286" font-size="11" fill="#1a1a1a">If nothing turns up,</text>
+  <text x="30" y="302" font-size="11" fill="#1a1a1a">findBy tries every</text>
+  <text x="30" y="318" font-size="11" fill="#1a1a1a">50 ms, for up to 1 s.</text>
+</svg>

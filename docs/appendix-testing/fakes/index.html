@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fakes: vi.fn, vi.stubGlobal and vi.mock — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/appendix-testing/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Fakes: vi.fn, vi.stubGlobal and vi.mock</h1>
+    <p class="lede">Needs Stage 0. A fake function that records its calls and answers as it&#39;s told, a global swapped for one, and a whole module replaced by fakes.</p>
+
+    
+      <ul class="listing">
+        
+          <li>
+            <a href="/support-desk-front-end/appendix-testing/fakes/a-function-that-remembers.html">vi.fn(): a Function That Remembers</a>
+            <p>vi.fn() makes a fake function. It records every call, and returns whatever the test tells it to. A homemade one takes ten lines.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/appendix-testing/fakes/swapping-a-global.html">vi.stubGlobal(): Swapping a Global</a>
+            <p>fetch is a global, looked up by name each time it&#39;s called. vi.stubGlobal replaces it, so client.js calls the fake without being changed at all.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/appendix-testing/fakes/replacing-a-whole-module.html">vi.mock(): Replacing a Whole Module</a>
+            <p>vi.mock swaps a file for a stand-in whose exported functions are all vi.fn() fakes. Every import of it, the page&#39;s included, gets the stand-in, and Vitest moves the call to the top of the file.</p>
+          </li>
+        
+      </ul>
+    
+
+    
+  </main>
+</body>
+</html>

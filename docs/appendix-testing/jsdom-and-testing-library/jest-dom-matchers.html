@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>jest-dom: Checks for Elements — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/appendix-testing/jsdom-and-testing-library/get-query-or-find.html">← getBy, queryBy or findBy</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/appendix-testing/jsdom-and-testing-library/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/appendix-testing/lists-and-wrappers/how-text-is-matched.html">How Text Is Matched →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>jest-dom: Checks for Elements</h1>
+    <p class="lede">One import adds element checks such as toBeInTheDocument to expect. It uses expect.extend, which you can use too.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Vitest's own matchers (topic 02) check values: strings, numbers,
+objects. <strong>jest-dom</strong> adds matchers that check <strong>elements</strong>. Stage 0's
+tests use two:</p>
+<table>
+<thead>
+<tr>
+<th>Matcher</th>
+<th>Passes when the element ...</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>toBeInTheDocument()</code></td>
+<td>is on the page</td>
+</tr>
+<tr>
+<td><code>toHaveTextContent('...')</code></td>
+<td>has text that <strong>contains</strong> this, with the same capitals</td>
+</tr>
+</tbody>
+</table>
+<p>They're added by one line in <code>setup.js</code> (Figure A.4):</p>
+<pre><code class="hljs language-js"><span class="hljs-keyword">import</span> <span class="hljs-string">&#x27;@testing-library/jest-dom/vitest&#x27;</span>;
+</code></pre>
+<p>That file does little more than call <code>expect.extend(...)</code> with
+jest-dom's matchers. <code>expect.extend</code> adds new methods to every
+<code>expect(...)</code> in the process, in the same way your homemade <code>expect()</code>
+in topic 02 had a <code>toBe</code> method.</p>
+<h2>A matcher of your own</h2>
+<p><code>expect.extend</code> is open to you too. A matcher returns <code>pass</code> (did it
+pass?) and a <code>message</code> for when it fails:</p>
+<pre><code class="hljs language-js">expect.<span class="hljs-title function_">extend</span>({
+  <span class="hljs-title function_">toBeAnOpenTicket</span>(<span class="hljs-params">ticket</span>) {
+    <span class="hljs-keyword">return</span> {
+      <span class="hljs-attr">pass</span>: ticket.<span class="hljs-property">status</span> === <span class="hljs-string">&#x27;open&#x27;</span>,
+      <span class="hljs-attr">message</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-string">`expected ticket <span class="hljs-subst">${ticket.id}</span> to be open`</span>,
+    };
+  },
+});
+
+<span class="hljs-title function_">expect</span>({ <span class="hljs-attr">id</span>: <span class="hljs-number">2</span>, <span class="hljs-attr">status</span>: <span class="hljs-string">&#x27;closed&#x27;</span> }).<span class="hljs-title function_">toBeAnOpenTicket</span>();
+<span class="hljs-comment">// fails with: Error: expected ticket 2 to be open</span>
+</code></pre>
+<p>The app doesn't need one, but it shows there's no magic: jest-dom is a
+collection of functions like this one.</p>
+<h2>Try it</h2>
+<ol>
+<li>In Figure A.9, change <code>'Connecting to the API'</code> to <code>'Connecting'</code>.
+Does it pass? Now try <code>'connecting'</code>:<pre><code class="hljs">Expected element to have text content:
+  connecting
+Received:
+  Connecting to the API…
+</code></pre>
+Change it back.</li>
+<li>Challenge: in a new file <code>src/scratch.test.js</code>, write the
+<code>toBeAnOpenTicket</code> matcher above and two tests for it, one that
+passes and one that fails. Then try
+<code>expect(...).not.toBeAnOpenTicket()</code> on the closed ticket: does it
+pass? Delete the file when you're done.</li>
+</ol>
+</div>
+    
+  </main>
+</body>
+</html>

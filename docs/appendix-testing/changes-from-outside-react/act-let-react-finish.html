@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>act(): Let React Finish — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/appendix-testing/helpers-that-build-the-world/real-localstorage.html">← Real localStorage, Shared by a File&#39;s Tests</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/appendix-testing/changes-from-outside-react/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/appendix-testing/changes-from-outside-react/a-mock-factory-step-by-step.html">A Mock Factory, Step by Step →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>act(): Let React Finish</h1>
+    <p class="lede">A state update doesn&#39;t redraw the page straight away. act() runs some code, then makes React finish every redraw and effect it caused. Testing Library already does this for render, clicks and findBy.</p>
+
+    
+
+    
+      <div class="slide-body"><p>When a component calls a state setter, React doesn't redraw the page
+there and then. It notes the change, and redraws a moment later, once
+the code that's running has finished. That's usually what you want:
+several changes in a row cause one redraw, not several.</p>
+<p>In a test it's a problem. The test is the code that's running, so if it
+causes a change and then checks the page at once, React hasn't redrawn
+yet.</p>
+<h2>What act() does</h2>
+<p><code>act(callback)</code> runs the callback, then makes React finish <strong>all</strong> the
+work it caused, redraws and effects, before <code>act</code> itself finishes. When
+the line after <code>act</code> runs, the page is up to date.</p>
+<p>You've used it all along without seeing it. Testing Library wraps these
+in <code>act()</code> for you:</p>
+<ul>
+<li><code>render()</code> and <code>rerender()</code></li>
+<li>every <code>userEvent</code> call</li>
+<li>each try inside <code>findBy...</code> and <code>waitFor</code></li>
+</ul>
+<p>So <code>act()</code> only appears in a test when the change comes from somewhere
+Testing Library doesn't know about. In Stage 5, that's a push from the
+&quot;server&quot;:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure A.25: a push from outside (src/test/fakeSocket.js, excerpt)</span>
+<span class="hljs-keyword">async</span> <span class="hljs-title function_">push</span>(<span class="hljs-params">notification</span>) {
+  <span class="hljs-keyword">if</span> (savedHandler === <span class="hljs-literal">null</span>) {
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&#x27;Nothing is listening: render the component first.&#x27;</span>);
+  }
+  <span class="hljs-keyword">await</span> <span class="hljs-title function_">act</span>(<span class="hljs-title function_">async</span> () =&gt; {
+    <span class="hljs-title function_">savedHandler</span>(notification);
+  });
+},
+</code></pre>
+<p>(Stage 5's version, without its comment. It's a method of the object
+<code>captureNotificationHandler()</code> returns, so it's indented two levels
+further in the file.) Calling <code>savedHandler</code> is ordinary code calling a
+function. The page's state changes, and <code>act</code> waits for the redraw.</p>
+<h2>Try it</h2>
+<p>Stage 5, topic 08 had you replace the <code>await act(...)</code> with a bare
+<code>savedHandler(notification);</code>. Do it again, and read the <strong>first</strong>
+failure:</p>
+<pre><code class="hljs">AssertionError: expected [ &lt;li class=&quot;notification&quot;&gt;…(3)&lt;/li&gt; ] to have
+a length of 2 but got 1
+</code></pre>
+<p>(one line in the terminal). The push did change the page's state: the
+list just hadn't been redrawn when the test counted it. Now try
+<code>await screen.findAllByRole('listitem')</code> in place of
+<code>screen.getAllByRole('listitem')</code> in that test. It still fails, with the
+same message. Why doesn't waiting help? (When does a <code>findAllBy</code> stop
+trying: when it finds two, or when it finds any?) Put both back.</p>
+</div>
+    
+  </main>
+</body>
+</html>

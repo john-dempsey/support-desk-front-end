@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How a Query Finds an Element — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/appendix-testing/jsdom-and-testing-library/render-and-screen.html">← render() and screen</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/appendix-testing/jsdom-and-testing-library/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/appendix-testing/jsdom-and-testing-library/get-query-or-find.html">getBy, queryBy or findBy →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>How a Query Finds an Element</h1>
+    <p class="lede">getByRole works out every element&#39;s role and accessible name, as a screen reader does, and picks the one that matches. When none does, it lists what it found.</p>
+
+    
+
+    
+      <div class="slide-body"><pre><code class="hljs language-js"><span class="hljs-comment">// Figure A.10: finding a heading (src/App.test.jsx, excerpt)</span>
+<span class="hljs-title function_">it</span>(<span class="hljs-string">&#x27;shows the not found page for an unknown URL&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-title function_">renderAppAt</span>(<span class="hljs-string">&#x27;/no-such-page&#x27;</span>);
+
+  <span class="hljs-title function_">expect</span>(
+    screen.<span class="hljs-title function_">getByRole</span>(<span class="hljs-string">&#x27;heading&#x27;</span>, { <span class="hljs-attr">level</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Page not found&#x27;</span> }),
+  ).<span class="hljs-title function_">toBeInTheDocument</span>();
+});
+</code></pre>
+<p>(Stage 0's version. It's indented one level further in the file, and the
+<code>expect</code> is one line there. <code>renderAppAt</code> is a helper in the same file
+that renders the whole app at a URL: Figure 0.31, Stage 0, topic 08.)</p>
+<h2>Role and name</h2>
+<p>A screen reader doesn't see tags or classes. It sees what each element
+<strong>is</strong> (its role) and what it's <strong>called</strong> (its accessible name).
+<code>getByRole</code> works the same way. For each element on the page it works
+out:</p>
+<ul>
+<li>
+<p><strong>the role</strong>, from the tag, unless a <code>role</code> attribute says otherwise:</p>
+<table>
+<thead>
+<tr>
+<th>Element</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>&lt;h1&gt;</code> ... <code>&lt;h6&gt;</code></td>
+<td><code>heading</code> (with <code>level</code> 1 to 6)</td>
+</tr>
+<tr>
+<td><code>&lt;a href=&quot;...&quot;&gt;</code></td>
+<td><code>link</code></td>
+</tr>
+<tr>
+<td><code>&lt;button&gt;</code></td>
+<td><code>button</code></td>
+</tr>
+<tr>
+<td><code>&lt;nav&gt;</code></td>
+<td><code>navigation</code></td>
+</tr>
+<tr>
+<td><code>&lt;p role=&quot;status&quot;&gt;</code></td>
+<td><code>status</code></td>
+</tr>
+</tbody>
+</table>
+</li>
+<li>
+<p><strong>the name</strong>, usually the element's text, or its <code>aria-label</code> if it
+has one (<code>&lt;nav aria-label=&quot;Main&quot;&gt;</code> is called &quot;Main&quot;)</p>
+</li>
+</ul>
+<p>Then it keeps the elements whose role, name and other options
+(<code>level</code>) all match. This is why the queries double as an accessibility
+check (Stage 0, topic 07): if a test can't find a button by its role
+and name, a screen reader user probably can't either.</p>
+<h2>When nothing matches</h2>
+<p>The error lists every role it <strong>did</strong> find, with each element's name.
+That list usually shows the mistake at once: a typo in the name, a
+<code>&lt;div&gt;</code> where a <code>&lt;button&gt;</code> should be, or a missing label.</p>
+<h2>Try it</h2>
+<p>In Figure A.10, change <code>'Page not found'</code> to <code>'Not found'</code> and run
+<code>npx vitest run src/App.test.jsx</code>. The error starts:</p>
+<pre><code class="hljs">TestingLibraryElementError: Unable to find an accessible element with
+the role &quot;heading&quot; and name &quot;Not found&quot;
+
+Here are the accessible roles:
+
+  banner:
+  ...
+</code></pre>
+<p>(The first line is one line in the terminal.) Scroll down to
+<code>heading</code>. What name did the <code>&lt;h1&gt;</code> actually have? Which roles are on
+every page, from the layout? Change it back.</p>
+</div>
+    
+  </main>
+</body>
+</html>

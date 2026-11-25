@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>vi.fn(): a Function That Remembers — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/appendix-testing/before-and-after-each-test/the-settings-that-undo-fakes.html">← The Settings That Undo Fakes</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/appendix-testing/fakes/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/appendix-testing/fakes/swapping-a-global.html">vi.stubGlobal(): Swapping a Global →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>vi.fn(): a Function That Remembers</h1>
+    <p class="lede">vi.fn() makes a fake function. It records every call, and returns whatever the test tells it to. A homemade one takes ten lines.</p>
+
+    
+
+    
+      <div class="slide-body"><p>A <strong>fake</strong> stands in for something the test doesn't want to run for
+real, such as a request to the API. Vitest's fakes all start from
+<code>vi.fn()</code>. (Vitest calls them &quot;mocks&quot;, hence names like <code>vi.mock</code> and
+<code>mockReset</code>.)</p>
+<h2>A homemade one first</h2>
+<pre><code class="hljs language-js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">makeFake</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> <span class="hljs-title function_">fake</span> = (<span class="hljs-params">...args</span>) =&gt; {
+    fake.<span class="hljs-property">calls</span>.<span class="hljs-title function_">push</span>(args);
+    <span class="hljs-keyword">return</span> fake.<span class="hljs-property">answer</span>;
+  };
+  fake.<span class="hljs-property">calls</span> = [];
+  fake.<span class="hljs-property">answer</span> = <span class="hljs-literal">undefined</span>;
+  <span class="hljs-keyword">return</span> fake;
+}
+</code></pre>
+<p>A JavaScript function is an object, so it can carry properties. Each
+time this fake is called, it saves its arguments in <code>fake.calls</code>, then
+returns <code>fake.answer</code>. A test sets the answer first, calls the code
+being tested, and then reads <code>calls</code> to check how the fake was used.</p>
+<h2>The real one</h2>
+<p><code>vi.fn()</code> is the same idea, with more built in:</p>
+<table>
+<thead>
+<tr>
+<th>You write</th>
+<th>The fake then</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>vi.fn()</code></td>
+<td>returns <code>undefined</code></td>
+</tr>
+<tr>
+<td><code>.mockReturnValue(x)</code></td>
+<td>returns <code>x</code></td>
+</tr>
+<tr>
+<td><code>.mockResolvedValue(x)</code></td>
+<td>returns a promise that <strong>resolves</strong> with <code>x</code>, as a successful request does</td>
+</tr>
+<tr>
+<td><code>.mockRejectedValue(error)</code></td>
+<td>returns a promise that <strong>rejects</strong> with <code>error</code>, as a failed request does</td>
+</tr>
+<tr>
+<td><code>.mock.calls</code></td>
+<td>is every call's arguments: <code>mock.calls[0][0]</code> is the first call's first argument</td>
+</tr>
+</tbody>
+</table>
+<p>Stage 0's <code>client.test.js</code> uses it to fake <code>fetch()</code>:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure A.6: a fake fetch() (src/api/client.test.js, excerpt)</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">fakeFetchResponding</span>(<span class="hljs-params">status, body</span>) {
+  <span class="hljs-keyword">const</span> fakeFetch = vi.<span class="hljs-title function_">fn</span>().<span class="hljs-title function_">mockResolvedValue</span>({
+    <span class="hljs-attr">ok</span>: status &gt;= <span class="hljs-number">200</span> &amp;&amp; status &lt; <span class="hljs-number">300</span>,
+    status,
+    <span class="hljs-attr">json</span>: <span class="hljs-title function_">async</span> () =&gt; body,
+  });
+  vi.<span class="hljs-title function_">stubGlobal</span>(<span class="hljs-string">&#x27;fetch&#x27;</span>, fakeFetch);
+  <span class="hljs-keyword">return</span> fakeFetch;
+}
+</code></pre>
+<p>The fake answers every call with a pretend response: only the three
+things <code>apiRequest()</code> reads (<code>ok</code>, <code>status</code>, <code>json()</code>). The helper
+returns the fake so a test can look at <code>fakeFetch.mock.calls</code>
+afterwards. (The next slide explains <code>vi.stubGlobal</code>.)</p>
+<h2>Try it</h2>
+<p>In the test &quot;calls the API base URL with the given path&quot;, add
+<code>console.log(fakeFetch.mock.calls);</code> just before <code>const requestedUrl</code>.
+Run <code>npx vitest run src/api</code>. It prints:</p>
+<pre><code class="hljs">[
+  [
+    &#x27;http://localhost:3000/welcome&#x27;,
+    { method: &#x27;GET&#x27;, headers: {}, body: undefined }
+  ]
+]
+</code></pre>
+<p>One call, with two arguments: the URL and the options. Which test
+checks the options, and which part of them? Remove the line.</p>
+</div>
+    
+  </main>
+</body>
+</html>

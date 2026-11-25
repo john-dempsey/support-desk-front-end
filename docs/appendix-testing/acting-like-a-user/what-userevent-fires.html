@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What userEvent Fires — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/appendix-testing/waiting-for-the-page/reading-env-late.html">← Reading .env Late</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/appendix-testing/acting-like-a-user/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/appendix-testing/acting-like-a-user/a-queue-of-answers.html">A Queue of Answers →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>What userEvent Fires</h1>
+    <p class="lede">userEvent.type() doesn&#39;t set the input&#39;s value. It clicks the input, then presses each key, firing the same events a browser would, and waits for React after each one.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Stage 3's tests type and choose with user-event (Figure 3.58, Stage 3,
+topic 10). To see what one call really does, a throwaway test listened
+for every event on a plain <code>&lt;input&gt;</code> while running
+<code>await userEvent.type(input, 'ab')</code>:</p>
+<pre><code class="hljs">pointerdown mousedown focus pointerup mouseup click
+keydown() keypress() beforeinput() input(a) keyup(a)
+keydown(a) keypress(a) beforeinput(a) input(ab) keyup(ab)
+</code></pre>
+<p>(The brackets show the input's value when each event fired. The output
+is one line in the terminal.)</p>
+<ul>
+<li><strong>First, a click.</strong> A user can't type into a field without clicking
+it, so user-event clicks first, and the input gets the <strong>focus</strong>.</li>
+<li><strong>Then each key in turn</strong>: <code>keydown</code>, <code>keypress</code>, <code>beforeinput</code>,
+<code>input</code>, <code>keyup</code>. The value grows by one letter at the <code>input</code> event.
+React's <code>onChange</code> listens for <code>input</code>, so a controlled input's
+<code>onChange</code> runs once per letter, as it does in a browser.</li>
+</ul>
+<h2>Why not just set the value?</h2>
+<p>Testing Library also has <code>fireEvent</code>, which fires <strong>one</strong> event of your
+choice. <code>fireEvent.change(input, { target: { value: 'ab' } })</code> would set
+the value in one go. The app's tests never use it, because no user
+types like that. user-event behaves like a person, so it also can't do
+what a person can't: clicking a disabled button does nothing (a
+throwaway test's <code>onClick</code> fake recorded no calls).</p>
+<h2>Why every call is awaited</h2>
+<p>Between events, user-event waits for React to finish drawing, so the
+next event sees the up-to-date page. That waiting takes time, so every
+call returns a promise, and the test has to <code>await</code> it.</p>
+<p>The app calls <code>userEvent.type(...)</code> and <code>userEvent.click(...)</code>
+directly. user-event's documentation also shows
+<code>const user = userEvent.setup()</code> followed by <code>user.type(...)</code>. The
+direct calls do the same thing, starting a fresh &quot;user&quot; for each call.</p>
+<h2>Try it</h2>
+<p>user-event can press special keys, written in braces: <code>{enter}</code>,
+<code>{backspace}</code>, <code>{tab}</code>. In <code>NewTicketPage.test.jsx</code>, change
+<code>fillInAndSubmit</code> so it types the <strong>description</strong> first, then types
+<code>`${subject}{enter}`</code> into the subject, and delete the click on
+&quot;Create ticket&quot;. Do the tests still pass? What does pressing Enter in a
+text input do in a browser form? Put it back.</p>
+</div>
+    
+  </main>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Four Hooks — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/appendix-testing/describe-it-and-expect-from-nothing/tests-that-wait.html">← Tests That Wait</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/appendix-testing/before-and-after-each-test/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/appendix-testing/before-and-after-each-test/setup-js-runs-in-every-file.html">setup.js Runs in Every File →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Four Hooks</h1>
+    <p class="lede">beforeEach, afterEach, beforeAll and afterAll save a function to run around the tests. They wrap a test like layers: the outermost runs first before it, and last after it.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Tests in the same file share one page and one copy of every module
+(topic 01). So something has to tidy up between them. That's what
+<strong>hooks</strong> are for:</p>
+<table>
+<thead>
+<tr>
+<th>Hook</th>
+<th>Runs its function</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>beforeEach(fn)</code></td>
+<td>before <strong>every</strong> test</td>
+</tr>
+<tr>
+<td><code>afterEach(fn)</code></td>
+<td>after <strong>every</strong> test, even one that failed</td>
+</tr>
+<tr>
+<td><code>beforeAll(fn)</code></td>
+<td>once, before the first test</td>
+</tr>
+<tr>
+<td><code>afterAll(fn)</code></td>
+<td>once, after the last test</td>
+</tr>
+</tbody>
+</table>
+<p>Like <code>it()</code>, a hook only <strong>saves</strong> its function. The runner calls it at
+the right moment. A hook written inside a <code>describe()</code> applies only to
+that group's tests. One written at the top of a file applies to every
+test in the file.</p>
+<h2>The order</h2>
+<p>When there are hooks at several levels, they wrap the test like layers:</p>
+<p><img src="/support-desk-front-end/assets/images/hook-order.svg" alt="Diagram: the order hooks run in around one test. They wrap the test like layers. First, before the test starts, Vitest itself undoes the last test's fakes, because of mockReset and unstubGlobals: before each test, not after it. Then the beforeEach hooks run from the outside in: setup.js's 1st, the test file's top level 2nd, the describe's 3rd. Then the test, 4th. Then the afterEach hooks from the inside out: the describe's 5th, the file's 6th, and setup.js's last, 7th, which calls cleanup(). Then it all happens again for the next test. In Stage 0, only setup.js has a hook: the afterEach that calls cleanup()."></p>
+<p><code>beforeEach</code> hooks run from the <strong>outside in</strong>, and <code>afterEach</code> hooks
+from the <strong>inside out</strong>, so whatever was set up first is tidied up last.
+(This was checked by a throwaway test with a <code>console.log</code> in a hook at
+each level.) The settings on the left of the diagram are slide 03's.</p>
+<p>Stage 0 has exactly one hook, in <code>setup.js</code>. Later stages add a few
+more, but most of the app's test files need none.</p>
+<h2>Try it</h2>
+<p>In <code>src/test/setup.js</code>, add <code>console.log('cleaning up');</code> as the first
+line inside <code>afterEach</code>. Run <code>npx vitest run src/pages</code>. How many times
+is it printed, and why that number? Remove the line.</p>
+</div>
+    
+  </main>
+</body>
+</html>

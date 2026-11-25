@@ -71,8 +71,8 @@ fake <code>fetch</code>.</p>
     <span class="hljs-attr">unstubEnvs</span>: <span class="hljs-literal">true</span>,
     <span class="hljs-attr">mockReset</span>: <span class="hljs-literal">true</span>,
 </code></pre>
-<p><code>unstubEnvs: true</code> puts every stubbed value back after each test, the
-way <code>unstubGlobals</code> already undid <code>vi.stubGlobal()</code>. Without it, the
+<p><code>unstubEnvs: true</code> puts every stubbed value back before the next test,
+the way <code>unstubGlobals</code> already undid <code>vi.stubGlobal()</code>. Without it, the
 empty token from one test would still be empty in the next.</p>
 <h2>A test should give the same answer everywhere</h2>
 <p>A test that passes on your laptop and fails on a classmate's is worse

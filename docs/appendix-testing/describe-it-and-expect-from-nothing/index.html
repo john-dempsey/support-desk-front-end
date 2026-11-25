@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>describe, it and expect From Nothing — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/appendix-testing/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>describe, it and expect From Nothing</h1>
+    <p class="lede">Needs Stage 0. A homemade test runner in plain JavaScript shows that it() only saves a test and expect() only throws. Then the real ones: names, checks, and tests that wait.</p>
+
+    
+      <ul class="listing">
+        
+          <li>
+            <a href="/support-desk-front-end/appendix-testing/describe-it-and-expect-from-nothing/saving-tests.html">Saving Tests: describe() and it()</a>
+            <p>it() doesn&#39;t run a test: it saves the function to run later, with its name. describe() runs its function at once, to save a group of tests under one name. expect() is an if and a throw.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/appendix-testing/describe-it-and-expect-from-nothing/running-them.html">Running Them</a>
+            <p>The runner calls each saved test inside try/catch. A test passes if its function finishes without throwing. That&#39;s the whole rule, in Vitest too.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/appendix-testing/describe-it-and-expect-from-nothing/the-real-thing.html">The Real Thing</a>
+            <p>Swap the homemade runner for one import line and the same tests run in Vitest. A test file is a list of it() calls, grouped by describe(), and names join with &gt;.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/appendix-testing/describe-it-and-expect-from-nothing/expect-and-its-checks.html">expect() and Its Checks</a>
+            <p>toBe asks &quot;the same value?&quot;, toEqual asks &quot;the same contents?&quot;, and toMatchObject asks &quot;at least these?&quot;. Choosing the wrong one gives a confusing failure.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/appendix-testing/describe-it-and-expect-from-nothing/tests-that-wait.html">Tests That Wait</a>
+            <p>An async test returns a promise, and Vitest waits for it, just as the homemade runner&#39;s await did. .rejects checks a promise that should fail, and must be awaited.</p>
+          </li>
+        
+      </ul>
+    
+
+    
+  </main>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Every Fake Is a Function Underneath — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/appendix-testing/waiting-for-the-page/why-the-answer-comes-later.html">← Why the Answer Comes Later</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/appendix-testing/waiting-for-the-page/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/appendix-testing/waiting-for-the-page/checking-the-calls.html">Checking the Calls →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Every Fake Is a Function Underneath</h1>
+    <p class="lede">mockResolvedValue and the rest are shortcuts for mockImplementation, which gives the fake a whole function to run. That function sees the arguments, so it can answer differently for each.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Each <code>mock...Value</code> method from topic 04 is a shortcut. Underneath, a
+<code>vi.fn()</code> fake runs <strong>a function</strong> each time it's called, and these
+methods give it a simple one:</p>
+<table>
+<thead>
+<tr>
+<th>Shortcut</th>
+<th>The function it gives the fake</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mockReturnValue(x)</code></td>
+<td><code>() =&gt; x</code></td>
+</tr>
+<tr>
+<td><code>mockResolvedValue(x)</code></td>
+<td><code>() =&gt; Promise.resolve(x)</code></td>
+</tr>
+<tr>
+<td><code>mockRejectedValue(error)</code></td>
+<td><code>() =&gt; Promise.reject(error)</code></td>
+</tr>
+<tr>
+<td><code>mockImplementation(fn)</code></td>
+<td><code>fn</code> itself</td>
+</tr>
+</tbody>
+</table>
+<p><code>mockImplementation</code> is the general one. Your function gets the same
+arguments the fake was called with, so it can decide what to answer.
+Figure 2.22 (Stage 2, topic 07) uses it to make <code>getTicket</code> fail for
+one ID and succeed for another:</p>
+<pre><code class="hljs language-js">getTicket.<span class="hljs-title function_">mockImplementation</span>(<span class="hljs-title function_">async</span> (ticketId) =&gt; {
+  <span class="hljs-keyword">if</span> (ticketId === <span class="hljs-string">&#x27;999&#x27;</span>) {
+    <span class="hljs-keyword">throw</span> <span class="hljs-title function_">createApiError</span>(<span class="hljs-number">404</span>, <span class="hljs-string">&#x27;Ticket 999 not found&#x27;</span>);
+  }
+  <span class="hljs-keyword">return</span> unassignedTicket;
+});
+</code></pre>
+<p>Because the function is <code>async</code>, <code>return</code> gives a resolved promise and
+<code>throw</code> gives a rejected one: the same two answers as the shortcuts.</p>
+<h2>A pretend error with a status</h2>
+<p>The page decides what to show from <code>error.status</code>, so the fake has to
+throw the same kind of error <code>apiRequest()</code> does. The test file has its
+own small copy of <code>client.js</code>'s helper:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure A.16: a pretend API error (src/pages/TicketDetailPage.test.jsx,</span>
+<span class="hljs-comment">// excerpt)</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">createApiError</span>(<span class="hljs-params">status, message</span>) {
+  <span class="hljs-keyword">const</span> error = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(message);
+  error.<span class="hljs-property">status</span> = status;
+  <span class="hljs-keyword">return</span> error;
+}
+</code></pre>
+<p>A fake only has to be realistic in the ways the code under test looks
+at. The page reads <code>status</code> and <code>message</code>, so that's all this error
+has.</p>
+<h2>Try it</h2>
+<p>In the <code>mockImplementation</code> above, change <code>'999'</code> to the number <code>999</code>
+and run the <code>TicketDetailPage</code> tests. The test waits for a second and
+then fails: <code>Unable to find role=&quot;heading&quot; and name &quot;Ticket not found&quot;</code>. Why did the fake never throw? (What type is every value
+<code>useParams()</code> gives?) Change it back.</p>
+</div>
+    
+  </main>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Settings That Undo Fakes — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/appendix-testing/before-and-after-each-test/setup-js-runs-in-every-file.html">← setup.js Runs in Every File</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/appendix-testing/before-and-after-each-test/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/appendix-testing/fakes/a-function-that-remembers.html">vi.fn(): a Function That Remembers →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>The Settings That Undo Fakes</h1>
+    <p class="lede">mockReset and unstubGlobals are hooks you don&#39;t write. Vitest runs them before every test, so a fake from one test is gone before the next one starts.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Topic 04 shows the fakes Stage 0's tests make. Every fake must be gone
+before the next test, or that test would start with the last one's
+fake. You could undo each one in an <code>afterEach</code>, but two settings do it
+for every test file:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure A.5: the test settings (vite.config.js, excerpt)</span>
+  <span class="hljs-attr">test</span>: {
+    <span class="hljs-comment">// jsdom gives the tests a pretend browser (document, window, ...) so</span>
+    <span class="hljs-comment">// React components can render without a real browser window.</span>
+    <span class="hljs-attr">environment</span>: <span class="hljs-string">&#x27;jsdom&#x27;</span>,
+    <span class="hljs-attr">setupFiles</span>: <span class="hljs-string">&#x27;./src/test/setup.js&#x27;</span>,
+    <span class="hljs-comment">// ...</span>
+    <span class="hljs-attr">unstubGlobals</span>: <span class="hljs-literal">true</span>,
+    <span class="hljs-attr">mockReset</span>: <span class="hljs-literal">true</span>,
+  },
+</code></pre>
+<p>(Stage 0's version, with the comment on the last two settings left
+out.)</p>
+<ul>
+<li><strong><code>unstubGlobals</code></strong> puts back anything a test replaced with
+<code>vi.stubGlobal()</code>, such as <code>fetch</code>.</li>
+<li><strong><code>mockReset</code></strong> makes every fake function forget what it was told to
+return, and what it was called with.</li>
+</ul>
+<p>They're hooks you don't have to write. One detail: Vitest runs them
+<strong>before each test</strong>, not after it. A throwaway test checked this: in an
+<code>afterEach</code>, and even in an <code>afterAll</code> after the last test, the faked
+<code>fetch</code> was still in place. The next test then started with the real
+one. Either way, no test ever sees another test's fake.</p>
+<h2>Order shouldn't matter</h2>
+<p>Tests run in the order they're written. But if every test starts clean,
+any order should pass. Vitest can prove it:</p>
+<pre><code class="hljs language-bash">npx vitest run --sequence.shuffle
+</code></pre>
+<p>runs the tests in a random order. All 13 pass.</p>
+<h2>Try it</h2>
+<ol>
+<li>Run the shuffle command twice, with <code>--reporter=verbose</code>. Is the
+order different each time?</li>
+<li>In <code>vite.config.js</code>, set <code>mockReset: false</code> and run <code>npm test</code>. All
+13 still pass. Read the first line of each <code>HomePage</code> test: why does
+none of them depend on the reset? Set it back to <code>true</code>. (It's a
+safety net: one forgotten line in a later test, and the reset is all
+that stops a leftover answer.)</li>
+</ol>
+</div>
+    
+  </main>
+</body>
+</html>

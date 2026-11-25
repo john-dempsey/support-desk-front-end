@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Five Packages, One Job Each — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/hardening/making-it-yours/try-it-yourself.html">← Try It Yourself</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/appendix-testing/the-pieces/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/appendix-testing/the-pieces/what-npm-test-runs.html">What npm test Runs →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Five Packages, One Job Each</h1>
+    <p class="lede">Vitest runs the tests, jsdom pretends to be a browser, Testing Library puts components on the page and finds things there, jest-dom adds checks, and user-event clicks and types.</p>
+
+    
+
+    
+      <div class="slide-body"><p>You've used a testing framework before, so you know the idea. You write
+small functions that call your code and check what comes back, and a
+tool runs them all and tells you which passed. This appendix is about
+the <strong>particular</strong> tools this app uses, and how each one works
+underneath. Every example comes from the app's own tests.</p>
+<p>Each topic belongs to a stage. It explains the tools that stage's tests
+first used, and needs nothing from later stages. Topics 01 to 05 need
+only Stage 0, so they quote Stage 0's tests: the same files you have in
+your own project, from the template. Some of those files changed in
+later stages, so do these topics' Try its in a copy of the starter as
+it was before you changed it.</p>
+<h2>The packages</h2>
+<p>No single package does everything a front-end test needs. The starter's
+<code>package.json</code> (Figure 0.2, Stage 0, topic 02) installs five for
+testing:</p>
+<table>
+<thead>
+<tr>
+<th>Package</th>
+<th>Its one job</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>vitest</code></td>
+<td>The <strong>test runner</strong>. It finds the test files, runs them and reports. It also gives you <code>describe</code>, <code>it</code>, <code>expect</code>, and <code>vi</code> for fakes.</td>
+</tr>
+<tr>
+<td><code>jsdom</code></td>
+<td>A <strong>pretend browser</strong>, written in JavaScript: <code>document</code>, <code>window</code> and HTML elements, inside Node. No window opens and nothing is drawn.</td>
+</tr>
+<tr>
+<td><code>@testing-library/react</code></td>
+<td>Puts a React component <strong>on</strong> jsdom's page (<code>render</code>), and <strong>finds</strong> things there the way a user would (<code>screen.getByRole(...)</code>).</td>
+</tr>
+<tr>
+<td><code>@testing-library/jest-dom</code></td>
+<td>Extra <strong>checks</strong> for elements, such as <code>toBeInTheDocument()</code> and <code>toHaveTextContent()</code>.</td>
+</tr>
+<tr>
+<td><code>@testing-library/user-event</code></td>
+<td><strong>Acts</strong> like a user: clicking, typing, choosing from a list. It's installed in Stage 0. Stage 2's tests click once with it, and Stage 3's type and choose (topic 08, later in this appendix).</td>
+</tr>
+</tbody>
+</table>
+<p>All five are <code>devDependencies</code>: needed while you build and test the app,
+and never sent to the browser.</p>
+<p>Vitest copies the names of Jest's functions, Jest being the most widely
+used JavaScript test runner. So most of this appendix holds for Jest
+too. The difference that matters here: Vitest is built on Vite, so it
+already understands JSX, ES modules and <code>import.meta.env</code>, using the
+same <code>vite.config.js</code> as <code>npm run dev</code>.</p>
+<h2>Try it</h2>
+<p>In your project folder, run <code>npx vitest --version</code>. Then open
+<code>node_modules/jsdom/package.json</code> and find its <code>&quot;description&quot;</code>. jsdom
+calls itself &quot;A JavaScript implementation of many web standards&quot;. Which
+web standards have the app's components used so far? (Think of what
+<code>document</code> and HTML elements give you.)</p>
+</div>
+    
+  </main>
+</body>
+</html>

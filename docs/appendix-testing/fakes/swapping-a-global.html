@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>vi.stubGlobal(): Swapping a Global — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/appendix-testing/fakes/a-function-that-remembers.html">← vi.fn(): a Function That Remembers</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/appendix-testing/fakes/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/appendix-testing/fakes/replacing-a-whole-module.html">vi.mock(): Replacing a Whole Module →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>vi.stubGlobal(): Swapping a Global</h1>
+    <p class="lede">fetch is a global, looked up by name each time it&#39;s called. vi.stubGlobal replaces it, so client.js calls the fake without being changed at all.</p>
+
+    
+
+    
+      <div class="slide-body"><p><code>client.js</code> never imports <code>fetch</code>. It's a <strong>global</strong>: a property of the
+global object (<code>window</code> in a browser, <code>globalThis</code> anywhere), available
+everywhere by name. And JavaScript looks a global up <strong>when the line
+runs</strong>, not when the file is loaded.</p>
+<p>So if a test replaces the global before calling <code>apiRequest()</code>, this
+line in <code>client.js</code> calls the fake:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure A.7: the call to fetch (src/api/client.js, excerpt)</span>
+    response = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-string">`<span class="hljs-subst">${API_URL}</span><span class="hljs-subst">${path}</span>`</span>, {
+</code></pre>
+<p><code>vi.stubGlobal('fetch', fakeFetch)</code> does two things:</p>
+<ol>
+<li>it remembers the real <code>fetch</code></li>
+<li>it sets <code>globalThis.fetch</code> to the fake</li>
+</ol>
+<p>The remembering is what lets <code>unstubGlobals</code> (topic 03) put the real
+one back before the next test.</p>
+<h2>Why fake fetch at all?</h2>
+<p>Without the fake, the tests would send real requests. They'd pass or
+fail depending on whether the API happened to be running, and they
+couldn't easily cause a <code>400</code> with <code>details</code>, or a <code>204</code>, whenever they
+wanted. With the fake, each test decides exactly what &quot;the API&quot;
+answers.</p>
+<h2>Try it</h2>
+<p>With your API <strong>stopped</strong>, delete the line
+<code>vi.stubGlobal('fetch', fakeFetch);</code> from <code>fakeFetchResponding</code> and run
+<code>npx vitest run src/api</code>. Six tests fail with:</p>
+<pre><code class="hljs">Error: Can&#x27;t reach the API at http://localhost:3000 — is the back-end
+running?
+</code></pre>
+<p>(one line in the terminal). They're calling the real <code>fetch</code> now. Which test still passes, and why?
+(Look at its first line.) Put the line back.</p>
+</div>
+    
+  </main>
+</body>
+</html>

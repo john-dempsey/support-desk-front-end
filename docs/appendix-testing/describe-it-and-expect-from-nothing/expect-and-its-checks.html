@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>expect() and Its Checks — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/appendix-testing/describe-it-and-expect-from-nothing/the-real-thing.html">← The Real Thing</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/appendix-testing/describe-it-and-expect-from-nothing/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/appendix-testing/describe-it-and-expect-from-nothing/tests-that-wait.html">Tests That Wait →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>expect() and Its Checks</h1>
+    <p class="lede">toBe asks &quot;the same value?&quot;, toEqual asks &quot;the same contents?&quot;, and toMatchObject asks &quot;at least these?&quot;. Choosing the wrong one gives a confusing failure.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Vitest's <code>expect(actual)</code> works like yours: it returns an object full of
+checks, and each one throws if it fails. They're called <strong>matchers</strong>.
+Stage 0's <code>client.test.js</code> uses five of them:</p>
+<table>
+<thead>
+<tr>
+<th>Matcher</th>
+<th>Passes when <code>actual</code> ...</th>
+<th>Example in Stage 0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>toBe(x)</code></td>
+<td><strong>is</strong> <code>x</code>: the same value, or the same object</td>
+<td>the URL <code>fetch</code> was called with</td>
+</tr>
+<tr>
+<td><code>toEqual(x)</code></td>
+<td>has the same <strong>contents</strong> as <code>x</code>, all the way down</td>
+<td>the response body</td>
+</tr>
+<tr>
+<td><code>toMatchObject(x)</code></td>
+<td>has <strong>at least</strong> the properties in <code>x</code></td>
+<td>an error's <code>status</code> and <code>message</code></td>
+</tr>
+<tr>
+<td><code>toBeNull()</code></td>
+<td>is <code>null</code></td>
+<td><code>apiRequest()</code> for a <code>204</code></td>
+</tr>
+<tr>
+<td><code>toBeUndefined()</code></td>
+<td>is <code>undefined</code></td>
+<td>the missing <code>Authorization</code> header</td>
+</tr>
+<tr>
+<td><code>.not.toBe(x)</code>, ...</td>
+<td><code>.not</code> in front turns any matcher round</td>
+<td>(not used in Stage 0)</td>
+</tr>
+</tbody>
+</table>
+<h2>toBe or toEqual?</h2>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure A.2: checking an object (src/api/client.test.js, excerpt)</span>
+<span class="hljs-title function_">it</span>(<span class="hljs-string">&#x27;returns the response body on success&#x27;</span>, <span class="hljs-title function_">async</span> () =&gt; {
+  <span class="hljs-title function_">fakeFetchResponding</span>(<span class="hljs-number">200</span>, { <span class="hljs-attr">data</span>: { <span class="hljs-attr">message</span>: <span class="hljs-string">&#x27;Hello world!&#x27;</span> } });
+
+  <span class="hljs-keyword">const</span> responseBody = <span class="hljs-keyword">await</span> <span class="hljs-title function_">apiRequest</span>(<span class="hljs-string">&#x27;/welcome&#x27;</span>);
+
+  <span class="hljs-title function_">expect</span>(responseBody).<span class="hljs-title function_">toEqual</span>({ <span class="hljs-attr">data</span>: { <span class="hljs-attr">message</span>: <span class="hljs-string">&#x27;Hello world!&#x27;</span> } });
+});
+</code></pre>
+<p>(It sits inside the file's <code>describe</code>, so it's indented one level
+further there.)</p>
+<p>For strings, numbers and booleans, <code>toBe</code> is right. For objects and
+arrays, it's almost always wrong: <code>toBe</code> asks whether they're <strong>the
+same object</strong>, and <code>responseBody</code> is a different object from the one
+written in the test, even though its contents match. <code>toEqual</code> compares
+the contents.</p>
+<p><code>toMatchObject</code> is looser still: it ignores any extra properties. A
+thrown error has a stack trace and more, but the test only cares about
+<code>status</code>, <code>message</code> and <code>details</code>.</p>
+<h2>Checks inside checks</h2>
+<pre><code class="hljs language-js">    <span class="hljs-attr">message</span>: expect.<span class="hljs-title function_">stringContaining</span>(<span class="hljs-string">&quot;Can&#x27;t reach the API&quot;</span>),
+</code></pre>
+<p>Inside <code>toMatchObject</code>, <code>expect.stringContaining(...)</code> stands for &quot;any
+string containing this&quot;. The test doesn't need to repeat the whole
+message, which includes the API's address.</p>
+<h2>Try it</h2>
+<ol>
+<li>In Figure A.2, change <code>toEqual</code> to <code>toBe</code> and run <code>npm test</code>. Read
+the failure:<pre><code class="hljs">AssertionError: expected { data: { message: &#x27;Hello world!&#x27; } } to be
+{ data: { message: &#x27;Hello world!&#x27; } } // Object.is equality
+</code></pre>
+(one line in the terminal). The two values print the same, but
+they're different objects. Vitest even suggests the fix underneath.
+Change it back.</li>
+<li>Change it to <code>toMatchObject({ data: {} })</code>. Does it pass? Why?
+Change it back.</li>
+</ol>
+</div>
+    
+  </main>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>setup.js Runs in Every File — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/appendix-testing/before-and-after-each-test/four-hooks.html">← Four Hooks</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/appendix-testing/before-and-after-each-test/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/appendix-testing/before-and-after-each-test/the-settings-that-undo-fakes.html">The Settings That Undo Fakes →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>setup.js Runs in Every File</h1>
+    <p class="lede">setupFiles runs setup.js at the start of every test file, so its afterEach wraps every test in the project. It clears the page each test leaves behind.</p>
+
+    
+
+    
+      <div class="slide-body"><pre><code class="hljs language-js"><span class="hljs-comment">// Figure A.4: before every test file (src/test/setup.js)</span>
+<span class="hljs-keyword">import</span> { afterEach } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;vitest&#x27;</span>;
+<span class="hljs-keyword">import</span> { cleanup } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@testing-library/react&#x27;</span>;
+<span class="hljs-comment">// Adds browser-specific checks to expect(), e.g.</span>
+<span class="hljs-comment">// expect(element).toBeInTheDocument() and .toHaveTextContent(&#x27;...&#x27;).</span>
+<span class="hljs-keyword">import</span> <span class="hljs-string">&#x27;@testing-library/jest-dom/vitest&#x27;</span>;
+
+<span class="hljs-comment">// Removes whatever the last test rendered, so every test starts with an</span>
+<span class="hljs-comment">// empty page.</span>
+<span class="hljs-title function_">afterEach</span>(<span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-title function_">cleanup</span>();
+});
+</code></pre>
+<p>(Stage 0's version.)</p>
+<p><code>vite.config.js</code> says <code>setupFiles: './src/test/setup.js'</code>. So in every
+test file's process, <code>setup.js</code> runs first: step 2 in topic 01's
+diagram. Its <code>afterEach()</code> is saved at the top level of <strong>every</strong> test
+file, before the file's own hooks. That's why it's the outermost layer.
+Writing the hook once in <code>setup.js</code> saves writing it in every file.</p>
+<h2>What cleanup() clears</h2>
+<p>A page test calls <code>render(&lt;HomePage /&gt;)</code>, which puts the component on
+jsdom's page. (Topic 05 shows exactly where.) The next test in the same
+file uses the <strong>same</strong> page. Without <code>cleanup()</code>, the last test's
+component would still be there, and the next test would find two of
+everything.</p>
+<h2>Try it</h2>
+<p>In <code>setup.js</code>, put <code>//</code> in front of <code>cleanup();</code> and run <code>npm test</code>.
+Exactly one test fails:</p>
+<pre><code class="hljs"> FAIL  src/App.test.jsx &gt; App routes &gt; shows the navigation on every page
+TestingLibraryElementError: Found multiple elements with the role
+&quot;navigation&quot; and name &quot;Main&quot;
+</code></pre>
+<p>(The error is one line in the terminal.) The previous test's page is
+still there, navigation and all. Why do the other page tests still
+pass? Look at what each one searches for. Remove the <code>//</code>.</p>
+</div>
+    
+  </main>
+</body>
+</html>

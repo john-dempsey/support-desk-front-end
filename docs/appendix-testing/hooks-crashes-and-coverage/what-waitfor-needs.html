@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What waitFor() Needs From Its Check — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/appendix-testing/hooks-crashes-and-coverage/renderhook-by-hand.html">← renderHook(), by Hand</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/appendix-testing/hooks-crashes-and-coverage/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/appendix-testing/hooks-crashes-and-coverage/faking-what-isnt-the-app.html">Faking What Isn&#39;t the App&#39;s →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>What waitFor() Needs From Its Check</h1>
+    <p class="lede">waitFor() runs its check again and again until it stops throwing. A check that returns false instead of throwing counts as passed at once.</p>
+
+    
+
+    
+      <div class="slide-body"><p><code>findBy...</code> waits for an <strong>element</strong>. <code>waitFor</code> waits for <strong>any</strong>
+check. It's the general tool underneath: <code>findByText('x')</code> is
+<code>waitFor(() =&gt; getByText('x'))</code> (topic 05).</p>
+<pre><code class="hljs language-js"><span class="hljs-keyword">await</span> <span class="hljs-title function_">waitFor</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-title function_">expect</span>(result.<span class="hljs-property">current</span>.<span class="hljs-property">isLoading</span>).<span class="hljs-title function_">toBe</span>(<span class="hljs-literal">false</span>));
+</code></pre>
+<p><code>waitFor(check)</code> calls <code>check</code> straight away, then again every 50 ms
+and whenever the page changes (the same rules as <code>findBy</code>):</p>
+<ul>
+<li>if <code>check</code> <strong>throws</strong>, that try failed: try again later</li>
+<li>if <code>check</code> <strong>doesn't throw</strong>, <code>waitFor</code> finishes</li>
+<li>after 1000 ms of throwing, <code>waitFor</code> fails with the last error</li>
+</ul>
+<p>So the check must <strong>throw</strong> when it's not ready, and an <code>expect</code> is the
+easy way to do that.</p>
+<h2>The mistake that waits for nothing</h2>
+<p>This looks right, but isn't:</p>
+<pre><code class="hljs language-js"><span class="hljs-keyword">await</span> <span class="hljs-title function_">waitFor</span>(<span class="hljs-function">() =&gt;</span> result.<span class="hljs-property">current</span>.<span class="hljs-property">isLoading</span> === <span class="hljs-literal">false</span>);
+</code></pre>
+<p>The arrow function <strong>returns</strong> <code>false</code> while loading, but it doesn't
+throw. To <code>waitFor</code>, not throwing means &quot;done&quot;, so it finishes at once,
+before the fake has answered.</p>
+<h2>Try it</h2>
+<p>In <code>useFetch.test.js</code>'s first test, change the <code>waitFor</code> line to the
+mistaken one above and run
+<code>npx vitest run src/hooks -t &quot;is loading at first&quot;</code>:</p>
+<pre><code class="hljs">AssertionError: expected null to deeply equal [ &#x27;first ticket&#x27; ]
+</code></pre>
+<p>The <code>waitFor</code> line passed. The <strong>next</strong> line failed, because the data
+hadn't arrived. When a test fails just after a <code>waitFor</code>, check the
+<code>waitFor</code> first. Now delete the <code>waitFor</code> line altogether: which line
+fails now? Put it back.</p>
+</div>
+    
+  </main>
+</body>
+</html>

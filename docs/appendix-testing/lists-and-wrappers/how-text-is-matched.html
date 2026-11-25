@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How Text Is Matched — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/appendix-testing/jsdom-and-testing-library/jest-dom-matchers.html">← jest-dom: Checks for Elements</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/appendix-testing/lists-and-wrappers/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/appendix-testing/lists-and-wrappers/within.html">within(): Queries Tied to an Element →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>How Text Is Matched</h1>
+    <p class="lede">A string must match the whole text, capitals and all. A regular expression can match part of it. The All queries return arrays, and Vitest&#39;s toHaveLength and toContain check arrays and strings.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Stage 1's tests find things by text and by name, and they don't always
+pass the whole text. The rules decide when that works.</p>
+<h2>A string matches the whole text</h2>
+<p>On a <code>TicketList</code> showing one unassigned ticket, a throwaway test tried
+these queries:</p>
+<table>
+<thead>
+<tr>
+<th>Query</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>getByText('Unassigned')</code></td>
+<td>finds the <code>&lt;td&gt;</code></td>
+</tr>
+<tr>
+<td><code>getByText('Unassign')</code></td>
+<td><strong>throws</strong>: a string must match the <strong>whole</strong> text</td>
+</tr>
+<tr>
+<td><code>getByText('unassigned')</code></td>
+<td><strong>throws</strong>: capitals count</td>
+</tr>
+<tr>
+<td><code>getByText(/unassigned/i)</code></td>
+<td>finds it: a regular expression matches <strong>part</strong> of the text, and <code>i</code> ignores capitals</td>
+</tr>
+<tr>
+<td><code>getByText('unassign', { exact: false })</code></td>
+<td>finds it: <code>exact: false</code> means &quot;contains, ignoring capitals&quot;</td>
+</tr>
+<tr>
+<td><code>getByRole('link', { name: 'Printer' })</code></td>
+<td><strong>throws</strong>: the name is &quot;Printer on fire&quot;</td>
+</tr>
+<tr>
+<td><code>getByRole('link', { name: /Printer/ })</code></td>
+<td>finds the <code>&lt;a&gt;</code></td>
+</tr>
+</tbody>
+</table>
+<p>Before comparing, Testing Library trims the text and turns every run of
+spaces and line breaks into a single space. So the way the JSX is laid
+out never matters.</p>
+<h2>A row's name is all its cells</h2>
+<p>Figure 1.36 (Stage 1, topic 07) finds a row with
+<code>{ name: /Mouse missing/ }</code>. The accessible name of a table row is the
+text of all its cells, joined with spaces. For the throwaway test's
+ticket it was:</p>
+<pre><code class="hljs">Printer on fire Open Casey Customer Unassigned 8 Oct 2026, 13:00
+</code></pre>
+<p>That's why the test uses a regular expression: matching the whole name
+would tie it to the date, and the date's hour depends on the time zone
+the tests run in.</p>
+<h2>The All queries</h2>
+<table>
+<thead>
+<tr>
+<th>Query</th>
+<th>Finds none</th>
+<th>Finds several</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>getAllBy...</code></td>
+<td>throws</td>
+<td>returns an array of them</td>
+</tr>
+<tr>
+<td><code>queryAllBy...</code></td>
+<td>returns <code>[]</code></td>
+<td>returns an array</td>
+</tr>
+<tr>
+<td><code>findAllBy...</code></td>
+<td>tries again, then rejects</td>
+<td>resolves with an array</td>
+</tr>
+</tbody>
+</table>
+<p>An array is checked with Vitest's own matchers:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure A.12: counting rows (src/components/TicketList.test.jsx, excerpt)</span>
+<span class="hljs-title function_">expect</span>(screen.<span class="hljs-title function_">getAllByRole</span>(<span class="hljs-string">&#x27;row&#x27;</span>)).<span class="hljs-title function_">toHaveLength</span>(<span class="hljs-number">3</span>);
+</code></pre>
+<p><code>toHaveLength(n)</code> works on anything with a <code>length</code>, so strings too.
+Its partner <code>toContain(x)</code> checks that an array has <code>x</code> in it, or that a
+string contains <code>x</code>. <code>formatDate</code>'s test uses it:
+<code>expect(readableDate).toContain('8 Oct 2026')</code>.</p>
+<h2>Try it</h2>
+<p>In <code>TicketList.test.jsx</code>, change <code>{ name: /Mouse missing/ }</code> to
+<code>{ name: 'Mouse missing' }</code> and run the tests. Read the error's list of
+rows: what is the row's full name? Now try <code>/mouse missing/</code> (no <code>i</code>),
+then <code>/mouse missing/i</code>. Change it back.</p>
+</div>
+    
+  </main>
+</body>
+</html>

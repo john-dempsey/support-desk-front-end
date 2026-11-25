@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saving Tests: describe() and it() — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/appendix-testing/the-pieces/a-fresh-world-for-every-file.html">← A Fresh World for Every File</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/appendix-testing/describe-it-and-expect-from-nothing/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/appendix-testing/describe-it-and-expect-from-nothing/running-them.html">Running Them →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Saving Tests: describe() and it()</h1>
+    <p class="lede">it() doesn&#39;t run a test: it saves the function to run later, with its name. describe() runs its function at once, to save a group of tests under one name. expect() is an if and a throw.</p>
+
+    
+
+    
+      <div class="slide-body"><p>The quickest way to see what <code>describe()</code>, <code>it()</code> and <code>expect()</code> do is
+to write them yourself. Over this slide and the next, you'll build a
+working test runner in about 40 lines of plain JavaScript, with no
+packages. It's a simplified copy of what Vitest does, not Vitest's own
+code.</p>
+<h2>Part 1: saving the tests</h2>
+<pre><code class="hljs language-js"><span class="hljs-comment">// mini-runner.js, part 1: saving the tests</span>
+<span class="hljs-keyword">const</span> tests = [];
+<span class="hljs-keyword">let</span> currentGroup = <span class="hljs-string">&#x27;&#x27;</span>;
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">describe</span>(<span class="hljs-params">groupName, defineTests</span>) {
+  currentGroup = groupName;
+  <span class="hljs-title function_">defineTests</span>(); <span class="hljs-comment">// runs the it() calls inside, which only save each test</span>
+  currentGroup = <span class="hljs-string">&#x27;&#x27;</span>;
+}
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">it</span>(<span class="hljs-params">testName, testFunction</span>) {
+  tests.<span class="hljs-title function_">push</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">`<span class="hljs-subst">${currentGroup}</span> &gt; <span class="hljs-subst">${testName}</span>`</span>, testFunction });
+}
+</code></pre>
+<ul>
+<li><strong><code>it()</code> runs nothing.</strong> It puts the test's name and its function in
+an array, to be run later. It's the same idea as an Express route:
+<code>app.get('/tickets', listTickets)</code> doesn't call <code>listTickets</code>, it
+saves it until a request arrives.</li>
+<li><strong><code>describe()</code> calls its function straight away.</strong> That function's
+only job is to call <code>it()</code> a few times. So <code>describe()</code> means &quot;save
+these tests, and put this group name in front of each one&quot;.</li>
+</ul>
+<h2>Part 2: checking a value</h2>
+<pre><code class="hljs language-js"><span class="hljs-comment">// mini-runner.js, part 2: checking a value</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">expect</span>(<span class="hljs-params">actual</span>) {
+  <span class="hljs-keyword">return</span> {
+    <span class="hljs-title function_">toBe</span>(<span class="hljs-params">expected</span>) {
+      <span class="hljs-keyword">if</span> (actual !== expected) {
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">`expected &#x27;<span class="hljs-subst">${actual}</span>&#x27; to be &#x27;<span class="hljs-subst">${expected}</span>&#x27;`</span>);
+      }
+    },
+  };
+}
+</code></pre>
+<p><code>expect(actual)</code> returns an object, and <code>toBe</code> is a method on it.
+That's why the two read as one sentence:
+<code>expect(statusLabel('open')).toBe('open')</code>. The method remembers
+<code>actual</code> (it's a closure) and compares it with <code>expected</code>.</p>
+<p>A check is just an <code>if</code> and a <code>throw</code>. When the values match, <code>toBe</code>
+does nothing at all. When they don't, it throws an error that says what
+was wrong.</p>
+<h2>Try it</h2>
+<p>Before the next slide, predict: if you called <code>it('a test', ...)</code> on its
+own, outside any <code>describe()</code>, what name would be saved? (Read the
+template string in <code>it()</code>.)</p>
+</div>
+    
+  </main>
+</body>
+</html>

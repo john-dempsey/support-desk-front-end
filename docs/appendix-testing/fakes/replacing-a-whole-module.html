@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>vi.mock(): Replacing a Whole Module — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/appendix-testing/fakes/swapping-a-global.html">← vi.stubGlobal(): Swapping a Global</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/appendix-testing/fakes/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/appendix-testing/jsdom-and-testing-library/a-pretend-page.html">A Pretend Page →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>vi.mock(): Replacing a Whole Module</h1>
+    <p class="lede">vi.mock swaps a file for a stand-in whose exported functions are all vi.fn() fakes. Every import of it, the page&#39;s included, gets the stand-in, and Vitest moves the call to the top of the file.</p>
+
+    
+
+    
+      <div class="slide-body"><p><code>HomePage</code> doesn't call <code>fetch</code>. It calls <code>getWelcome()</code>, which it
+imports. To control what the page receives, Stage 0's test replaces the
+<strong>whole module</strong> <code>welcome.api.js</code>:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// Figure A.8: faking an API module (src/pages/HomePage.test.jsx, excerpt)</span>
+<span class="hljs-keyword">import</span> { describe, expect, it, vi } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;vitest&#x27;</span>;
+<span class="hljs-keyword">import</span> { render, screen } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@testing-library/react&#x27;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-title class_">HomePage</span> <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./HomePage.jsx&#x27;</span>;
+<span class="hljs-keyword">import</span> { getWelcome } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;../api/welcome.api.js&#x27;</span>;
+
+vi.<span class="hljs-title function_">mock</span>(<span class="hljs-string">&#x27;../api/welcome.api.js&#x27;</span>);
+
+<span class="hljs-title function_">describe</span>(<span class="hljs-string">&#x27;HomePage&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-title function_">it</span>(<span class="hljs-string">&quot;shows the API&#x27;s welcome message&quot;</span>, <span class="hljs-title function_">async</span> () =&gt; {
+    getWelcome.<span class="hljs-title function_">mockResolvedValue</span>({ <span class="hljs-attr">message</span>: <span class="hljs-string">&#x27;Hello world!&#x27;</span> });
+
+    <span class="hljs-title function_">render</span>(<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">HomePage</span> /&gt;</span></span>);
+
+    <span class="hljs-title function_">expect</span>(<span class="hljs-keyword">await</span> screen.<span class="hljs-title function_">findByText</span>(<span class="hljs-string">&#x27;Hello world!&#x27;</span>)).<span class="hljs-title function_">toBeInTheDocument</span>();
+  });
+</code></pre>
+<p>(Stage 0's version, without its comments.)</p>
+<h2>How it works</h2>
+<p>A module is loaded <strong>once</strong> per process, and every file that imports it
+shares that one copy. <code>vi.mock(path)</code> tells Vitest: &quot;in this test
+file's process, whoever imports this path gets a stand-in instead&quot;.</p>
+<p><img src="/support-desk-front-end/assets/images/vi-mock-swaps-a-module.svg" alt="Diagram: how vi.mock swaps a module. HomePage.test.jsx imports HomePage.jsx, and imports getWelcome. HomePage.jsx also imports getWelcome. Both imports go to the stand-in module, whose getWelcome is a vi.fn() that returns whatever the test told it to. The real welcome.api.js is read once, to see what it exports, and it imports client.js, but fetch() is never called. A note: every import of welcome.api.js in this test file's process gets the stand-in, the page's as well as the test's. vi.mock runs before any import, because Vitest moves it to the top of the file. The real file is never called, so no request is sent."></p>
+<ul>
+<li><strong>The stand-in.</strong> Vitest loads the real file once, to see what it
+exports, and builds a stand-in where every exported function is a
+<code>vi.fn()</code> that returns <code>undefined</code>.</li>
+<li><strong>The same fake everywhere.</strong> The test's <code>getWelcome</code> and the page's
+<code>getWelcome</code> are the same fake. So when the test calls
+<code>getWelcome.mockResolvedValue(...)</code>, it's setting what the page gets.</li>
+<li><strong>Moved to the top.</strong> <code>import</code> lines run before any other code in a
+file. If <code>vi.mock</code> ran where it's written, <code>HomePage.jsx</code> would
+already have the real module. So Vitest moves every <code>vi.mock()</code> call
+above the imports before the file runs. Where you write it doesn't
+matter.</li>
+</ul>
+<h2>Try it</h2>
+<ol>
+<li>Delete the <code>vi.mock(...)</code> line and run <code>npx vitest run src/pages</code>.
+Every test fails with something like
+<code>TypeError: getWelcome.mockResolvedValue is not a function</code>: the
+real <code>getWelcome</code> has no fake methods. Put it back.</li>
+<li>Move the <code>vi.mock(...)</code> line to the very <strong>bottom</strong> of the file. Do
+the tests still pass? Put it back.</li>
+<li>In the first test, delete the <code>getWelcome.mockResolvedValue(...)</code>
+line. The test fails after about a second, and prints the page: just
+the <code>Welcome</code> heading. The fake returned <code>undefined</code>, so there was
+nothing to show. Why is there no loading message, and no error
+either? (Read <code>HomePage.jsx</code>.) Put the line back.</li>
+</ol>
+</div>
+    
+  </main>
+</body>
+</html>

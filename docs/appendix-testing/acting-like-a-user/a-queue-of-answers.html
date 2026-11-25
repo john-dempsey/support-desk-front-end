@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A Queue of Answers — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/appendix-testing/acting-like-a-user/what-userevent-fires.html">← What userEvent Fires</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/appendix-testing/acting-like-a-user/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/appendix-testing/acting-like-a-user/matching-part-of-a-value.html">Matching Part of a Value →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>A Queue of Answers</h1>
+    <p class="lede">Each ...Once answer is used for one call, in the order they were given. When the queue is empty, the fake falls back to its everyday answer, or undefined.</p>
+
+    
+
+    
+      <div class="slide-body"><p>A <code>vi.fn()</code> fake keeps two kinds of answer:</p>
+<ul>
+<li>an <strong>everyday answer</strong>, from <code>mockReturnValue</code>, <code>mockResolvedValue</code>,
+<code>mockImplementation</code>, ...</li>
+<li>a <strong>queue</strong> of one-off answers, from <code>mockReturnValueOnce</code>,
+<code>mockResolvedValueOnce</code>, ...</li>
+</ul>
+<p>On each call it takes the next answer from the queue, if there is one.
+Only when the queue is empty does it use the everyday answer. A
+throwaway test showed the rules:</p>
+<pre><code class="hljs language-js"><span class="hljs-keyword">const</span> fake = vi.<span class="hljs-title function_">fn</span>()
+  .<span class="hljs-title function_">mockReturnValue</span>(<span class="hljs-string">&#x27;default&#x27;</span>)
+  .<span class="hljs-title function_">mockReturnValueOnce</span>(<span class="hljs-string">&#x27;first&#x27;</span>)
+  .<span class="hljs-title function_">mockReturnValueOnce</span>(<span class="hljs-string">&#x27;second&#x27;</span>);
+<span class="hljs-title function_">fake</span>(); <span class="hljs-title function_">fake</span>(); <span class="hljs-title function_">fake</span>(); <span class="hljs-title function_">fake</span>();
+<span class="hljs-comment">// &#x27;first&#x27;, &#x27;second&#x27;, &#x27;default&#x27;, &#x27;default&#x27;</span>
+
+<span class="hljs-keyword">const</span> bare = vi.<span class="hljs-title function_">fn</span>().<span class="hljs-title function_">mockReturnValueOnce</span>(<span class="hljs-string">&#x27;only&#x27;</span>);
+<span class="hljs-title function_">bare</span>(); <span class="hljs-title function_">bare</span>();
+<span class="hljs-comment">// &#x27;only&#x27;, undefined</span>
+</code></pre>
+<p>The order you <strong>write</strong> them in doesn't matter: <code>'default'</code> was given
+first, but the queue was still used first. (Each method returns the
+fake itself, which is why they can be chained with dots.)</p>
+<h2>An everyday answer for every test</h2>
+<p>Stage 3's <code>TicketDetailPage</code> loads a ticket <strong>and</strong> its comments. Most
+of its tests don't care about comments, so a <code>beforeEach</code> gives
+<code>getComments</code> an everyday answer, <code>getComments.mockResolvedValue([])</code>
+(Figure 3.64, Stage 3, topic 10).</p>
+<p><code>mockReset</code> (topic 03) wipes it before each test, and this <code>beforeEach</code>
+then sets it again. A test about comments sets its own answer
+afterwards, which replaces it.</p>
+<h2>Try it</h2>
+<p><code>TagsPage</code>'s &quot;adds a tag&quot; test queues two answers for <code>getTags</code>: one for
+when the page loads, one for after the new tag is added (Figure 3.63,
+Stage 3, topic 10). Delete the <strong>second</strong> <code>mockResolvedValueOnce</code> and
+run <code>npx vitest run src/pages/TagsPage.test.jsx</code>. The test fails after
+a second: <code>Unable to find an element with the text: urgent</code>. What did
+the fake answer for the second call? Put it back.</p>
+</div>
+    
+  </main>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 470" width="860" height="470" role="img" aria-labelledby="title desc" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <title id="title">What one npm test run does</title>
+  <desc id="desc">At the top, npm test starts vitest run, which finds the three test files by their names. Each file then runs in a separate process, side by side. In each process, five steps: build a new jsdom page, run setup.js, read the test file to collect its tests, run the tests one at a time, and send the results back. At the bottom, Vitest combines the results and prints the summary: 3 test files passed, 13 tests passed. A note: nothing is shared between files, each has its own page and its own copy of every module.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#1a1a1a"/>
+    </marker>
+  </defs>
+  <rect width="860" height="470" fill="#ffffff"/>
+
+  <rect x="230" y="16" width="400" height="58" rx="6" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5"/>
+  <text x="430" y="40" font-size="14" font-weight="700" fill="#1a1a1a" text-anchor="middle" font-family="ui-monospace, Consolas, monospace">npm test → vitest run</text>
+  <text x="430" y="62" font-size="12" fill="#3d444d" text-anchor="middle">finds every *.test.js and *.test.jsx file by its name</text>
+
+  <line x1="330" y1="76" x2="150" y2="110" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="430" y1="76" x2="430" y2="110" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="530" y1="76" x2="710" y2="110" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <g font-size="12" fill="#3d444d">
+    <rect x="20" y="114" width="260" height="214" rx="6" fill="#f6f8fa" stroke="#59636e" stroke-width="1.5"/>
+    <text x="150" y="138" font-size="13" font-weight="700" fill="#1a1a1a" text-anchor="middle" font-family="ui-monospace, Consolas, monospace">client.test.js</text>
+    <text x="150" y="156" font-size="11" fill="#59636e" text-anchor="middle">a separate process</text>
+    <text x="36" y="186">1. build a new jsdom page</text>
+    <text x="36" y="212">2. run setup.js</text>
+    <text x="36" y="238">3. read the file: collect its tests</text>
+    <text x="36" y="264">4. run the tests, one at a time</text>
+    <text x="36" y="290">5. send the results back</text>
+    <text x="150" y="316" font-size="11" fill="#59636e" text-anchor="middle">7 tests</text>
+
+    <rect x="300" y="114" width="260" height="214" rx="6" fill="#f6f8fa" stroke="#59636e" stroke-width="1.5"/>
+    <text x="430" y="138" font-size="13" font-weight="700" fill="#1a1a1a" text-anchor="middle" font-family="ui-monospace, Consolas, monospace">HomePage.test.jsx</text>
+    <text x="430" y="156" font-size="11" fill="#59636e" text-anchor="middle">a separate process</text>
+    <text x="316" y="186">1. build a new jsdom page</text>
+    <text x="316" y="212">2. run setup.js</text>
+    <text x="316" y="238">3. read the file: collect its tests</text>
+    <text x="316" y="264">4. run the tests, one at a time</text>
+    <text x="316" y="290">5. send the results back</text>
+    <text x="430" y="316" font-size="11" fill="#59636e" text-anchor="middle">3 tests</text>
+
+    <rect x="580" y="114" width="260" height="214" rx="6" fill="#f6f8fa" stroke="#59636e" stroke-width="1.5"/>
+    <text x="710" y="138" font-size="13" font-weight="700" fill="#1a1a1a" text-anchor="middle" font-family="ui-monospace, Consolas, monospace">App.test.jsx</text>
+    <text x="710" y="156" font-size="11" fill="#59636e" text-anchor="middle">a separate process</text>
+    <text x="596" y="186">1. build a new jsdom page</text>
+    <text x="596" y="212">2. run setup.js</text>
+    <text x="596" y="238">3. read the file: collect its tests</text>
+    <text x="596" y="264">4. run the tests, one at a time</text>
+    <text x="596" y="290">5. send the results back</text>
+    <text x="710" y="316" font-size="11" fill="#59636e" text-anchor="middle">3 tests</text>
+  </g>
+
+  <line x1="150" y1="330" x2="330" y2="364" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="430" y1="330" x2="430" y2="364" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="710" y1="330" x2="530" y2="364" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="230" y="368" width="400" height="52" rx="6" fill="#dafbe1" stroke="#116329" stroke-width="1.5"/>
+  <text x="430" y="390" font-size="12" fill="#1a1a1a" text-anchor="middle" font-family="ui-monospace, Consolas, monospace">Test Files  3 passed (3)</text>
+  <text x="430" y="408" font-size="12" fill="#1a1a1a" text-anchor="middle" font-family="ui-monospace, Consolas, monospace">     Tests  13 passed (13)</text>
+
+  <rect x="20" y="432" width="820" height="30" rx="6" fill="#ddf4ff" stroke="#0550ae" stroke-width="1.5"/>
+  <text x="34" y="452" font-size="12" fill="#1a1a1a">Nothing is shared between files: each one has its own page and its own copy of every module. Tests in the same file do share them.</text>
+</svg>

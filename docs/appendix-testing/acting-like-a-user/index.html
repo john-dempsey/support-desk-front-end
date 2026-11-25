@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Acting Like a User — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/appendix-testing/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Acting Like a User</h1>
+    <p class="lede">Needs Stage 3. What userEvent fires for one keypress, how a fake&#39;s queue of one-off answers works, matchers that match part of a value, vi.spyOn, and jest-dom&#39;s checks for form controls.</p>
+
+    
+      <ul class="listing">
+        
+          <li>
+            <a href="/support-desk-front-end/appendix-testing/acting-like-a-user/what-userevent-fires.html">What userEvent Fires</a>
+            <p>userEvent.type() doesn&#39;t set the input&#39;s value. It clicks the input, then presses each key, firing the same events a browser would, and waits for React after each one.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/appendix-testing/acting-like-a-user/a-queue-of-answers.html">A Queue of Answers</a>
+            <p>Each ...Once answer is used for one call, in the order they were given. When the queue is empty, the fake falls back to its everyday answer, or undefined.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/appendix-testing/acting-like-a-user/matching-part-of-a-value.html">Matching Part of a Value</a>
+            <p>expect.objectContaining and its relatives are stand-ins that toEqual and toHaveBeenCalledWith ask &quot;do you match this?&quot;. toHaveBeenLastCalledWith only looks at the latest call.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/appendix-testing/acting-like-a-user/vi-spyon.html">vi.spyOn(): One Method on a Real Object</a>
+            <p>jsdom has no confirmation box: its window.confirm() complains and returns undefined. vi.spyOn swaps that one method for a fake, and mockReset makes it call the real one again.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/appendix-testing/acting-like-a-user/checks-for-form-controls.html">Checks for Form Controls</a>
+            <p>jest-dom has checks for what a form control holds and how a screen reader describes it. toHaveAccessibleDescription follows aria-describedby to the error message.</p>
+          </li>
+        
+      </ul>
+    
+
+    
+  </main>
+</body>
+</html>

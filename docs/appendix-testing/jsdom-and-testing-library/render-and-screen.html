@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>render() and screen — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/appendix-testing/jsdom-and-testing-library/a-pretend-page.html">← A Pretend Page</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/appendix-testing/jsdom-and-testing-library/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/appendix-testing/jsdom-and-testing-library/how-a-query-finds-an-element.html">How a Query Finds an Element →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>render() and screen</h1>
+    <p class="lede">render() adds a &lt;div&gt; to jsdom&#39;s page and has React draw the component into it, effects and all. screen searches the whole page, and screen.debug() prints it.</p>
+
+    
+
+    
+      <div class="slide-body"><pre><code class="hljs language-js"><span class="hljs-comment">// Figure A.9: the loading state (src/pages/HomePage.test.jsx, excerpt)</span>
+<span class="hljs-title function_">it</span>(<span class="hljs-string">&#x27;shows a loading message while waiting for the API&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-comment">// A promise that never resolves keeps the page in its loading state.</span>
+  getWelcome.<span class="hljs-title function_">mockReturnValue</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Promise</span>(<span class="hljs-function">() =&gt;</span> {}));
+
+  <span class="hljs-title function_">render</span>(<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">HomePage</span> /&gt;</span></span>);
+
+  <span class="hljs-title function_">expect</span>(screen.<span class="hljs-title function_">getByRole</span>(<span class="hljs-string">&#x27;status&#x27;</span>)).<span class="hljs-title function_">toHaveTextContent</span>(
+    <span class="hljs-string">&#x27;Connecting to the API&#x27;</span>,
+  );
+});
+</code></pre>
+<p>(Stage 0's version. It's indented one level further in the file, and the
+last statement is one line there.)</p>
+<h2>render()</h2>
+<p><code>render(&lt;HomePage /&gt;)</code>, from React Testing Library:</p>
+<ol>
+<li>creates a <code>&lt;div&gt;</code> and adds it to jsdom's <code>document.body</code></li>
+<li>has React draw <code>&lt;HomePage /&gt;</code> into that <code>&lt;div&gt;</code>, the same job
+<code>main.jsx</code> does with the <code>root</code> element in the real app</li>
+<li>waits until React has finished, <strong>including running the component's
+effects</strong>, and only then returns</li>
+</ol>
+<p>So by the next line, <code>HomePage</code>'s effect has already called
+<code>getWelcome()</code>, and the page shows whatever it shows while it waits.
+(A throwaway test confirmed it: straight after <code>render</code>, <code>getWelcome</code>
+had been called once, and <code>document.body</code> held one <code>&lt;div&gt;</code>.)</p>
+<p>This test's fake returns a promise that <strong>never</strong> settles, so the page
+stays in its loading state for as long as the test wants to look.</p>
+<h2>screen</h2>
+<p><code>screen</code> is a set of <strong>queries</strong> (slides 03 and 04) that search
+all of <code>document.body</code>. Whatever <code>render</code> added is in there.
+<code>screen.debug()</code> prints what's there, which is the best way to find out
+why a query can't find something.</p>
+<h2>Try it</h2>
+<p>Add <code>screen.debug();</code> straight after <code>render(&lt;HomePage /&gt;);</code> in Figure
+A.9, and run <code>npx vitest run src/pages -t loading</code>. It prints:</p>
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>
+      Welcome
+    <span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">p</span>
+      <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;loading&quot;</span>
+      <span class="hljs-attr">role</span>=<span class="hljs-string">&quot;status&quot;</span>
+    &gt;</span>
+      Connecting to the API…
+    <span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
+</code></pre>
+<p>Find the <code>&lt;div&gt;</code> that <code>render</code> added, and the element that
+<code>getByRole('status')</code> found. Remove the line.</p>
+</div>
+    
+  </main>
+</body>
+</html>

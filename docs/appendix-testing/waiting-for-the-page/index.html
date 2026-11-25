@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Waiting for the Page — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/appendix-testing/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Waiting for the Page</h1>
+    <p class="lede">Needs Stage 2. Why a fake&#39;s answer arrives after render() returns, what every mock...Value method is short for, how toHaveBeenCalledWith compares, and why vi.stubEnv only works on code that reads the value late.</p>
+
+    
+      <ul class="listing">
+        
+          <li>
+            <a href="/support-desk-front-end/appendix-testing/waiting-for-the-page/why-the-answer-comes-later.html">Why the Answer Comes Later</a>
+            <p>A fake that resolves at once still answers after render() returns, because an await always waits for the running code to finish. findBy gives the page that chance.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/appendix-testing/waiting-for-the-page/every-fake-is-a-function.html">Every Fake Is a Function Underneath</a>
+            <p>mockResolvedValue and the rest are shortcuts for mockImplementation, which gives the fake a whole function to run. That function sees the arguments, so it can answer differently for each.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/appendix-testing/waiting-for-the-page/checking-the-calls.html">Checking the Calls</a>
+            <p>toHaveBeenCalledWith reads the fake&#39;s mock.calls for you, and passes if any one call had exactly these arguments. Its failure message lists every call it saw.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/appendix-testing/waiting-for-the-page/reading-env-late.html">Reading .env Late</a>
+            <p>vi.stubEnv changes import.meta.env while the test runs. It only works because getToken() reads the value each time it&#39;s called, not once when the file loads.</p>
+          </li>
+        
+      </ul>
+    
+
+    
+  </main>
+</body>
+</html>

@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vitest at a Glance — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/appendix-testing/hooks-crashes-and-coverage/how-coverage-is-counted.html">← How Coverage Is Counted</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/appendix-testing/quick-reference/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/appendix-testing/quick-reference/testing-library.html">Testing Library, user-event and jest-dom at a Glance →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Vitest at a Glance</h1>
+    <p class="lede">describe, it, hooks, matchers, stand-ins, fakes and settings: every part of Vitest the app&#39;s tests use, with the topic that explains it.</p>
+
+    
+
+    
+      <div class="slide-body"><p>Everything here is imported from <code>'vitest'</code>. The last column is the
+topic of this appendix that explains it.</p>
+<h2>Structure</h2>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Does</th>
+<th>Topic</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>describe(name, fn)</code></td>
+<td>runs <code>fn</code> at once to save a group of tests under <code>name</code></td>
+<td>02</td>
+</tr>
+<tr>
+<td><code>it(name, fn)</code></td>
+<td>saves a test, to run later; it passes if <code>fn</code> doesn't throw (<code>test</code> is the same)</td>
+<td>02</td>
+</tr>
+<tr>
+<td><code>it.only</code>, <code>it.skip</code></td>
+<td>run only this test / skip this test</td>
+<td>02</td>
+</tr>
+<tr>
+<td><code>beforeEach(fn)</code>, <code>afterEach(fn)</code></td>
+<td>save <code>fn</code> to run before / after every test</td>
+<td>03</td>
+</tr>
+</tbody>
+</table>
+<h2>Checks: <code>expect(value).matcher(...)</code></h2>
+<table>
+<thead>
+<tr>
+<th>Matcher</th>
+<th>Passes when the value ...</th>
+<th>Topic</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>toBe(x)</code></td>
+<td>is <code>x</code> (the same value, or the same object)</td>
+<td>02</td>
+</tr>
+<tr>
+<td><code>toEqual(x)</code></td>
+<td>has the same contents as <code>x</code></td>
+<td>02</td>
+</tr>
+<tr>
+<td><code>toMatchObject(x)</code></td>
+<td>has at least the properties in <code>x</code></td>
+<td>02</td>
+</tr>
+<tr>
+<td><code>toBeNull()</code>, <code>toBeUndefined()</code></td>
+<td>is <code>null</code> / <code>undefined</code></td>
+<td>02</td>
+</tr>
+<tr>
+<td><code>toHaveLength(n)</code></td>
+<td>has <code>length</code> <code>n</code> (array or string)</td>
+<td>06</td>
+</tr>
+<tr>
+<td><code>toContain(x)</code></td>
+<td>is an array holding <code>x</code>, or a string containing <code>x</code></td>
+<td>06</td>
+</tr>
+<tr>
+<td><code>toHaveBeenCalled()</code></td>
+<td>is a fake that was called at least once</td>
+<td>04</td>
+</tr>
+<tr>
+<td><code>toHaveBeenCalledWith(...)</code></td>
+<td>is a fake that was called with these arguments, in any call</td>
+<td>07</td>
+</tr>
+<tr>
+<td><code>toHaveBeenLastCalledWith(...)</code></td>
+<td>... in its <strong>latest</strong> call</td>
+<td>08</td>
+</tr>
+<tr>
+<td><code>toHaveBeenCalledTimes(n)</code></td>
+<td>is a fake called exactly <code>n</code> times</td>
+<td>07</td>
+</tr>
+<tr>
+<td><code>.not.</code></td>
+<td>turns any matcher round</td>
+<td>02</td>
+</tr>
+<tr>
+<td><code>await expect(promise).rejects.</code></td>
+<td>waits for <code>promise</code> to fail, then checks the error</td>
+<td>02</td>
+</tr>
+</tbody>
+</table>
+<h2>Stand-ins, inside an expected value</h2>
+<table>
+<thead>
+<tr>
+<th>Stand-in</th>
+<th>Matches</th>
+<th>Topic</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>expect.objectContaining({...})</code></td>
+<td>an object with at least these properties</td>
+<td>08</td>
+</tr>
+<tr>
+<td><code>expect.stringContaining('...')</code></td>
+<td>a string containing this</td>
+<td>02</td>
+</tr>
+</tbody>
+</table>
+<h2>Fakes</h2>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Does</th>
+<th>Topic</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>vi.fn()</code></td>
+<td>makes a fake function that records its calls in <code>.mock.calls</code></td>
+<td>04</td>
+</tr>
+<tr>
+<td><code>.mockReturnValue(x)</code>, <code>.mockResolvedValue(x)</code>, <code>.mockRejectedValue(e)</code></td>
+<td>sets the fake's everyday answer</td>
+<td>04, 07</td>
+</tr>
+<tr>
+<td><code>.mockImplementation(fn)</code></td>
+<td>the fake runs <code>fn</code>, with the same arguments</td>
+<td>07</td>
+</tr>
+<tr>
+<td><code>.mockReturnValueOnce(x)</code>, <code>.mockResolvedValueOnce(x)</code></td>
+<td>adds a one-off answer to the queue</td>
+<td>08</td>
+</tr>
+<tr>
+<td><code>vi.mock(path)</code></td>
+<td>replaces a module: every function becomes a <code>vi.fn()</code></td>
+<td>04</td>
+</tr>
+<tr>
+<td><code>vi.mock(path, factory)</code></td>
+<td>replaces a module with what <code>factory</code> returns</td>
+<td>10</td>
+</tr>
+<tr>
+<td><code>vi.hoisted(fn)</code></td>
+<td>runs <code>fn</code> at the very top, before the imports</td>
+<td>10</td>
+</tr>
+<tr>
+<td><code>vi.spyOn(object, 'method')</code></td>
+<td>replaces one method of an existing object</td>
+<td>08</td>
+</tr>
+<tr>
+<td><code>vi.stubGlobal(name, value)</code></td>
+<td>replaces a global, such as <code>fetch</code></td>
+<td>04</td>
+</tr>
+<tr>
+<td><code>vi.stubEnv(name, value)</code></td>
+<td>replaces an <code>import.meta.env</code> value</td>
+<td>07</td>
+</tr>
+</tbody>
+</table>
+<h2>Settings (<code>test</code> in <code>vite.config.js</code>)</h2>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Does</th>
+<th>Topic</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>environment: 'jsdom'</code></td>
+<td>gives every test file a pretend page</td>
+<td>01, 05</td>
+</tr>
+<tr>
+<td><code>setupFiles</code></td>
+<td>runs <code>setup.js</code> at the start of every test file</td>
+<td>03</td>
+</tr>
+<tr>
+<td><code>mockReset</code>, <code>unstubGlobals</code>, <code>unstubEnvs</code></td>
+<td>undo every fake before each test</td>
+<td>03</td>
+</tr>
+<tr>
+<td><code>coverage</code></td>
+<td>which files <code>npm run coverage</code> reports on</td>
+<td>11</td>
+</tr>
+</tbody>
+</table>
+<h2>Try it</h2>
+<p>Pick three rows you'd find hardest to explain in a viva. For each, find
+one use in the app (<code>grep -rn &quot;toHaveBeenLastCalledWith&quot; src</code> finds
+them), re-read its topic, and explain the line out loud: what would
+make it fail?</p>
+</div>
+    
+  </main>
+</body>
+</html>

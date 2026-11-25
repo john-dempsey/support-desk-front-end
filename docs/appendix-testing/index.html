@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Appendix A: How the Testing Tools Work — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Appendix A: How the Testing Tools Work</h1>
+    <p class="lede">What describe(), it(), expect(), vi.fn(), render() and the rest actually do, explained from the ground up with the app&#39;s own tests, in the order the stages first use them.</p>
+
+    
+      <ul class="listing">
+        
+          <li>
+            <a href="/support-desk-front-end/appendix-testing/the-pieces/index.html">The Pieces, and What npm test Does</a>
+            <p>Needs Stage 0. Five packages, each with one job, and what happens between typing npm test and seeing &quot;13 passed&quot;.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/appendix-testing/describe-it-and-expect-from-nothing/index.html">describe, it and expect From Nothing</a>
+            <p>Needs Stage 0. A homemade test runner in plain JavaScript shows that it() only saves a test and expect() only throws. Then the real ones: names, checks, and tests that wait.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/appendix-testing/before-and-after-each-test/index.html">Before and After Each Test</a>
+            <p>Needs Stage 0. Hooks run code around every test. setup.js uses one to clear the page, and two settings in vite.config.js undo every fake, so each test starts clean.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/appendix-testing/fakes/index.html">Fakes: vi.fn, vi.stubGlobal and vi.mock</a>
+            <p>Needs Stage 0. A fake function that records its calls and answers as it&#39;s told, a global swapped for one, and a whole module replaced by fakes.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/appendix-testing/jsdom-and-testing-library/index.html">A Browser With No Window: jsdom and Testing Library</a>
+            <p>Needs Stage 0. jsdom gives Node a pretend page, render() puts a component on it, queries find elements the way a screen reader does, and jest-dom adds checks for them.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/appendix-testing/lists-and-wrappers/index.html">Lists and Wrappers</a>
+            <p>Needs Stage 1. How a query decides that text matches, what within() really is, and why a test has to rebuild whatever main.jsx wraps around the app.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/appendix-testing/waiting-for-the-page/index.html">Waiting for the Page</a>
+            <p>Needs Stage 2. Why a fake&#39;s answer arrives after render() returns, what every mock...Value method is short for, how toHaveBeenCalledWith compares, and why vi.stubEnv only works on code that reads the value late.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/appendix-testing/acting-like-a-user/index.html">Acting Like a User</a>
+            <p>Needs Stage 3. What userEvent fires for one keypress, how a fake&#39;s queue of one-off answers works, matchers that match part of a value, vi.spyOn, and jest-dom&#39;s checks for form controls.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/appendix-testing/helpers-that-build-the-world/index.html">Helpers That Build the World</a>
+            <p>Needs Stage 4. Stage 4 adds few new tools. Instead, its tests lean on a helper that makes fresh fakes and hands them back, and on jsdom&#39;s real localStorage, which a file&#39;s tests share.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/appendix-testing/changes-from-outside-react/index.html">Changes From Outside React</a>
+            <p>Needs Stage 5. What act() does and why you rarely see it, the order Vitest runs a file with a mock factory in, and why rerender() is not the same as rendering again.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/appendix-testing/hooks-crashes-and-coverage/index.html">Hooks, Crashes and Coverage</a>
+            <p>Needs Stage 6. renderHook() built by hand, what waitFor() needs from its check, two fakes for things that aren&#39;t the app&#39;s (console.error and DEV), and how a coverage report is counted.</p>
+          </li>
+        
+          <li>
+            <a href="/support-desk-front-end/appendix-testing/quick-reference/index.html">Quick Reference</a>
+            <p>Every testing function the finished app&#39;s tests use, what it does in a line, and the topic of this appendix that explains it.</p>
+          </li>
+        
+      </ul>
+    
+
+    
+  </main>
+</body>
+</html>

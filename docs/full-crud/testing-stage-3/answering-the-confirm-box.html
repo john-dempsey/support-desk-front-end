@@ -69,8 +69,8 @@ early <code>return</code> (topic 06, slide 02) works: no request is sent at all.
 <h2>Putting it back</h2>
 <p>The fake must not leak into the next test, or a later test might get
 an answer it didn't ask for. <code>vite.config.js</code> sets <code>mockReset: true</code>,
-which puts every <code>vi.spyOn()</code> back to the real function after each test
-(Stage 0, topic 08). So no test needs to tidy up after itself.</p>
+which makes every <code>vi.spyOn()</code> call the real function again before the
+next test (Stage 0, topic 08). So no test needs to tidy up after itself.</p>
 <h2>Try it</h2>
 <p>Write the test that README exercise 6 asks for: in <code>TagsPage.test.jsx</code>,
 check that clicking <strong>Delete bug</strong> and then Cancel doesn't call

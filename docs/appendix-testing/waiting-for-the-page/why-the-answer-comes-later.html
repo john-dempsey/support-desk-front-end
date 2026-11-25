@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Why the Answer Comes Later — Support Desk Front-End</title>
+  <link rel="stylesheet" href="/support-desk-front-end/assets/hljs-theme.css">
+  <link rel="stylesheet" href="/support-desk-front-end/assets/style.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div class="nav-slot nav-slot-left">
+        <a class="nav-home" href="/support-desk-front-end/index.html" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 12 3l9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+        </a>
+        <a class="nav-prev" href="/support-desk-front-end/appendix-testing/lists-and-wrappers/rebuilding-the-wrappers.html">← Rebuilding the Wrappers</a>
+      </div>
+      <div class="nav-slot nav-slot-center">
+        <a class="nav-up" href="/support-desk-front-end/appendix-testing/waiting-for-the-page/index.html">↑ Up</a>
+      </div>
+      <div class="nav-slot nav-slot-right">
+        <a class="nav-next" href="/support-desk-front-end/appendix-testing/waiting-for-the-page/every-fake-is-a-function.html">Every Fake Is a Function Underneath →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Why the Answer Comes Later</h1>
+    <p class="lede">A fake that resolves at once still answers after render() returns, because an await always waits for the running code to finish. findBy gives the page that chance.</p>
+
+    
+
+    
+      <div class="slide-body"><pre><code class="hljs language-js"><span class="hljs-comment">// Figure A.15: waiting for the ticket</span>
+<span class="hljs-comment">// (src/pages/TicketDetailPage.test.jsx, excerpt)</span>
+<span class="hljs-title function_">it</span>(<span class="hljs-string">&#x27;shows the ticket from the API&#x27;</span>, <span class="hljs-title function_">async</span> () =&gt; {
+  getTicket.<span class="hljs-title function_">mockResolvedValue</span>(unassignedTicket);
+
+  <span class="hljs-title function_">renderPageAt</span>(<span class="hljs-string">&#x27;/tickets/2&#x27;</span>);
+
+  <span class="hljs-title function_">expect</span>(
+    <span class="hljs-keyword">await</span> screen.<span class="hljs-title function_">findByRole</span>(<span class="hljs-string">&#x27;heading&#x27;</span>, {
+      <span class="hljs-attr">level</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Invoice discrepancy&#x27;</span>,
+    }),
+  ).<span class="hljs-title function_">toBeInTheDocument</span>();
+</code></pre>
+<p>(Stage 2's version, with the first <code>expect</code> reflowed to fit and the
+test's other three checks left out. It's indented one level further in
+the file.)</p>
+<p>The fake's promise has <strong>already resolved</strong> before the page even asks
+for it. So why can't the test use <code>getByRole</code> straight after
+<code>renderPageAt</code>? A throwaway test checked: straight after <code>render</code>, the
+heading wasn't there, and the loading message was.</p>
+<h2>await always waits its turn</h2>
+<p>JavaScript runs one piece of code at a time. When code reaches <code>await</code>,
+it stops there, and the rest of it is put in a queue to run later. That
+happens <strong>even when the promise has already resolved</strong>: the rest only
+runs once the code that's running now has finished.</p>
+<p><img src="/support-desk-front-end/assets/images/findby-waits.svg" alt="Diagram: when the fake's answer arrives, and how findBy waits for it. Two lanes, the test above and the page below, with time running left to right. 1: the test calls getTicket.mockResolvedValue with a ticket. 2: the test calls render; the page draws Loading the ticket, and its effect reaches await getTicket of 2. The promise has already resolved, but an await still waits until the code that's running now has finished. 3: render returns and the page says Loading, so getBy would throw here. 4: the test reaches await findByRole; the first try finds nothing, and the test waits. 5: the page's await finishes: the test is waiting, so the page's code gets its turn; it saves the ticket in state and React draws the heading. 6: the page changed, so findByRole tries again, finds the heading, and the test carries on. A note: if nothing turns up, findBy tries every 50 ms, for up to 1 s."></p>
+<p>The code running at step 2 is <strong>the test</strong>. So the page's <code>await</code> can't
+finish until the test itself stops and waits, which it does at step 4,
+on <code>await screen.findByRole(...)</code>. That's the page's chance: its code
+runs, the ticket is saved in state, and React draws it. <code>findByRole</code>
+notices the page changed, tries again, and finds the heading.</p>
+<p>So <code>findBy</code> isn't only &quot;wait a bit&quot;. By waiting, the test <strong>lets</strong> the
+page finish.</p>
+<h2>Try it</h2>
+<p>In Figure A.15, change <code>await screen.findByRole(</code> to
+<code>screen.getByRole(</code> (no <code>await</code>) and run
+<code>npx vitest run src/pages/TicketDetailPage.test.jsx</code>. The error prints
+the page: what does it show instead of the ticket? Change it back.</p>
+</div>
+    
+  </main>
+</body>
+</html>
